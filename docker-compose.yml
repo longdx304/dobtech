@@ -1,107 +1,43 @@
-version: "3.8"
+version: "3.9"
 services:
     backend:
         build:
-            dockerfile: Dockerfile
             context: ./backend
+            dockerfile: Dockerfile
+        image: backend:test
         container_name: medusa-server
-        restart: always
         depends_on:
-            postgres:
-                condition: service_healthy
-            redis:
-                condition: service_started
-            # minio:
-            #     condition: service_started
-        volumes:
-            - ./backend:/app/medusa
-            - backend_node_modules:/app/medusa/node_modules
+            - postgres
+            - redis
         ports:
-            - "9000:9000"
+            - 9000:9000
+            - 7001:7001
         environment:
-            NODE_ENV: development
+            DATABASE_TYPE: postgres
             DATABASE_URL: postgres://admin:admin@postgres:5432/medusa_db
             REDIS_URL: redis://cache
+            NODE_ENV: development
             JWT_SECRET: some_jwt_secret
             COOKIE_SECRET: some_cookie_secret
-            # MINIO_ENDPOINT: http://minio:9000
-            # MINIO_BUCKET: medusa-bucket
-            # MINIO_ACCESS_KEY: 7nR9aSt9LR32Py3o
-            # MINIO_SECRET_KEY: ath8oTjP2rLdhY08EwLMUZksvWwhPyGv
+            MEDUSA_ADMIN_ONBOARDING_TYPE: default
+            STORE_CORS: http://localhost:8000,http://localhost:7001
 
     postgres:
-        image: postgres:10.4-alpine
-        restart: always
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U postgres"]
-            interval: 5s
-            timeout: 5s
-            retries: 5
-        expose:
-            - 5432
+        image: postgres:16-alpine
         volumes:
-            - postgres_data:/var/lib/postgresql/data
+            - postgres-db:/var/lib/postgresql/data
         environment:
-            POSTGRES_USER: admin
-            POSTGRES_PASSWORD: admin
-            POSTGRES_DB: medusa_db
+            - POSTGRES_DB=medusa_db
+            - POSTGRES_USER=admin
+            - POSTGRES_PASSWORD=admin
+        ports:
+            - 5432:5432
 
     redis:
-        image: redis:7.0.7-alpine
-        restart: always
+        image: redis
         container_name: cache
         expose:
-            - 6379
-        volumes:
-            - redis_data:/data
-
-    # minio:
-    #     image: quay.io/minio/minio
-    #     restart: always
-    #     ports:
-    #         - "9001:9000"
-    #         - "9090:9090"
-    #     environment:
-    #         MINIO_ROOT_USER: ROOTNAME
-    #         MINIO_ROOT_PASSWORD: CHANGEME123
-    #     command: server /data --console-address ":9090"
-    #     volumes:
-    #         - minio_data:/data
-
-    # admin:
-    #     build:
-    #         context: ./admin
-    #         dockerfile: Dockerfile
-    #     image: admin:latest
-    #     restart: always
-    #     depends_on:
-    #         - backend
-    #     container_name: medusa-admin
-    #     ports:
-    #         - "7700:7700"
-    #     environment:
-    #         MEDUSA_BACKEND_URL: http://backend:9000
-    #         NODE_OPTIONS: --openssl-legacy-provider
-
-    storefront:
-        build:
-            context: ./storefront
-            dockerfile: Dockerfile
-        container_name: medusa-storefront
-        env_file:
-          - ./storefront/.env
-        restart: always
-        depends_on:
-            - backend
-        volumes:
-            - ./storefront:/app/storefront
-            - storefront_node_modules:/app/storefront/node_modules
-        ports:
-            - "8000:8000"
+            - 6379:6379
 
 volumes:
-    storefront_node_modules:
-    backend_node_modules:
-    # minio_data:
-    postgres_data:
-    redis_data:
+    postgres-db:
