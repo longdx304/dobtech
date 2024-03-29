@@ -23,7 +23,7 @@ services:
             JWT_SECRET: some_jwt_secret
             COOKIE_SECRET: some_cookie_secret
             MEDUSA_ADMIN_ONBOARDING_TYPE: default
-            STORE_CORS: http://localhost:8000,http://localhost:7001
+            STORE_CORS: http://storefront:8000,http://localhost:7001
 
     postgres:
         image: postgres:16-alpine
@@ -38,13 +38,16 @@ services:
 
     redis:
         image: redis:7.0.7-alpine
+        restart: always
         container_name: cache
-        expose:
-            - 6379
+        ports:
+            - '6379:6379'
         volumes:
           - redis_data:/data
 
     storefront:
+        # env_file:
+        #     - ./storefront/.env
         build:
             context: ./storefront
             dockerfile: Dockerfile
@@ -58,7 +61,8 @@ services:
           - ./storefront:/app/storefront
           - storefront_node_modules:/app/storefront/node_modules
         environment:
-            NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://localhost:9000
+            NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://backend:9000
+            NEXT_PUBLIC_MEDUSA_ADMIN_URL: http://backend:7001
             NEXT_PUBLIC_BASE_URL: http://localhost:8000
             NEXT_PUBLIC_DEFAULT_REGION: us
             NEXT_PUBLIC_SEARCH_ENDPOINT: http://127.0.0.1:7700

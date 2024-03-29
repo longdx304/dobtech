@@ -6,6 +6,7 @@ import { redirect } from "next/navigation"
 
 import { getRegion, updateCart } from "@lib/data"
 
+const ADMIN_URL = process.env.NEXT_PUBLIC_MEDUSA_ADMIN_URL;
 /**
  * Updates the countrycode param and revalidates the regions cache
  * @param regionId
@@ -36,5 +37,5 @@ export async function updateRegion(countryCode: string, currentPath: string) {
 
 export async function resetOnboardingState(orderId: string) {
   cookies().set("_medusa_onboarding", "false", { maxAge: -1 })
-  redirect(`http://localhost:7001/a/orders/${orderId}`)
+  redirect(`${ADMIN_URL}/a/orders/${orderId}`)
 }
