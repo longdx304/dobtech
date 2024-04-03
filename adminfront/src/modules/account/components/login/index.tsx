@@ -7,20 +7,13 @@ import { signIn } from 'next-auth/react';
 import { useSession } from 'next-auth/react';
 import { adminLogIn } from '@/services/accounts';
 
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import SubmitButton from '@/modules/common/components/submit-button';
+import Card from '@/components/Card';
+// import Card from '@mui/material/Card';
 import { useFormState } from 'react-dom';
 import ErrorMessage from '@/modules/common/components/error-message';
+import { Input } from '@/components/Input';
+import SubmitButton from '@/modules/common/components/submit-button';
 
 interface Props {}
 
@@ -34,27 +27,22 @@ const LoginTemplate = ({}: Props) => {
 				'sm:justify-between sm:p-32'
 			)}
 		>
-			<Card className="w-[300px] sm:w-[400px]">
-				<CardHeader className="flex justify-center items-center">
-					<CardTitle>Đăng nhập</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<form className="space-y-4" action={formAction}>
-						<div className="space-y-2">
-							<Input type="email" name="email" placeholder="Email *" />
-							<ErrorMessage error={state?.email} />
-						</div>
-						<div className="space-y-2">
-							<Input type="password" name="password" placeholder="Mật khẩu *" />
-							<ErrorMessage error={state?.password} />
-						</div>
-						<ErrorMessage error={state?.result} />
-						<SubmitButton className="w-full" type="submit">
-							Xác nhận
-						</SubmitButton>
-					</form>
-				</CardContent>
-				<CardFooter className="flex justify-center"></CardFooter>
+			<Card className="flex flex-col justify-start gap-4">
+				<div className="text-2xl text-center font-bold">Đăng nhập</div>
+				<form className="space-y-4" action={formAction}>
+					<div className="space-y-2">
+						<Input type="email" name="email" label="Email" required autoFocus />
+						<ErrorMessage error={state?.email} />
+					</div>
+					<div className="space-y-2">
+						<Input type="password" name="password" label="Mật khẩu" required />
+						<ErrorMessage error={state?.password} />
+					</div>
+					<ErrorMessage error={state?.result} />
+					<SubmitButton className="w-full" variant="contained">
+						Xác nhận
+					</SubmitButton>
+				</form>
 			</Card>
 		</div>
 	);

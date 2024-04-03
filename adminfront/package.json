@@ -9,9 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/cache": "^11.11.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/server": "^11.11.0",
+    "@emotion/styled": "^11.11.5",
     "@hookform/resolvers": "^3.3.4",
     "@medusajs/medusa": "^1.20.4",
     "@medusajs/medusa-js": "^6.1.8",
+    "@mui/material": "^5.15.14",
+    "@mui/material-nextjs": "^5.15.11",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@tanstack/react-query": "^4.36.1",

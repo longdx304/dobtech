@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidateTag } from 'next/cache';
-import { getToken } from '@/applications/accounts';
+import { getToken } from '@/actions/accounts';
 import { z } from 'zod';
 import handleErrorZod from '../lib/handleErrorZod';
 import { getMedusaHeaders } from './common';
