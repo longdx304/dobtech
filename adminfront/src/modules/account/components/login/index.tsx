@@ -30,7 +30,7 @@ const LoginTemplate = ({}: Props) => {
 	return (
 		<div
 			className={cn(
-				'flex min-h-screen flex-col items-center justify-center py-32',
+				'flex flex-col items-center justify-center fixed w-full h-full',
 				'sm:justify-between sm:p-32'
 			)}
 		>
