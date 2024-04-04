@@ -28,7 +28,8 @@ export async function adminLogIn(_currentState: unknown, formData: FormData) {
 		await getToken({ email, password }).then(() => {
 			revalidateTag('admin');
 		});
+		return { result: null };
 	} catch (error) {
-		return { result: error.toString() };
+		return { result: 'Email hoặc mật khẩu không đúng!' };
 	}
 }

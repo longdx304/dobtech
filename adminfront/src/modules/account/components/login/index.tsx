@@ -41,17 +41,18 @@ const LoginTemplate = ({}: Props) => {
 				<CardContent>
 					<form className="space-y-4" action={formAction}>
 						<div className="space-y-2">
-							<Input type="email" name="email" placeholder="Email *" />
+							<Input type="email" name="email" placeholder="Email *" data-testid="email"/>
 							<ErrorMessage error={state?.email} />
 						</div>
 						<div className="space-y-2">
-							<Input type="password" name="password" placeholder="Mật khẩu *" />
+							<Input type="password" name="password" placeholder="Mật khẩu *" data-testid="password"/>
 							<ErrorMessage error={state?.password} />
 						</div>
-						<ErrorMessage error={state?.result} />
-						<SubmitButton className="w-full" type="submit">
+						<ErrorMessage error={state?.result} data-testid="error1"/>
+						<SubmitButton className="w-full" type="submit" data-testid="submitBtn">
 							Xác nhận
 						</SubmitButton>
+						{/* {state?.result && <div data-testid="error1">{'Error Logging In'}</div>} */}
 					</form>
 				</CardContent>
 				<CardFooter className="flex justify-center"></CardFooter>
