@@ -1,19 +1,13 @@
 'use client';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { useSession } from 'next-auth/react';
-import { Mail, Lock, LogIn } from 'lucide-react';
+import { Lock, LogIn, Mail } from 'lucide-react';
 
-import { adminLogIn } from '@/services/accounts';
-import { cn } from '@/lib/utils';
 import Card from '@/components/Card';
-import { useFormState } from 'react-dom';
-import ErrorMessage from '@/modules/common/components/error-message';
 import { Input, InputPassword } from '@/components/Input';
+import { cn } from '@/lib/utils';
+import ErrorMessage from '@/modules/common/components/error-message';
 import SubmitButton from '@/modules/common/components/submit-button';
+import { adminLogIn } from '@/services/accounts';
+import { useFormState } from 'react-dom';
 
 interface Props {}
 
@@ -52,7 +46,10 @@ const LoginTemplate = ({}: Props) => {
 						<ErrorMessage error={state?.password} />
 					</div>
 					<ErrorMessage error={state?.result} />
-					<SubmitButton className="w-full !flex !items-center !justify-center" icon={<LogIn color="white" />}>
+					<SubmitButton
+						className="w-full !flex !items-center !justify-center"
+						icons={<LogIn color="white" />}
+					>
 						Xác nhận
 					</SubmitButton>
 				</form>

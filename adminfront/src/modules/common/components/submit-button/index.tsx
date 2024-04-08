@@ -1,22 +1,22 @@
-import { React } from 'react';
+import React, { ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
 import { cn } from '@/lib/utils';
 import Button from '@/components/Button';
 
-const SubmitButton = (
-	{
-		variant = 'contained',
-		className,
-		'data-testid': dataTestId,
-		children,
-		...props
-	}: {
-		variant?: 'contained' | 'outlined' | 'text' | null;
-		className?: string;
-		'data-testid'?: string;
-		children: React.ReactNode;
-	}
-) => {
+interface Props {
+	className?: string;
+	'data-testid'?: string;
+	children: ReactNode;
+	icons?: ReactNode;
+}
+
+const SubmitButton = ({
+	className,
+	'data-testid': dataTestId,
+	children,
+	icons,
+	...props
+}: Props) => {
 	const { pending } = useFormStatus();
 
 	return (
@@ -26,6 +26,7 @@ const SubmitButton = (
 			disabled={pending}
 			loading={pending}
 			data-testid={dataTestId}
+			icon={icons}
 			{...props}
 		>
 			{children}

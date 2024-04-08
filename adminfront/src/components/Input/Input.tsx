@@ -1,7 +1,7 @@
-import { Input as AntdInput } from 'antd';
+import { Input as AntdInput, InputProps as AntdInputProps } from 'antd';
 import { cn } from '@/lib/utils';
 
-interface Props {
+interface Props extends AntdInputProps{
 	className?: string;
 }
 
