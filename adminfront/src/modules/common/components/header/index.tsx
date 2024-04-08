@@ -1,30 +1,43 @@
 'use client';
 import { FC } from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import { Menu } from 'lucide-react';
 import Image from 'next/image';
+import { Flex, Drawer } from 'antd';
+
+import Card from '@/components/Card';
+import Button from '@/components/Button';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import DrawerMenu from './DrawerMenu';
 
 interface Props {}
 
 const Header = (): FC<Props> => {
+	const { state, onClose, onOpen } = useToggleState(false);
+
 	return (
-		<AppBar position="fixed" color="white" sx={{ bottom: 'auto', top: 0 }}>
-			<Toolbar className="flex justify-between items-center">
-				<div>
+		<Card className="!fixed !top-0 w-full [&_.ant-card-body]:!py-1">
+			<Flex
+				className="flex justify-between items-center"
+				justify="space-between"
+				align="center"
+			>
+				<div className="flex items-center">
 					<Image
 						src="/images/dob-icon.png"
-						width={32}
-						height={43}
+						width={28}
+						height={37}
 						alt="Dob Icon"
 					/>
 				</div>
-				<IconButton color="inherit" aria-label="open drawer">
-					<Menu />
-				</IconButton>
-			</Toolbar>
-		</AppBar>
+				<Button
+					icon={<Menu />}
+					shape="circle"
+					type="text"
+					onClick={() => onOpen()}
+				/>
+			</Flex>
+			<DrawerMenu state={state} onOpen={onOpen} onClose={onClose} />
+		</Card>
 	);
 };
 

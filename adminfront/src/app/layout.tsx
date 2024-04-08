@@ -2,9 +2,8 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { getAdmin } from '@/actions/accounts';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+import { AntdRegistry } from '@ant-design/nextjs-registry';
+
 import theme from '../theme';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -25,13 +24,10 @@ export default async function RootLayout({
 	return (
 		<html lang="en">
 			<body className={inter.className}>
-				<AppRouterCacheProvider options={{ enableCssLayer: true }}>
-					<ThemeProvider theme={theme}>
-						{/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-						<CssBaseline />
-						{adminUser ? main : login}
-					</ThemeProvider>
-				</AppRouterCacheProvider>
+				<AntdRegistry>
+					{/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+					{adminUser ? main : login}
+				</AntdRegistry>
 			</body>
 		</html>
 	);

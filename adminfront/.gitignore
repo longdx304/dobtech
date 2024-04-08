@@ -4,8 +4,11 @@
 /node_modules
 /.pnp
 .pnp.js
+.pnp.*
 .yarn/install-state.gz
 package-lock.json
+yarn.lock
+/.yarn
 
 # testing
 /coverage
@@ -37,5 +40,5 @@ yarn-error.log*
 next-env.d.ts
 
 # PWA
-/public/sw.js*
-/public/workbox-*.js*
+public/sw.js*
+public/workbox-*.js*

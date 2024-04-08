@@ -14,7 +14,7 @@ export default async function MainLayout({
 	const adminUser = await getAdmin().catch(() => null);
 
 	return (
-		<main className="bg-[#EFF0F3]">
+		<main className="">
 			<Header />
 			{children}
 		</main>

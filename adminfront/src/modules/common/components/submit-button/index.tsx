@@ -1,7 +1,7 @@
-import Button from '@mui/material/Button';
 import { React } from 'react';
 import { useFormStatus } from 'react-dom';
 import { cn } from '@/lib/utils';
+import Button from '@/components/Button';
 
 const SubmitButton = (
 	{
@@ -21,11 +21,10 @@ const SubmitButton = (
 
 	return (
 		<Button
-			// size="large"
 			className={cn('py-[10px]', className)}
-			type="submit"
+			htmlType="submit"
 			disabled={pending}
-			variant={variant}
+			loading={pending}
 			data-testid={dataTestId}
 			{...props}
 		>

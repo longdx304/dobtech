@@ -1,4 +1,4 @@
-import TextField from '@mui/material/TextField';
+import { Input as AntdInput } from 'antd';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -6,5 +6,5 @@ interface Props {
 }
 
 export default function Input({ className, ...props }: Props) {
-	return <TextField className={cn('', className)} {...props} />;
+	return <AntdInput size="large" className={cn('', className)} {...props} />;
 }
