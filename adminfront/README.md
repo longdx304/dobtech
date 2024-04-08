@@ -14,6 +14,30 @@ pnpm dev
 bun dev
 ```
 
+## Testing
+
+### Running Tests
+
+To run the tests, execute the following command:
+
+```bash
+npm run test
+# or
+yarn test
+# or
+pnpm test
+# or
+bun test
+```
+
+### Test Coverage
+Our test suite covers the following scenarios:
+- Rendering the login form and its elements.
+-
+
+### Test Implementation
+The tests are implemented using Jest and React Testing Library. They ensure that the login template component behaves correctly under different scenarios, providing confidence in the functionality of our application.
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
