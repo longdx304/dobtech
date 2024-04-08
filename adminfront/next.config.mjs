@@ -1,14 +1,14 @@
-import withPWA from "next-pwa";
-import runtimeCaching from "next-pwa/cache.js";
+import withPWA from 'next-pwa';
+import runtimeCaching from 'next-pwa/cache.js';
 
 /** @type {import('next').NextConfig} */
 const pwaConfig = {
-  disable: false,
-  dest: "public",
-  // disable: !isProduction,
-  runtimeCaching,
-  register: true,
-  skipWaiting: true,
+	disable: false,
+	dest: 'public',
+	// disable: !isProduction,
+	runtimeCaching,
+	register: true,
+	skipWaiting: true,
 };
 
 const nextConfig = {};

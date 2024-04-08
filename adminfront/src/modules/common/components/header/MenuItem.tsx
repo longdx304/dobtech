@@ -59,7 +59,7 @@ const itemOption: MenuProps['items'] = [
 ];
 
 // Item menu user
-const itemUser: MenuProps['items'] = (
+const itemUser = (
 	user: IAdminResponse,
 	handleDropdownClick: (e: any) => void
 ) => [
@@ -83,7 +83,7 @@ const itemUser: MenuProps['items'] = (
 ];
 
 // Generation menu
-export const menuItems: MenuProps['items'] = (
+export const menuItems = (
 	user: IAdminResponse,
 	handleDropdownClick: (e: any) => void
 ) => [

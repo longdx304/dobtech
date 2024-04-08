@@ -14,9 +14,11 @@ export default async function MainLayout({
 	const adminUser = await getAdmin().catch(() => null);
 
 	return (
-		<main className="pt-[4.5rem] lg:pt-0">
+		<main className="w-full pt-[4.5rem] sm:pt-0">
 			<Header user={adminUser} />
-			{children}
+			<article className="sm:w-[calc(100%-200px-4rem)] sm:ml-[200px] sm:pt-4 sm:px-8 md:w-[calc(100%-250px-4rem)] md:ml-[250px]">
+				{children}
+			</article>
 		</main>
 	);
 }

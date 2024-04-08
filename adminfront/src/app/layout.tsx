@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({
 	main,
 	login,
+	children,
 }: Readonly<{
 	main?: React.ReactNode;
 	login?: React.ReactNode;
@@ -25,6 +26,7 @@ export default async function RootLayout({
 		<html lang="en">
 			<body className={inter.className}>
 				<AntdRegistry>{adminUser ? main : login}</AntdRegistry>
+				{children}
 			</body>
 		</html>
 	);
