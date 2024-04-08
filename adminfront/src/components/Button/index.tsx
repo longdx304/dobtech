@@ -1,9 +1,8 @@
-import { Button as AntdButton } from 'antd';
+import { Button as AntdButton, ButtonProps as AntdButtonProps } from 'antd';
 import { cn } from '@/lib/utils';
 
-interface Props {
+interface Props extends AntdButtonProps {
 	className?: string;
-	type?: 'primary' | 'dashed' | 'text' | 'link';
 }
 
 export default function Button({
@@ -13,7 +12,12 @@ export default function Button({
 	...props
 }: Props) {
 	return (
-		<AntdButton className={cn('', className)} type={type} size="large" {...props}>
+		<AntdButton
+			className={cn('', className)}
+			type={type}
+			size="large"
+			{...props}
+		>
 			{children}
 		</AntdButton>
 	);
