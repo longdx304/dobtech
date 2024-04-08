@@ -1,12 +1,15 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { getAdmin } from '@/applications/accounts';
+import { getAdmin } from '@/actions/accounts';
+import { AntdRegistry } from '@ant-design/nextjs-registry';
+
+import theme from '../theme';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-	manifest: "/manifest.json",
+	manifest: '/manifest.json',
 };
 
 export default async function RootLayout({
@@ -20,7 +23,12 @@ export default async function RootLayout({
 
 	return (
 		<html lang="en">
-			<body className={inter.className}>{adminUser ? main : login}</body>
+			<body className={inter.className}>
+				<AntdRegistry>
+					{/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+					{adminUser ? main : login}
+				</AntdRegistry>
+			</body>
 		</html>
 	);
 }

@@ -1,7 +1,7 @@
 'use server';
 
-import { getToken } from '@/applications/accounts';
 import { revalidateTag } from 'next/cache';
+import { getToken } from '@/actions/accounts';
 import { z } from 'zod';
 import handleErrorZod from '@/lib/utils';
 

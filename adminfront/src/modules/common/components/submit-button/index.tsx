@@ -1,33 +1,28 @@
-import { Button } from '@/components/ui/button';
-import React from 'react';
+import { React } from 'react';
 import { useFormStatus } from 'react-dom';
+import { cn } from '@/lib/utils';
+import Button from '@/components/Button';
 
-const SubmitButton = ({
-	variant = 'default',
-	className,
-	'data-testid': dataTestId,
-	children,
-	...props
-}: {
-	children: React.ReactNode;
-	variant?:
-		| 'default'
-		| 'primary'
-		| 'secondary'
-		| 'transparent'
-		| 'danger'
-		| null;
-	className?: string;
-	'data-testid'?: string;
-}) => {
+const SubmitButton = (
+	{
+		className,
+		'data-testid': dataTestId,
+		children,
+		...props
+	}: {
+		className?: string;
+		'data-testid'?: string;
+		children: React.ReactNode;
+	}
+) => {
 	const { pending } = useFormStatus();
 
 	return (
 		<Button
-			className={className}
-			type="submit"
+			className={cn('py-[10px]', className)}
+			htmlType="submit"
 			disabled={pending}
-			// variant={variant}
+			loading={pending}
 			data-testid={dataTestId}
 			{...props}
 		>

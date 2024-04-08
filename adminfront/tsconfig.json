@@ -22,7 +22,7 @@
       // "@/*": ["./src/*"],
       "@/lib/*": ["lib/*"],
       "@/components/*": ["components/*"],
-      "@/applications/*": ["applications/*"],
+      "@/actions/*": ["actions/*"],
       "@/services/*": ["services/*"],
       "@/modules/*": ["modules/*"],
       "@/types/*": ["types/*"]
