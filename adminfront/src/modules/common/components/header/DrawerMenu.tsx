@@ -5,36 +5,28 @@ import { Flex, Drawer, Menu } from 'antd';
 import type { MenuProps } from 'antd';
 
 import Button from '@/components/Button';
-import { menuItems } from './MenuItem';
+import { menuItems, menuRoutes } from './MenuItem';
 import { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Props {
 	state: boolean;
 	onOpen: () => void;
 	onClose: () => void;
 }
-type MenuItem = Required<MenuProps>['items'][number];
-
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[],
-  type?: 'group',
-): MenuItem {
-  return {
-    key,
-    icon,
-    children,
-    label,
-    type,
-  } as MenuItem;
-}
 
 const DrawerMenu = ({ state, onOpen, onClose }: Props) => {
-	
+	const router = useRouter();
 	// Render items menu
 	const _menuItems = useMemo(() => menuItems, []);
+
+	// Handle user click menu items
+	const handleClickMenu: MenuProps['onClick'] = (e) => {
+		const { key } = e;
+		if (menuRoutes[key]) {
+			router.push(menuRoutes[key]);
+		}
+	};
 
 	return (
 		<Drawer
@@ -54,7 +46,7 @@ const DrawerMenu = ({ state, onOpen, onClose }: Props) => {
 		>
 			<Menu
 				className=""
-				onClick={() => {}}
+				onClick={handleClickMenu}
 				// style={{ width: 256 }}
 				// defaultSelectedKeys={['1']}
 				// defaultOpenKeys={['sub1']}
