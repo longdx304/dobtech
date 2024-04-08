@@ -8,7 +8,7 @@ interface Props {
 }
 export default function Card({ className, children }: Props) {
 	return (
-		<AntdCard className={cn('p-8 shadow-lg', className)}>
+		<AntdCard className={cn('p-4 shadow-lg', className)}>
 			{children}
 		</AntdCard>
 	);

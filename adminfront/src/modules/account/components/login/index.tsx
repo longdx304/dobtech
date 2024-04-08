@@ -18,10 +18,10 @@ const LoginTemplate = ({}: Props) => {
 		<div
 			className={cn(
 				'flex flex-col items-center justify-center fixed w-full h-full',
-				'sm:justify-between sm:p-32 sm:relative'
+				'sm:justify-between sm:py-32 sm:relative'
 			)}
 		>
-			<Card className="flex flex-col justify-start gap-4">
+			<Card className="[&_.ant-card-body]:flex [&_.ant-card-body]:flex-col [&_.ant-card-body]:justify-start [&_.ant-card-body]:gap-4">
 				<div className="text-2xl text-center font-bold">Đăng nhập</div>
 				<form className="space-y-4" action={formAction}>
 					<div className="space-y-2">
