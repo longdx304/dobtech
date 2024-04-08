@@ -10,10 +10,7 @@ const ErrorMessage = ({
 	}
 
 	return (
-		<div
-			className="text-rose-500 text-sm"
-			data-testid={dataTestid}
-		>
+		<div className="text-rose-500 text-sm" data-testid={dataTestid}>
 			<span>{error}</span>
 		</div>
 	);

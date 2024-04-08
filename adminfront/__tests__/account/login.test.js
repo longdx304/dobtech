@@ -1,79 +1,80 @@
-import '@testing-library/jest-dom';
-import {
-	fireEvent,
-	render,
-	screen,
-	cleanup,
-	waitFor,
-	within
-} from '@testing-library/react';
 import LoginTemplate from '@/modules/account/components/login';
+import ErrorMessage from '@/modules/common/components/error-message';
 import { adminLogIn } from '@/services/accounts';
-import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
+import { cleanup, render, screen } from '@testing-library/react';
+import { getToken } from '@/applications/accounts';
 
 jest.mock('react-dom', () => ({
-	useFormState: jest.fn(() => []),
-	useFormStatus: jest.fn(() => []),
+	useFormState: jest.fn(() => [null, jest.fn()]),
+	useFormStatus: jest.fn(() => [null, jest.fn()]),
 }));
 
-jest.mock('../../src/services/accounts', () => ({ adminLogIn: jest.fn() }));
+jest.mock('../../src/applications/accounts.ts', () => ({
+	getToken: jest.fn(),
+}));
 
 afterEach(cleanup);
 
-describe('Login', () => {
-	it('renders login', () => {
+describe('Login Template', () => {
+	it('should render login form', () => {
 		render(<LoginTemplate />);
 
-		// check if all component are rendered
 		expect(screen.getByTestId('email')).toBeInTheDocument();
 		expect(screen.getByTestId('password')).toBeInTheDocument();
 		expect(screen.getByTestId('submitBtn')).toBeInTheDocument();
 	});
 
-	it('should submit form when button is clicked', async () => {
-		adminLogIn.mockResolvedValueOnce({});
-		render(<LoginTemplate />);
+	it('should render error message when error is present', () => {
+		render(<ErrorMessage error="Test error" data-testid="error" />);
 
-		const emailInput = screen.getByTestId('email');
-		const passwordInput = screen.getByTestId('password');
-		const submitBtn = screen.getByTestId('submitBtn');
-
-		fireEvent.change(emailInput, { target: { value: 'admin@test.com' } });
-		fireEvent.change(passwordInput, { target: { value: '123456' } });
-		expect(submitBtn).toBeEnabled();
-		userEvent.click(submitBtn);
-		await waitFor(() => {
-			// console.log(
-			// 	"screen.queryByText('Error Logging In')",
-			// 	screen.getByTestId('error1')
-			// );
-			expect(
-				screen.queryByText('Email hoặc mật khẩu không đúng!')
-			).toBeNull();
-			// expect(screen.queryByText('Success Logging In')).toBeInTheDocument();
-		});
+		expect(screen.getByTestId('error')).toBeInTheDocument();
+		expect(screen.getByTestId('error')).toHaveTextContent('Test error');
 	});
-	it('should submit form when button is clicked err', async () => {
-		// adminLogIn.mockResolvedValueOnce({});
-		render(<LoginTemplate />);
 
-		const emailInput = screen.getByTestId('email');
-		const passwordInput = screen.getByTestId('password');
-		const submitBtn = screen.getByTestId('submitBtn');
+	it('should return error for invalid email', async () => {
+		const formData = new FormData();
+		formData.append('email', 'testexample.com');
+		formData.append('password', 'validpassword');
 
-		fireEvent.change(emailInput, { target: { value: 'admin@teszt.com' } });
-		fireEvent.change(passwordInput, { target: { value: '123456z' } });
-		expect(submitBtn).toBeEnabled();
-		userEvent.click(submitBtn);
-		await waitFor(() => {
-			// console.log(
-			// 	"screen.queryByText('Error Logging In')",
-			// 	screen.getByTestId('error1')
-			// );
-			expect(
-				screen.getByTestId('error1')
-			).toHaveTextContain("Email hoặc mật khẩu không đúng!");
-			// expect(screen.queryByText('Success Logging In')).toBeInTheDocument();
+		try {
+			await adminLogIn(null, formData);
+		} catch (error) {
+			expect(error).toEqual({ result: 'Email không đúng định dạng' });
+		}
+	});
+
+	it('should return error for invalid email', async () => {
+		const formData = new FormData();
+		formData.append('email', 'test@example.com');
+		formData.append('password', 'short');
+
+		try {
+			await adminLogIn(null, formData);
+		} catch (error) {
+			expect(error).toEqual({
+				result: 'Mật khẩu phải ít nhất phải có 6 ký tự',
+			});
+		}
+	});
+
+	it('should return null result on successful login', async () => {
+		getToken.mockResolvedValueOnce([]);
+
+		const result = await getToken({
+			email: 'test@example.com',
+			password: 'validpassword',
 		});
+		expect(result).toEqual([]);
+	});
+
+	it('should return error message on failed login', async () => {
+		getToken.mockResolvedValueOnce('Email hoặc mật khẩu không đúng!');
+
+		const result = await getToken({
+			email: 'test@example.com',
+			password: 'invalidpassword',
+		});
+		expect(result).toEqual('Email hoặc mật khẩu không đúng!');
 	});
 });

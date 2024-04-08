@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { React } from 'react';
+import React from 'react';
 import { useFormStatus } from 'react-dom';
 
 const SubmitButton = ({
@@ -10,7 +10,13 @@ const SubmitButton = ({
 	...props
 }: {
 	children: React.ReactNode;
-	variant?: 'primary' | 'secondary' | 'transparent' | 'danger' | null;
+	variant?:
+		| 'default'
+		| 'primary'
+		| 'secondary'
+		| 'transparent'
+		| 'danger'
+		| null;
 	className?: string;
 	'data-testid'?: string;
 }) => {
@@ -21,7 +27,7 @@ const SubmitButton = ({
 			className={className}
 			type="submit"
 			disabled={pending}
-			variant={variant}
+			// variant={variant}
 			data-testid={dataTestId}
 			{...props}
 		>

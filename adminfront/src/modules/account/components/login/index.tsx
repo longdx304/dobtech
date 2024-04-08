@@ -1,26 +1,18 @@
 'use client';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { useSession } from 'next-auth/react';
 import { adminLogIn } from '@/services/accounts';
 
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
 import {
 	Card,
 	CardContent,
-	CardDescription,
 	CardFooter,
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import ErrorMessage from '@/modules/common/components/error-message';
 import SubmitButton from '@/modules/common/components/submit-button';
 import { useFormState } from 'react-dom';
-import ErrorMessage from '@/modules/common/components/error-message';
 
 interface Props {}
 
@@ -41,18 +33,30 @@ const LoginTemplate = ({}: Props) => {
 				<CardContent>
 					<form className="space-y-4" action={formAction}>
 						<div className="space-y-2">
-							<Input type="email" name="email" placeholder="Email *" data-testid="email"/>
-							<ErrorMessage error={state?.email} />
+							<Input
+								type="email"
+								name="email"
+								placeholder="Email *"
+								data-testid="email"
+							/>
+							<ErrorMessage error={state?.email} data-testid="errorEmail" />
 						</div>
 						<div className="space-y-2">
-							<Input type="password" name="password" placeholder="Mật khẩu *" data-testid="password"/>
-							<ErrorMessage error={state?.password} />
+							<Input
+								type="password"
+								name="password"
+								placeholder="Mật khẩu *"
+								data-testid="password"
+							/>
+							<ErrorMessage
+								error={state?.password}
+								data-testid="errorPassword"
+							/>
 						</div>
-						<ErrorMessage error={state?.result} data-testid="error1"/>
-						<SubmitButton className="w-full" type="submit" data-testid="submitBtn">
+						<ErrorMessage error={state?.result} data-testid="error" />
+						<SubmitButton className="w-full" data-testid="submitBtn">
 							Xác nhận
 						</SubmitButton>
-						{/* {state?.result && <div data-testid="error1">{'Error Logging In'}</div>} */}
 					</form>
 				</CardContent>
 				<CardFooter className="flex justify-center"></CardFooter>

@@ -1,15 +1,12 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
 import { getToken } from '@/applications/accounts';
+import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
-import handleErrorZod from '../lib/handleErrorZod';
-import { getMedusaHeaders } from './common';
+import handleErrorZod from '@/lib/utils';
 
 const loginSchema = z.object({
-	email: z
-		.string()
-		.email('Email không đúng định dạng'),
+	email: z.string().email('Email không đúng định dạng'),
 	password: z.string().min(6, {
 		message: 'Mật khẩu phải ít nhất phải có 6 ký tự',
 	}),
@@ -29,7 +26,7 @@ export async function adminLogIn(_currentState: unknown, formData: FormData) {
 			revalidateTag('admin');
 		});
 		return { result: null };
-	} catch (error) {
+	} catch (error: any) {
 		return { result: 'Email hoặc mật khẩu không đúng!' };
 	}
 }
