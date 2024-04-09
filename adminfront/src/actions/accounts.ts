@@ -33,7 +33,6 @@ export async function getToken(credentials: IAdminAuth) {
 
 export async function getAdmin() {
 	const headers = await getMedusaHeaders(['auth']);
-	console.log("headers:", headers)
 
 	return medusaClient.admin.auth.getSession(headers).then(({ user }) => user);
 }

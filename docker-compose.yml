@@ -62,8 +62,6 @@ services:
             NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://backend:9000
 
     storefront:
-        env_file:
-            - ./storefront/.env
         build:
             context: ./storefront
             dockerfile: Dockerfile
