@@ -3,14 +3,14 @@ import ErrorMessage from '@/modules/common/components/error-message';
 import { adminLogIn } from '@/services/accounts';
 import '@testing-library/jest-dom';
 import { cleanup, render, screen } from '@testing-library/react';
-import { getToken } from '@/applications/accounts';
+import { getToken } from '@/actions/accounts';
 
 jest.mock('react-dom', () => ({
 	useFormState: jest.fn(() => [null, jest.fn()]),
 	useFormStatus: jest.fn(() => [null, jest.fn()]),
 }));
 
-jest.mock('../../src/applications/accounts.ts', () => ({
+jest.mock('../../src/actions/accounts.ts', () => ({
 	getToken: jest.fn(),
 }));
 

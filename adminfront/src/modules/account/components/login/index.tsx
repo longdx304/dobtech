@@ -30,6 +30,7 @@ const LoginTemplate = ({}: Props) => {
 							name="email"
 							placeholder="Email"
 							prefix={<Mail />}
+							data-testid="email"
 							required
 							autoFocus
 						/>
@@ -40,6 +41,7 @@ const LoginTemplate = ({}: Props) => {
 							type="password"
 							name="password"
 							placeholder="Mật khẩu"
+							data-testid="password"
 							prefix={<Lock />}
 							required
 						/>
@@ -48,6 +50,7 @@ const LoginTemplate = ({}: Props) => {
 					<ErrorMessage error={state?.result} />
 					<SubmitButton
 						className="w-full !flex !items-center !justify-center"
+						data-testid="submitBtn"
 						icons={<LogIn color="white" />}
 					>
 						Xác nhận
