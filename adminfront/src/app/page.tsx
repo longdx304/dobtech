@@ -5,6 +5,6 @@ export const metadata: Metadata = {
 	description: 'Admin Page',
 };
 
-export default function Main() {
-	return <div className="h-full w-full flex justify-center">Dashboard</div>;
+export default function Home() {
+	return <></>;
 }

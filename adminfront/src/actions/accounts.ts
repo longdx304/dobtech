@@ -1,6 +1,11 @@
+"use server";
+
 // Authentication actions
 import { medusaClient } from '@/lib/database/config';
 import { cookies } from 'next/headers';
+import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
+
 import { getMedusaHeaders } from './common';
 import { IAdminAuth } from '@/types/account';
 
@@ -27,7 +32,23 @@ export async function getToken(credentials: IAdminAuth) {
 }
 
 export async function getAdmin() {
-	const headers = getMedusaHeaders(['auth']);
+	const headers = await getMedusaHeaders(['auth']);
+	console.log("headers:", headers)
 
 	return medusaClient.admin.auth.getSession(headers).then(({ user }) => user);
+}
+
+
+export async function signOut() {
+  cookies().set("_medusa_jwt", "", {
+    maxAge: -1,
+  })
+  // const nextUrl = headers().get("next-url")
+  // const countryCode = nextUrl?.split("/")[1] || ""
+  revalidateTag("auth")
+  revalidateTag("admin")
+	redirect(`/`)
+  // if (nextUrl) {
+  //   redirect(`/${countryCode}/account`)
+  // }
 }

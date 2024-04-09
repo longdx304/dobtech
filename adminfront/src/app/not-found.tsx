@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "404",
@@ -12,6 +13,9 @@ export default function NotFound() {
       <p className="text-small-regular text-ui-fg-base">
         The page you tried to access does not exist.
       </p>
+      <Link className="flex gap-x-1 items-center group" href="/">
+        <div className="text-ui-fg-interactive">Go to frontpage</div>
+      </Link>
     </div>
   )
 }

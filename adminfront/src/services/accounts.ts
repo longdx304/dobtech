@@ -16,6 +16,7 @@ export async function adminLogIn(_currentState: unknown, formData: FormData) {
 	try {
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
+		console.log("aaa", email, password)
 
 		const resolver = handleErrorZod(loginSchema.safeParse({ email, password }));
 		if (resolver) {

@@ -1,33 +1,21 @@
 'use client';
-import { FC } from 'react';
+import { FC, MouseEvent } from 'react';
 import Image from 'next/image';
 import { Flex, Drawer, Menu } from 'antd';
-import type { MenuProps } from 'antd';
 
 import Button from '@/components/Button';
-import { menuItems, menuRoutes } from './MenuItem';
-import { useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+
+import { IAdminResponse } from '@/types/account';
+import Menubar from './Menubar';
 
 interface Props {
 	state: boolean;
 	onOpen: () => void;
 	onClose: () => void;
+	user: IAdminResponse;
 }
 
-const DrawerMenu = ({ state, onOpen, onClose }: Props) => {
-	const router = useRouter();
-	// Render items menu
-	const _menuItems = useMemo(() => menuItems, []);
-
-	// Handle user click menu items
-	const handleClickMenu: MenuProps['onClick'] = (e) => {
-		const { key } = e;
-		if (menuRoutes[key]) {
-			router.push(menuRoutes[key]);
-		}
-	};
-
+const DrawerMenu = ({ state, onOpen, onClose, user }: Props) => {
 	return (
 		<Drawer
 			className="[&_.ant-drawer-title]:flex [&_.ant-drawer-title]:justify-center [&_.ant-drawer-title]:items-center [&_.ant-drawer-body]:!px-0"
@@ -44,15 +32,7 @@ const DrawerMenu = ({ state, onOpen, onClose }: Props) => {
 			onClose={() => onClose()}
 			open={state}
 		>
-			<Menu
-				className=""
-				onClick={handleClickMenu}
-				// style={{ width: 256 }}
-				// defaultSelectedKeys={['1']}
-				// defaultOpenKeys={['sub1']}
-				mode="inline"
-				items={_menuItems}
-			/>
+			<Menubar user={user} />
 		</Drawer>
 	);
 };
