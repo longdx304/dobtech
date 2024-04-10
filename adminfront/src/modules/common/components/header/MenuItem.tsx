@@ -1,17 +1,17 @@
 import type { MenuProps } from 'antd';
-import { Menu, Flex } from 'antd';
+import { Flex } from 'antd';
 import {
 	CalendarRange,
+	Ellipsis,
+	LogOut,
+	PackageSearch,
 	Settings,
 	User,
-	Ellipsis,
 	Users,
-	LogOut,
 } from 'lucide-react';
 
-import { IAdminResponse } from '@/types/account.ts';
-import { Text } from '@/components/Typography';
 import { Dropdown } from '@/components/Dropdown';
+import { IAdminResponse } from '@/types/account';
 
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(
@@ -42,7 +42,8 @@ const itemDropdown: MenuProps['items'] = [
 // Item menu overview
 const itemOverview: MenuProps['items'] = [
 	getItem('Quản lý nhân viên', 'overview-1', <Users />),
-	getItem('Đơn hàng của bạn', 'overview-2', <CalendarRange />),
+	getItem('Quản lý sản phẩm', 'overview-2', <PackageSearch />),
+	getItem('Đơn hàng của bạn', 'overview-3', <CalendarRange />),
 	getItem('Label', 'overview-3', <Settings />, [
 		getItem('Option 5', '5'),
 		getItem('Option 6', '6'),
@@ -94,4 +95,5 @@ export const menuItems = (
 
 export const menuRoutes: Record<string, string> = {
 	'overview-1': '/accounts',
+	'overview-2': '/products',
 };
