@@ -20,15 +20,26 @@ export default async function RootLayout({
 }: Readonly<{
 	main?: React.ReactNode;
 	login?: React.ReactNode;
+	children: React.ReactNode;
 }>) {
 	const adminUser = await getAdmin().catch(() => null);
 
+	let contentToRender;
+  if (adminUser && main) {
+    contentToRender = main;
+  } else if (!adminUser && login) {
+    contentToRender = login;
+  } else {
+    contentToRender = children;
+  }
+	
 	return (
 		<html lang="en">
 			<body className={inter.className}>
 				<AntdRegistry>
 					<ConfigProvider theme={theme}>
-						{adminUser ? main : login}
+						{/* {adminUser ? main : login} */}
+						{contentToRender}
 					</ConfigProvider>
 				</AntdRegistry>
 				{/* {children} */}

@@ -58,17 +58,16 @@ export async function createMember(_currentState: unknown, formData: FormData) {
 	try {
 		const email = formData.get('email') as string;
 		const fullName = formData.get('fullName') as string;
-		const phone = formData.get('phone') as number;
+		const phone = formData.get('phone') as unknown as number;
 		const rolesEmp = formData.getAll('rolesEmp') as any;
 
-		console.log(' aaa ', rolesEmp);
 		const resolver = handleErrorZod(
 			createMemberSchema.safeParse({ email, fullName, phone, rolesEmp })
 		);
 		if (resolver) {
 			return resolver;
 		}
-	} catch (error) {
+	} catch (error: any) {
 		console.log(' error ', error.message);
 	}
 }

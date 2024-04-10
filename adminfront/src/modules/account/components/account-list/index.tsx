@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { useMemo } from 'react';
 
 import { Card } from '@/components/Card';
-import Table from '@/components/Table';
+import { Table } from '@/components/Table';
 import { FloatButton } from '@/components/Button';
 import { Title } from '@/components/Typography';
 import { Input } from '@/components/Input';

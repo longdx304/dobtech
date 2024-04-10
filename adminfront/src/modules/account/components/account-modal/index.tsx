@@ -18,7 +18,6 @@ interface Props {
 
 const AccountModal = ({ state: stateModal, handleOk, handleCancel }: Props) => {
 	const [state, formAction] = useFormState(createMember, null);
-	console.log('state', state);
 	return (
 		<SubmitModal
 			open={stateModal}
