@@ -1,6 +1,6 @@
 import { Modal as AntdModal, ModalProps } from 'antd';
 import { cn } from '@/lib/utils';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { Button, SubmitButton } from '@/components/Button';
 
 interface Props extends ModalProps {
@@ -8,7 +8,7 @@ interface Props extends ModalProps {
 	children?: ReactNode;
 	handleSubmit?: () => void;
 	handleCancel: () => void;
-	formAction: () => any;
+	formAction: (formData: FormData) => any;
 }
 
 export default function SubmitModal({
@@ -25,7 +25,9 @@ export default function SubmitModal({
 				<Button key="1" type="default" danger onClick={handleCancel}>
 					Huỷ
 				</Button>,
-				<SubmitButton key="2" form="modal">Xác nhận</SubmitButton>,
+				<SubmitButton key="2" form="modal">
+					Xác nhận
+				</SubmitButton>,
 			]}
 			{...props}
 		>

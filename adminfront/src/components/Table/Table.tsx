@@ -7,16 +7,9 @@ interface Props extends TableProps {
 	children?: ReactNode;
 }
 
-export default function Table({
-	className,
-	children,
-	...props
-}: Props) {
+export default function Table({ className, children, ...props }: Props) {
 	return (
-		<AntdTable
-			className={cn('w-full', className)}
-			{...props}
-		>
+		<AntdTable className={cn('w-full', className)} {...props}>
 			{children}
 		</AntdTable>
 	);

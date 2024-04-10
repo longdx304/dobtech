@@ -1,20 +1,12 @@
-import { FloatButton as AntdFloatButton, FloatButtonProps } from 'antd';
 import { cn } from '@/lib/utils';
-import { ReactNode } from 'react';
+import { FloatButton as AntdFloatButton, FloatButtonProps } from 'antd';
 
 interface Props extends FloatButtonProps {
 	className?: string;
 }
 
-export default function FloatButton({
-	className,
-	...props
-}: Props) {
+export default function FloatButton({ className, ...props }: Props) {
 	return (
-		<AntdFloatButton
-			className={cn('', className)}
-			shape="circle"
-			{...props}
-		/>
+		<AntdFloatButton className={cn('', className)} shape="circle" {...props} />
 	);
 }

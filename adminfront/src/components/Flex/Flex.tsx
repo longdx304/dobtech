@@ -4,18 +4,11 @@ import { ReactNode } from 'react';
 
 interface Props extends FlexProps {
 	className?: string;
-	children?: ReactNode;
+	children: ReactNode;
 }
-export default function Flex({
-	className,
-	children,
-	...props
-}: Props) {
+export default function Flex({ className, children, ...props }: Props) {
 	return (
-		<AntdFlex
-			className={cn('', className)}
-			{...props}
-		>
+		<AntdFlex className={cn('', className)} {...props}>
 			{children}
 		</AntdFlex>
 	);

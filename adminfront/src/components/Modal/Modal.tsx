@@ -7,16 +7,9 @@ interface Props extends ModalProps {
 	children?: ReactNode;
 }
 
-export default function Modal({
-	className,
-	children,
-	...props
-}: Props) {
+export default function Modal({ className, children, ...props }: Props) {
 	return (
-		<AntdModal
-			className={cn('', className)}
-			{...props}
-		>
+		<AntdModal className={cn('', className)} {...props}>
 			{children}
 		</AntdModal>
 	);
