@@ -11,7 +11,7 @@ import {
 
 import { IAdminResponse } from '@/types/account.ts';
 import { Text } from '@/components/Typography';
-import Dropdown from '@/components/Dropdown';
+import { Dropdown } from '@/components/Dropdown';
 
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(

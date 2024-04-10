@@ -8,6 +8,6 @@ interface Props extends AntdInputProps {
 
 export default function InputPassword({ className, ...props }: Props) {
 	return (
-		<AntdInput.Password size="large" className={cn('', className)} {...props} />
+		<AntdInput.Password size="large" className={cn('p-3 gap-2', className)} {...props} />
 	);
 }

@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
 import { cn } from '@/lib/utils';
-import Button from '@/components/Button';
+import { Button } from '@/components/Button';
 
 interface Props {
 	className?: string;

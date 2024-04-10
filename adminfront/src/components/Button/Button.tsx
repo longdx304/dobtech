@@ -13,7 +13,7 @@ export default function Button({
 }: Props) {
 	return (
 		<AntdButton
-			className={cn('', className)}
+			className={cn('leading-none', className)}
 			type={type}
 			size="large"
 			{...props}

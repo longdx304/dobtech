@@ -31,7 +31,7 @@ export default async function RootLayout({
 						{adminUser ? main : login}
 					</ConfigProvider>
 				</AntdRegistry>
-				{children}
+				{/* {children} */}
 			</body>
 		</html>
 	);
