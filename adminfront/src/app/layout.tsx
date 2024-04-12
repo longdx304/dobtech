@@ -5,7 +5,7 @@ import { getAdmin } from '@/actions/accounts';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 import theme from '../theme';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, App } from 'antd';
 
 const inter = Inter({ subsets: ['latin'] });
 

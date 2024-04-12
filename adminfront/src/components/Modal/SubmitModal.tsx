@@ -1,4 +1,6 @@
-import { Modal as AntdModal, ModalProps } from 'antd';
+'use client';
+import { Modal as AntdModal, ModalProps, Form } from 'antd';
+
 import { cn } from '@/lib/utils';
 import { ReactNode, useState } from 'react';
 import { Button, SubmitButton } from '@/components/Button';
@@ -6,34 +8,35 @@ import { Button, SubmitButton } from '@/components/Button';
 interface Props extends ModalProps {
 	className?: string;
 	children?: ReactNode;
-	handleSubmit?: () => void;
 	handleCancel: () => void;
-	formAction: (formData: FormData) => any;
+	form: any;
 }
 
 export default function SubmitModal({
 	handleCancel,
-	formAction,
 	className,
+	form,
 	children,
 	...props
 }: Props) {
+
 	return (
 		<AntdModal
 			className={cn('', className)}
+			// afterClose={() => form.resetFields()}
+			onCancel={handleCancel}
 			footer={[
 				<Button key="1" type="default" danger onClick={handleCancel}>
 					Huỷ
 				</Button>,
-				<SubmitButton key="2" form="modal">
+				<Button key="2" onClick={() => form.submit()}>
 					Xác nhận
-				</SubmitButton>,
+				</Button>,
 			]}
 			{...props}
 		>
-			<form action={formAction} id="modal" className="w-full space-y-4">
+			
 				{children}
-			</form>
 		</AntdModal>
 	);
 }

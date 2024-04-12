@@ -18,3 +18,17 @@ body {
   height: 20px;
   stroke-width: 1.5px;
 }
+
+/* Antd Form */
+.ant-form .ant-form-item-label {
+	padding: 0 0 0 !important;
+}
+
+.ant-form .ant-form-item-label label {
+	font-size: 16px !important;
+	font-weight: 500;
+}
+
+.ant-form .ant-form-item {
+	margin-bottom: 16px;
+}

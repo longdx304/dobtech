@@ -17,11 +17,11 @@ export interface IAdminResponse {
 }
 
 export enum ERoleEmp {
-	WarehouseManager = '1',
-	WarehouseStaff = '2',
-	Driver = '3',
-	AssistantDriver = '4',
-	InventoryChecker = '5',
+	WarehouseManager = 'warehouse-manager',
+	WarehouseStaff = 'warehouse-staff',
+	Driver = 'driver',
+	AssistantDriver = 'assistant-driver',
+	InventoryChecker = 'inventory-checker',
 }
 
 export const rolesEmployee = Object.freeze([
@@ -31,3 +31,10 @@ export const rolesEmployee = Object.freeze([
 	{ label: 'Kiểm hàng', value: ERoleEmp.InventoryChecker },
 	{ label: 'Phụ xe', value: ERoleEmp.AssistantDriver },
 ]);
+
+export type IUserRequest = {
+	email: string;
+	fullName: string;
+	phone: string;
+	rolesUser: string[];
+};
