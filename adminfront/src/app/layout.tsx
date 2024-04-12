@@ -5,7 +5,7 @@ import { getAdmin } from '@/actions/accounts';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 import theme from '../theme';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, App } from 'antd';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,7 +28,9 @@ export default async function RootLayout({
 			<body className={inter.className}>
 				<AntdRegistry>
 					<ConfigProvider theme={theme}>
-						{adminUser ? main : login}
+						<App>
+							{adminUser ? main : login}
+						</App>
 					</ConfigProvider>
 				</AntdRegistry>
 				{/* {children} */}
