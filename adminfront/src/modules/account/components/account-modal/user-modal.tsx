@@ -47,7 +47,7 @@ export default function UserModal({
 			message.success('Đăng ký nhân viên thành công');
 		} else {
 			// Update user
-			const result = await updateUser(user.id, values);
+			const result = await updateUser(user!.id, values);
 			message.success('Cập nhật nhân viên thành công');
 		}
 		handleCancel();
