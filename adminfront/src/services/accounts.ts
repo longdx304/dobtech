@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { revalidateTag } from 'next/cache';
 
-import { getToken, createUser, updateUser } from '@/actions/accounts';
+import { getToken } from '@/actions/accounts';
 import { handleErrorZod } from '@/lib/utils';
 
 const loginSchema = z.object({
@@ -31,21 +31,3 @@ export async function adminLogIn(_currentState: unknown, formData: FormData) {
 		return { result: 'Email hoặc mật khẩu không đúng!' };
 	}
 }
-
-// export async function createMember(payload: IUserRequest) {
-// 	try {
-
-// 		// Case User Id is exists so update user, otherwise to create new user;
-// 		if (userId) {
-// 			console.log("update")
-// 			result = await updateUser(userId, { fullName, phone, rolesUser });
-// 		} else {
-// 			result = await createUser({ email, fullName, phone, rolesUser });
-// 		}
-// 		revalidateTag('user');
-// 		return { result: result, success: true };
-// 	} catch (error) {
-// 		console.log(' error ', error);
-// 		return { result: 'Đăng ký nhân viên thất bại!', success: false };
-// 	}
-// }

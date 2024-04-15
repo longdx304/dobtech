@@ -16,7 +16,12 @@ export interface IAdminResponse {
 	metadata: json | null;
 }
 
-export enum ERoleEmp {
+export enum ERole {
+  ADMIN = "admin",
+	MEMBER = "member"
+}
+
+export enum EPermissions {
 	WarehouseManager = 'warehouse-manager',
 	WarehouseStaff = 'warehouse-staff',
 	Driver = 'driver',
@@ -25,16 +30,16 @@ export enum ERoleEmp {
 }
 
 export const rolesEmployee = Object.freeze([
-	{ label: 'Quản lý kho', value: ERoleEmp.WarehouseManager },
-	{ label: 'Nhân viên kho', value: ERoleEmp.WarehouseStaff },
-	{ label: 'Tài xế', value: ERoleEmp.Driver },
-	{ label: 'Kiểm hàng', value: ERoleEmp.InventoryChecker },
-	{ label: 'Phụ xe', value: ERoleEmp.AssistantDriver },
+	{ label: 'Quản lý kho', value: EPermissions.WarehouseManager },
+	{ label: 'Nhân viên kho', value: EPermissions.WarehouseStaff },
+	{ label: 'Tài xế', value: EPermissions.Driver },
+	{ label: 'Kiểm hàng', value: EPermissions.InventoryChecker },
+	{ label: 'Phụ xe', value: EPermissions.AssistantDriver },
 ]);
 
 export type IUserRequest = {
 	email: string;
 	fullName: string;
 	phone: string;
-	rolesUser: string[];
+	permissions: string[];
 };

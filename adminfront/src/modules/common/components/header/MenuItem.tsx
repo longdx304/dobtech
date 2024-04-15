@@ -40,16 +40,20 @@ const itemDropdown: MenuProps['items'] = [
 ];
 
 // Item menu overview
-const itemOverview: MenuProps['items'] = [
-	getItem('Quản lý nhân viên', 'overview-1', <Users />),
-	getItem('Đơn hàng của bạn', 'overview-2', <CalendarRange />),
-	getItem('Label', 'overview-3', <Settings />, [
-		getItem('Option 5', '5'),
-		getItem('Option 6', '6'),
-		getItem('Option 7', '7'),
-		getItem('Option 8', '8'),
-	]),
-];
+const itemOverview: MenuProps['items'] = (
+	role: string,
+	permissions: string[]
+) =>
+	[
+		role === 'admin' && getItem('Quản lý nhân viên', 'overview-1', <Users />),
+		getItem('Đơn hàng của bạn', 'overview-2', <CalendarRange />),
+		getItem('Label', 'overview-3', <Settings />, [
+			getItem('Option 5', '5'),
+			getItem('Option 6', '6'),
+			getItem('Option 7', '7'),
+			getItem('Option 8', '8'),
+		]),
+	].filter(() => true);
 
 // Item menu option
 const itemOption: MenuProps['items'] = [
@@ -71,7 +75,7 @@ const itemUser = (
 			<a onClick={(e) => e.preventDefault()}>
 				<Flex className="w-full" justify="space-between" align="center">
 					<div className="font-bold">
-						{`${user.first_name} ${user.last_name}`}{' '}
+						{`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}
 					</div>
 					<Ellipsis />
 				</Flex>
@@ -86,11 +90,21 @@ const itemUser = (
 export const menuItems = (
 	user: IAdminResponse,
 	handleDropdownClick: (e: any) => void
-) => [
-	getItem('Tổng quan', 'overview', null, itemOverview, 'group'),
-	getItem('Tuỳ chỉnh', 'option', null, itemOption, 'group'),
-	getItem('', 'user', null, itemUser(user, handleDropdownClick), 'group'),
-];
+) => {
+	const role = user.role;
+	const permissions = user.permissions.split(',');
+	return [
+		getItem(
+			'Tổng quan',
+			'overview',
+			null,
+			itemOverview(role, permissions),
+			'group'
+		),
+		getItem('Tuỳ chỉnh', 'option', null, itemOption, 'group'),
+		getItem('', 'user', null, itemUser(user, handleDropdownClick), 'group'),
+	];
+};
 
 export const menuRoutes: Record<string, string> = {
 	'overview-1': '/accounts',

@@ -2,7 +2,7 @@
 import { Plus, CircleAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { User } from '@medusajs/medusa';
-import { Modal } from 'antd';
+import { Modal, message } from 'antd';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 import { Card } from '@/components/Card';
@@ -60,7 +60,12 @@ const AccountList = ({ data }: Props) => {
 			okText: 'Đồng ý',
 			cancelText: 'Huỷ',
 			async onOk() {
-				await deleteUser(userId);
+				try {
+					await deleteUser(userId);
+					message.success('Xoá nhân viên thành công!');
+				} catch (error) {
+					message.error('Xoá nhân viên thất bại!');
+				}
 			},
 			onCancel() {
 				console.log('Cancel');
@@ -69,7 +74,6 @@ const AccountList = ({ data }: Props) => {
 	};
 
 	const handleChangePage = (page: number) => {
-		console.log('page', page);
 		// create new search params with new value
 		const newSearchParams = updateSearchQuery(searchParams, {
 			page: page,
@@ -91,8 +95,8 @@ const AccountList = ({ data }: Props) => {
 				dataSource={data?.users ?? []}
 				rowKey="id"
 				pagination={{
-					total: Math.floor(data.count / data.limit),
-					pageSize: data.limit,
+					total: Math.floor(data?.count / data?.limit),
+					pageSize: data?.limit,
 					current: currentPage,
 					onChange: handleChangePage,
 				}}

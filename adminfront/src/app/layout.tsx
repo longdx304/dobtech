@@ -28,9 +28,7 @@ export default async function RootLayout({
 			<body className={inter.className}>
 				<AntdRegistry>
 					<ConfigProvider theme={theme}>
-						<App>
-							{adminUser ? main : login}
-						</App>
+						<App>{adminUser ? main : login}</App>
 					</ConfigProvider>
 				</AntdRegistry>
 				{/* {children} */}
