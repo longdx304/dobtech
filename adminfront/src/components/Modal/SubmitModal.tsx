@@ -19,7 +19,6 @@ export default function SubmitModal({
 	children,
 	...props
 }: Props) {
-
 	return (
 		<AntdModal
 			className={cn('', className)}
@@ -29,14 +28,19 @@ export default function SubmitModal({
 				<Button key="1" type="default" danger onClick={handleCancel}>
 					Huỷ
 				</Button>,
-				<Button key="2" onClick={() => form.submit()}>
+				<Button
+					key="2"
+					htmlType="submit"
+					key="submit"
+					onClick={() => form?.submit()}
+					data-testid="submitButton"
+				>
 					Xác nhận
 				</Button>,
 			]}
 			{...props}
 		>
-			
-				{children}
+			{children}
 		</AntdModal>
 	);
 }

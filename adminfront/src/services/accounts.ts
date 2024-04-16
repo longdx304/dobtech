@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { revalidateTag } from 'next/cache';
 
-import { getToken, createUser, updateUser } from '@/actions/accounts';
+import { getToken } from '@/actions/accounts';
 import { handleErrorZod } from '@/lib/utils';
 
 const loginSchema = z.object({
@@ -29,23 +29,5 @@ export async function adminLogIn(_currentState: unknown, formData: FormData) {
 		return { result: null };
 	} catch (error: any) {
 		return { result: 'Email hoặc mật khẩu không đúng!' };
-	}
-}
-
-export async function createMember(_currentState: unknown, formData: FormData) {
-	try {
-		const email = formData.get('email') as string;
-		const fullName = formData.get('fullName') as string;
-		const phone = formData.get('phone') as unknown as number;
-		const rolesEmp = formData.getAll('rolesEmp') as any;
-
-		const resolver = handleErrorZod(
-			createMemberSchema.safeParse({ email, fullName, phone, rolesEmp })
-		);
-		if (resolver) {
-			return resolver;
-		}
-	} catch (error: any) {
-		console.log(' error ', error.message);
 	}
 }

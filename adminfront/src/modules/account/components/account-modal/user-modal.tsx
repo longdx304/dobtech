@@ -6,10 +6,10 @@ import { Form, type FormProps, App } from 'antd';
 import { User } from '@medusajs/medusa';
 
 import { Modal, SubmitModal } from '@/components/Modal';
-import { InputWithLabel } from '@/components/Input';
+import { Input } from '@/components/Input';
 import { Title } from '@/components/Typography';
 import { CheckboxGroup } from '@/components/Checkbox';
-import { rolesEmployee, ERoleEmp, IUserRequest } from '@/types/account';
+import { rolesEmployee, EPermissions, IUserRequest } from '@/types/account';
 import { createUser, updateUser } from '@/actions/accounts';
 import { isEmpty } from 'lodash';
 
@@ -30,27 +30,40 @@ export default function UserModal({
 	const [form] = Form.useForm();
 	const { message } = App.useApp();
 
+	const titleModal = `${isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
+
 	useEffect(() => {
-		form.setFieldsValue({
-			email: user?.email ?? '',
-			phone: user?.phone ?? '',
-			fullName: user?.first_name ?? '',
-		});
-	}, [user]);
+		form &&
+			form?.setFieldsValue({
+				email: user?.email ?? '',
+				phone: user?.phone ?? '',
+				fullName: user?.first_name ?? '',
+				permissions: user?.permissions?.split(',') ?? [
+					EPermissions.WarehouseStaff,
+					EPermissions.WarehouseManager,
+					EPermissions.Driver,
+					EPermissions.InventoryChecker,
+					EPermissions.AssistantDriver,
+				],
+			});
+	}, [user, form]);
 
 	// Submit form
 	const onFinish: FormProps<IUserRequest>['onFinish'] = async (values) => {
-		console.log('value:', values);
-		// Create user
-		if (isEmpty(user)) {
-			const result = await createUser(values);
-			message.success('Đăng ký nhân viên thành công');
-		} else {
-			// Update user
-			const result = await updateUser(user!.id, values);
-			message.success('Cập nhật nhân viên thành công');
+		try {
+			// Create user
+			if (isEmpty(user)) {
+				const result = await createUser(values);
+				message.success('Đăng ký nhân viên thành công');
+			} else {
+				// Update user
+				const result = await updateUser(user.id, values);
+				message.success('Cập nhật nhân viên thành công');
+			}
+			handleCancel();
+		} catch (error: any) {
+			message.error(error?.message);
 		}
-		handleCancel();
 	};
 
 	const onFinishFailed: FormProps<IUserRequest>['onFinishFailed'] = (
@@ -67,47 +80,62 @@ export default function UserModal({
 			handleCancel={handleCancel}
 			form={form}
 		>
-			<Title level={3} className="text-center">{`${
-				isEmpty(user) ? 'Thêm mới' : 'Cập nhật'
-			} nhân viên`}</Title>
+			<Title level={3} className="text-center">
+				{titleModal}
+			</Title>
 			<Form form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
 				<Form.Item
+					labelCol={{ span: 24 }}
 					name="email"
 					rules={[{ required: true, message: 'Email không đúng định dạng!' }]}
 					label="Email:"
-					initialValue={user?.email}
 				>
-					<InputWithLabel placeholder="Email" prefix={<Mail />} />
+					<Input
+						placeholder="Email"
+						prefix={<Mail />}
+						disabled={!isEmpty(user)}
+						data-testid="email"
+					/>
 				</Form.Item>
 				<Form.Item
+					labelCol={{ span: 24 }}
 					name="fullName"
 					rules={[{ required: true, message: 'Tên phải có ít nhất 2 ký tự!' }]}
 					label="Tên nhân viên:"
-					initialValue={user?.first_name}
 				>
-					<InputWithLabel placeholder="Tên nhân viên" prefix={<UserRound />} />
+					<Input
+						placeholder="Tên nhân viên"
+						prefix={<UserRound />}
+						data-testid="fullName"
+					/>
 				</Form.Item>
 				<Form.Item
+					labelCol={{ span: 24 }}
 					name="phone"
-					rules={[{ required: true, message: 'Tên phải có ít nhất 2 ký tự!' }]}
+					rules={[
+						{
+							required: true,
+							message: 'Số điện thoại phải có ít nhất 2 ký tự!',
+						},
+						{ min: 10, message: 'Số điện thoại phải có ' },
+					]}
 					label="Số diện thoại:"
-					initialValue={user?.phone}
 				>
-					<InputWithLabel placeholder="Số điện thoại" prefix={<Phone />} />
+					<Input
+						placeholder="Số điện thoại"
+						prefix={<Phone />}
+						data-testid="phone"
+					/>
 				</Form.Item>
 				<Form.Item
+					labelCol={{ span: 24 }}
 					label="Phân quyền nhân viên"
-					name="rolesUser"
-					rules={[{ required: true, message: 'Tên phải có ít nhất 2 ký tự!' }]}
-					initialValue={[
-						ERoleEmp.WarehouseStaff,
-						ERoleEmp.WarehouseManager,
-						ERoleEmp.Driver,
-						ERoleEmp.InventoryChecker,
-						ERoleEmp.AssistantDriver,
+					name="permissions"
+					rules={[
+						{ required: true, message: 'Nhân viên phải có ít nhất 1 vai trò!' },
 					]}
 				>
-					<CheckboxGroup options={rolesEmployee} />
+					<CheckboxGroup data-testid="permissions" options={rolesEmployee} />
 				</Form.Item>
 			</Form>
 		</SubmitModal>

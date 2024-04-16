@@ -42,7 +42,10 @@ export async function getToken(credentials: IAdminAuth) {
 export async function getAdmin() {
 	const headers = await getMedusaHeaders(['auth']);
 
-	return medusaClient.admin.auth.getSession(headers).then(({ user }) => user);
+	return medusaClient.admin.auth
+		.getSession(headers)
+		.then(({ user }) => user)
+		.catch((error) => console.log('error', error));
 }
 
 /**
@@ -82,16 +85,11 @@ export async function listUser(
 	searchParams: Record<string, unknown>
 ): Promise<TResponse<Omit<User, 'password_hash'>> | null> {
 	try {
+		const headers = await getMedusaHeaders(['users']);
 		const limitData = searchParams?.limit ?? 10;
 		const page = searchParams?.page ?? 1;
 		const offsetData = +limitData * (+page - 1);
 		delete searchParams.page;
-
-		const headers = {
-			next: {
-				tags: ['users'],
-			},
-		} as Record<string, any>;
 
 		const { users, count, offset, limit } = await medusaClient.admin.users.list(
 			{ ...searchParams, limit: limitData, offset: offsetData },
@@ -100,14 +98,13 @@ export async function listUser(
 
 		return { users, count, offset, limit };
 	} catch (error) {
-		console.log(error);
 		return null;
 	}
 }
 
 export async function createUser(payload: IUserRequest) {
-	const headers = await getMedusaHeaders(['user']);
-	const { email, fullName, phone, rolesUser } = payload;
+	const headers = await getMedusaHeaders(['users']);
+	const { email, fullName, phone, permissions } = payload;
 
 	return medusaClient.admin.users
 		.create(
@@ -115,6 +112,8 @@ export async function createUser(payload: IUserRequest) {
 				email,
 				password: '123456',
 				first_name: fullName,
+				phone,
+				permissions: permissions.join(','),
 			},
 			headers
 		)
@@ -124,17 +123,22 @@ export async function createUser(payload: IUserRequest) {
 				revalidateTag('users');
 				return user;
 			}
+		})
+		.catch((error: any) => {
+			throw new Error(error?.response?.data?.message ?? '');
 		});
 }
 
 export async function updateUser(userId: string, payload: IUserRequest) {
-	const headers = getMedusaHeaders(['user']);
-	const { email, fullName, phone, rolesUser } = payload;
+	const headers = await getMedusaHeaders(['users']);
+	const { fullName, phone, permissions } = payload;
 	return medusaClient.admin.users
 		.update(
 			userId,
 			{
 				first_name: fullName,
+				phone,
+				permissions: permissions.join(','),
 			},
 			headers
 		)
@@ -144,14 +148,22 @@ export async function updateUser(userId: string, payload: IUserRequest) {
 				revalidateTag('users');
 				return user;
 			}
+		})
+		.catch((error: any) => {
+			throw new Error(error?.response?.data?.message ?? '');
 		});
 }
 
 export async function deleteUser(userId: string) {
-	const headers = getMedusaHeaders(['user']);
+	const headers = await getMedusaHeaders(['users']);
 
-	return medusaClient.admin.users.delete(userId).then(() => {
-		revalidateTag('users');
-		return;
-	});
+	return medusaClient.admin.users
+		.delete(userId)
+		.then(() => {
+			revalidateTag('users');
+			return;
+		})
+		.catch((error: any) => {
+			throw new Error(error?.response?.data?.message ?? '');
+		});
 }
