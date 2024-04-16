@@ -117,11 +117,12 @@ export async function createUser(payload: IUserRequest) {
 			},
 			headers
 		)
-		.then(async ({ user }) => {
-			if (!isEmpty(user)) {
+		.then(async (data) => {
+			console.log(data)
+			if (!isEmpty(data.user)) {
 				// await setMetadata(user.id, { phone, rolesUser });
 				revalidateTag('users');
-				return user;
+				return data.user;
 			}
 		})
 		.catch((error: any) => {
@@ -158,7 +159,7 @@ export async function deleteUser(userId: string) {
 	const headers = await getMedusaHeaders(['users']);
 
 	return medusaClient.admin.users
-		.delete(userId)
+		.delete(userId, headers)
 		.then(() => {
 			revalidateTag('users');
 			return;
