@@ -1,6 +1,5 @@
 'use client';
-import { User } from '@medusajs/medusa';
-import { App, Form, message, type FormProps } from 'antd';
+import { Form, message, type FormProps } from 'antd';
 import { Mail, Phone, UserRound } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -11,7 +10,6 @@ import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
 import { EPermissions, IAdminResponse, IUserRequest, rolesEmployee } from '@/types/account';
 import _ from 'lodash';
-import { TResponse } from '@/types/common';
 
 interface Props {
 	state: boolean;

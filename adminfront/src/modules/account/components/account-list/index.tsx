@@ -84,9 +84,6 @@ const AccountList = ({ data }: Props) => {
 		[data]
 	);
 
-	console.log('data users', data);
-	
-
 	return (
 		<Card className="w-full">
 			<Table

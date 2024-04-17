@@ -1,12 +1,11 @@
-import type { TableProps } from 'antd';
-import { User, Pencil, X } from 'lucide-react';
+import { Pencil, User, X } from 'lucide-react';
 
 import { Avatar } from '@/components/Avatar';
+import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
-import { Button } from '@/components/Button';
-import { User as TUser } from '@medusajs/medusa';
 import { IAdminResponse } from '@/types/account';
+import { User as TUser } from '@medusajs/medusa';
 
 interface Props {
 	handleDeleteUser: (userId: TUser['id']) => void;

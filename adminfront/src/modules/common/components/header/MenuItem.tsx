@@ -2,6 +2,7 @@ import type { MenuProps } from 'antd';
 import { Flex } from 'antd';
 import {
 	CalendarRange,
+	ClipboardPenLine,
 	Ellipsis,
 	LogOut,
 	PackageSearch,
@@ -46,8 +47,9 @@ const itemOverview = (
 ) =>
 	[
 		role === 'admin' && getItem('Quản lý nhân viên', 'overview-1', <Users />),
-		getItem('Đơn hàng của bạn', 'overview-2', <CalendarRange />),
-		getItem('Label', 'overview-3', <Settings />, [
+		getItem('Quản lý sản phẩm', 'overview-2', <ClipboardPenLine />),
+		getItem('Đơn hàng của bạn', 'overview-3', <CalendarRange />),
+		getItem('Label', 'overview-4', <Settings />, [
 			getItem('Option 5', '5'),
 			getItem('Option 6', '6'),
 			getItem('Option 7', '7'),

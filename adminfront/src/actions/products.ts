@@ -5,12 +5,12 @@ import { medusaClient } from '@/lib/database/config';
 import { Product } from '@medusajs/medusa';
 
 import { TResponse } from '@/types/common';
-import { IProductRequest } from '@/types/products';
+import { IProductRequest, IProductResponse } from '@/types/products';
 import { getMedusaHeaders } from './common';
 
 export async function listProducts(
 	searchParams: Record<string, unknown>
-): Promise<TResponse<Omit<Product, 'password_hash'>> | null> {
+): Promise<TResponse<IProductResponse> | null> {
 	try {
 		const headers = await getMedusaHeaders(['products']);
 
@@ -25,9 +25,12 @@ export async function listProducts(
 				headers
 			);
 
-		return { products, count, offset, limit } as unknown as TResponse<
-			Omit<Product, 'password_hash'>
-		>;
+		return {
+			data: products,
+			count,
+			offset,
+			limit,
+		} as unknown as TResponse<IProductResponse>;
 	} catch (error) {
 		console.log(error);
 		return null;
@@ -42,32 +45,64 @@ export async function createProduct(payload: IProductRequest) {
 		{
 			title,
 			is_giftcard: false,
-			discountable: false,
-		},
-		headers
-	);
-}
-
-export async function createProductVariant(productId: string, payload: any) {
-	const headers = await getMedusaHeaders(['product']);
-	const { color, quantity, price, inventoryQuantity } = payload;
-
-	return medusaClient.admin.products.createVariant(
-		productId,
-		{
-			title: color,
-			prices: [
+			discountable: true,
+			options: [
 				{
-					amount: price,
-					currency_code: 'vnd',
+					title: color, // Color
 				},
 			],
-			inventory_quantity: inventoryQuantity,
-			metadata: {
-				quantity,
-			},
+			variants: [
+				{
+					title: title,
+					prices: [
+						{
+							amount: price,
+							currency_code: 'vnd',
+						},
+					],
+					options: [
+						{
+							value: 'White',
+						},
+						{
+							value: 'Small',
+						},
+					],
+					length: quantity,
+					inventory_quantity: inventoryQuantity,
+				},
+			],
 		},
 		headers
 	);
 }
 
+export async function updateProduct(
+	productId: string,
+	payload: Partial<IProductRequest>
+) {
+	const headers = await getMedusaHeaders(['product']);
+	const product = await medusaClient.admin.products.retrieve(
+		productId,
+		headers
+	);
+
+	if (!product) {
+		throw new Error(`Product with ID ${productId} not found.`);
+	}
+
+	const updatedProduct = await medusaClient.admin.products.update(
+		productId,
+		{
+			...product,
+			...payload,
+		},
+		headers
+	);
+	return updatedProduct;
+}
+
+export async function deleteProduct(productId: string) {
+	const headers = await getMedusaHeaders(['product']);
+	return medusaClient.admin.products.delete(productId, headers);
+}
