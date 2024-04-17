@@ -2,7 +2,7 @@
 import { ChangeEvent } from 'react';
 import { Search } from 'lucide-react';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
-import { debounce } from 'lodash';
+import _ from 'lodash';
 
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
@@ -25,7 +25,7 @@ const AccountSearch = ({}: Props) => {
 	};
 
 	// Function use debounce for onChange input
-	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
+	const handleChangeDebounce = _.debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
 		// create new search params with new value
 		const newSearchParams = updateSearchQuery(searchParams, {

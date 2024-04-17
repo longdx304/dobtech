@@ -40,7 +40,7 @@ const itemDropdown: MenuProps['items'] = [
 ];
 
 // Item menu overview
-const itemOverview: MenuProps['items'] = (
+const itemOverview = (
 	role: string,
 	permissions: string[]
 ) =>
@@ -92,13 +92,13 @@ export const menuItems = (
 	handleDropdownClick: (e: any) => void
 ) => {
 	const role = user.role;
-	const permissions = user.permissions.split(',');
+	const permissions = user?.permissions?.split(',');
 	return [
 		getItem(
 			'Tổng quan',
 			'overview',
 			null,
-			itemOverview(role, permissions),
+			itemOverview(role, permissions) as MenuItem[],
 			'group'
 		),
 		getItem('Tuỳ chỉnh', 'option', null, itemOption, 'group'),

@@ -2,15 +2,14 @@
 
 // Authentication actions
 import { medusaClient } from '@/lib/database/config';
-import { cookies } from 'next/headers';
+import _ from 'lodash';
 import { revalidateTag } from 'next/cache';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { isEmpty } from 'lodash';
-import { User } from '@medusajs/medusa';
 
-import { getMedusaHeaders } from './common';
-import { IAdminAuth, IUserRequest } from '@/types/account';
+import { IAdminAuth, IAdminResponse, IUserRequest } from '@/types/account';
 import { TResponse } from '@/types/common';
+import { getMedusaHeaders } from './common';
 
 /**
  */
@@ -22,6 +21,7 @@ export async function getToken(credentials: IAdminAuth) {
 			},
 		})
 		.then(({ access_token }) => {
+			console.log('access_token', access_token);
 			access_token &&
 				cookies().set('_medusa_jwt', access_token, {
 					maxAge: 60 * 60 * 24 * 7,
@@ -68,25 +68,26 @@ export async function signOut() {
 /**
  *
  */
-export async function setMetadata(id, payload) {
-	return medusaClient.admin.users.setMetadata(id, [
-		{
-			key: 'phone',
-			value: '123456789',
-		},
-		{
-			key: 'rolesUser',
-			value: ['1', '2'],
-		},
-	]);
-}
+// export async function setMetadata(id, payload) {
+// 	return medusaClient.admin.users.setMetadata(id, [
+// 		{
+// 			key: 'phone',
+// 			value: '123456789',
+// 		},
+// 		{
+// 			key: 'rolesUser',
+// 			value: ['1', '2'],
+// 		},
+// 	]);
+// }
 
 export async function listUser(
 	searchParams: Record<string, unknown>
-): Promise<TResponse<Omit<User, 'password_hash'>> | null> {
+): Promise<TResponse<IAdminResponse> | null> {
 	try {
 		const headers = await getMedusaHeaders(['users']);
-		const limitData = searchParams?.limit ?? 10;
+		const limitData: number = (searchParams?.limit as number) ?? 10;
+
 		const page = searchParams?.page ?? 1;
 		const offsetData = +limitData * (+page - 1);
 		delete searchParams.page;
@@ -96,7 +97,12 @@ export async function listUser(
 			headers
 		);
 
-		return { users, count, offset, limit };
+		return {
+			data: users,
+			count,
+			offset,
+			limit,
+		} as unknown as TResponse<IAdminResponse>;
 	} catch (error) {
 		return null;
 	}
@@ -114,11 +120,11 @@ export async function createUser(payload: IUserRequest) {
 				first_name: fullName,
 				phone,
 				permissions: permissions.join(','),
-			},
+			} as any,
 			headers
 		)
 		.then(async ({ user }) => {
-			if (!isEmpty(user)) {
+			if (!_.isEmpty(user)) {
 				// await setMetadata(user.id, { phone, rolesUser });
 				revalidateTag('users');
 				return user;
@@ -139,11 +145,11 @@ export async function updateUser(userId: string, payload: IUserRequest) {
 				first_name: fullName,
 				phone,
 				permissions: permissions.join(','),
-			},
+			} as any,
 			headers
 		)
 		.then(async ({ user }) => {
-			if (!isEmpty(user)) {
+			if (!_.isEmpty(user)) {
 				// await setMetadata(user.id, { phone, rolesUser });
 				revalidateTag('users');
 				return user;
@@ -158,7 +164,7 @@ export async function deleteUser(userId: string) {
 	const headers = await getMedusaHeaders(['users']);
 
 	return medusaClient.admin.users
-		.delete(userId)
+		.delete(userId, headers)
 		.then(() => {
 			revalidateTag('users');
 			return;

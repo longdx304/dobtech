@@ -1,24 +1,23 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { Mail, UserRound, Phone } from 'lucide-react';
-import { useFormState } from 'react-dom';
-import { Form, type FormProps, App } from 'antd';
 import { User } from '@medusajs/medusa';
+import { App, Form, message, type FormProps } from 'antd';
+import { Mail, Phone, UserRound } from 'lucide-react';
+import { useEffect } from 'react';
 
-import { Modal, SubmitModal } from '@/components/Modal';
-import { Input } from '@/components/Input';
-import { Title } from '@/components/Typography';
-import { CheckboxGroup } from '@/components/Checkbox';
-import { rolesEmployee, EPermissions, IUserRequest } from '@/types/account';
 import { createUser, updateUser } from '@/actions/accounts';
-import { isEmpty } from 'lodash';
+import { CheckboxGroup } from '@/components/Checkbox';
+import { Input } from '@/components/Input';
+import { SubmitModal } from '@/components/Modal';
+import { Title } from '@/components/Typography';
+import { EPermissions, IAdminResponse, IUserRequest, rolesEmployee } from '@/types/account';
+import _ from 'lodash';
+import { TResponse } from '@/types/common';
 
 interface Props {
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
-	user: Omit<User, 'password_hash'> | null;
-	// setCurrentUser: () => void;
+	user: IAdminResponse | null;
 }
 
 export default function UserModal({
@@ -28,9 +27,11 @@ export default function UserModal({
 	user,
 }: Props) {
 	const [form] = Form.useForm();
-	const { message } = App.useApp();
+	// const { message } = App.useApp();
+	const [messageApi, contextHolder] = message.useMessage();
 
-	const titleModal = `${isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
+
+	const titleModal = `${_.isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
 
 	useEffect(() => {
 		form &&
@@ -52,7 +53,7 @@ export default function UserModal({
 	const onFinish: FormProps<IUserRequest>['onFinish'] = async (values) => {
 		try {
 			// Create user
-			if (isEmpty(user)) {
+			if (_.isEmpty(user)) {
 				const result = await createUser(values);
 				message.success('Đăng ký nhân viên thành công');
 			} else {
@@ -62,7 +63,11 @@ export default function UserModal({
 			}
 			handleCancel();
 		} catch (error: any) {
-			message.error(error?.message);
+			// message.error(error?.message);
+			messageApi.open({
+				type: 'error',
+				content: error?.message,
+			});
 		}
 	};
 
@@ -93,7 +98,7 @@ export default function UserModal({
 					<Input
 						placeholder="Email"
 						prefix={<Mail />}
-						disabled={!isEmpty(user)}
+						disabled={!_.isEmpty(user)}
 						data-testid="email"
 					/>
 				</Form.Item>

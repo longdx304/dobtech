@@ -6,27 +6,25 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import { Button } from '@/components/Button';
 import { User as TUser } from '@medusajs/medusa';
+import { IAdminResponse } from '@/types/account';
 
 interface Props {
-	handleDeleteUser: (userId: TUser["id"]) => void;
-	handleEditUser: (record: TUser) => void;
+	handleDeleteUser: (userId: TUser['id']) => void;
+	handleEditUser: (record: IAdminResponse) => void;
 }
 
-const accountColumns: TableProps<any>['columns'] = ({
-	handleDeleteUser,
-	handleEditUser
-}: Props) => [
+const accountColumns = ({ handleDeleteUser, handleEditUser }: Props) => [
 	{
 		title: 'Avatar',
 		dataIndex: 'first_name',
 		key: 'first_name',
 		width: 40,
-		render: (text) => <Avatar icon={<User />} />,
+		render: (text: string) => <Avatar icon={<User />} />,
 	},
 	{
 		title: 'Thông tin',
 		key: 'information',
-		render: (_, record) => (
+		render: (_: any, record: any) => (
 			<Flex vertical gap="small">
 				<Text strong>{record.first_name}</Text>
 			</Flex>
@@ -36,9 +34,14 @@ const accountColumns: TableProps<any>['columns'] = ({
 		title: 'Action',
 		key: 'action',
 		width: 40,
-		render: (_, record) => (
+		render: (_: any, record: any) => (
 			<Flex>
-				<Button onClick={() => handleEditUser(record)} type="text" shape="circle" icon={<Pencil />} />
+				<Button
+					onClick={() => handleEditUser(record)}
+					type="text"
+					shape="circle"
+					icon={<Pencil />}
+				/>
 				<Button
 					onClick={() => handleDeleteUser(record.id)}
 					type="text"

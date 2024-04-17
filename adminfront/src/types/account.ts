@@ -1,9 +1,11 @@
+import { User } from '@medusajs/medusa';
+
 export interface IAdminAuth {
 	email: string;
 	password: string;
 }
 
-export interface IAdminResponse {
+export interface IAdminResponse{
 	id: string;
 	created_at: string;
 	updated_at: string;
@@ -12,6 +14,8 @@ export interface IAdminResponse {
 	email: string;
 	first_name: string | null;
 	last_name: string | null;
+	phone: string;
+	permissions: string;
 	api_token: string | null;
 	metadata: JSON | null;
 }

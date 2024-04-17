@@ -1,40 +1,36 @@
 'use client';
-import { Plus, CircleAlert } from 'lucide-react';
-import { useMemo, useState } from 'react';
 import { User } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { CircleAlert, Plus } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useMemo, useState } from 'react';
 
+import { deleteUser } from '@/actions/accounts';
+import { FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Table } from '@/components/Table';
-import { FloatButton } from '@/components/Button';
-import { Title } from '@/components/Typography';
-import { Input } from '@/components/Input';
-import { SubmitButton } from '@/components/Button';
-import { UserModal } from '@/modules/account/components/account-modal';
-import accountColumns from './account-column';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { TResponse } from '@/types/common';
-import { deleteUser } from '@/actions/accounts';
 import { updateSearchQuery } from '@/lib/utils';
+import { UserModal } from '@/modules/account/components/account-modal';
+import { TResponse } from '@/types/common';
+import accountColumns from './account-column';
+import { IAdminResponse } from '@/types/account';
 
 interface Props {
-	data: TResponse<Omit<User, 'password_hash'>> | null;
+	data: TResponse<IAdminResponse> | null;
 }
 
 const AccountList = ({ data }: Props) => {
+	console.log('data', data);
 	const searchParams = useSearchParams();
 	const { replace } = useRouter();
 	const pathname = usePathname();
 	const currentPage = searchParams.get('page') ?? 1;
 
 	const { state, onOpen, onClose } = useToggleState(false);
-	const [currentUser, setCurrentUser] = useState<Omit<
-		User,
-		'password_hash'
-	> | null>(null);
+	const [currentUser, setCurrentUser] = useState<IAdminResponse | null>(null);
 
-	const handleEditUser = (record: User) => {
+	const handleEditUser = (record: IAdminResponse) => {
 		setCurrentUser(record);
 		onOpen();
 	};
@@ -76,7 +72,7 @@ const AccountList = ({ data }: Props) => {
 	const handleChangePage = (page: number) => {
 		// create new search params with new value
 		const newSearchParams = updateSearchQuery(searchParams, {
-			page: page,
+			page: page.toString(),
 		});
 
 		// Replace url
@@ -88,21 +84,21 @@ const AccountList = ({ data }: Props) => {
 		[data]
 	);
 
+	console.log('data users', data);
+	
+
 	return (
 		<Card className="w-full">
 			<Table
 				columns={columns}
-				dataSource={data?.users ?? []}
+				dataSource={data?.data ?? []}
 				rowKey="id"
 				pagination={{
-					total: Math.floor(data?.count / data?.limit),
+					total: Math.floor(data?.count ?? 0 / (data?.limit ?? 0)),
 					pageSize: data?.limit,
-					current: currentPage,
+					current: currentPage as number,
 					onChange: handleChangePage,
 				}}
-				// onRow={(record, rowIndex) => ({
-				// 	onClick: (event) => onClickRow(record),
-				// })}
 			/>
 			<FloatButton
 				className="absolute"
