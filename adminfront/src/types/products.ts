@@ -4,6 +4,7 @@ export interface IProductResponse {
 	updated_at: string;
 	deleted_at: string | null;
 	title: string;
+  size?: string;
   color: string;
   quantity: number;
   price: number;

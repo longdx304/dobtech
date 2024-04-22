@@ -3,13 +3,36 @@ import { Search } from 'lucide-react';
 
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
-import { Title } from '@/components/Typography';
 import { Input } from '@/components/Input';
-import { SubmitButton } from '@/components/Button';
+import { Title } from '@/components/Typography';
+import { updateSearchQuery } from '@/lib/utils';
+import _ from 'lodash';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { ChangeEvent } from 'react';
 
 interface Props {}
 
 const ProductSearch = ({}: Props) => {
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const router = useRouter();
+
+	// Function use debounce for onChange input
+	const handleChangeDebounce = _.debounce(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const { value: inputValue } = e.target;
+			// create new search params with new value
+			const newSearchParams = updateSearchQuery(searchParams, {
+				q: inputValue,
+				page: '1',
+			});
+
+			// Replace url
+			router.replace(`${pathname}?${newSearchParams}`);
+		},
+		750
+	);
+
 	return (
 		<Card className="w-full space-y-4" bordered={false}>
 			<Flex vertical gap="small" className="w-full">
@@ -21,10 +44,8 @@ const ProductSearch = ({}: Props) => {
 						name="search"
 						prefix={<Search />}
 						placeholder="Vui lòng nhập tên hoặc mã sản phẩm"
+						onChange={handleChangeDebounce}
 					/>
-					<SubmitButton className="mt-1" data-testid="submitBtn">
-						Tìm kiếm
-					</SubmitButton>
 				</Flex>
 				{/* Filter & Sort */}
 			</Flex>

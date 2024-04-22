@@ -4,6 +4,7 @@ import {
 	BadgeDollarSign,
 	CandlestickChart,
 	Palette,
+	Scale3D,
 	Sigma,
 	UserRound,
 } from 'lucide-react';
@@ -13,8 +14,9 @@ import { InputWithLabel } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
 import { IProductRequest, IProductResponse } from '@/types/products';
-import { App, Form, type FormProps } from 'antd';
+import { App, Form, message, type FormProps } from 'antd';
 import _ from 'lodash';
+import { useEffect } from 'react';
 
 interface Props {
 	state: boolean;
@@ -30,19 +32,34 @@ export default function ProductModal({
 	product,
 }: Props) {
 	const [form] = Form.useForm();
-	const { message } = App.useApp();
+	const [messageApi, contextHolder] = message.useMessage();
+
+	const titleModal = `${_.isEmpty(product) ? 'Thêm mới' : 'Cập nhật'} sản phẩm`;
 
 	const onFinish: FormProps<IProductRequest>['onFinish'] = async (values) => {
 		console.log('value:', values);
 
-		if (_.isEmpty(product)) {
-			await createProduct(values);
-			message.success('Thêm sản phẩm thành công');
-		} else {
-			await updateProduct(product!.id, values);
-			message.success('Cập nhật sản phẩm thành công');
+		try {
+			if (_.isEmpty(product)) {
+				console.log('product:', values);
+				await createProduct(values);
+				message.success('Thêm sản phẩm thành công');
+			} else {
+				// await updateProduct(
+				// 	product!.id,
+				// 	'variant_01HW1ZKJ0PJ0Q8E7VFH1PQ67MQ',
+				// 	'opt_01HW1ZJ0175GJ4K2JDW50E13SS',
+				// 	values
+				// );
+				// message.success('Cập nhật sản phẩm thành công');
+			}
+			handleCancel();
+		} catch (error: any) {
+			messageApi.open({
+				type: 'error',
+				content: error?.message,
+			});
 		}
-		handleCancel();
 	};
 
 	const onFinishFailed: FormProps<IProductRequest>['onFinishFailed'] = (
@@ -51,6 +68,18 @@ export default function ProductModal({
 		console.log('Failed:', errorInfo);
 	};
 
+	useEffect(() => {
+		form &&
+			form?.setFieldsValue({
+				product: product?.title ?? '',
+				color: product?.color ?? '',
+				quantity: product?.quantity ?? '',
+				price: product?.price ?? '',
+				inventoryQuantity: product?.inventoryQuantity ?? '',
+			});
+	}, [product, form]);
+
+	console.log('form');
 	return (
 		<SubmitModal
 			open={stateModal}
@@ -59,12 +88,12 @@ export default function ProductModal({
 			handleCancel={handleCancel}
 			form={form}
 		>
-			<Title level={3} className="text-center">{`${
-				_.isEmpty(product) ? 'Thêm mới' : 'Cập nhật'
-			} sản phẩm`}</Title>
+			<Title level={3} className="text-center">
+				{titleModal}
+			</Title>
 			<Form form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
 				<Form.Item
-					name="productName"
+					name="title"
 					rules={[
 						{
 							required: true,
@@ -77,7 +106,7 @@ export default function ProductModal({
 					<InputWithLabel placeholder="Tên sản phẩm" prefix={<UserRound />} />
 				</Form.Item>
 				<Form.Item
-					name="colors"
+					name="color"
 					rules={[
 						{ required: true, message: 'Màu sắc phải có ít nhất 2 kí tự' },
 					]}

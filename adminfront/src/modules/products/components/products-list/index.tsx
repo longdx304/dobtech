@@ -1,5 +1,5 @@
 'use client';
-import { Plus } from 'lucide-react';
+import { CircleAlert, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { FloatButton } from '@/components/Button';
@@ -13,6 +13,8 @@ import { TResponse } from '@/types/common';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { updateSearchQuery } from '@/lib/utils';
 import { IProductResponse } from '@/types/products';
+import { Modal, message } from 'antd';
+import { deleteProduct } from '@/actions/products';
 
 interface Props {
 	data: TResponse<IProductResponse> | null;
@@ -25,24 +27,48 @@ const ProductList = ({ data }: Props) => {
 	const currentPage = searchParams.get('page') ?? 1;
 
 	const { state, onOpen, onClose } = useToggleState(false);
-
-	const [currentProduct, setCurrentProduct] = useState<IProductResponse | null>(null);
-
+	const [currentProduct, setCurrentProduct] = useState<IProductResponse | null>(
+		null
+	);
 
 	const handleEditProduct = (record: IProductResponse) => {
 		setCurrentProduct(record);
 		onOpen();
 	};
-	// const handleEditUser = (record: IAdminResponse) => {
-	// 	setCurrentUser(record);
-	// 	onOpen();
-	// };
-
-	const handleDeleteProduct = (productId: Product['id']) => {}
 
 	const handleCloseModal = () => {
 		setCurrentProduct(null);
 		onClose();
+	};
+
+	const handleDeleteProduct = (productId: Product['id']) => {
+		Modal.confirm({
+			title: 'Bạn có muốn xoá sản phẩm này không ?',
+			content:
+				'Sản phẩm sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá sản phẩm này chứ?',
+
+			icon: (
+				<CircleAlert
+					style={{ width: 32, height: 24 }}
+					className="mr-2"
+					color="#E7B008"
+				/>
+			),
+			okType: 'danger',
+			okText: 'Đồng ý',
+			cancelText: 'Huỷ',
+			async onOk() {
+				try {
+					await deleteProduct(productId);
+					message.success('Xoá nhân viên thành công!');
+				} catch (error) {
+					message.error('Xoá nhân viên thất bại!');
+				}
+			},
+			onCancel() {
+				console.log('Cancel');
+			},
+		});
 	};
 
 	const columns = useMemo(
@@ -61,7 +87,7 @@ const ProductList = ({ data }: Props) => {
 	};
 
 	console.log('data', data);
-	
+
 	return (
 		<Card className="w-full">
 			<Table
@@ -84,7 +110,7 @@ const ProductList = ({ data }: Props) => {
 			<ProductModal
 				state={state}
 				handleOk={onClose}
-				handleCancel={onClose}
+				handleCancel={handleCloseModal}
 				product={currentProduct}
 			/>
 		</Card>
