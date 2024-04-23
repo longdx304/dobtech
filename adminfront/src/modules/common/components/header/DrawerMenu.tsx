@@ -3,8 +3,7 @@ import { FC, MouseEvent } from 'react';
 import Image from 'next/image';
 import { Flex, Drawer, Menu } from 'antd';
 
-import Button from '@/components/Button';
-
+import { Button } from '@/components/Button';
 import { IAdminResponse } from '@/types/account';
 import Menubar from './Menubar';
 

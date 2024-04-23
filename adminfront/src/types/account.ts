@@ -15,3 +15,31 @@ export interface IAdminResponse {
 	api_token: string | null;
 	metadata: json | null;
 }
+
+export enum ERole {
+  ADMIN = "admin",
+	MEMBER = "member"
+}
+
+export enum EPermissions {
+	WarehouseManager = 'warehouse-manager',
+	WarehouseStaff = 'warehouse-staff',
+	Driver = 'driver',
+	AssistantDriver = 'assistant-driver',
+	InventoryChecker = 'inventory-checker',
+}
+
+export const rolesEmployee = Object.freeze([
+	{ label: 'Quản lý kho', value: EPermissions.WarehouseManager },
+	{ label: 'Nhân viên kho', value: EPermissions.WarehouseStaff },
+	{ label: 'Tài xế', value: EPermissions.Driver },
+	{ label: 'Kiểm hàng', value: EPermissions.InventoryChecker },
+	{ label: 'Phụ xe', value: EPermissions.AssistantDriver },
+]);
+
+export type IUserRequest = {
+	email: string;
+	fullName: string;
+	phone: string;
+	permissions: string[];
+};

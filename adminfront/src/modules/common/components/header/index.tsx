@@ -4,8 +4,8 @@ import { Menu } from 'lucide-react';
 import Image from 'next/image';
 import { Flex, Drawer } from 'antd';
 
-import Card from '@/components/Card';
-import Button from '@/components/Button';
+import { Card } from '@/components/Card';
+import { Button } from '@/components/Button';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import useScrollDirection from '@/lib/hooks/useScrollDirection';
 import DrawerMenu from './DrawerMenu';

@@ -1,11 +1,14 @@
 import { Typography, TitleProps } from 'antd';
+import { cn } from '@/lib/utils';
 
-interface Props extends TitleProps {};
+interface Props extends TitleProps {
+	className?: string;
+};
 
 const { Title: AntdTitle } = Typography;
 
-export default function Title({children,...props} : Props) {
+export default function Title({className, children,...props} : Props) {
 	return (
-		<AntdTitle {...props}>{children}</AntdTitle>
+		<AntdTitle {...props} className={cn("m-0", className)}>{children}</AntdTitle>
 	)
 }

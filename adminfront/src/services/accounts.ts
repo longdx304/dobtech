@@ -1,9 +1,10 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
-import { getToken } from '@/actions/accounts';
 import { z } from 'zod';
-import handleErrorZod from '@/lib/utils';
+import { revalidateTag } from 'next/cache';
+
+import { getToken } from '@/actions/accounts';
+import { handleErrorZod } from '@/lib/utils';
 
 const loginSchema = z.object({
 	email: z.string().email('Email không đúng định dạng'),

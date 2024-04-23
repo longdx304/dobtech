@@ -42,9 +42,6 @@ const Menubar = ({ user, className }: Props) => {
 		<Menu
 			className={className}
 			onClick={handleClickMenu}
-			// style={{ width: 256 }}
-			// defaultSelectedKeys={['1']}
-			// defaultOpenKeys={['sub1']}
 			mode="inline"
 			items={_menuItems}
 		/>
