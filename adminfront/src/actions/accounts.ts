@@ -123,11 +123,12 @@ export async function createUser(payload: IUserRequest) {
 			} as any,
 			headers
 		)
-		.then(async ({ user }) => {
-			if (!_.isEmpty(user)) {
+		.then(async (data) => {
+			console.log(data)
+			if (!_.isEmpty(data.user)) {
 				// await setMetadata(user.id, { phone, rolesUser });
 				revalidateTag('users');
-				return user;
+				return data.user;
 			}
 		})
 		.catch((error: any) => {

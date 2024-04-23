@@ -86,7 +86,7 @@ export default function UserModal({
 			<Title level={3} className="text-center">
 				{titleModal}
 			</Title>
-			<Form form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+			<Form id="form-user" form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name="email"

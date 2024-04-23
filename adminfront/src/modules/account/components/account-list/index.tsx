@@ -102,6 +102,7 @@ const AccountList = ({ data }: Props) => {
 				icon={<Plus color="white" />}
 				type="primary"
 				onClick={onOpen}
+				data-testid="btnCreateAccount"
 			/>
 			<UserModal
 				state={state}
