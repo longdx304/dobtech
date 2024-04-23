@@ -60,9 +60,9 @@ const ProductList = ({ data }: Props) => {
 			async onOk() {
 				try {
 					await deleteProduct(productId);
-					message.success('Xoá nhân viên thành công!');
+					message.success('Xoá sản phẩm thành công!');
 				} catch (error) {
-					message.error('Xoá nhân viên thất bại!');
+					message.error('Xoá sản phẩm thất bại!');
 				}
 			},
 			onCancel() {
@@ -106,6 +106,7 @@ const ProductList = ({ data }: Props) => {
 				icon={<Plus color="white" />}
 				type="primary"
 				onClick={onOpen}
+				data-testid="btnCreateProduct"
 			/>
 			<ProductModal
 				state={state}

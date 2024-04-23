@@ -1,5 +1,5 @@
 import { EPermissions } from '@/types/account';
-import createUser from '../../fixtures/accounts/create-user';
+// import createUser from '../../fixtures/accounts/create-user';
 describe('template spec', () => {
 	const email = 'testcreateuser@test.com';
 	const phone = '0102030405';

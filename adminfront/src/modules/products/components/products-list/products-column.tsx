@@ -1,4 +1,4 @@
-import { PackageSearch, Pencil, X } from 'lucide-react';
+import { Pencil, X } from 'lucide-react';
 
 import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
@@ -6,7 +6,6 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import { IProductResponse } from '@/types/products';
 import { Product } from '@medusajs/medusa';
-import Image from 'next/image';
 
 interface Props {
 	handleDeleteProduct: (userId: Product['id']) => void;
@@ -92,12 +91,14 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 					type="text"
 					shape="circle"
 					icon={<Pencil />}
+					data-testid="editProduct"
 				/>
 				<Button
 					onClick={() => handleDeleteProduct(record.id)}
 					type="text"
 					shape="circle"
 					icon={<X color="red" />}
+					data-testid="deleteProduct"
 				/>
 			</Flex>
 		),

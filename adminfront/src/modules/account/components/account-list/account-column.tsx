@@ -4,12 +4,7 @@ import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
-<<<<<<< HEAD
-import { IAdminResponse } from '@/types/account';
-=======
-import { Button } from '@/components/Button';
 import { Tag } from '@/components/Tag';
->>>>>>> feat/admin_accounts
 import { User as TUser } from '@medusajs/medusa';
 import { rolesEmployee } from '@/types/account';
 
@@ -49,7 +44,7 @@ const accountColumns: TableProps<any>['columns'] = ({
 					</Text>
 				</Flex>
 				<Flex wrap="wrap" gap="small">
-					{record.permissions.split(',').map((permission) => (
+					{record?.permissions?.split(',').map((permission) => (
 						<Tag
 							key={permission}
 							color={COLOR_PERMISSION[permission] as keyof COLOR_PERMISSION}

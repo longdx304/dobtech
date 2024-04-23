@@ -35,7 +35,7 @@ export default function SubmitModal({
 					data-testid="submitButton"
 				>
 					Xác nhận
-				</Button>,
+				</Button>
 			]}
 			{...props}
 		>

@@ -8,7 +8,12 @@ import { CheckboxGroup } from '@/components/Checkbox';
 import { Input } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import { EPermissions, IAdminResponse, IUserRequest, rolesEmployee } from '@/types/account';
+import {
+	EPermissions,
+	IAdminResponse,
+	IUserRequest,
+	rolesEmployee,
+} from '@/types/account';
 import _ from 'lodash';
 
 interface Props {
@@ -28,7 +33,6 @@ export default function UserModal({
 	// const { message } = App.useApp();
 	const [messageApi, contextHolder] = message.useMessage();
 
-
 	const titleModal = `${_.isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
 
 	useEffect(() => {
@@ -46,6 +50,8 @@ export default function UserModal({
 				],
 			});
 	}, [user, form]);
+
+	console.log('user', user, form.getFieldValue('phone'));
 
 	// Submit form
 	const onFinish: FormProps<IUserRequest>['onFinish'] = async (values) => {
@@ -86,7 +92,12 @@ export default function UserModal({
 			<Title level={3} className="text-center">
 				{titleModal}
 			</Title>
-			<Form id="form-user" form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+			<Form
+				id="form-user"
+				form={form}
+				onFinish={onFinish}
+				onFinishFailed={onFinishFailed}
+			>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name="email"
