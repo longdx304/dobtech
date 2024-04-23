@@ -1,11 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Mail, UserRound, Phone } from 'lucide-react';
-import { useFormState } from 'react-dom';
 import { Form, type FormProps, App } from 'antd';
 import { User } from '@medusajs/medusa';
 
-import { Modal, SubmitModal } from '@/components/Modal';
+import { SubmitModal } from '@/components/Modal';
 import { Input } from '@/components/Input';
 import { Title } from '@/components/Typography';
 import { CheckboxGroup } from '@/components/Checkbox';

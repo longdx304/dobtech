@@ -2,7 +2,7 @@
 import { Plus, CircleAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { User } from '@medusajs/medusa';
-import { Modal, message } from 'antd';
+import { App } from 'antd';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 import { Card } from '@/components/Card';
@@ -33,6 +33,7 @@ const AccountList = ({ data }: Props) => {
 		User,
 		'password_hash'
 	> | null>(null);
+	const { message, modal } = App.useApp();
 
 	const handleEditUser = (record: User) => {
 		setCurrentUser(record);
@@ -45,7 +46,7 @@ const AccountList = ({ data }: Props) => {
 	};
 
 	const handleDeleteUser = (userId: User['id']) => {
-		Modal.confirm({
+		modal.confirm({
 			title: 'Bạn có muốn xoá nhân viên này không ?',
 			content:
 				'Nhân viên sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá nhân viên này chứ?',
@@ -105,7 +106,7 @@ const AccountList = ({ data }: Props) => {
 				// })}
 			/>
 			<FloatButton
-				className="absolute"
+				className="top-2/3"
 				icon={<Plus color="white" />}
 				type="primary"
 				onClick={onOpen}

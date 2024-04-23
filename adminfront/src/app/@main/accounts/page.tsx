@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { User } from '@medusajs/medusa';
-import { cache } from 'react';
 import { Suspense } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 

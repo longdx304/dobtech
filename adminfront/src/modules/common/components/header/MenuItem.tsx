@@ -7,6 +7,7 @@ import {
 	Ellipsis,
 	Users,
 	LogOut,
+	LayoutList
 } from 'lucide-react';
 
 import { IAdminResponse } from '@/types/account.ts';
@@ -46,8 +47,9 @@ const itemOverview: MenuProps['items'] = (
 ) =>
 	[
 		role === 'admin' && getItem('Quản lý nhân viên', 'overview-1', <Users />),
-		getItem('Đơn hàng của bạn', 'overview-2', <CalendarRange />),
-		getItem('Label', 'overview-3', <Settings />, [
+		role === 'admin' && getItem('Danh mục', 'overview-2', <LayoutList />),
+		getItem('Đơn hàng của bạn', 'overview-3', <CalendarRange />),
+		getItem('Label', 'overview-4', <Settings />, [
 			getItem('Option 5', '5'),
 			getItem('Option 6', '6'),
 			getItem('Option 7', '7'),
@@ -108,4 +110,5 @@ export const menuItems = (
 
 export const menuRoutes: Record<string, string> = {
 	'overview-1': '/accounts',
+	'overview-2': '/product-categories',
 };
