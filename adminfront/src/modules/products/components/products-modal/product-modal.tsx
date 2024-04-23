@@ -4,7 +4,6 @@ import {
 	BadgeDollarSign,
 	CandlestickChart,
 	Palette,
-	Scale3D,
 	Sigma,
 	UserRound,
 } from 'lucide-react';
@@ -12,9 +11,10 @@ import {
 import { createProduct, updateProduct } from '@/actions/products';
 import { InputWithLabel } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
+import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
 import { IProductRequest, IProductResponse } from '@/types/products';
-import { App, Form, message, type FormProps } from 'antd';
+import { Form, message, type FormProps } from 'antd';
 import _ from 'lodash';
 import { useEffect } from 'react';
 
@@ -41,17 +41,17 @@ export default function ProductModal({
 
 		try {
 			if (_.isEmpty(product)) {
-				console.log('product:', values);
 				await createProduct(values);
 				message.success('Thêm sản phẩm thành công');
 			} else {
-				// await updateProduct(
-				// 	product!.id,
-				// 	'variant_01HW1ZKJ0PJ0Q8E7VFH1PQ67MQ',
-				// 	'opt_01HW1ZJ0175GJ4K2JDW50E13SS',
-				// 	values
-				// );
-				// message.success('Cập nhật sản phẩm thành công');
+				await updateProduct(
+					product!.id,
+					product.variants ?? [],
+					product.options ?? [],
+					values
+				);
+
+				message.success('Cập nhật sản phẩm thành công');
 			}
 			handleCancel();
 		} catch (error: any) {
@@ -72,6 +72,7 @@ export default function ProductModal({
 		form &&
 			form?.setFieldsValue({
 				product: product?.title ?? '',
+				size: product?.sizes ?? [],
 				color: product?.color ?? '',
 				quantity: product?.quantity ?? '',
 				price: product?.price ?? '',
@@ -79,7 +80,6 @@ export default function ProductModal({
 			});
 	}, [product, form]);
 
-	console.log('form');
 	return (
 		<SubmitModal
 			open={stateModal}
@@ -104,6 +104,30 @@ export default function ProductModal({
 					initialValue={product?.title}
 				>
 					<InputWithLabel placeholder="Tên sản phẩm" prefix={<UserRound />} />
+				</Form.Item>
+				<Form.Item
+					name="sizes"
+					rules={[
+						{ required: true, message: 'Kích thước phải có ít nhất 2 kí tự' },
+					]}
+					label="Kích thước:"
+					initialValue={product?.sizes}
+				>
+					{/* <InputWithLabel placeholder="Kích thước" prefix={<Scale3D />} /> */}
+					{/* <Select
+						mode="tags"
+						placeholder="Chọn hoặc nhập kích thước"
+						style={{ width: '100%' }}
+						tokenSeparators={[',']}
+						// prefix={<Scale3D />}
+					/> */}
+					<Select
+						mode="tags"
+						placeholder="Chọn hoặc nhập kích thước"
+						style={{ width: '100%' }}
+						tokenSeparators={[',']}
+						// prefix={<Scale3D />}
+					/>
 				</Form.Item>
 				<Form.Item
 					name="color"

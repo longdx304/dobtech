@@ -29,12 +29,29 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 				<Flex vertical gap="small" className="flex flex-col items-center">
 					<Text strong>{record.title}</Text>
 					<Text className="text-xs">
-						{record?.variants.map((variant: any) => (
-							<span key={variant.id}>
-								{variant.title} / {variant.options[0]?.value}
-								<br />
-							</span>
-						))}
+						{record?.variants.map((variant: any) => {
+							const colorOption = record.options.find((option: any) => {
+								return (
+									option.values.some(
+										(value: any) => value.variant_id === variant.id
+									) && option.title === 'Color'
+								);
+							});
+
+							const colorValue =
+								colorOption?.values.find(
+									(value: any) => value.variant_id === variant.id
+								)?.value || 'N/A';
+
+							return (
+								<div key={variant.id}>
+									<span>
+										{variant.title} / {colorValue}
+										<br />
+									</span>
+								</div>
+							);
+						})}
 					</Text>
 				</Flex>
 			</Flex>
@@ -52,8 +69,8 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 				<Text className="text-xs">
 					{record?.variants.map((variant: any) => {
 						return (
-							<div className="text-blue-500">
-								<span key={variant.id}>
+							<div className="text-blue-500" key={variant.id}>
+								<span>
 									SLTK: {variant.inventory_quantity}
 									<br />
 								</span>

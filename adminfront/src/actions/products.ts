@@ -13,13 +13,12 @@ export async function listProducts(
 	searchParams: Record<string, unknown>
 ): Promise<TResponse<IProductResponse> | null> {
 	try {
-		const headers = await getMedusaHeaders(['users']);
+		const headers = await getMedusaHeaders(['products']);
 
 		const limitData: number = (searchParams?.limit as number) ?? 10;
 		const page = searchParams?.page ?? 1;
 		const offsetData = +limitData * (+page - 1);
 		delete searchParams.page;
-
 		const { products, count, offset, limit } =
 			await medusaClient.admin.products.list(
 				{ ...searchParams, limit: limitData, offset: offsetData },
@@ -39,8 +38,21 @@ export async function listProducts(
 }
 
 export async function createProduct(payload: IProductRequest) {
-	const headers = await getMedusaHeaders(['users']);
-	const { title, color, quantity, price, inventoryQuantity } = payload;
+	const headers = await getMedusaHeaders(['products']);
+	const { title, color, quantity, price, inventoryQuantity, sizes } = payload;
+
+	const variants = sizes?.map((size: string) => {
+		return {
+			title: size,
+			prices: [{ amount: +price, currency_code: 'vnd' }],
+			inventory_quantity: +inventoryQuantity,
+			options: [
+				{ value: color },
+				{ value: size },
+				{ value: quantity as unknown as string },
+			],
+		};
+	});
 
 	return medusaClient.admin.products
 		.create(
@@ -49,46 +61,14 @@ export async function createProduct(payload: IProductRequest) {
 				categories: [],
 				is_giftcard: false,
 				discountable: true,
-				options: [
-					{
-						title: 'Color',
-					},
-					{
-						title: 'Size',
-					},
-					{
-						title: 'Quantity',
-					},
-				],
-				variants: [
-					{
-						title: '31',
-						prices: [
-							{
-								amount: +price,
-								currency_code: 'vnd',
-							},
-						],
-						inventory_quantity: +inventoryQuantity,
-						options: [
-							{
-								value: color,
-							},
-							{
-								value: 'Small',
-							},
-							{
-								value: quantity as unknown as string,
-							},
-						],
-					},
-				],
+				options: [{ title: 'Color' }, { title: 'Size' }, { title: 'Quantity' }],
+				variants,
 			},
 			headers
 		)
 		.then(async ({ product }) => {
 			if (!_.isEmpty(product)) {
-				revalidateTag('users');
+				revalidateTag('products');
 				return product;
 			}
 		})
@@ -100,22 +80,91 @@ export async function createProduct(payload: IProductRequest) {
 
 export async function updateProduct(
 	productId: string,
-	variantId: string,
-	optionId: string,
+	variants: any[],
+	options: any[],
 	payload: Partial<IProductRequest>
 ) {
-	const headers = await getMedusaHeaders(['users']);
-	const { title, color, quantity, price, inventoryQuantity } = payload;
+	const headers = await getMedusaHeaders(['products']);
+	const { color, quantity, price, inventoryQuantity } = payload;
 
-	
+	const colorOption = options.find(
+		(opt: any) => opt.title.toLowerCase() === 'color'
+	);
+	const sizeOption = options.find(
+		(opt: any) => opt.title.toLowerCase() === 'size'
+	);
+	const quantityOption = options.find(
+		(opt: any) => opt.title.toLowerCase() === 'quantity'
+	);
+
+	if (!colorOption || !sizeOption || !quantityOption) {
+		throw new Error('Color, Size, or Quantity option not found');
+	}
+
+	// Get option ids
+	const colorOptionId = colorOption.id;
+	const sizeOptionId = sizeOption.id;
+	const quantityOptionId = quantityOption.id;
+
+	// Matching variant with selected size
+	const selectedSizes = payload.sizes;
+	const variantWithMatchingSize = variants.filter((variant) => {
+		return selectedSizes!.includes(variant.title);
+	});
+
+	// Update variant with matching size
+	const updatedVariants = variantWithMatchingSize.map(
+		(variantWithMatchingSize: any) => {
+			return {
+				title: variantWithMatchingSize.title,
+				prices: [{ amount: +price!, currency_code: 'vnd' }],
+				options: [
+					{ option_id: colorOptionId, value: color },
+					{ option_id: sizeOptionId, value: variantWithMatchingSize.title },
+					{ option_id: quantityOptionId, value: quantity },
+				],
+				inventory_quantity: +inventoryQuantity!,
+			};
+		}
+	);
+
+	// Create an array of update promises
+	const updatePromises = updatedVariants.map((updatedVariant, index) => {
+		return medusaClient.admin.products
+			.updateVariant(
+				productId,
+				variantWithMatchingSize[index].id,
+				updatedVariant,
+				headers
+			)
+			.then(({ product }) => {
+				if (!_.isEmpty(product)) {
+					return product;
+				}
+			})
+			.catch((error: any) => {
+				console.error('Error updating product:', error);
+				throw new Error(error?.response?.data?.message ?? '');
+			});
+	});
+
+	try {
+		const updatedProducts = await Promise.all(updatePromises);
+		// revalidate after all updates
+		revalidateTag('products');
+		return updatedProducts;
+	} catch (error) {
+		console.error('Error updating products:', error);
+		throw error; 
+	}
 }
 
 export async function deleteProduct(productId: string) {
-	const headers = await getMedusaHeaders(['users']);
+	const headers = await getMedusaHeaders(['products']);
 	return medusaClient.admin.products
 		.delete(productId, headers)
 		.then(() => {
-			revalidateTag('users');
+			revalidateTag('products');
 			return;
 		})
 		.catch((error: any) => {
