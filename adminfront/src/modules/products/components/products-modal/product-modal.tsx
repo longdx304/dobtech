@@ -17,6 +17,7 @@ import { IProductRequest, IProductResponse } from '@/types/products';
 import { Form, message, type FormProps } from 'antd';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
+import InputNumber from '@/components/Input/InputNumber';
 
 interface Props {
 	state: boolean;
@@ -40,27 +41,28 @@ export default function ProductModal({
 		form &&
 			form?.setFieldsValue({
 				title: product?.title ?? '',
-				sizes:
-					product?.options
-						.find((option) => option.title === 'Size')
-						?.values.map((value) => value.value) ?? [],
+				// sizes:
+				// 	product?.options
+				// 		.find((option) => option.title === 'Size')
+				// 		?.values.map((value) => value.value) ?? [],
 
-				color:
-					product?.options
-						.find((option) => option.title === 'Color')
-						?.values.map((value) => value.value) ?? [],
+				// color:
+				// 	product?.options
+				// 		.find((option) => option.title === 'Color')
+				// 		?.values.map((value) => value.value) ?? [],
 
-				price:
-					product?.variants.map((variant) => variant.prices[0].amount) ?? [],
+				// price:
+				// 	product?.variants.map((variant) => variant.prices[0].amount) ?? [],
 
-				quantity:
-					product?.options
-						.find((option) => option.title === 'Quantity')
-						?.values.map((value) => value.value) ?? [],
-						
-				inventoryQuantity:
-					product?.variants.map((variant) => variant.inventory_quantity) ?? [],
+				// quantity:
+				// 	product?.options
+				// 		.find((option) => option.title === 'Quantity')
+				// 		?.values.map((value) => value.value) ?? [],
+
+				// inventoryQuantity:
+				// 	product?.variants.map((variant) => variant.inventory_quantity) ?? [],
 			});
+		console.log('product', product);
 	}, [product, form]);
 
 	const onFinish: FormProps<IProductRequest>['onFinish'] = async (values) => {
@@ -132,9 +134,6 @@ export default function ProductModal({
 						{ required: true, message: 'Kích thước phải có ít nhất 2 kí tự' },
 					]}
 					label="Kích thước:"
-					initialValue={
-						product?.options.find((option) => option.title === 'Size')?.values
-					}
 				>
 					<Select
 						mode="tags"
@@ -142,7 +141,56 @@ export default function ProductModal({
 						style={{ width: '100%' }}
 						tokenSeparators={[',']}
 						data-testid="sizes"
-						// prefix={<Scale3D />}
+						options={
+							product?.options.find((option) => option.title === 'Size')?.values
+						}
+						onChange={(selectedSizes) => {
+							const selectedVariantIds = selectedSizes.map(
+								(size: any) =>
+									product?.options
+										.find((option) => option.title === 'Size')
+										?.values.find((value) => value.value === size)?.variant_id
+							);
+
+							const selectedOptions = product?.options
+								.filter((option) =>
+									['Color', 'Quantity'].includes(option.title)
+								)
+								.map((option) => ({
+									...option,
+									values: option.values.find((value) =>
+										selectedVariantIds.includes(value.variant_id)
+									),
+								}));
+
+							const selectedVariants = product?.variants.filter((variant) =>
+								selectedVariantIds.includes(variant.id)
+							);
+
+							const valuesToSet = {
+								sizes: selectedSizes,
+
+								color: selectedOptions?.find(
+									(option) => option.title === 'Color'
+								)?.values?.value,
+
+								quantity: selectedOptions?.find(
+									(option) => option.title === 'Quantity'
+								)?.values?.value,
+
+								price: selectedVariants?.map(
+									(variant) => variant.prices[0].amount
+								),
+
+								inventoryQuantity: selectedVariants?.map(
+									(variant) => variant.inventory_quantity
+								),
+							};
+
+							console.log('valuesToSet', valuesToSet);
+
+							form.setFieldsValue(valuesToSet);
+						}}
 					/>
 				</Form.Item>
 				<Form.Item
@@ -151,9 +199,9 @@ export default function ProductModal({
 						{ required: true, message: 'Màu sắc phải có ít nhất 2 kí tự' },
 					]}
 					label="Màu sắc:"
-					initialValue={
-						product?.options.find((option) => option.title === 'Color')?.values
-					}
+					// initialValue={
+					// 	product?.options.find((option) => option.title === 'Color')?.values
+					// }
 				>
 					<Input
 						placeholder="Màu sắc"
@@ -165,12 +213,12 @@ export default function ProductModal({
 					name="quantity"
 					rules={[{ required: true, message: 'Số lượng phải lớn hơn 0' }]}
 					label="Số lượng:"
-					initialValue={
-						product?.options.find((option) => option.title === 'Quantity')
-							?.values
-					}
+					// initialValue={
+					// 	product?.options.find((option) => option.title === 'Quantity')
+					// 		?.values
+					// }
 				>
-					<Input
+					<InputNumber
 						placeholder="Số lượng sản phẩm"
 						prefix={<Sigma />}
 						data-testid="quantity"
@@ -182,11 +230,11 @@ export default function ProductModal({
 						{ required: true, message: 'Giá tiền phải lớn hơn 1.000 VND' },
 					]}
 					label="Giá:"
-					initialValue={product?.variants?.map(
-						(variant) => variant.prices[0].amount
-					)}
+					// initialValue={product?.variants?.map(
+					// 	(variant) => variant.prices[0].amount
+					// )}
 				>
-					<Input
+					<InputNumber
 						placeholder="Giá sản phẩm"
 						prefix={<BadgeDollarSign />}
 						data-testid="price"
@@ -198,11 +246,11 @@ export default function ProductModal({
 						{ required: true, message: 'Số lượng tồn kho phải lớn hơn 0' },
 					]}
 					label="Số lượng tồn kho:"
-					initialValue={product?.variants.map(
-						(variant) => variant.inventory_quantity
-					)}
+					// initialValue={product?.variants.map(
+					// 	(variant) => variant.inventory_quantity
+					// )}
 				>
-					<Input
+					<InputNumber
 						placeholder="Số lượng tồn kho"
 						prefix={<CandlestickChart />}
 						data-testid="inventoryQuantity"

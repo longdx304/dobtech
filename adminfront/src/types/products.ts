@@ -15,6 +15,7 @@ export interface IProductResponse {
 }
 
 interface IProductVariant {
+	id: string;
 	title: string;
 	prices: { amount: number; currency_code: string }[];
 	inventory_quantity: number;
