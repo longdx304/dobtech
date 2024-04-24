@@ -90,11 +90,11 @@ const CategoryModal: React.FC<Props> = ({
 					parent_category_id: parentCategory?.id ?? null,
 				};
 				const result = await createCategory(payload);
-				message.success('Đăng ký nhân viên thành công');
+				message.success('Đăng ký danh mục sản phẩm thành công');
 			} else {
 				// Update user
 				const result = await updateCategory(category.id, values);
-				message.success('Cập nhật nhân viên thành công');
+				message.success('Cập nhật danh mục sản phẩm thành công');
 			}
 			handleCancel();
 		} catch (error: any) {
@@ -114,7 +114,7 @@ const CategoryModal: React.FC<Props> = ({
 				{titleModal}
 			</Title>
 			{!_.isEmpty(ancestors) && (
-				<div className="py-2">
+				<div className="py-2" data-testid="breadcrumbCategory">
 					<Breadcrumb items={ancestors} />
 				</div>
 			)}
@@ -156,6 +156,7 @@ const CategoryModal: React.FC<Props> = ({
 							label="Trạng thái:"
 						>
 							<Select
+								data-testid="is_active"
 								options={[
 									{ value: true, label: 'Hoạt động' },
 									{ value: false, label: 'Không hoạt động' },
@@ -171,6 +172,7 @@ const CategoryModal: React.FC<Props> = ({
 							label="Quyền riêng tư:"
 						>
 							<Select
+								data-testid="is_internal"
 								options={[
 									{ value: false, label: 'Công khai' },
 									{ value: true, label: 'Không công khai' },

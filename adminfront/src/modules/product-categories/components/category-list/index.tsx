@@ -134,9 +134,9 @@ const CategoryList = ({ data }: Props) => {
 			async onOk() {
 				try {
 					await deleteCategory(categoryId);
-					message.success('Xoá danh mục thành công.');
+					message.success('Xoá danh mục thành công');
 				} catch (error) {
-					message.error('Xoá danh mục thất bại.');
+					message.error('Xoá danh mục thất bại');
 				}
 			},
 			onCancel() {},

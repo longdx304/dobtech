@@ -10,9 +10,10 @@ import { menuItems, menuRoutes } from './MenuItem';
 interface Props {
 	user: IAdminResponse;
 	className?: string;
+	onClose: () => void;
 }
 
-const Menubar = ({ user, className }: Props) => {
+const Menubar = ({ user, className, onClose }: Props) => {
 	const router = useRouter();
 
 	// Handle user click menu items
@@ -20,6 +21,7 @@ const Menubar = ({ user, className }: Props) => {
 		const { key } = e;
 		if (menuRoutes[key]) {
 			router.push(menuRoutes[key]);
+			onClose();
 			return;
 		}
 	};

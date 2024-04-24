@@ -73,7 +73,10 @@ const CategoryItem = (props: Props) => {
 				<div className="flex w-full items-center justify-between">
 					<div className="flex items-center">
 						{hasChildren && (
-							<div className="absolute flex w-[20px] cursor-pointer items-center justify-center">
+							<div
+								className="absolute flex w-[20px] cursor-pointer items-center justify-center"
+								data-testid="collapseIcon"
+							>
 								{props.collapseIcon}
 							</div>
 						)}
@@ -82,7 +85,7 @@ const CategoryItem = (props: Props) => {
 							{!hasChildren && <Tag className="w-[18px]" />}
 						</div>
 						<span
-							className={cn('ml-2 select-none text-xs font-medium', {
+							className={cn('ml-2 select-none text-sm sm:text-xs font-medium', {
 								'font-normal text-gray-400': !hasChildren,
 							})}
 						>
@@ -126,6 +129,7 @@ const CategoryItem = (props: Props) => {
 							}
 						>
 							<Button
+								data-testid="addSubCategory"
 								type="text"
 								shape="circle"
 								onClick={() => props.handleCreateSubCategory(item)}
@@ -133,7 +137,10 @@ const CategoryItem = (props: Props) => {
 							/>
 						</Tooltip>
 						<Dropdown menu={{ items: itemDropdown, onClick: handleMenuClick }}>
-							<a onClick={(e) => e.preventDefault()}>
+							<a
+								onClick={(e) => e.preventDefault()}
+								data-testid="dropdownCategory"
+							>
 								<Ellipsis />
 							</a>
 						</Dropdown>

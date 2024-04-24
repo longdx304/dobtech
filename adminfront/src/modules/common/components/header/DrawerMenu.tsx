@@ -31,7 +31,7 @@ const DrawerMenu = ({ state, onOpen, onClose, user }: Props) => {
 			onClose={() => onClose()}
 			open={state}
 		>
-			<Menubar user={user} />
+			<Menubar user={user} onClose={onClose} />
 		</Drawer>
 	);
 };
