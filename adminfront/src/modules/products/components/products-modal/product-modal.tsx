@@ -38,31 +38,47 @@ export default function ProductModal({
 	const titleModal = `${_.isEmpty(product) ? 'Thêm mới' : 'Cập nhật'} sản phẩm`;
 
 	useEffect(() => {
+		const selectedSizes = product?.options.find(
+			(option) => option.title === 'Size'
+		)?.values;
+
+		const selectedVariantIds = selectedSizes?.map(
+			(size: any) =>
+				product?.options
+					.find((option) => option.title === 'Size')
+					?.values.find((value) => value.value === size)?.variant_id
+		);
+
+		const selectedOptions = product?.options
+			.filter((option) => ['Color', 'Quantity'].includes(option.title))
+			.map((option) => ({
+				...option,
+				values: option.values.find((value) =>
+					selectedVariantIds?.includes(value.variant_id)
+				),
+			}));
+
+		const selectedVariants = product?.variants.filter((variant) =>
+			selectedVariantIds?.includes(variant.id)
+		);
+
 		form &&
 			form?.setFieldsValue({
 				title: product?.title ?? '',
-				// sizes:
-				// 	product?.options
-				// 		.find((option) => option.title === 'Size')
-				// 		?.values.map((value) => value.value) ?? [],
+				sizes: [],
 
-				// color:
-				// 	product?.options
-				// 		.find((option) => option.title === 'Color')
-				// 		?.values.map((value) => value.value) ?? [],
+				color: selectedOptions?.find((option) => option.title === 'Color')
+					?.values?.value ?? '',
 
-				// price:
-				// 	product?.variants.map((variant) => variant.prices[0].amount) ?? [],
+				quantity: selectedOptions?.find((option) => option.title === 'Quantity')
+					?.values?.value ?? '',
 
-				// quantity:
-				// 	product?.options
-				// 		.find((option) => option.title === 'Quantity')
-				// 		?.values.map((value) => value.value) ?? [],
+				price: selectedVariants?.map((variant) => variant.prices[0].amount).toString() ?? [],
 
-				// inventoryQuantity:
-				// 	product?.variants.map((variant) => variant.inventory_quantity) ?? [],
+				inventoryQuantity: selectedVariants?.map(
+					(variant) => variant.inventory_quantity
+				) ?? [],
 			});
-		console.log('product', product);
 	}, [product, form]);
 
 	const onFinish: FormProps<IProductRequest>['onFinish'] = async (values) => {
@@ -131,7 +147,7 @@ export default function ProductModal({
 				<Form.Item
 					name="sizes"
 					rules={[
-						{ required: true, message: 'Kích thước phải có ít nhất 2 kí tự' },
+						{ required: true, message: 'Hãy chọn kích thước phù hợp' },
 					]}
 					label="Kích thước:"
 				>
@@ -142,7 +158,7 @@ export default function ProductModal({
 						tokenSeparators={[',']}
 						data-testid="sizes"
 						options={
-							product?.options.find((option) => option.title === 'Size')?.values
+							product && product?.options.find((option) => option.title === 'Size')?.values || undefined
 						}
 						onChange={(selectedSizes) => {
 							const selectedVariantIds = selectedSizes.map(
@@ -187,9 +203,7 @@ export default function ProductModal({
 								),
 							};
 
-							console.log('valuesToSet', valuesToSet);
-
-							form.setFieldsValue(valuesToSet);
+							product && form.setFieldsValue(valuesToSet);
 						}}
 					/>
 				</Form.Item>
@@ -218,7 +232,7 @@ export default function ProductModal({
 					// 		?.values
 					// }
 				>
-					<InputNumber
+					<Input
 						placeholder="Số lượng sản phẩm"
 						prefix={<Sigma />}
 						data-testid="quantity"

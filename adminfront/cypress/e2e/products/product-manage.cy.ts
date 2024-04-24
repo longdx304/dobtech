@@ -11,8 +11,8 @@ describe('template spec', () => {
 	const priceUpdated = '20000';
 	const inventoryQuantity = '100';
 	const inventoryQuantityUpdated = '200';
-	const sizes = ['S', 'M', 'L'];
-	const sizesUpdated = ['S', 'M'];
+	const sizes = ['S', 'M'];
+	const sizesUpdated = ['S'];
 
 	beforeEach(() => {
 		cy.login('admin@test.com', '123456'), cy.wait(1000), cy.visit('/products');
@@ -41,16 +41,37 @@ describe('template spec', () => {
 			.should('exist')
 			.click();
 		cy.findByTestId('title').should('exist').clear().type(productNameUpdated);
-		// cy.findByTestId('sizes')
-		// 	.should('exist')
-		// 	.clear()
-		// 	.type(sizesUpdated.join(','));
-		cy.findByTestId('color').should('exist').clear().type(colorUpdated);
-		cy.findByTestId('quantity').should('exist').clear().type(quantityUpdated);
-		cy.findByTestId('price').should('exist').clear().type(priceUpdated);
-		cy.findByTestId('inventoryQuantity')
+
+		cy.findByTestId('sizes')
 			.should('exist')
-			.clear()
+			.then(($select) => {
+				// Get the input within the Select
+				const $selectInput = $select.find('.ant-select-selector input');
+
+				// Clear the input by sending backspaces
+				cy.wrap($selectInput).clear();
+			});
+
+		// Choose the first option in the dropdown
+		cy.get('.ant-select-item-option').first().click();
+
+		// Get the input again and check the value
+		cy.findByTestId('color')
+			.should('have.value', color)
+			.clear({ force: true })
+			.type(colorUpdated);
+
+		cy.findByTestId('quantity')
+			.should('have.value', quantity)
+			.clear({ force: true })
+			.type(quantityUpdated);
+		cy.findByTestId('price')
+			.should('have.value', price)
+			.clear({ force: true })
+			.type(priceUpdated);
+		cy.findByTestId('inventoryQuantity')
+			.should('have.value', inventoryQuantity)
+			.clear({ force: true })
 			.type(inventoryQuantityUpdated);
 		cy.findByTestId('submitButton').should('exist').click();
 
