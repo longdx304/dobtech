@@ -10,7 +10,8 @@ import {
 	LayoutList
 } from 'lucide-react';
 
-import { IAdminResponse } from '@/types/account.ts';
+import { IAdminResponse } from '@/types/account';
+import { ERoutes } from '@/types/routes';
 import { Text } from '@/components/Typography';
 import { Dropdown } from '@/components/Dropdown';
 
@@ -109,6 +110,6 @@ export const menuItems = (
 };
 
 export const menuRoutes: Record<string, string> = {
-	'overview-1': '/accounts',
-	'overview-2': '/product-categories',
+	'overview-1': ERoutes.ACCOUNTS,
+	'overview-2': ERoutes.PRODUCT_CATEGORIES,
 };

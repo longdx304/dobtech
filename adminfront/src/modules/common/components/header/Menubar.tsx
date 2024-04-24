@@ -10,10 +10,10 @@ import { menuItems, menuRoutes } from './MenuItem';
 interface Props {
 	user: IAdminResponse;
 	className?: string;
-	onClose: () => void;
+	onClose?: () => void;
 }
 
-const Menubar = ({ user, className, onClose }: Props) => {
+const Menubar = ({ user, className, onClose = () => {} }: Props) => {
 	const router = useRouter();
 
 	// Handle user click menu items
