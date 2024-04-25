@@ -21,7 +21,6 @@ interface Props {
 }
 
 const AccountList = ({ data }: Props) => {
-	console.log('data', data);
 	const searchParams = useSearchParams();
 	const { replace } = useRouter();
 	const pathname = usePathname();

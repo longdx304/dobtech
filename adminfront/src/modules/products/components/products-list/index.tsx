@@ -1,26 +1,28 @@
 'use client';
+
 import { CircleAlert, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { deleteProduct } from '@/actions/products';
 import { FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Table } from '@/components/Table';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import productsColumns from './products-column';
-import { ProductModal } from '../products-modal';
-import { Product } from '@medusajs/medusa';
-import { TResponse } from '@/types/common';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { updateSearchQuery } from '@/lib/utils';
+import { TResponse } from '@/types/common';
 import { IProductResponse } from '@/types/products';
+import { Product } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
-import { deleteProduct } from '@/actions/products';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { ProductModal } from '../products-modal';
+import productsColumns from './products-column';
 
 interface Props {
 	data: TResponse<IProductResponse> | null;
+	categories: any;
 }
 
-const ProductList = ({ data }: Props) => {
+const ProductList = ({ data, categories }: Props) => {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -86,8 +88,6 @@ const ProductList = ({ data }: Props) => {
 		router.replace(`${pathname}?${newSearchParams}`);
 	};
 
-	console.log('data', data);
-
 	return (
 		<Card className="w-full">
 			<Table
@@ -102,7 +102,7 @@ const ProductList = ({ data }: Props) => {
 				}}
 			/>
 			<FloatButton
-				className="absolute"
+				className="fixed"
 				icon={<Plus color="white" />}
 				type="primary"
 				onClick={onOpen}
@@ -113,6 +113,7 @@ const ProductList = ({ data }: Props) => {
 				handleOk={onClose}
 				handleCancel={handleCloseModal}
 				product={currentProduct}
+				productCategories={categories}
 			/>
 		</Card>
 	);

@@ -3,6 +3,7 @@
 import {
 	BadgeDollarSign,
 	CandlestickChart,
+	Layers,
 	Palette,
 	Sigma,
 	UserRound,
@@ -10,20 +11,21 @@ import {
 
 import { createProduct, updateProduct } from '@/actions/products';
 import { Input } from '@/components/Input';
+import InputNumber from '@/components/Input/InputNumber';
 import { SubmitModal } from '@/components/Modal';
-import { Select } from '@/components/Select';
+import { Select, TreeSelect } from '@/components/Select';
 import { Title } from '@/components/Typography';
 import { IProductRequest, IProductResponse } from '@/types/products';
 import { Form, message, type FormProps } from 'antd';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
-import InputNumber from '@/components/Input/InputNumber';
 
 interface Props {
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
 	product: IProductResponse | null;
+	productCategories: any;
 }
 
 export default function ProductModal({
@@ -31,12 +33,14 @@ export default function ProductModal({
 	handleOk,
 	handleCancel,
 	product,
+	productCategories,
 }: Props) {
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 
 	const titleModal = `${_.isEmpty(product) ? 'Thêm mới' : 'Cập nhật'} sản phẩm`;
 
+	// set form values when product is loaded
 	useEffect(() => {
 		const selectedSizes = product?.options.find(
 			(option) => option.title === 'Size'
@@ -65,25 +69,30 @@ export default function ProductModal({
 		form &&
 			form?.setFieldsValue({
 				title: product?.title ?? '',
+				categories: product?.categories?.map((category) => category.id) ?? [],
 				sizes: [],
 
-				color: selectedOptions?.find((option) => option.title === 'Color')
-					?.values?.value ?? '',
+				color:
+					selectedOptions?.find((option) => option.title === 'Color')?.values
+						?.value ?? '',
 
-				quantity: selectedOptions?.find((option) => option.title === 'Quantity')
-					?.values?.value ?? '',
+				quantity:
+					selectedOptions?.find((option) => option.title === 'Quantity')?.values
+						?.value ?? '',
 
-				price: selectedVariants?.map((variant) => variant.prices[0].amount).toString() ?? [],
+				price:
+					selectedVariants
+						?.map((variant) => variant.prices[0].amount)
+						.toString() ?? [],
 
-				inventoryQuantity: selectedVariants?.map(
-					(variant) => variant.inventory_quantity
-				) ?? [],
+				inventoryQuantity:
+					selectedVariants?.map((variant) => variant.inventory_quantity) ?? [],
 			});
 	}, [product, form]);
+	console.log('product', product);
 
+	// handle form submit
 	const onFinish: FormProps<IProductRequest>['onFinish'] = async (values) => {
-		console.log('value:', values);
-
 		try {
 			if (_.isEmpty(product)) {
 				await createProduct(values);
@@ -113,7 +122,35 @@ export default function ProductModal({
 		console.log('Failed:', errorInfo);
 	};
 
-	console.log('product', product);
+	// recursive function to convert categories to tree data
+	const convertCategoriesToTreeData = (categories: any) => {
+		return categories.map((category: any) => {
+			const { id, name, category_children } = category;
+			const children =
+				category_children.length > 0
+					? convertCategoriesToTreeData(category_children)
+					: [];
+
+			return {
+				title: name,
+				value: id,
+				id: id,
+				children,
+			};
+		});
+	};
+
+	const treeData = convertCategoriesToTreeData(productCategories);
+
+	const [categoryValue, setCategoryValue] = useState<any>([]);
+
+	const onChange = (newValue: string[]) => {
+		// const selectedCategories = newValue.map((value: string) =>
+		// 	productCategories.find((category: any) => category.id === value)
+		// );
+
+		setCategoryValue(newValue);
+	};
 
 	return (
 		<SubmitModal
@@ -126,7 +163,12 @@ export default function ProductModal({
 			<Title level={3} className="text-center">
 				{titleModal}
 			</Title>
-			<Form form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+			<Form
+				form={form}
+				onFinish={onFinish}
+				onFinishFailed={onFinishFailed}
+				className="pt-3"
+			>
 				<Form.Item
 					name="title"
 					rules={[
@@ -140,15 +182,30 @@ export default function ProductModal({
 				>
 					<Input
 						placeholder="Tên sản phẩm"
-						prefix={<UserRound />}
+						prefix={<Layers />}
 						data-testid="title"
 					/>
 				</Form.Item>
 				<Form.Item
-					name="sizes"
+					name="categories"
+					label="Danh mục:"
 					rules={[
-						{ required: true, message: 'Hãy chọn kích thước phù hợp' },
+						{
+							required: true,
+							message: 'Phải chọn ít nhất một danh mục!',
+						},
 					]}
+				>
+					<TreeSelect
+						title="Chọn danh mục"
+						treeData={treeData}
+						onChange={onChange}
+						value={categoryValue}
+					/>
+				</Form.Item>
+				<Form.Item
+					name="sizes"
+					rules={[{ required: true, message: 'Hãy chọn kích thước phù hợp' }]}
 					label="Kích thước:"
 				>
 					<Select
@@ -158,7 +215,10 @@ export default function ProductModal({
 						tokenSeparators={[',']}
 						data-testid="sizes"
 						options={
-							product && product?.options.find((option) => option.title === 'Size')?.values || undefined
+							(product &&
+								product?.options.find((option) => option.title === 'Size')
+									?.values) ||
+							undefined
 						}
 						onChange={(selectedSizes) => {
 							const selectedVariantIds = selectedSizes.map(

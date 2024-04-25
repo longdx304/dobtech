@@ -12,9 +12,26 @@ export interface IProductResponse {
 	price: number;
 	inventoryQuantity: number;
 	metadata: JSON | null;
+	categories?: IProductCategory[];
 }
 
-interface IProductVariant {
+export interface IProductCategory {
+	id: string;
+	created_at: string;
+	updated_at: string;
+	name: string;
+	description: string;
+	handle: string;
+	is_active: boolean;
+	is_internal: boolean;
+	parent_category_id: string | null;
+	rank: number;
+	metadata: any | null;
+	category_children: IProductCategory[];
+	parent_category: IProductCategory | null;
+}
+
+export interface IProductVariant {
 	id: string;
 	title: string;
 	prices: { amount: number; currency_code: string }[];
@@ -25,18 +42,20 @@ interface IProductVariant {
 	}[];
 }
 
-interface IProductOptions {
+export interface IProductOptions {
+	id: string;
 	title: string;
 	values: { value: string; variant_id: string }[];
 }
 
 export interface IProductRequest {
 	title: string;
-	sizes?: string[];
+	categories: IProductCategory[];
+	sizes: string[];
 	color: string;
 	quantity: number;
 	price: number;
 	inventoryQuantity: number;
-	variants?: any[];
-	options?: any[];
+	variants?: IProductVariant[];
+	options?: IProductOptions[];
 }

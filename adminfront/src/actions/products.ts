@@ -4,7 +4,12 @@
 import { medusaClient } from '@/lib/database/config';
 
 import { TResponse } from '@/types/common';
-import { IProductRequest, IProductResponse } from '@/types/products';
+import {
+	IProductOptions,
+	IProductRequest,
+	IProductResponse,
+	IProductVariant,
+} from '@/types/products';
 import _ from 'lodash';
 import { revalidateTag } from 'next/cache';
 import { getMedusaHeaders } from './common';
@@ -39,8 +44,23 @@ export async function listProducts(
 
 export async function createProduct(payload: IProductRequest) {
 	const headers = await getMedusaHeaders(['products']);
-	const { title, color, quantity, price, inventoryQuantity, sizes } = payload;
 
+	const {
+		title,
+		color,
+		quantity,
+		price,
+		inventoryQuantity,
+		sizes,
+		categories,
+	} = payload;
+
+	// array object of category ids
+	const categoriesIds = categories?.map((category) => {
+		return { id: category };
+	});
+
+	// Create variants for each size
 	const variants = sizes?.map((size: string) => {
 		return {
 			title: size,
@@ -58,7 +78,7 @@ export async function createProduct(payload: IProductRequest) {
 		.create(
 			{
 				title,
-				categories: [],
+				categories: categoriesIds as unknown as any,
 				is_giftcard: false,
 				discountable: true,
 				options: [{ title: 'Color' }, { title: 'Size' }, { title: 'Quantity' }],
@@ -80,13 +100,19 @@ export async function createProduct(payload: IProductRequest) {
 
 export async function updateProduct(
 	productId: string,
-	variants: any[],
-	options: any[],
+	variants: IProductVariant[],
+	options: IProductOptions[],
 	payload: Partial<IProductRequest>
 ) {
 	const headers = await getMedusaHeaders(['products']);
-	const { color, quantity, price, inventoryQuantity } = payload;
+	const { color, quantity, price, inventoryQuantity, categories } = payload;
 
+	// array object of category ids
+	const categoriesIds = categories?.map((category) => {
+		return { id: category };
+	});
+
+	// Get color, size, and quantity options
 	const colorOption = options.find(
 		(opt: any) => opt.title.toLowerCase() === 'color'
 	);
@@ -128,8 +154,27 @@ export async function updateProduct(
 		}
 	);
 
-	// Create an array of update promises
-	const updatePromises = updatedVariants.map((updatedVariant, index) => {
+	// Update product categories
+	const updateCategory = medusaClient.admin.products
+		.update(
+			productId,
+			{
+				categories: categoriesIds as unknown as any,
+			},
+			headers
+		)
+		.then(({ product }) => {
+			if (!_.isEmpty(product)) {
+				return product;
+			}
+		})
+		.catch((error: any) => {
+			console.error('Error updating product:', error);
+			throw new Error(error?.response?.data?.message ?? '');
+		});
+
+	// Update product variants
+	const updateVariants = updatedVariants.map((updatedVariant, index) => {
 		return medusaClient.admin.products
 			.updateVariant(
 				productId,
@@ -149,13 +194,13 @@ export async function updateProduct(
 	});
 
 	try {
-		const updatedProducts = await Promise.all(updatePromises);
-		// revalidate after all updates
+		const results = await Promise.all([updateCategory, ...updateVariants]);
+
 		revalidateTag('products');
-		return updatedProducts;
+		return results;
 	} catch (error) {
 		console.error('Error updating products:', error);
-		throw error; 
+		throw error;
 	}
 }
 

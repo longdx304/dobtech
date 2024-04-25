@@ -6,6 +6,7 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import { IProductResponse } from '@/types/products';
 import { Product } from '@medusajs/medusa';
+import formatNumber from '@/lib/utils';
 
 interface Props {
 	handleDeleteProduct: (userId: Product['id']) => void;
@@ -63,7 +64,7 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 		render: (_: any, record: any) => (
 			<Flex vertical gap="small">
 				<Text strong className="text-xs">
-					{record?.variants[0]?.prices[0]?.amount}
+					{formatNumber(record?.variants[0]?.prices[0]?.amount)}đ
 				</Text>
 				<Text className="text-xs">
 					{record?.variants.map((variant: any) => {
