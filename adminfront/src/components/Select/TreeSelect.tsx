@@ -10,6 +10,7 @@ interface Props extends TreeSelectProps {
 	treeData: any;
 	value: any;
 	onChange: (value: any) => void;
+	dataTestId: string;
 }
 
 export default function TreeSelect({
@@ -18,6 +19,7 @@ export default function TreeSelect({
 	value,
 	title,
 	onChange,
+	dataTestId,
 }: Props) {
 	const tProps = {
 		treeData,
@@ -37,6 +39,7 @@ export default function TreeSelect({
 			className={cn('', className)}
 			// treeLine={true}
 			{...tProps}
+			data-testid={dataTestId}
 		/>
 	);
 }

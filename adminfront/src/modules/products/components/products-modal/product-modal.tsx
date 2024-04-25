@@ -201,6 +201,7 @@ export default function ProductModal({
 						treeData={treeData}
 						onChange={onChange}
 						value={categoryValue}
+						dataTestId="categories"
 					/>
 				</Form.Item>
 				<Form.Item

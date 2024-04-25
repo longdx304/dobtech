@@ -21,7 +21,19 @@ describe('template spec', () => {
 	it('should show new product when successfully created product', () => {
 		cy.findByTestId('btnCreateProduct').should('exist').click();
 		cy.findByTestId('title').should('exist').type(productName);
-		cy.findByTestId('sizes').should('exist').type(sizes.join(','));
+		cy.findByTestId('categories').should('exist').click();
+		cy.get('.ant-select-tree-checkbox').first().click();
+
+		cy.findByTestId('sizes')
+			.should('exist')
+			.then(($select) => {
+				// Find the input element within the TreeSelect component
+				const $selectInput = $select.find('.ant-select-selector input');
+
+				// Type into the input field
+				cy.wrap($selectInput).type(sizes.join(','), { force: true });
+			});
+
 		cy.findByTestId('color').should('exist').type(color);
 		cy.findByTestId('quantity').should('exist').type(quantity);
 		cy.findByTestId('price').should('exist').type(price);
@@ -42,6 +54,9 @@ describe('template spec', () => {
 			.click();
 		cy.findByTestId('title').should('exist').clear().type(productNameUpdated);
 
+		cy.findByTestId('categories').should('exist').click();
+		cy.get('.ant-select-tree-checkbox').last().click();
+
 		cy.findByTestId('sizes')
 			.should('exist')
 			.then(($select) => {
@@ -49,7 +64,7 @@ describe('template spec', () => {
 				const $selectInput = $select.find('.ant-select-selector input');
 
 				// Clear the input by sending backspaces
-				cy.wrap($selectInput).clear();
+				cy.wrap($selectInput).clear({ force: true });
 			});
 
 		// Choose the first option in the dropdown
