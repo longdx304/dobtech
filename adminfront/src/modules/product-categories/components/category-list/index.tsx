@@ -1,24 +1,21 @@
 'use client';
-import { Plus, CircleAlert, GripVertical, ChevronDown } from 'lucide-react';
-import { useMemo, useState, useCallback } from 'react';
 import { ProductCategory } from '@medusajs/medusa';
-import { App } from 'antd';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import Nestable from 'react-nestable';
-import { dropRight, flatMap, get } from 'lodash';
-import { Divider } from 'antd';
+import { App, Divider, Modal, message } from 'antd';
+import _ from 'lodash';
+import { ChevronDown, CircleAlert, GripVertical, Plus } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState } from 'react';
+import Nestable, { Item } from 'react-nestable';
 import 'react-nestable/dist/styles/index.css';
 import '../../styles/product-categories.css';
 
-import { Card } from '@/components/Card';
+import { deleteCategory, updateCategory } from '@/actions/productCategories';
 import { FloatButton } from '@/components/Button';
+import { Card } from '@/components/Card';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { TResponse } from '@/types/common';
-import { Tooltip } from '@/components/Tooltip';
 import CategoryItem from '../category-item';
 import CategoryModal from '../category-modal';
-import { deleteCategory, updateCategory } from '@/actions/productCategories';
 
 interface Props {
 	data: ProductCategory | null;
@@ -45,7 +42,7 @@ const CategoryList = ({ data }: Props) => {
 	const pathname = usePathname();
 	const currentPage = searchParams.get('page') ?? 1;
 
-	const { message, modal } = App.useApp();
+	// const { message, modal } = App.useApp();
 	const { state, onOpen, onClose } = useToggleState(false);
 	const [isUpdating, enableUpdating, disableUpdating] = useToggleState(false);
 	const [isError, enableError, disableError] = useToggleState(false);
@@ -64,18 +61,19 @@ const CategoryList = ({ data }: Props) => {
 		}) => {
 			enableUpdating();
 			let parentId = null;
-			const { dragItem, items, targetPath } = params;
+
+			const { dragItem, items, targetPath }: any = params;
 			const [rank] = targetPath.slice(-1);
 
 			if (targetPath.length > 1) {
-				const path = dropRight(
-					flatMap(targetPath.slice(0, -1), (item) => [
+				const path = _.dropRight(
+					_.flatMap(targetPath.slice(0, -1), (item) => [
 						item,
 						'category_children',
 					])
 				);
 
-				const newParent = get(items, path);
+				const newParent = _.get(items, path);
 				parentId = newParent.id;
 			}
 
@@ -86,7 +84,6 @@ const CategoryList = ({ data }: Props) => {
 				// 	parent_category_id: parentId,
 				// 	rank,
 				// });
-				console.log('dragItem', dragItem.id, parentId, rank);
 				await updateCategory(dragItem.id, {
 					parent_category_id: parentId,
 					rank,
@@ -117,7 +114,7 @@ const CategoryList = ({ data }: Props) => {
 	};
 
 	const handleDeleteCategory = async (categoryId: ProductCategory['id']) => {
-		modal.confirm({
+		Modal.confirm({
 			title: 'Bạn có muốn xoá danh mục này không ?',
 			content:
 				'Danh mục sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá danh mục này chứ?',
@@ -147,9 +144,10 @@ const CategoryList = ({ data }: Props) => {
 	const NestableList = useMemo(
 		() => (
 			<Nestable
-				items={data}
+				// item={data}
+				items={data as any as ProductCategory[]}
 				collapsed={true}
-				onChange={onItemDrop}
+				onChange={onItemDrop as any}
 				childrenProp="category_children"
 				// Adding an unreasonably high number here to prevent us from
 				// setting a hard limit  on category depth. This should be decided upon
@@ -157,7 +155,7 @@ const CategoryList = ({ data }: Props) => {
 				maxDepth={99}
 				renderItem={({ item, depth, handler, collapseIcon }) => (
 					<CategoryItem
-						item={item}
+						item={item as ProductCategory}
 						depth={depth}
 						handler={handler}
 						collapseIcon={collapseIcon}
@@ -237,7 +235,7 @@ const CategoryList = ({ data }: Props) => {
 				handleCancel={handleCloseModal}
 				category={currentCategory}
 				parentCategory={parentCategory}
-				categories={data}
+				categories={data as any as ProductCategory[]}
 			/>
 		</Card>
 	);

@@ -2,15 +2,13 @@
 
 // Authentication actions
 import { medusaClient } from '@/lib/database/config';
-import { cookies } from 'next/headers';
-import { revalidateTag } from 'next/cache';
-import { cache } from 'react';
 import _ from 'lodash';
+import { revalidateTag } from 'next/cache';
 
-import { getMedusaHeaders } from './common';
-import { TResponse } from '@/types/common';
+import { TCategoryRequest } from '@/types/productCategories';
 import { ProductCategory } from '@medusajs/medusa';
-// TResponse
+import { getMedusaHeaders } from './common';
+
 export async function listCategories(): Promise<ProductCategory | null> {
 	try {
 		const headers = await getMedusaHeaders(['categories']);
@@ -24,7 +22,7 @@ export async function listCategories(): Promise<ProductCategory | null> {
 				},
 				headers
 			);
-		return product_categories;
+		return product_categories as unknown as ProductCategory;
 	} catch (error) {
 		console.log('error', error);
 		return null;
@@ -37,8 +35,8 @@ export async function createCategory(payload: TCategoryRequest) {
 
 		const data = await medusaClient.admin.productCategories.create(
 			{
-				...payload,
-			},
+				...payload
+			} as any,
 			headers
 		);
 		if (!_.isEmpty(data?.product_category)) {
@@ -47,7 +45,7 @@ export async function createCategory(payload: TCategoryRequest) {
 		}
 		return null;
 	} catch (error) {
-		throw new Error(error?.response?.data?.message ?? '');
+		throw new Error((error as any)?.response?.data?.message ?? '');
 	}
 }
 
@@ -61,7 +59,7 @@ export async function updateCategory(
 		const data = await medusaClient.admin.productCategories.update(
 			categoryId,
 			{
-				...payload,
+				...(payload as any),
 			},
 			headers
 		);
@@ -71,7 +69,7 @@ export async function updateCategory(
 		}
 		return null;
 	} catch (error) {
-		throw new Error(error?.response?.data?.message ?? '');
+		throw new Error((error as any)?.response?.data?.message ?? '');
 	}
 }
 

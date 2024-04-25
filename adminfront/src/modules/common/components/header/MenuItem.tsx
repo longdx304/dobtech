@@ -1,19 +1,18 @@
 import type { MenuProps } from 'antd';
-import { Menu, Flex } from 'antd';
+import { Flex } from 'antd';
 import {
 	CalendarRange,
+	Ellipsis,
+	LayoutList,
+	LogOut,
 	Settings,
 	User,
-	Ellipsis,
 	Users,
-	LogOut,
-	LayoutList
 } from 'lucide-react';
 
+import { Dropdown } from '@/components/Dropdown';
 import { IAdminResponse } from '@/types/account';
 import { ERoutes } from '@/types/routes';
-import { Text } from '@/components/Typography';
-import { Dropdown } from '@/components/Dropdown';
 
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(
@@ -42,10 +41,7 @@ const itemDropdown: MenuProps['items'] = [
 ];
 
 // Item menu overview
-const itemOverview: MenuProps['items'] = (
-	role: string,
-	permissions: string[]
-) =>
+const itemOverview = (role: string, permissions: string[]) =>
 	[
 		role === 'admin' && getItem('Quản lý nhân viên', 'overview-1', <Users />),
 		role === 'admin' && getItem('Danh mục', 'overview-2', <LayoutList />),
@@ -95,13 +91,13 @@ export const menuItems = (
 	handleDropdownClick: (e: any) => void
 ) => {
 	const role = user.role;
-	const permissions = user.permissions.split(',');
+	const permissions = user?.permissions?.split(',');
 	return [
 		getItem(
 			'Tổng quan',
 			'overview',
 			null,
-			itemOverview(role, permissions),
+			itemOverview(role, permissions) as MenuItem[],
 			'group'
 		),
 		getItem('Tuỳ chỉnh', 'option', null, itemOption, 'group'),

@@ -1,18 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
 import { ProductCategory } from '@medusajs/medusa';
-import { Form, type FormProps, App, Col, Row } from 'antd';
+import { App, Col, Form, Row, message, type FormProps } from 'antd';
 import _ from 'lodash';
 import { Highlighter } from 'lucide-react';
+import React, { useEffect } from 'react';
 
-import { SubmitModal } from '@/components/Modal';
-import { Input, TextArea } from '@/components/Input';
-import { Title } from '@/components/Typography';
 import { createCategory, updateCategory } from '@/actions/productCategories';
-import { TCategoryRequest } from '@/types/productCategories';
-import { Select } from '@/components/Select';
 import { Breadcrumb } from '@/components/Breadcrumb';
+import { Input, TextArea } from '@/components/Input';
+import { SubmitModal } from '@/components/Modal';
+import { Select } from '@/components/Select';
+import { Title } from '@/components/Typography';
+import { TCategoryRequest } from '@/types/productCategories';
 import { useMemo } from 'react';
 
 interface Props {
@@ -32,7 +32,7 @@ const CategoryModal: React.FC<Props> = ({
 	categories,
 }) => {
 	const [form] = Form.useForm();
-	const { message } = App.useApp();
+	// const { message } = App.useApp();
 
 	const titleModal = `${
 		_.isEmpty(category) ? 'Thêm mới' : 'Cập nhật'
@@ -49,14 +49,16 @@ const CategoryModal: React.FC<Props> = ({
 	}, [category, form]);
 
 	// Get tree category
-	const getAncestors = (targetNode, nodes, acc = []) => {
+	const getAncestors = (targetNode: any, nodes: any, acc = []) => {
 		let parentCategory = null;
 
-		acc.push(targetNode);
+		console.log('targetNode', targetNode);
+
+		acc.push(targetNode as never);
 
 		if (targetNode.parent_category_id) {
 			parentCategory = nodes.find(
-				(n) => n.id === targetNode.parent_category_id
+				(n: any) => n.id === targetNode.parent_category_id
 			);
 
 			acc = getAncestors(parentCategory, nodes, acc);
@@ -76,7 +78,11 @@ const CategoryModal: React.FC<Props> = ({
 		const newResult = result?.map((item: ProductCategory) => ({
 			title: item.name,
 		}));
-		_.isEmpty(category) && newResult.push({ title: 'Danh mục mới' });
+		
+		if (_.isEmpty(category) && newResult) {
+			newResult.push({ title: 'Danh mục mới' });
+		}
+
 		return newResult;
 	}, [parentCategory, categories]);
 
@@ -158,7 +164,7 @@ const CategoryModal: React.FC<Props> = ({
 							<Select
 								data-testid="is_active"
 								options={[
-									{ value: true, label: 'Hoạt động' },
+									{ value: true as any, label: 'Hoạt động' },
 									{ value: false, label: 'Không hoạt động' },
 								]}
 							/>
@@ -174,7 +180,7 @@ const CategoryModal: React.FC<Props> = ({
 							<Select
 								data-testid="is_internal"
 								options={[
-									{ value: false, label: 'Công khai' },
+									{ value: false as any, label: 'Công khai' },
 									{ value: true, label: 'Không công khai' },
 								]}
 							/>

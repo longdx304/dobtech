@@ -1,10 +1,7 @@
 import { getAdmin } from '@/actions/accounts';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import theme from '../theme';
 
 import Header from '@/modules/common/components/header';
+import { IAdminResponse } from '@/types/account';
 
 export default async function MainLayout({
 	children,
@@ -13,9 +10,11 @@ export default async function MainLayout({
 }>) {
 	const adminUser = await getAdmin().catch(() => null);
 
+	const user: IAdminResponse = adminUser && (adminUser as any) 
+
 	return (
 		<main className="w-full pt-[4.5rem] sm:pt-0">
-			<Header user={adminUser} />
+			<Header user={user} />
 			<article className="sm:w-[calc(100%-200px-4rem)] sm:ml-[200px] sm:pt-4 sm:px-8 md:w-[calc(100%-250px-4rem)] md:ml-[250px]">
 				{children}
 			</article>

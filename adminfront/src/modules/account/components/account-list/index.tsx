@@ -17,9 +17,10 @@ import useToggleState from '@/lib/hooks/use-toggle-state';
 import { TResponse } from '@/types/common';
 import { deleteUser } from '@/actions/accounts';
 import { updateSearchQuery } from '@/lib/utils';
+import { IAdminResponse } from '@/types/account';
 
 interface Props {
-	data: TResponse<Omit<User, 'password_hash'>> | null;
+	data: TResponse<IAdminResponse> | null;
 }
 
 const AccountList = ({ data }: Props) => {
@@ -29,13 +30,10 @@ const AccountList = ({ data }: Props) => {
 	const currentPage = searchParams.get('page') ?? 1;
 
 	const { state, onOpen, onClose } = useToggleState(false);
-	const [currentUser, setCurrentUser] = useState<Omit<
-		User,
-		'password_hash'
-	> | null>(null);
+	const [currentUser, setCurrentUser] = useState<IAdminResponse | null>(null);
 	const { message, modal } = App.useApp();
 
-	const handleEditUser = (record: User) => {
+	const handleEditUser = (record: IAdminResponse) => {
 		setCurrentUser(record);
 		onOpen();
 	};
@@ -77,13 +75,14 @@ const AccountList = ({ data }: Props) => {
 	const handleChangePage = (page: number) => {
 		// create new search params with new value
 		const newSearchParams = updateSearchQuery(searchParams, {
-			page: page,
+			page: page.toString(),
 		});
 
 		// Replace url
 		replace(`${pathname}?${newSearchParams}`);
 	};
 
+	
 	const columns = useMemo(
 		() => accountColumns({ handleDeleteUser, handleEditUser }),
 		[data]
@@ -93,17 +92,14 @@ const AccountList = ({ data }: Props) => {
 		<Card className="w-full">
 			<Table
 				columns={columns}
-				dataSource={data?.users ?? []}
+				dataSource={data?.data ?? []}
 				rowKey="id"
 				pagination={{
-					total: Math.floor(data?.count / data?.limit),
+					total: Math.floor(data?.count ?? 0 / (data?.limit ?? 0)),
 					pageSize: data?.limit,
-					current: currentPage,
+					current: currentPage as number,
 					onChange: handleChangePage,
 				}}
-				// onRow={(record, rowIndex) => ({
-				// 	onClick: (event) => onClickRow(record),
-				// })}
 			/>
 			<FloatButton
 				className="top-2/3"

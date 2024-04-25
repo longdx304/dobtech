@@ -1,8 +1,9 @@
-import { Typography, ParagraphProps } from 'antd';
+import { Typography, TypographyProps } from 'antd';
 import { cn } from '@/lib/utils';
 
-interface Props extends ParagraphProps {
+interface Props extends TypographyProps {
 	className?: string;
+	children: React.ReactNode;
 }
 
 const { Paragraph: AntParagraph } = Typography;

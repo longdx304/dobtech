@@ -1,7 +1,5 @@
-import { Select as AntdSelect, SelectProps } from 'antd';
 import { cn } from '@/lib/utils';
-import { Flex } from '@/components/Flex';
-import { ErrorText } from '@/components/Typography';
+import { Select as AntdSelect, SelectProps } from 'antd';
 
 interface Props extends SelectProps {
 	className?: string;

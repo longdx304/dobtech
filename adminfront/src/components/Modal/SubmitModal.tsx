@@ -29,7 +29,6 @@ export default function SubmitModal({
 					Huỷ
 				</Button>,
 				<Button
-					key="2"
 					htmlType="submit"
 					key="submit"
 					onClick={() => form?.submit()}

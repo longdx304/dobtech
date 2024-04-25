@@ -8,15 +8,15 @@ import { SubmitModal } from '@/components/Modal';
 import { Input } from '@/components/Input';
 import { Title } from '@/components/Typography';
 import { CheckboxGroup } from '@/components/Checkbox';
-import { rolesEmployee, EPermissions, IUserRequest } from '@/types/account';
+import { rolesEmployee, EPermissions, IUserRequest, IAdminResponse } from '@/types/account';
 import { createUser, updateUser } from '@/actions/accounts';
-import { isEmpty } from 'lodash';
+import _ from 'lodash';
 
 interface Props {
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
-	user: Omit<User, 'password_hash'> | null;
+	user: IAdminResponse | null;
 	// setCurrentUser: () => void;
 }
 
@@ -29,7 +29,7 @@ export default function UserModal({
 	const [form] = Form.useForm();
 	const { message } = App.useApp();
 
-	const titleModal = `${isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
+	const titleModal = `${_.isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
 
 	useEffect(() => {
 		form &&
@@ -51,7 +51,7 @@ export default function UserModal({
 	const onFinish: FormProps<IUserRequest>['onFinish'] = async (values) => {
 		try {
 			// Create user
-			if (isEmpty(user)) {
+			if (_.isEmpty(user)) {
 				const result = await createUser(values);
 				message.success('Đăng ký nhân viên thành công');
 			} else {
@@ -92,7 +92,7 @@ export default function UserModal({
 					<Input
 						placeholder="Email"
 						prefix={<Mail />}
-						disabled={!isEmpty(user)}
+						disabled={!_.isEmpty(user)}
 						data-testid="email"
 					/>
 				</Form.Item>

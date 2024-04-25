@@ -27,7 +27,7 @@ const Menubar = ({ user, className, onClose = () => {} }: Props) => {
 	};
 
 	// Handle user click dropdown
-	const handleDropdownClick = (e) => {
+	const handleDropdownClick = (e: any) => {
 		const { key } = e;
 		if (key === 'logout') {
 			signOut();

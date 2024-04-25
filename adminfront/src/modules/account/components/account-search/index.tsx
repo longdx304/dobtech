@@ -1,14 +1,13 @@
 'use client';
-import { ChangeEvent } from 'react';
+import _ from 'lodash';
 import { Search } from 'lucide-react';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
-import { debounce } from 'lodash';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { ChangeEvent } from 'react';
 
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
-import { Title } from '@/components/Typography';
 import { Input } from '@/components/Input';
-import { SubmitButton } from '@/components/Button';
+import { Title } from '@/components/Typography';
 import { updateSearchQuery } from '@/lib/utils';
 
 interface Props {}
@@ -25,17 +24,20 @@ const AccountSearch = ({}: Props) => {
 	};
 
 	// Function use debounce for onChange input
-	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
-		const { value: inputValue } = e.target;
-		// create new search params with new value
-		const newSearchParams = updateSearchQuery(searchParams, {
-			q: inputValue,
-			page: '1',
-		});
+	const handleChangeDebounce = _.debounce(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const { value: inputValue } = e.target;
+			// create new search params with new value
+			const newSearchParams = updateSearchQuery(searchParams, {
+				q: inputValue,
+				page: '1',
+			});
 
-		// Replace url
-		replace(`${pathname}?${newSearchParams}`);
-	}, 750);
+			// Replace url
+			replace(`${pathname}?${newSearchParams}`);
+		},
+		750
+	);
 
 	return (
 		<Card className="w-full space-y-4" bordered={false}>

@@ -26,7 +26,7 @@ type Props = {
 	collapseIcon: React.ReactNode;
 	handleCreateSubCategory: (parentCategory: ProductCategory) => void;
 	handleEdit: (record: ProductCategory) => void;
-	handleDelete: (record: ProductCategory) => void;
+	handleDelete: (record: ProductCategory['id']) => void;
 };
 
 const CategoryItem = (props: Props) => {
@@ -57,7 +57,7 @@ const CategoryItem = (props: Props) => {
 			return;
 		}
 		// Case item is delete
-		props.handleDelete(item.id);
+		props.handleDelete(item.id as any);
 	};
 
 	return (

@@ -1,13 +1,11 @@
-import { Tooltip as AntdTooltip, TooltipProps } from 'antd';
 import { cn } from '@/lib/utils';
-import { Flex } from '@/components/Flex';
-import { ErrorText } from '@/components/Typography';
+import { Tooltip as AntdTooltip, TooltipProps } from 'antd';
 
-interface Props extends TooltipProps {
+type Props = TooltipProps & {
 	className?: string;
 	title: string;
 	icon: React.ReactNode;
-}
+};
 
 export default function TooltipIcon({
 	title,

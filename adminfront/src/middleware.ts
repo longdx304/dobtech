@@ -1,15 +1,12 @@
+import _ from 'lodash';
 import { NextRequest, NextResponse } from 'next/server';
-import { isEmpty, intersection } from 'lodash';
 
-import { getAdmin } from '@/actions/accounts';
-import { medusaClient } from '@/lib/database/config';
-import { getMedusaHeaders } from './actions/common';
 import { ERole } from '@/types/account';
 import { routesConfig } from '@/types/routes';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
 
-async function getUser(accessToken) {
+async function getUser(accessToken: any) {
 	if (accessToken) {
 		return fetch(`${BACKEND_URL}/admin/auth`, {
 			headers: {
@@ -40,9 +37,8 @@ export async function middleware(request: NextRequest) {
 	// Get pathname of current routes
 	const pathname = request.nextUrl.pathname;
 	// Find mode of routes
-	const { mode: routesMode } = routesConfig.find(
-		(routes) => routes.path === pathname
-	);
+	const { mode: routesMode } =
+		routesConfig.find((routes) => routes.path === pathname) || {};
 
 	// Routes mode isn't exists return homepage
 	if (!routesMode) {
@@ -50,10 +46,10 @@ export async function middleware(request: NextRequest) {
 	}
 
 	// Check current user has permission into routes
-	const hasPermissions = intersection(routesMode, permissions.split(','));
+	const hasPermissions = _.intersection(routesMode, permissions.split(','));
 
 	// If user hasn't permission return homepage
-	if (isEmpty(hasPermissions)) {
+	if (_.isEmpty(hasPermissions)) {
 		return NextResponse.redirect(new URL('/', request.url), 307);
 	}
 
@@ -62,4 +58,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
 	matcher: ['/accounts/:path', '/products/:path'],
+	runtime: 'experimental-edge',
+	unstable_allowDynamic: [
+		'**/node_modules/lodash*/**/*.js',
+	],
 };

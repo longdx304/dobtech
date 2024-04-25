@@ -41,7 +41,7 @@ const LoginTemplate = ({}: Props) => {
 							placeholder="Mật khẩu"
 							data-testid="password"
 							prefix={<Lock />}
-							error={state?.password}
+							// error={state?.password}
 						/>
 					</div>
 					<ErrorText error={state?.result} />

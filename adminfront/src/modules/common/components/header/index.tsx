@@ -1,23 +1,23 @@
 'use client';
-import { FC } from 'react';
+import { Flex } from 'antd';
 import { Menu } from 'lucide-react';
 import Image from 'next/image';
-import { Flex, Drawer } from 'antd';
+import { FC } from 'react';
 
-import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
+import { Card } from '@/components/Card';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import useScrollDirection from '@/lib/hooks/useScrollDirection';
-import DrawerMenu from './DrawerMenu';
-import { IAdminResponse } from '@/types/account';
 import { cn } from '@/lib/utils';
+import { IAdminResponse } from '@/types/account';
+import DrawerMenu from './DrawerMenu';
 import Menubar from './Menubar';
 
 interface Props {
 	user: IAdminResponse;
 }
 
-const Header = ({ user }): FC<Props> => {
+const Header: FC<Props> = ({ user }) => {
 	const { state, onClose, onOpen } = useToggleState(false);
 	const scrollDirection = useScrollDirection();
 
@@ -26,7 +26,9 @@ const Header = ({ user }): FC<Props> => {
 			className={cn(
 				'fixed top-0 w-full p-0 [&_.ant-card-body]:py-2 transition-all ease-in-out duration-300',
 				'sm:w-[200px] md:w-[250px] sm:h-full sm:[&_.ant-card-body]:px-0',
-				scrollDirection === "up" ? 'max-sm:translate-y-0' : 'max-sm:-translate-y-14'
+				scrollDirection === 'up'
+					? 'max-sm:translate-y-0'
+					: 'max-sm:-translate-y-14'
 			)}
 			bordered={false}
 		>
