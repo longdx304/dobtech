@@ -2,8 +2,8 @@
 import { Modal as AntdModal, ModalProps, Form } from 'antd';
 
 import { cn } from '@/lib/utils';
-import { ReactNode, useState } from 'react';
-import { Button, SubmitButton } from '@/components/Button';
+import { ReactNode } from 'react';
+import { Button } from '@/components/Button';
 
 interface Props extends ModalProps {
 	className?: string;

@@ -7,18 +7,41 @@ import {
 	Palette,
 	Sigma,
 	UserRound,
+	Plus,
+	Minus,
 } from 'lucide-react';
-
-import { createProduct, updateProduct } from '@/actions/products';
-import { Input } from '@/components/Input';
-import InputNumber from '@/components/Input/InputNumber';
-import { SubmitModal } from '@/components/Modal';
-import { Select, TreeSelect } from '@/components/Select';
-import { Title } from '@/components/Typography';
-import { IProductRequest, IProductResponse } from '@/types/products';
+import type { CollapseProps } from 'antd';
 import { Form, message, type FormProps } from 'antd';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
+import { AdminPostProductsReq, ProductVariant } from '@medusajs/medusa';
+import { useAdminCreateProduct } from 'medusa-react';
+import { redirect } from 'next/navigation'
+
+import { createProduct, updateProduct } from '@/actions/products';
+import { prepareImages } from '@/actions/images';
+import { Input, InputNumber } from '@/components/Input';
+import { SubmitModal } from '@/components/Modal';
+import { Collapse } from '@/components/Collapse';
+import { Flex } from '@/components/Flex';
+import { Select, TreeSelect } from '@/components/Select';
+import { Title } from '@/components/Typography';
+import {
+	IProductRequest,
+	IProductResponse,
+	NewProductForm,
+	ProductStatus,
+} from '@/types/products';
+import { FormImage } from '@/types/common';
+import {
+	GeneralForm,
+	OrganizeForm,
+	AttributeForm,
+	ThumbnailForm,
+	MediaForm,
+} from './components';
+import { AddVariant } from './components/variant-form';
+import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 
 interface Props {
 	state: boolean;
@@ -35,91 +58,60 @@ export default function ProductModal({
 	product,
 	productCategories,
 }: Props) {
+	const { isFeatureEnabled } = useFeatureFlag();
+	const { mutate, isLoading } = useAdminCreateProduct();
+
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 
-	const titleModal = `${_.isEmpty(product) ? 'Thêm mới' : 'Cập nhật'} sản phẩm`;
-
-	// set form values when product is loaded
-	useEffect(() => {
-		const selectedSizes = product?.options.find(
-			(option) => option.title === 'Size'
-		)?.values;
-
-		const selectedVariantIds = selectedSizes?.map(
-			(size: any) =>
-				product?.options
-					.find((option) => option.title === 'Size')
-					?.values.find((value) => value.value === size)?.variant_id
-		);
-
-		const selectedOptions = product?.options
-			.filter((option) => ['Color', 'Quantity'].includes(option.title))
-			.map((option) => ({
-				...option,
-				values: option.values.find((value) =>
-					selectedVariantIds?.includes(value.variant_id)
-				),
-			}));
-
-		const selectedVariants = product?.variants.filter((variant) =>
-			selectedVariantIds?.includes(variant.id)
-		);
-
-		form &&
-			form?.setFieldsValue({
-				title: product?.title ?? '',
-				categories: product?.categories?.map((category) => category.id) ?? [],
-				sizes: [],
-
-				color:
-					selectedOptions?.find((option) => option.title === 'Color')?.values
-						?.value ?? '',
-
-				quantity:
-					selectedOptions?.find((option) => option.title === 'Quantity')?.values
-						?.value ?? '',
-
-				price:
-					selectedVariants
-						?.map((variant) => variant.prices[0].amount)
-						.toString() ?? [],
-
-				inventoryQuantity:
-					selectedVariants?.map((variant) => variant.inventory_quantity) ?? [],
-			});
-	}, [product, form]);
-	console.log('product', product);
+	const titleModal = 'Thêm mới sản phẩm';
 
 	// handle form submit
-	const onFinish: FormProps<IProductRequest>['onFinish'] = async (values) => {
-		try {
-			if (_.isEmpty(product)) {
-				await createProduct(values);
-				message.success('Thêm sản phẩm thành công');
-			} else {
-				await updateProduct(
-					product!.id,
-					product.variants ?? [],
-					product.options ?? [],
-					values
-				);
+	const onFinish: FormProps<NewProductForm>['onFinish'] = async (values) => {
+		// Payload
+		const payload = createPayload(
+			values,
+			true,
+			isFeatureEnabled('sales_channels')
+		);
 
-				message.success('Cập nhật sản phẩm thành công');
+		// Prepped images thumbnail
+		if (values.thumbnail?.length) {
+			let preppedImages: FormImage[] = [];
+			try {
+				preppedImages = await prepareImages(values.thumbnail);
+			} catch (error) {
+				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
+				messageApi.error(errorMsg);
+				return;
 			}
-			handleCancel();
-		} catch (error: any) {
-			messageApi.open({
-				type: 'error',
-				content: error?.message,
-			});
+			const urls = preppedImages.map((img) => img.url);
+			payload.thumbnail = urls[0];
 		}
-	};
-
-	const onFinishFailed: FormProps<IProductRequest>['onFinishFailed'] = (
-		errorInfo
-	) => {
-		console.log('Failed:', errorInfo);
+		// Prepped images media
+		if (values.media?.length) {
+			let preppedImages: FormImage[] = [];
+			try {
+				preppedImages = await prepareImages(values.media);
+			} catch (error) {
+				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
+				messageApi.error(errorMsg);
+				return;
+			}
+			const urls = preppedImages.map((img) => img.url);
+			payload.images = urls;
+		}
+		mutate(payload, {
+			onSuccess: ({ product }) => {
+				messageApi.success('Thêm sản phẩm thành công!');
+				redirect(`/products/${product.id}`)
+				handleOk();
+			},
+			onError: (error) => {
+				console.log('error', error);
+				messageApi.error('Đã xảy ra lỗi khi thêm sản phẩm!');
+			},
+		});
 	};
 
 	// recursive function to convert categories to tree data
@@ -142,196 +134,195 @@ export default function ProductModal({
 
 	const treeData = convertCategoriesToTreeData(productCategories);
 
-	const [categoryValue, setCategoryValue] = useState<any>([]);
-
-	const onChange = (newValue: string[]) => {
-		// const selectedCategories = newValue.map((value: string) =>
-		// 	productCategories.find((category: any) => category.id === value)
-		// );
-
-		setCategoryValue(newValue);
-	};
+	const itemsCollapse: CollapseProps['items'] = [
+		{
+			key: 'generalForm',
+			label: (
+				<Flex>
+					<div>{'Thông tin chung'}</div>
+					<div className="text-rose-600 text-xl">{'*'}</div>
+				</Flex>
+			),
+			children: <GeneralForm />,
+		},
+		{
+			key: 'organizeForm',
+			label: 'Phân loại',
+			children: <OrganizeForm treeCategories={treeData} />,
+		},
+		{
+			key: 'variantForm',
+			label: 'Variants',
+			children: <AddVariant form={form} />,
+		},
+		{
+			key: 'attributeForm',
+			label: 'Đặc điểm',
+			children: <AttributeForm />,
+		},
+		{
+			key: 'thumbnailForm',
+			label: 'Ảnh đại diện',
+			children: <ThumbnailForm form={form} />,
+		},
+		{
+			key: 'imageForm',
+			label: 'Hình ảnh',
+			children: <MediaForm form={form} />,
+		},
+	];
 
 	return (
 		<SubmitModal
 			open={stateModal}
 			onOk={handleOk}
-			confirmLoading={false}
+			confirmLoading={isLoading}
 			handleCancel={handleCancel}
+			width={800}
 			form={form}
 		>
 			<Title level={3} className="text-center">
 				{titleModal}
 			</Title>
-			<Form
-				form={form}
-				onFinish={onFinish}
-				onFinishFailed={onFinishFailed}
-				className="pt-3"
-			>
-				<Form.Item
-					name="title"
-					rules={[
-						{
-							required: true,
-							message: 'Tên sản phẩm phải có ít nhất 2 ký tự!',
-						},
-					]}
-					label="Tên sản phẩm:"
-					initialValue={product?.title}
-				>
-					<Input
-						placeholder="Tên sản phẩm"
-						prefix={<Layers />}
-						data-testid="title"
-					/>
-				</Form.Item>
-				<Form.Item
-					name="categories"
-					label="Danh mục:"
-					rules={[
-						{
-							required: true,
-							message: 'Phải chọn ít nhất một danh mục!',
-						},
-					]}
-				>
-					<TreeSelect
-						title="Chọn danh mục"
-						treeData={treeData}
-						onChange={onChange}
-						value={categoryValue}
-						dataTestId="categories"
-					/>
-				</Form.Item>
-				<Form.Item
-					name="sizes"
-					rules={[{ required: true, message: 'Hãy chọn kích thước phù hợp' }]}
-					label="Kích thước:"
-				>
-					<Select
-						mode="tags"
-						placeholder="Chọn hoặc nhập kích thước"
-						style={{ width: '100%' }}
-						tokenSeparators={[',']}
-						data-testid="sizes"
-						options={
-							(product &&
-								product?.options.find((option) => option.title === 'Size')
-									?.values) ||
-							undefined
-						}
-						onChange={(selectedSizes) => {
-							const selectedVariantIds = selectedSizes.map(
-								(size: any) =>
-									product?.options
-										.find((option) => option.title === 'Size')
-										?.values.find((value) => value.value === size)?.variant_id
-							);
-
-							const selectedOptions = product?.options
-								.filter((option) =>
-									['Color', 'Quantity'].includes(option.title)
-								)
-								.map((option) => ({
-									...option,
-									values: option.values.find((value) =>
-										selectedVariantIds.includes(value.variant_id)
-									),
-								}));
-
-							const selectedVariants = product?.variants.filter((variant) =>
-								selectedVariantIds.includes(variant.id)
-							);
-
-							const valuesToSet = {
-								sizes: selectedSizes,
-
-								color: selectedOptions?.find(
-									(option) => option.title === 'Color'
-								)?.values?.value,
-
-								quantity: selectedOptions?.find(
-									(option) => option.title === 'Quantity'
-								)?.values?.value,
-
-								price: selectedVariants?.map(
-									(variant) => variant.prices[0].amount
-								),
-
-								inventoryQuantity: selectedVariants?.map(
-									(variant) => variant.inventory_quantity
-								),
-							};
-
-							product && form.setFieldsValue(valuesToSet);
-						}}
-					/>
-				</Form.Item>
-				<Form.Item
-					name="color"
-					rules={[
-						{ required: true, message: 'Màu sắc phải có ít nhất 2 kí tự' },
-					]}
-					label="Màu sắc:"
-					// initialValue={
-					// 	product?.options.find((option) => option.title === 'Color')?.values
-					// }
-				>
-					<Input
-						placeholder="Màu sắc"
-						prefix={<Palette />}
-						data-testid="color"
-					/>
-				</Form.Item>
-				<Form.Item
-					name="quantity"
-					rules={[{ required: true, message: 'Số lượng phải lớn hơn 0' }]}
-					label="Số lượng:"
-					// initialValue={
-					// 	product?.options.find((option) => option.title === 'Quantity')
-					// 		?.values
-					// }
-				>
-					<Input
-						placeholder="Số lượng sản phẩm"
-						prefix={<Sigma />}
-						data-testid="quantity"
-					/>
-				</Form.Item>
-				<Form.Item
-					name="price"
-					rules={[
-						{ required: true, message: 'Giá tiền phải lớn hơn 1.000 VND' },
-					]}
-					label="Giá:"
-					// initialValue={product?.variants?.map(
-					// 	(variant) => variant.prices[0].amount
-					// )}
-				>
-					<InputNumber
-						placeholder="Giá sản phẩm"
-						prefix={<BadgeDollarSign />}
-						data-testid="price"
-					/>
-				</Form.Item>
-				<Form.Item
-					name="inventoryQuantity"
-					rules={[
-						{ required: true, message: 'Số lượng tồn kho phải lớn hơn 0' },
-					]}
-					label="Số lượng tồn kho:"
-					// initialValue={product?.variants.map(
-					// 	(variant) => variant.inventory_quantity
-					// )}
-				>
-					<InputNumber
-						placeholder="Số lượng tồn kho"
-						prefix={<CandlestickChart />}
-						data-testid="inventoryQuantity"
-					/>
-				</Form.Item>
+			<Form form={form} onFinish={onFinish} className="pt-3">
+				<Collapse
+					className="bg-white [&_.ant-collapse-header]:px-0 [&_.ant-collapse-header]:py-4 [&_.ant-collapse-header]:text-base [&_.ant-collapse-header]:font-medium"
+					defaultActiveKey={['generalForm']}
+					// ghost
+					items={itemsCollapse}
+					expandIconPosition="end"
+					bordered={false}
+					expandIcon={({ isActive }) =>
+						isActive ? <Minus size={20} /> : <Plus size={20} />
+					}
+				/>
 			</Form>
 		</SubmitModal>
 	);
 }
+
+const createPayload = (
+	data: NewProductForm,
+	publish = true,
+	salesChannelsEnabled = false
+): AdminPostProductsReq => {
+	const payload: AdminPostProductsReq = {
+		// General
+		title: data?.general?.title,
+		subtitle: data?.general?.subtitle || undefined,
+		material: data?.general?.material || undefined,
+		handle: data?.general?.handle || undefined,
+		description: data?.general?.description || undefined,
+		discountable: data?.general?.discounted,
+		is_giftcard: false,
+		// Organize
+		collection_id: data?.organize?.collection || undefined,
+		categories: data?.organize?.categories?.length
+			? data.organize.categories.map((id) => ({ id }))
+			: undefined,
+		tags: data?.organize?.tags
+			? data.organize.tags.map((t) => ({
+					value: t,
+			  }))
+			: undefined,
+		type: data.organize.type
+			? {
+					value: data.organize.type.label,
+					id: data.organize.type.value,
+			  }
+			: undefined,
+		// Options
+		options: data.options.map((o) => ({
+			title: o.title,
+		})),
+		// Variants
+		variants: data.variants.map((v) => ({
+			title: v?.title!,
+			options: v?.options,
+			material: undefined,
+			sku: v?.sku || undefined,
+			inventory_quantity: v?.inventory_quantity || 0,
+			ean: v?.ean || undefined,
+			upc: v?.upc || undefined,
+			barcode: v?.barcode || undefined,
+			manage_inventory: v?.manage_inventory || true,
+			allow_backorder: v?.allow_backorder || false,
+			prices: [],
+			// prices: getVariantPrices(v.prices),
+			width: v?.width || undefined,
+			length: v?.length || undefined,
+			height: v?.height || undefined,
+			weight: v?.weight || undefined,
+			hs_code: v?.hs_code || undefined,
+			mid_code: v?.mid_code || undefined,
+			origin_country: v?.origin_country || undefined,
+		})),
+		// Dimensions
+		width: data?.dimensions?.width || undefined,
+		length: data?.dimensions?.length || undefined,
+		height: data?.dimensions?.height || undefined,
+		weight: data?.dimensions?.weight || undefined,
+		// Customs
+		hs_code: data?.customs?.hs_code || undefined,
+		mid_code: data?.customs?.mid_code || undefined,
+		origin_country: data?.customs?.origin_country || undefined,
+
+		// @ts-ignore
+		status: publish ? ProductStatus.PUBLISHED : ProductStatus.DRAFT,
+	};
+
+	return payload;
+};
+
+const createBlank = (): NewProductForm => {
+	return {
+		general: {
+			title: '',
+			material: null,
+			subtitle: null,
+			description: null,
+			handle: '',
+		},
+		customs: {
+			hs_code: null,
+			mid_code: null,
+			origin_country: null,
+		},
+		dimensions: {
+			height: null,
+			length: null,
+			weight: null,
+			width: null,
+		},
+		discounted: {
+			value: true,
+		},
+		media: [],
+		organize: {
+			categories: null,
+			collection: null,
+			tags: null,
+			type: null,
+		},
+		// salesChannels: {
+		//   channels: [],
+		// },
+		thumbnail: [],
+		variants: [],
+		options: [],
+	};
+};
+
+// const getVariantPrices = (prices: PricesFormType) => {
+// 	const priceArray = prices.prices
+// 		.filter((price) => typeof price.amount === 'number')
+// 		.map((price) => {
+// 			return {
+// 				amount: price.amount as number,
+// 				currency_code: price.region_id ? undefined : price.currency_code,
+// 				region_id: price.region_id || undefined,
+// 			};
+// 		});
+
+// 	return priceArray;
+// };

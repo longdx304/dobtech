@@ -59,3 +59,90 @@ export interface IProductRequest {
 	variants?: IProductVariant[];
 	options?: IProductOptions[];
 }
+
+export type GeneralFormType = {
+  title: string;
+  subtitle?: string | null;
+  handle?: string;
+  material?: string | null;
+  description?: string | null;
+	discounted: boolean;
+}
+
+export type Option = {
+  value: string;
+  label: string;
+}
+
+export type OrganizeFormType = {
+  type?: Option | null;
+  collection?: Option | null;
+  tags?: string[] | null;
+  categories?: string[] | null;
+}
+
+export type OptionsFormType = {
+	title: string;
+	values: string[];
+}
+export type VariantFormType = {
+	title: string;
+	options: { value: string }[];
+	manage_inventory?: boolean;
+	allow_backorder?: boolean;
+	sku?: string;
+	inventory_quantity?: number;
+	ean?: string;
+	upc?: string;
+	barcode?: string;
+	width?: number;
+	length?: number;
+	height?: number;
+	weight?: number;
+	mid_code?: string;
+	hs_code?: string;
+	origin_country?: string;
+}
+
+export type DimensionsFormType = {
+  length?: number | null;
+  width?: number | null;
+  height?: number | null;
+  weight?: number | null;
+}
+
+export type CustomsFormType = {
+  mid_code?: string | null;
+  hs_code?: string | null;
+  origin_country?: Option | null;
+}
+
+export type FormImage = {
+  url: string;
+  name?: string;
+  size?: number;
+  nativeFile?: File;
+	selected?: boolean;
+}
+
+export type ThumbnailFormType = FormImage[];
+
+export type MediaFormType = FormImage[];
+
+export type NewProductForm = {
+  general: GeneralFormType;
+  organize: OrganizeFormType;
+	options: OptionsFormType[];
+  variants: VariantFormType[];
+  dimensions: DimensionsFormType;
+  customs: CustomsFormType;
+  thumbnail: ThumbnailFormType;
+  media: MediaFormType;
+}
+
+export enum ProductStatus {
+  DRAFT = "draft",
+  PROPOSED = "proposed",
+  PUBLISHED = "published",
+  REJECTED = "rejected",
+}
