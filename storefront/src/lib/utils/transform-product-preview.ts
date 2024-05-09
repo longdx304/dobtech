@@ -11,7 +11,6 @@ const transformProductPreview = (
 	region: Region
 ): ProductPreviewType => {
 	const variants = product.variants as unknown as CalculatedVariant[];
-	console.log("variants:", variants);
 
 	let cheapestVariant = undefined;
 

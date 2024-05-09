@@ -48,3 +48,18 @@ body {
 .category > .ant-dropdown {
 	width: 100% !important;
 }
+
+.box-tick {
+	height: 1rem;
+	width: 1rem;
+	overflow: hidden;
+}
+
+.box-tick::before {
+	border: 1rem solid transparent;
+	border-bottom: 1rem solid #000;
+	content: '';
+	bottom: 0;
+	position: absolute;
+	right: -1rem;
+}

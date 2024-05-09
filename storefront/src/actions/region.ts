@@ -1,4 +1,6 @@
 import { medusaClient } from "@/lib/database/config";
+import { Region } from '@medusajs/medusa';
+// import { Region } from '@/types/medusa';
 import { cache } from 'react';
 
 const regionMap = new Map<string, Region>()

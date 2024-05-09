@@ -1,34 +1,47 @@
-import { FC, Fragment } from "react";
+import { FC } from 'react';
 
-import { Pagination } from "@/components/Pagination";
-import { Flex } from "@/components/Flex";
-import ProductPreview from "@/modules/products/components/product-preview";
-import { getProductsList } from "@/actions/products";
+import { Flex } from '@/components/Flex';
+import ProductPreview from '@/modules/products/components/product-preview';
+import { ProductPreviewType } from '@/types/product';
 
-interface Props {}
+interface ProductListProps {
+  data: {
+    products: ProductPreviewType[];
+    count: number;
+  };
+}
 
-const ProductList: FC<Props> = async ({}) => {
-	const { response } = await getProductsList({ pageParam: 0 });
-	console.log("data:", response);
-	return (
-		<Flex vertical gap="middle" justify="center">
-			<div className="grid grid-cols-5 w-full gap-x-6 gap-y-6">
-				{response?.products?.map((product) => (
-					<ProductPreview key={product.id} data={product} />
-				))}
-			</div>
-			<Pagination
-				className="flex justify-center"
-				showSizeChanger={false}
-				defaultCurrent={0}
-				total={response?.count ?? 0}
-				defaultPageSize={12}
-				// showTotal={(total, range) =>
-				// 	`${range[0]}-${range[1]} of ${total} items`
-				// }
-			/>
-		</Flex>
-	);
+const ProductList: FC<ProductListProps> = async ({ data }) => {
+  // const searchParams = useSearchParams();
+  // const currentPage = searchParams.get('page') ?? 1;
+  // const router = useRouter();
+  // const pathname = usePathname();
+
+  // const handleChangePage = (page: number) => {
+  //   const newSearchParams = updateSearchQuery(searchParams, {
+  //     page: page.toString(),
+  //   });
+
+  //   router.push(`/daily?${newSearchParams}`);
+  // };
+
+  return (
+    <Flex vertical gap='middle' justify='center'>
+      <div className='grid grid-cols-5 w-full gap-x-6 gap-y-6'>
+        {data.products?.map((product) => (
+          <ProductPreview key={product.id} data={product} />
+        ))}
+      </div>
+      {/* <Pagination
+        className='flex justify-center'
+        showSizeChanger={false}
+        total={data.count ?? 0}
+        current={currentPage as number}
+        pageSize={data.products.length}
+        onChange={handleChangePage}
+      /> */}
+    </Flex>
+  );
 };
 
 export default ProductList;

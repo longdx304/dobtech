@@ -1,6 +1,5 @@
-import { type ClassValue, clsx } from 'clsx';
+import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -32,7 +31,7 @@ export function handleErrorZod(resolver: any) {
  * Use update search query
  */
 export const updateSearchQuery = (
-	searchParams: any,
+	searchParams: string | URLSearchParams,
 	updateQuery: Record<string, string>
 ) => {
 	const newSearchParams = new URLSearchParams(searchParams.toString());

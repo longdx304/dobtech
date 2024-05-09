@@ -14,7 +14,6 @@ interface Props {
 }
 
 const ProductPreview: FC<Props> = ({ data }) => {
-	console.log("datra", data)
 	return (
 		<LocalizedClientLink
 			href={`products/${data.handle}`}
