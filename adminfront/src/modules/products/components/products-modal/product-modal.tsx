@@ -82,7 +82,10 @@ export default function ProductModal({
 				preppedImages = await prepareImages(values.thumbnail);
 			} catch (error) {
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
-				messageApi.error(errorMsg);
+				messageApi.open({
+					type: 'error',
+					content: errorMsg,
+				});
 				return;
 			}
 			const urls = preppedImages.map((img) => img.url);
@@ -95,7 +98,10 @@ export default function ProductModal({
 				preppedImages = await prepareImages(values.media);
 			} catch (error) {
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
-				messageApi.error(errorMsg);
+				messageApi.open({
+					type: 'error',
+					content: errorMsg,
+				});
 				return;
 			}
 			const urls = preppedImages.map((img) => img.url);
@@ -103,13 +109,19 @@ export default function ProductModal({
 		}
 		mutate(payload, {
 			onSuccess: ({ product }) => {
-				messageApi.success('Thêm sản phẩm thành công!');
+				messageApi.open({
+					type: 'success',
+					content: 'Thêm sản phẩm thành công.',
+				});
 				redirect(`/products/${product.id}`)
 				handleOk();
 			},
 			onError: (error) => {
 				console.log('error', error);
-				messageApi.error('Đã xảy ra lỗi khi thêm sản phẩm!');
+				messageApi.open({
+					type: 'error',
+					content: 'Đã xảy ra lỗi khi thêm sản phẩm.',
+				});
 			},
 		});
 	};

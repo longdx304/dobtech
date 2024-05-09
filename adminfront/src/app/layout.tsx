@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { getAdmin } from '@/actions/accounts';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { ConfigProvider, App } from 'antd';
+import { ConfigProvider } from 'antd';
 
 import theme from '../theme';
 import { FeatureFlagProvider } from '@/lib/providers/feature-flag-provider';

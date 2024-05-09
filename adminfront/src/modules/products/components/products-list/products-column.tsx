@@ -1,4 +1,4 @@
-import { Pencil, X } from 'lucide-react';
+import { Pencil, X, MonitorX, Trash2 } from 'lucide-react';
 
 import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
@@ -7,6 +7,7 @@ import { Text } from '@/components/Typography';
 import { IProductResponse } from '@/types/products';
 import { Product } from '@medusajs/medusa';
 import formatNumber from '@/lib/utils';
+import { ActionAbles } from '@/components/Dropdown';
 
 interface Props {
 	handleDeleteProduct: (userId: Product['id']) => void;
@@ -85,24 +86,41 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 		title: 'Action',
 		key: 'action',
 		width: 40,
-		render: (_: any, record: any) => (
-			<Flex className="flex flex-col">
-				<Button
-					onClick={() => handleEditProduct(record)}
-					type="text"
-					shape="circle"
-					icon={<Pencil />}
-					data-testid="editProduct"
-				/>
-				<Button
-					onClick={() => handleDeleteProduct(record.id)}
-					type="text"
-					shape="circle"
-					icon={<X color="red" />}
-					data-testid="deleteProduct"
-				/>
-			</Flex>
-		),
+		render: (_: any, record: any) => {
+			const actions = [
+				{
+					label: <span className="w-full">Chỉnh sửa</span>,
+					key: 'edit',
+					icon: <Pencil size={20} />,
+				},
+				{
+					label: <span className="w-full">Ngừng xuất bản</span>,
+					key: 'stop-publishing',
+					icon: <MonitorX size={20} />,
+				},
+				{
+					label: <span className="w-full">Xoá</span>,
+					key: 'delete',
+					icon: <Trash2 size={20} />,
+					danger: true,
+				},
+			];
+		
+			const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+				if (key === 'edit') {
+					handleEditProduct(record);
+					return;
+				}
+				// Case item is delete
+				if (key === 'delete') {
+					handleDeleteProduct(record.id);
+					return;
+				}
+			};
+
+			return (
+				<ActionAbles actions={actions} onMenuClick={handleMenuClick} />
+		)},
 	},
 ];
 

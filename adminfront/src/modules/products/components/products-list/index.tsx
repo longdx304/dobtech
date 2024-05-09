@@ -34,8 +34,7 @@ const ProductList = ({ data, categories }: Props) => {
 	);
 
 	const handleEditProduct = (record: IProductResponse) => {
-		setCurrentProduct(record);
-		onOpen();
+		router.push(`/products/${record.id}`);
 	};
 
 	const handleCloseModal = () => {

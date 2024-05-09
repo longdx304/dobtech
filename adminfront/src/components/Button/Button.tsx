@@ -1,3 +1,4 @@
+'use client';
 import { Button as AntdButton, ButtonProps as AntdButtonProps } from 'antd';
 import { cn } from '@/lib/utils';
 

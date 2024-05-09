@@ -9,12 +9,14 @@ interface Props extends ModalProps {
 	children?: ReactNode;
 	handleCancel: () => void;
 	handleOk: () => void;
+	isLoading?: boolean;
 }
 
 export default function Modal({
 	className,
 	handleOk,
 	handleCancel,
+	isLoading,
 	children,
 	...props
 }: Props) {
@@ -23,13 +25,14 @@ export default function Modal({
 			className={cn('', className)}
 			onCancel={handleCancel}
 			footer={[
-				<Button key="1" type="default" danger onClick={handleCancel}>
+				<Button key="1" type="default" danger onClick={handleCancel} loading={isLoading}>
 					Huỷ
 				</Button>,
 				<Button
 					htmlType="submit"
 					key="submit"
 					onClick={handleOk}
+					loading={isLoading}
 					data-testid="submitButton"
 				>
 					Xác nhận

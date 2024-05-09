@@ -145,6 +145,7 @@ const AddOptions: FC<> = ({ form }) => {
 									initialValue={[]}
 								>
 									<Select
+										size="large"
 										mode="tags"
 										placeholder="Xanh, Đỏ, Đen, S, M, L..."
 										style={{ width: '100%' }}

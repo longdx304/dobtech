@@ -11,6 +11,16 @@ const pwaConfig = {
 	skipWaiting: true,
 };
 
-const nextConfig = {};
+const nextConfig = {
+	reactStrictMode: true,
+	images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
+    ],
+  },
+};
 
 export default withPWA(pwaConfig)(nextConfig);

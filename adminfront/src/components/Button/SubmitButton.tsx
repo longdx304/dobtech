@@ -1,3 +1,4 @@
+'use client';
 import React, { ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
 import { cn } from '@/lib/utils';

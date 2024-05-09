@@ -12,7 +12,7 @@ const { Text: AntdText } = Typography;
 
 export default function Text({ className, strong, children, ...props }: Props) {
 	return (
-		<AntdText className={cn('m-0 text-base', className)} {...props}>
+		<AntdText className={cn('m-0 text-sm', className)} {...props}>
 			{strong ? <strong>{children}</strong> : children}
 		</AntdText>
 	);
