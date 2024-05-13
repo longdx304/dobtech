@@ -30,7 +30,7 @@ const Header: FC<Props> = ({ user }) => {
 					? 'max-sm:translate-y-0'
 					: 'max-sm:-translate-y-14'
 			)}
-			bordered={false}
+			rounded={false}
 		>
 			{/* Logo */}
 			<Flex

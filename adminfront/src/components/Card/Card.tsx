@@ -5,11 +5,11 @@ import { ReactNode } from 'react';
 interface Props extends CardProps {
 	className?: string;
 	children?: ReactNode;
-	bordered?: boolean;
+	rounded?: boolean;
 }
 export default function Card({
 	className,
-	bordered = false,
+	rounded = false,
 	children,
 	...props
 }: Props) {
@@ -18,8 +18,9 @@ export default function Card({
 			className={cn(
 				'shadow-lg [&_.ant-card-body]:p-4',
 				className,
-				bordered ? 'rounded-xl' : 'max-sm:rounded-none'
+				rounded ? 'rounded-xl' : 'max-sm:rounded-none'
 			)}
+			bordered={false}
 			{...props}
 		>
 			{children}

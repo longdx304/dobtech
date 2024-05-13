@@ -34,7 +34,7 @@ const ProductSearch = ({}: Props) => {
 	);
 
 	return (
-		<Card className="w-full space-y-4" bordered={false}>
+		<Card className="w-full space-y-4" rounded={false}>
 			<Flex vertical gap="small" className="w-full">
 				{/* Title */}
 				<Title level={5}>Tìm kiếm sản phẩm</Title>

@@ -1,0 +1,100 @@
+import { Pencil, NotebookPen, Trash2 } from 'lucide-react';
+
+import { Button } from '@/components/Button';
+import { ProductCollection } from '@medusajs/medusa';
+import { ActionAbles } from '@/components/Dropdown';
+import moment from 'moment';
+
+interface Props {
+	handleDeleteCollection: (collectionId: ProductCollection['id']) => void;
+	handleEditCollection: (record: ProductCollection) => void;
+	handleProductCollection: (record: ProductCollection) => void;
+}
+const collectionColumns = ({
+	handleEditCollection,
+	handleDeleteCollection,
+	handleProductCollection,
+}: Props) => [
+	{
+		title: 'Tiêu đề',
+		dataIndex: 'title',
+		key: 'title',
+		fixed: 'left',
+	},
+	{
+		title: 'Định danh',
+		dataIndex: 'handle',
+		key: 'handle',
+	},
+	{
+		title: 'Đã tạo lúc',
+		dataIndex: 'created_at',
+		key: 'created_at',
+		render: (create_at: string) => {
+			return moment(create_at).format('L');
+		},
+	},
+	{
+		title: 'Đã cập nhật lúc',
+		dataIndex: 'updated_at',
+		key: 'updated_at',
+		render: (updated_at: string) => {
+			return moment(updated_at).format('L');
+		},
+	},
+	{
+		title: 'Sản phẩm',
+		dataIndex: 'products',
+		key: 'products',
+		render: (products: any) => {
+			return products?.length || '-';
+		},
+	},
+	{
+		title: '',
+		key: 'action',
+		width: 40,
+		fixed: 'right',
+		render: (_: any, record: ProductCollection) => {
+			const actions = [
+				{
+					label: <span className="w-full">Chỉnh sửa bộ sưu tập</span>,
+					key: 'edit',
+					icon: <Pencil size={20} />,
+					// onClick: handleEditVariant(record),
+				},
+				{
+					label: <span className="w-full">Quản lý sản phẩm</span>,
+					key: 'product',
+					icon: <NotebookPen size={20} />,
+				},
+				{
+					label: <span className="w-full">Xoá bộ sưu tập</span>,
+					key: 'delete',
+					icon: <Trash2 size={20} />,
+					danger: true,
+				},
+			];
+
+			const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+				if (key === 'edit') {
+					handleEditCollection(record);
+					return;
+				}
+				// Case item is delete
+				if (key === 'delete') {
+					handleDeleteCollection(record.id);
+					return;
+				}
+				if (key === 'product') {
+					handleProductCollection(record);
+					return;
+				}
+			};
+
+			return <ActionAbles actions={actions} onMenuClick={handleMenuClick} />;
+		},
+	},
+];
+
+export default collectionColumns;

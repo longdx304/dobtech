@@ -22,7 +22,7 @@ const LoginTemplate = ({}: Props) => {
 				'sm:justify-between sm:py-32 sm:relative'
 			)}
 		>
-			<Card className="[&_.ant-card-body]:flex [&_.ant-card-body]:flex-col [&_.ant-card-body]:justify-start [&_.ant-card-body]:gap-4" bordered={true}>
+			<Card className="[&_.ant-card-body]:flex [&_.ant-card-body]:flex-col [&_.ant-card-body]:justify-start [&_.ant-card-body]:gap-4" rounded={true}>
 				<div className="text-2xl text-center font-bold">Đăng nhập</div>
 				<form className="space-y-4" action={formAction}>
 					<div className="space-y-2">

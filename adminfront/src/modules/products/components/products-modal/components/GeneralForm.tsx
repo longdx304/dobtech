@@ -7,6 +7,7 @@ import {
 	Palette,
 	Sigma,
 	UserRound,
+	CircleAlert,
 } from 'lucide-react';
 
 import { Flex } from '@/components/Flex';
@@ -50,6 +51,11 @@ const GeneralForm: FC<Props> = () => {
 						labelCol={{ span: 24 }}
 						name={['general', 'handle']}
 						label="Tiêu đề URL sản phẩm:"
+						tooltip={{
+							title:
+								'URL Slug cho sản phẩm. Sẽ được tự động tạo nếu để trống',
+							icon: <CircleAlert size={18} />,
+						}}
 						// initialValue={product?.title}
 					>
 						<Input
