@@ -2,6 +2,12 @@ import { FC, useEffect, useMemo } from 'react';
 import { Form, message, typeFormProps, Row, Col } from 'antd';
 import { Product } from '@medusajs/client-types';
 import { CircleAlert, Plus, Trash2 } from 'lucide-react';
+import {
+	useAdminCreateProductOption,
+	useAdminUpdateProductOption,
+	useAdminDeleteProductOption,
+} from 'medusa-react';
+import _ from 'lodash';
 
 import { SubmitModal } from '@/components/Modal';
 import { Title, Text } from '@/components/Typography';
@@ -10,47 +16,100 @@ import { TooltipIcon } from '@/components/Tooltip';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { Button } from '@/components/Button';
+import { AddVariant } from './variant-form';
 
 type Props = {
-	product?: Product;
+	product: Product;
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
 };
 
 const OptionModal: FC<Props> = ({ state, product, handleOk, handleCancel }) => {
+	const createOption = useAdminCreateProductOption(product.id);
+	const updateOption = useAdminUpdateProductOption(product.id);
+	const deleteOption = useAdminDeleteProductOption(product.id);
+	//
 	const [form] = Form.useForm();
+	const [messageApi, contextHolder] = message.useMessage();
+
 	const onCancel = () => {
+		const options = product.options.map((option) => ({
+			title: option.title,
+		}));
+		form.setFieldsValue({
+			options: options,
+		});
+		// form.resetFields();
 		handleCancel();
 	};
 
 	const onFinish: FormProps<any>['onFinish'] = async (values) => {
-		console.log(values);
+		const { options } = values;
+		const optionsProduct = product.options;
+		// Create array of option ids
+		const optionIds = options.map((option) => option.id).filter((id) => id);
 
-		// handleOk();
+		const promiseUpsert = options.map((option) => {
+			const findOption = optionsProduct.find((o) => o.id === option?.id);
+			// if option not exists so create new option
+			if (_.isEmpty(findOption)) {
+				return createOption.mutateAsync({
+					title: option.title,
+				});
+			} else {
+				// if option exists so check if title is changed
+				if (findOption.title !== option.title) {
+					return updateOption.mutateAsync({
+						option_id: option.id,
+						title: option.title,
+					});
+				}
+			}
+		});
+
+		const promiseDelete = optionsProduct.map((option) => {
+			const isDeleteOption = !optionIds.includes(option.id);
+			if (isDeleteOption) {
+				return deleteOption.mutateAsync(option.id);
+			}
+		});
+
+		// Combine all promises
+		const combinedPromise = [...promiseUpsert, ...promiseDelete];
+		Promise.all(combinedPromise)
+			.then(() => {
+				messageApi.success('Thao tác thành công.');
+				handleOk();
+			})
+			.catch((e: any) => {
+				console.log('e', e);
+				messageApi.success('Có lỗi xảy ra, vui lòng thử lại sau.');
+			});
 	};
 
 	useEffect(() => {
 		if (product) {
 			const options = product.options.map((option) => ({
+				id: option.id,
 				title: option.title,
-				// options: option.values,
-				initValues: option.values,
 			}));
 			form.setFieldsValue({
 				options: options,
 			});
 		}
-	}, [form]);
+	}, [form, product]);
+
 	return (
 		<SubmitModal
 			open={state}
 			onOk={handleOk}
-			// isLoading={isLoading}
+			isLoading={createOption.isLoading || updateOption.isLoading || deleteOption.isLoading}
 			handleCancel={onCancel}
-			width={800}
+			width={400}
 			form={form}
 		>
+			{contextHolder}
 			<Title level={3} className="text-center">
 				{`Chỉnh sửa tuỳ chọn`}
 			</Title>
@@ -61,6 +120,7 @@ const OptionModal: FC<Props> = ({ state, product, handleOk, handleCancel }) => {
 				// initialValues={getDefaultValues(thumbnail)}
 			>
 				<OptionForm form={form} />
+				{/* <AddVariant form={form} product={product} /> */}
 			</Form>
 		</SubmitModal>
 	);
@@ -73,21 +133,18 @@ type OptionFormProps = {
 };
 
 const OptionForm = ({ form }) => {
-
 	const checkDuplicate = (_, value) => {
-		console.log('validate',value)
 		if (!value || value.length === 0) {
 			return Promise.resolve();
 		}
-		
+
 		const valueSet = new Set(value);
 		if (valueSet.size !== value.length) {
 			return Promise.reject(new Error('Các giá trị không được trùng lặp'));
 		}
-		
+
 		return Promise.resolve();
 	};
-
 
 	return (
 		<Flex vertical>
@@ -105,29 +162,9 @@ const OptionForm = ({ form }) => {
 					<Flex vertical gap="small" className="w-full">
 						{fields.length > 0 && (
 							<Row gutter={[16, 16]} wrap={false}>
-								<Col span={6}>
-									<Text className="text-sm text-gray-500 font-medium">
-										Tiêu đề tuỳ chọn
-									</Text>
-								</Col>
-								<Col span={6}>
-									<Flex gap="4px" align="center">
-										<Text className="text-sm text-gray-500 font-medium">
-											Biến thể
-										</Text>
-										<TooltipIcon
-											title="Biến thể đã được thêm vào sản phẩm. Không thể xoá ở đây."
-											icon={
-												<CircleAlert
-													className="w-[16px] stroke-2 text-gray-500"
-												/>
-											}
-										/>
-									</Flex>
-								</Col>
 								<Col flex="auto">
 									<Text className="text-sm text-gray-500 font-medium">
-										Biến thể (phân tách bằng dấu phẩy)
+										Tiêu đề tuỳ chọn
 									</Text>
 								</Col>
 								<Col flex="40px"></Col>
@@ -135,7 +172,7 @@ const OptionForm = ({ form }) => {
 						)}
 						{fields.map((field, index) => (
 							<Row key={field.key} gutter={[16, 16]} wrap={false}>
-								<Col span={6}>
+								<Col flex="auto">
 									<Form.Item
 										{...field}
 										rules={[
@@ -151,56 +188,6 @@ const OptionForm = ({ form }) => {
 										className="mb-0 text-xs"
 									>
 										<Input placeholder="Màu sắc, Kích thước..." />
-									</Form.Item>
-								</Col>
-								<Col span={6}>
-									<Form.Item
-										{...field}
-										rules={[
-											{
-												required: true,
-												type: 'array',
-												message: 'Vui lòng nhập tiêu đề hoặc xoá trường này',
-											},
-										]}
-										labelCol={{ span: 24 }}
-										name={[field.name, 'initValues']}
-										className="mb-0 text-xs"
-										initialValue={[]}
-									>
-										<Select
-											size="large"
-											mode="tags"
-											placeholder="Xanh, Đỏ, Đen, S, M, L..."
-											style={{ width: '100%' }}
-											tokenSeparators={[',']}
-											disabled
-										/>
-									</Form.Item>
-								</Col>
-								<Col flex="auto">
-									<Form.Item
-										{...field}
-										rules={[
-											{
-												required: true,
-												type: 'array',
-												message: 'Vui lòng nhập tiêu đề hoặc xoá trường này',
-											},
-											{ validator: checkDuplicate },
-										]}
-										labelCol={{ span: 24 }}
-										name={[field.name, 'values']}
-										className="mb-0 text-xs"
-										initialValue={[]}
-									>
-										<Select
-											size="large"
-											mode="tags"
-											placeholder="Xanh, Đỏ, Đen, S, M, L..."
-											style={{ width: '100%' }}
-											tokenSeparators={[',']}
-										/>
 									</Form.Item>
 								</Col>
 								<Col flex="40px">

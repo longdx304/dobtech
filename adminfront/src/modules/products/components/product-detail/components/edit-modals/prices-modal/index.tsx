@@ -24,7 +24,7 @@ type Props = {
 const PricesModal = ({ product, state, handleOk, handleCancel }) => {
 	const editedPrices = useRef({});
 	const [form] = Form.useForm();
-	const { mutateAsync, isLoading } = useAdminUpdateVariant(product.id);
+	const { mutateAsync, isLoading } = useAdminUpdateVariant(product?.id);
 	const [messageApi, contextHolder] = message.useMessage();
 
 	const {

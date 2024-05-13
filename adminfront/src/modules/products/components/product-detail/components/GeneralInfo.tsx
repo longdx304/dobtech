@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { Product } from '@medusajs/medusa';
+import { Product, ProductCategory } from '@medusajs/medusa';
 import { Row, Col } from 'antd';
 import { Pencil, Trash2, Dot } from 'lucide-react';
 import { useAdminSalesChannels } from 'medusa-react';
@@ -12,29 +12,57 @@ import { ActionAbles } from '@/components/Dropdown';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { Select } from '@/components/Select';
 import { Tag } from '@/components/Tag';
+import GeneralModal from './edit-modals/GeneralModal';
 
 type Props = {
 	product: Product;
 	loadingProduct: boolean;
+	productCategories: ProductCategory;
 };
 
-const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
+const GeneralInfo: FC<Props> = ({
+	product,
+	loadingProduct,
+	productCategories,
+}) => {
 	const { state, onOpen, onClose } = useToggleState(false);
+
+	// const handleEditGeneral = () => {
+	// 	onOpen();
+	// }
 
 	const actions = [
 		{
-			label: <span className="w-full">Chỉnh sửa</span>,
+			label: <span className="w-full">Chỉnh sửa thông tin</span>,
 			key: 'edit',
 			icon: <Pencil size={20} />,
+			onClick: onOpen,
 		},
 	];
 
-	const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-		if (key === 'edit') {
-			onOpen();
-			return;
-		}
+	const handleMenuClick: MenuProps['onClick'] = ({ key }) => {};
+
+	// recursive function to convert categories to tree data
+	const convertCategoriesToTreeData = (categories: any) => {
+		return (
+			categories?.map((category: any) => {
+				const { id, name, category_children } = category;
+				const children =
+					category_children.length > 0
+						? convertCategoriesToTreeData(category_children)
+						: [];
+
+				return {
+					title: name,
+					value: id,
+					id: id,
+					children,
+				};
+			}) || []
+		);
 	};
+
+	const treeData = convertCategoriesToTreeData(productCategories);
 
 	return (
 		<Card loading={loadingProduct} className="p-4">
@@ -80,6 +108,13 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 				</Col>
 				<Col span={24}></Col>
 			</Row>
+			<GeneralModal
+				state={state}
+				handleOk={onClose}
+				handleCancel={onClose}
+				product={product}
+				treeData={treeData}
+			/>
 		</Card>
 	);
 };
@@ -92,9 +127,18 @@ const ProductTags = ({ product }: Props) => {
 	}
 
 	return (
-		<Flex align='center' justify='flex-start' gap='small' className="my-4 flex flex-wrap">
+		<Flex
+			align="center"
+			justify="flex-start"
+			gap="small"
+			className="my-4 flex flex-wrap"
+		>
 			{product?.tags?.map((t) => (
-				<Tag key={t.id} bordered={false} className="w-fit py-2 px-3 text-xs text-gray-500 bg-gray-100 font-semibold rounded-md">
+				<Tag
+					key={t.id}
+					bordered={false}
+					className="w-fit py-2 px-3 text-xs text-gray-500 bg-gray-100 font-semibold rounded-md"
+				>
 					{t.value}
 				</Tag>
 			))}

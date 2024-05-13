@@ -9,6 +9,7 @@ import { Flex } from '@/components/Flex';
 import { Title, Text } from '@/components/Typography';
 import { ActionAbles } from '@/components/Dropdown';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import AttributeModal from './edit-modals/AttributeModal';
 
 type Props = {
 	product: Product;
@@ -19,9 +20,10 @@ const AttributesInfo: FC<Props> = ({ product, loadingProduct }) => {
 	const { state, onOpen, onClose } = useToggleState(false);
 	const actions = [
 		{
-			label: <span className="w-full">Chỉnh sửa</span>,
+			label: <span className="w-full">Chỉnh sửa thuộc tính</span>,
 			key: 'edit',
 			icon: <Pencil size={20} />,
+			onClick: onOpen,
 		},
 	];
 
@@ -131,6 +133,12 @@ const AttributesInfo: FC<Props> = ({ product, loadingProduct }) => {
 					</Flex>
 				</Col>
 			</Row>
+			<AttributeModal
+				state={state}
+				handleOk={onClose}
+				handleCancel={onClose}
+				product={product}
+			/>
 		</Card>
 	);
 };

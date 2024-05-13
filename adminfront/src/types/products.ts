@@ -87,7 +87,7 @@ export type OptionsFormType = {
 }
 export type VariantFormType = {
 	title: string;
-	options: { value: string }[];
+	options: { value: string, option_id?: string }[];
 	manage_inventory?: boolean;
 	allow_backorder?: boolean;
 	sku?: string;

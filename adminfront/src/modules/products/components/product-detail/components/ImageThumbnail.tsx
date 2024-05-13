@@ -1,9 +1,10 @@
 'use client';
 import { FC } from 'react';
 import { Product } from '@medusajs/medusa';
-import { ArrowLeft } from 'lucide-react';
-import { Row, Col, Empty } from 'antd';
+import { ArrowLeft, CircleAlert } from 'lucide-react';
+import { Row, Col, Empty, Modal, message } from 'antd';
 import { Pencil, Trash2 } from 'lucide-react';
+import { useAdminUpdateProduct } from 'medusa-react';
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -21,6 +22,7 @@ type Props = {
 
 const ImageThumbnail: FC = ({ product, loadingProduct }) => {
 	const { state, onOpen, onClose } = useToggleState(false);
+	const updateProduct = useAdminUpdateProduct(product?.id);
 
 	const actions = [
 		{
@@ -36,6 +38,36 @@ const ImageThumbnail: FC = ({ product, loadingProduct }) => {
 		},
 	];
 
+	const handleDeleteThumbnail = () => {
+		Modal.confirm({
+			title: 'Bạn có muốn xoá thumbnail này không ?',
+			content:
+				'Thumbnail sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá thumbnail này chứ?',
+			icon: (
+				<CircleAlert
+					style={{ width: 32, height: 24 }}
+					className="mr-2"
+					color="#E7B008"
+				/>
+			),
+			okType: 'danger',
+			okText: 'Đồng ý',
+			cancelText: 'Huỷ',
+			async onOk() {
+				try {
+					updateProduct.mutateAsync({ thumbnail: null });
+					message.success('Xoá thumbnail thành công!');
+				} catch (error) {
+					message.error('Xoá thumbnail thất bại!');
+				}
+			},
+			confirmLoading: updateProduct.isLoading,
+			onCancel() {
+				console.log('Cancel');
+			},
+		});
+	};
+
 	const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
 		if (key === 'edit') {
 			onOpen();
@@ -43,13 +75,13 @@ const ImageThumbnail: FC = ({ product, loadingProduct }) => {
 		}
 		// Case item is delete
 		if (key === 'delete') {
-			// handleDeleteProduct(record.id);
+			handleDeleteThumbnail()
 			return;
 		}
 	};
 
 	return (
-		<Card loading={loadingProduct}>
+		<Card loading={loadingProduct} className="max-h-[200px]">
 			<Row gutter={[16, 16]}>
 				<Col span={24}>
 					<Flex align="center" justify="space-between">
@@ -77,7 +109,7 @@ const ImageThumbnail: FC = ({ product, loadingProduct }) => {
 				state={state}
 				handleOk={onClose}
 				handleCancel={onClose}
-				thumbnail={product?.thumbnail}
+				product={product}
 			/>
 		</Card>
 	);

@@ -102,7 +102,7 @@ const ProductList = ({ data, categories }: Props) => {
 			/>
 			<FloatButton
 				className="fixed"
-				icon={<Plus color="white" />}
+				icon={<Plus color="white" size={20} />}
 				type="primary"
 				onClick={onOpen}
 				data-testid="btnCreateProduct"

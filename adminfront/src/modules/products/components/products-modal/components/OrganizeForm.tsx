@@ -8,9 +8,10 @@ import { Switch } from '@/components/Switch';
 
 interface Props {
 	treeCategories: any;
+	isEdit?: boolean;
 }
 
-const OrganizeForm: FC<Props> = ({ treeCategories }) => {
+const OrganizeForm: FC<Props> = ({ treeCategories, isEdit = false }) => {
 	return (
 		<Row gutter={[16, 4]}>
 			<Col span={24}>
@@ -63,7 +64,7 @@ const OrganizeForm: FC<Props> = ({ treeCategories }) => {
 					/>
 				</Form.Item>
 			</Col>
-			<Col span={24}>
+			{!isEdit && <Col span={24}>
 				<Form.Item
 					name={['organize', 'salesChannels']}
 					label="Kênh bán hàng mới"
@@ -74,7 +75,7 @@ const OrganizeForm: FC<Props> = ({ treeCategories }) => {
 					<Switch className="float-right" />
 				</Form.Item>
 				<div className="text-gray-500 text-xs">{`Sản phẩm này chỉ sẽ có sẵn trên kênh bán hàng mặc định nếu để không được bật đến.`}</div>
-			</Col>
+			</Col>}
 		</Row>
 	);
 };

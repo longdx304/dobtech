@@ -2,14 +2,15 @@ import { Pencil, Copy, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/Button';
 import { IProductResponse } from '@/types/products';
-import { Product } from '@medusajs/medusa';
+import { Product, ProductVariant } from '@medusajs/medusa';
 import { ActionAbles } from '@/components/Dropdown';
 
 interface Props {
-	// handleDeleteProduct: (userId: Product['id']) => void;
-	// handleEditProduct: (record: IProductResponse) => void;
+	handleDeleteVariant: (variantId: ProductVariant['id']) => void;
+	handleEditVariant: (record: ProductVariant) => void;
+	handleCopyVariant: (record: ProductVariant) => void;
 }
-const variantsColumns = ({}: Props) => [
+const variantsColumns = ({handleEditVariant, handleDeleteVariant, handleCopyVariant}: Props) => [
 	{
 		title: 'Tiêu đề',
 		dataIndex: 'title',
@@ -34,12 +35,13 @@ const variantsColumns = ({}: Props) => [
 		title: '',
 		key: 'action',
 		width: 40,
-		render: (_: any, record: Product) => {
+		render: (_: any, record: ProductVariant) => {
 			const actions = [
 				{
 					label: <span className="w-full">Chỉnh sửa biến thể</span>,
 					key: 'edit',
 					icon: <Pencil size={20} />,
+					// onClick: handleEditVariant(record),
 				},
 				{
 					label: <span className="w-full">Nhân bản biến thể</span>,
@@ -56,12 +58,16 @@ const variantsColumns = ({}: Props) => [
 
 			const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
 				if (key === 'edit') {
-					// handleEditProduct(record);
+					handleEditVariant(record)
 					return;
 				}
 				// Case item is delete
 				if (key === 'delete') {
-					// handleDeleteProduct(record.id);
+					handleDeleteVariant(record.id);
+					return;
+				}
+				if (key === 'copy') {
+					handleCopyVariant(record);
 					return;
 				}
 			};

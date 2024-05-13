@@ -8,7 +8,7 @@ interface Props extends AntdSelectProps {
 export default function Select({ className, ...props }: Props) {
 	return (
 		<AntdSelect
-			size="small"
+			size="large"
 			className={cn(
 				'[&_.ant-select-selector]:p-[4px] [&_.ant-select-selection-placeholder]:pl-[4px] [&_.ant-select-selection-item]:pl-[4px]',
 				className

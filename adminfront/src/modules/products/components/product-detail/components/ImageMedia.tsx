@@ -36,7 +36,7 @@ const ImageMedia: FC = ({ product, loadingProduct }) => {
 	};
 
 	return (
-		<Card loading={loadingProduct}>
+		<Card loading={loadingProduct} className='max-h-[200px]'>
 			<Row gutter={[16, 16]}>
 				<Col span={24}>
 					<Flex align='center' justify='space-between'>
@@ -60,7 +60,7 @@ const ImageMedia: FC = ({ product, loadingProduct }) => {
 					</Flex>
 				</Col>
 			</Row>
-			<MediaModal state={state} handleOk={onClose} handleCancel={onClose} images={product?.images} />
+			<MediaModal state={state} handleOk={onClose} handleCancel={onClose} product={product} />
 		</Card>
 	);
 };

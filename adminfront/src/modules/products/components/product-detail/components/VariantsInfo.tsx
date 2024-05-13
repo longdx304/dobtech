@@ -1,7 +1,9 @@
-import { FC, useMemo } from 'react';
-import { Product } from '@medusajs/medusa';
-import { Row, Col, Empty } from 'antd';
-import { Plus, CircleDollarSign, Settings } from 'lucide-react';
+import { FC, useMemo, useState } from 'react';
+import { Product } from '@medusajs/client-types';
+import { Row, Col, Empty, Modal, message } from 'antd';
+import { Plus, CircleDollarSign, Settings, CircleAlert } from 'lucide-react';
+import { useAdminDeleteVariant } from 'medusa-react';
+import { ProductVariant } from '@medusajs/medusa';
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -14,6 +16,7 @@ import variantsColumns from './variantsColumns';
 import { Table } from '@/components/Table';
 import PricesModal from './edit-modals/prices-modal';
 import OptionModal from './edit-modals/OptionModal';
+import AddVariantModal from './edit-modals/variant-form/AddVariantModal';
 
 type Props = {
 	product: Product;
@@ -21,6 +24,9 @@ type Props = {
 };
 
 const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
+	const [messageApi, contextHolder] = message.useMessage();
+	const deleteVariant = useAdminDeleteVariant(product?.id);
+
 	const {
 		state: statePrice,
 		onOpen: onOpenPrice,
@@ -31,11 +37,31 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 		onOpen: onOpenOption,
 		onClose: onCloseOption,
 	} = useToggleState(false);
+	const {
+		state: stateVariants,
+		onOpen: onOpenVariants,
+		onClose: onCloseVariants,
+	} = useToggleState(false);
+
+	const [editVariant, setEditVariant] = useState<ProductVariant | null>(null);
+	const [typeVariant, setTypeVariant] = useState<
+		'CREATE' | 'UPDATE' | 'COPY' | null
+	>(null);
+
+	const handleCreateVariant = () => {
+		setTypeVariant('CREATE');
+		onOpenVariants();
+	};
+	const handleCloseVariant = () => {
+		setTypeVariant(null);
+		onCloseVariants();
+	};
 	const actions = [
 		{
 			label: <span className="w-full">Thêm biến thể</span>,
 			key: 'add-variants',
 			icon: <Plus size={20} />,
+			onClick: handleCreateVariant,
 		},
 		{
 			label: <span className="w-full">Chỉnh sửa giá</span>,
@@ -51,17 +77,60 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 		},
 	];
 
-	const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-		// if (key === 'edit-price') {
-		// 	onOpenPrice();
-		// 	return;
-		// }
+	const handleEditVariant = (variant: ProductVariant) => {
+		setTypeVariant('UPDATE');
+		setEditVariant(variant);
+		onOpenVariants();
+	};
+	const handleCopyVariant = (variant: ProductVariant) => {
+		setTypeVariant('COPY');
+		setEditVariant(variant);
+		onOpenVariants();
 	};
 
-	const columns = useMemo(() => variantsColumns({}), [product]);
+	const handleDeleteVariant = (variantId: ProductVariant['id']) => {
+		Modal.confirm({
+			title: 'Bạn có muốn xoá biến thể này không ?',
+			content:
+				'Biến thể sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá biến thể này chứ?',
+			icon: (
+				<CircleAlert
+					style={{ width: 32, height: 24 }}
+					className="mr-2"
+					color="#E7B008"
+				/>
+			),
+			okType: 'danger',
+			okText: 'Đồng ý',
+			cancelText: 'Huỷ',
+			confirmLoading: deleteVariant.isLoading,
+			async onOk() {
+				try {
+					deleteVariant.mutate(variantId, {
+						onSuccess: () => {
+							messageApi.success('Xoá biến thể thành công!');
+						},
+					});
+				} catch (error) {
+					messageApi.error('Xoá biến thể thất bại!');
+				}
+			},
+			onCancel() {
+				console.log('Cancel');
+			},
+		});
+	};
+
+	const handleMenuClick: MenuProps['onClick'] = ({ key }) => {};
+
+	const columns = useMemo(
+		() => variantsColumns({ handleEditVariant, handleDeleteVariant, handleCopyVariant }),
+		[product]
+	);
 
 	return (
 		<Card loading={loadingProduct} className="p-4">
+			{contextHolder}
 			<Row gutter={[16, 16]}>
 				<Col span={24}>
 					<Flex align="center" justify="space-between">
@@ -100,6 +169,14 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 				handleOk={onCloseOption}
 				handleCancel={onCloseOption}
 			/>
+			<AddVariantModal
+				product={product}
+				state={stateVariants}
+				handleOk={onCloseVariants}
+				handleCancel={handleCloseVariant}
+				variant={editVariant}
+				typeVariant={typeVariant}
+			/>
 		</Card>
 	);
 };
@@ -120,7 +197,7 @@ const RenderOptions = ({ product }: { product: Product }) => {
 					>
 						<Flex vertical gap="8px" className="w-full">
 							<Text className="text-sm font-semibold">{option.title}</Text>
-							<Flex align="center" gap="4px">
+							<Flex align="center">
 								{option?.values
 									?.map((value) => value.value)
 									.filter((v, index, self) => self.indexOf(v) === index)

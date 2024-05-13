@@ -10,6 +10,7 @@ interface Props extends ModalProps {
 	children?: ReactNode;
 	handleCancel: () => void;
 	form: any;
+	isLoading?: boolean;
 }
 
 export default function SubmitModal({
@@ -17,6 +18,7 @@ export default function SubmitModal({
 	className,
 	form,
 	children,
+	isLoading,
 	...props
 }: Props) {
 	return (
@@ -25,7 +27,7 @@ export default function SubmitModal({
 			// afterClose={() => form.resetFields()}
 			onCancel={handleCancel}
 			footer={[
-				<Button key="1" type="default" danger onClick={handleCancel}>
+				<Button key="1" type="default" danger onClick={handleCancel} loading={isLoading}>
 					Huỷ
 				</Button>,
 				<Button
@@ -33,6 +35,7 @@ export default function SubmitModal({
 					key="submit"
 					onClick={() => form?.submit()}
 					data-testid="submitButton"
+					loading={isLoading}
 				>
 					Xác nhận
 				</Button>

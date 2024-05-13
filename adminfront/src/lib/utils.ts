@@ -52,3 +52,14 @@ const formatNumber = (num: number, option?: Intl.NumberFormatOptions) => {
 };
 
 export default formatNumber;
+
+export const getErrorMessage = (error: any) => {
+  let msg = error?.response?.data?.message
+  if (msg[0].message) {
+    msg = msg[0].message
+  }
+  if (!msg) {
+    msg = "Đã xảy ra lỗi khi thực hiện thao tác. Vui lòng thử lại sau."
+  }
+  return msg
+}

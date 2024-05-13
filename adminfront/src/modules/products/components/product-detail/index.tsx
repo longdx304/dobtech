@@ -1,6 +1,7 @@
 'use client';
 import { useAdminProduct } from "medusa-react"
 import { Row, Col } from 'antd';
+import { ProductCategory } from "@medusajs/medusa"
 
 import BackToProducts from './components/BackToProducts';
 import Images from './components/Images';
@@ -10,11 +11,12 @@ import AttributesInfo from './components/AttributesInfo';
 
 interface Props {
 	id: string;
+	productCategories: ProductCategory;
 }
 
-export default function ProductDetail({ id }: Props) {
+export default function ProductDetail({ id , productCategories}: Props) {
 	const { product, status, error, isLoading } = useAdminProduct(id || "")
-	console.log(product);
+
 	return (
 		<Row gutter={[16,16]} className="mb-12">
 			<Col span={24}>
@@ -24,7 +26,7 @@ export default function ProductDetail({ id }: Props) {
 				<Images product={product} loadingProduct={isLoading} />
 			</Col>
 			<Col span={24}>
-				<GeneralInfo product={product} loadingProduct={isLoading} />
+				<GeneralInfo product={product} loadingProduct={isLoading} productCategories={productCategories} />
 			</Col>
 			<Col span={24}>
 				<VariantsInfo product={product} loadingProduct={isLoading} />
