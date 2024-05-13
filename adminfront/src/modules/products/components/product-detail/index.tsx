@@ -1,7 +1,6 @@
 'use client';
 import { useAdminProduct } from "medusa-react"
 import { Row, Col } from 'antd';
-import { ProductCategory } from "@medusajs/medusa"
 
 import BackToProducts from './components/BackToProducts';
 import Images from './components/Images';
@@ -11,7 +10,6 @@ import AttributesInfo from './components/AttributesInfo';
 
 interface Props {
 	id: string;
-	productCategories: ProductCategory;
 }
 
 export default function ProductDetail({ id , productCategories}: Props) {
@@ -26,7 +24,7 @@ export default function ProductDetail({ id , productCategories}: Props) {
 				<Images product={product} loadingProduct={isLoading} />
 			</Col>
 			<Col span={24}>
-				<GeneralInfo product={product} loadingProduct={isLoading} productCategories={productCategories} />
+				<GeneralInfo product={product} loadingProduct={isLoading} />
 			</Col>
 			<Col span={24}>
 				<VariantsInfo product={product} loadingProduct={isLoading} />

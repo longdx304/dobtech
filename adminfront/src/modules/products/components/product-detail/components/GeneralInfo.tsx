@@ -1,8 +1,13 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Product, ProductCategory } from '@medusajs/medusa';
-import { Row, Col } from 'antd';
+import { Row, Col, message } from 'antd';
 import { Pencil, Trash2, Dot } from 'lucide-react';
-import { useAdminSalesChannels } from 'medusa-react';
+import {
+	useAdminSalesChannels,
+	useAdminProductCategories,
+	useAdminCollections,
+	useAdminUpdateProduct,
+} from 'medusa-react';
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -17,19 +22,24 @@ import GeneralModal from './edit-modals/GeneralModal';
 type Props = {
 	product: Product;
 	loadingProduct: boolean;
-	productCategories: ProductCategory;
 };
 
-const GeneralInfo: FC<Props> = ({
-	product,
-	loadingProduct,
-	productCategories,
-}) => {
+const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
+	const updateProduct = useAdminUpdateProduct(product?.id);
+	const [statusValue, setStatusValue] = useState<string | undefined>(
+		product?.status
+	);
 	const { state, onOpen, onClose } = useToggleState(false);
+	const { product_categories, isLoadingCategory } = useAdminProductCategories({
+		parent_category_id: 'null',
+		include_descendants_tree: true,
+		is_internal: false,
+	});
+	const { collections, isLoading: isLoadingCollection } = useAdminCollections();
 
-	// const handleEditGeneral = () => {
-	// 	onOpen();
-	// }
+	useEffect(() => {
+		setStatusValue(product?.status);
+	}, [product]);
 
 	const actions = [
 		{
@@ -48,7 +58,7 @@ const GeneralInfo: FC<Props> = ({
 			categories?.map((category: any) => {
 				const { id, name, category_children } = category;
 				const children =
-					category_children.length > 0
+					category_children?.length > 0
 						? convertCategoriesToTreeData(category_children)
 						: [];
 
@@ -62,26 +72,45 @@ const GeneralInfo: FC<Props> = ({
 		);
 	};
 
-	const treeData = convertCategoriesToTreeData(productCategories);
+	const treeData = convertCategoriesToTreeData(product_categories);
+
+	const onChangeStatus = (value) => {
+		updateProduct.mutateAsync(
+			{ status: value },
+			{
+				onSuccess: () => {
+					setStatusValue(value);
+					message.success('Cập nhật trạng thái thành công');
+				},
+				onError: () => {
+					message.error('Cập nhật trạng thái thất bại');
+				},
+			}
+		);
+	};
 
 	return (
-		<Card loading={loadingProduct} className="p-4">
+		<Card
+			loading={loadingProduct || isLoadingCategory || isLoadingCollection}
+			className="p-4"
+		>
 			<Row gutter={[16, 16]}>
 				<Col span={24}>
 					<Flex align="center" justify="space-between">
 						<Title level={3}>{product?.title}</Title>
 						<Flex align="center" justify="flex-end" gap="40px">
 							<Select
-								value={product?.status}
+								value={statusValue}
 								suffixIcon={null}
 								variant="borderless"
-								className="w-[150px]"
+								className="w-[140px] hover:bg-gray-200 rounded-md"
+								onChange={onChangeStatus}
 								options={[
 									{
 										value: 'published',
 										label: (
-											<Flex justify="center" align="center" gap="2px">
-												<Dot color="rgb(52 211 153)" />
+											<Flex justify="flex-start" align="center" gap="2px">
+												<Dot color="rgb(52 211 153)" size={20} className="w-[20px]" />
 												<Text>{'Đã xuất bản'}</Text>
 											</Flex>
 										),
@@ -89,8 +118,8 @@ const GeneralInfo: FC<Props> = ({
 									{
 										value: 'draft',
 										label: (
-											<Flex justify="center" align="center" gap="4px">
-												<Dot color="rgb(156 163 175)" />
+											<Flex justify="flex-start" align="center" gap="2px">
+												<Dot color="rgb(156 163 175)" size={20} className="w-[20px]" />
 												<Text>{'Bản nháp'}</Text>
 											</Flex>
 										),
@@ -114,6 +143,7 @@ const GeneralInfo: FC<Props> = ({
 				handleCancel={onClose}
 				product={product}
 				treeData={treeData}
+				collections={collections}
 			/>
 		</Card>
 	);
@@ -127,12 +157,7 @@ const ProductTags = ({ product }: Props) => {
 	}
 
 	return (
-		<Flex
-			align="center"
-			justify="flex-start"
-			gap="small"
-			className="my-4 flex flex-wrap"
-		>
+		<Flex align="center" justify="flex-start" className="my-4 flex flex-wrap">
 			{product?.tags?.map((t) => (
 				<Tag
 					key={t.id}

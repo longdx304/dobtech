@@ -1,11 +1,12 @@
 'use client';
 import { User } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
-import { CircleAlert, Plus } from 'lucide-react';
+import { CircleAlert, Plus, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import _ from 'lodash';
+import { useAdminDeleteUser } from 'medusa-react';
 
-import { deleteUser } from '@/actions/accounts';
 import { FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Table } from '@/components/Table';
@@ -16,7 +17,10 @@ import { UserModal } from '@/modules/account/components/account-modal';
 import { IAdminResponse } from '@/types/account';
 import accountColumns from './account-column';
 import { TResponse } from '@/types/common';
-import { useAdminProducts, useAdminUsers } from 'medusa-react';
+import { useAdminUsers } from 'medusa-react';
+import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
+import { Title } from '@/components/Typography';
 
 interface Props {
 	// data: TResponse<IAdminResponse> | null;
@@ -26,19 +30,21 @@ const AccountList = ({}: Props) => {
 	const searchParams = useSearchParams();
 	const { replace } = useRouter();
 	const pathname = usePathname();
-	const currentPage = searchParams.get('page') ?? 1;
-
-	const { query } = useAdminAction();
 
 	const PAGE_SIZE = 10;
-	const { users, count, isLoading } = useAdminUsers({
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const [searchValue, setSearchValue] = useState('');
+	const { users, count, isLoading, isRefetching } = useAdminUsers({
 		limit: PAGE_SIZE,
-		q: query || undefined,
+		offset: (currentPage - 1) * PAGE_SIZE,
+		q: searchValue || undefined,
 	});
-	console.log('query', query);
 
 	const { state, onOpen, onClose } = useToggleState(false);
 	const [currentUser, setCurrentUser] = useState<IAdminResponse | null>(null);
+	const [userId, setUserId] = useState<string | null>(null);
+	const deleteUser = useAdminDeleteUser(userId);
 
 	const handleEditUser = (record: IAdminResponse) => {
 		setCurrentUser(record);
@@ -51,42 +57,47 @@ const AccountList = ({}: Props) => {
 	};
 
 	const handleDeleteUser = (userId: User['id']) => {
-		Modal.confirm({
-			title: 'Bạn có muốn xoá nhân viên này không ?',
-			content:
-				'Nhân viên sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá nhân viên này chứ?',
-			icon: (
-				<CircleAlert
-					style={{ width: 32, height: 24 }}
-					className="mr-2"
-					color="#E7B008"
-				/>
-			),
-			okType: 'danger',
-			okText: 'Đồng ý',
-			cancelText: 'Huỷ',
-			async onOk() {
-				try {
-					await deleteUser(userId);
-					message.success('Xoá nhân viên thành công!');
-				} catch (error) {
-					message.error('Xoá nhân viên thất bại!');
-				}
-			},
-			onCancel() {
-				console.log('Cancel');
-			},
-		});
+		setUserId(userId);
+		console.log('userId', userId)
+		if (userId) {
+			Modal.confirm({
+				title: 'Bạn có muốn xoá nhân viên này không ?',
+				content:
+					'Nhân viên sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá nhân viên này chứ?',
+				icon: (
+					<CircleAlert
+						style={{ width: 32, height: 24 }}
+						className="mr-2"
+						color="#E7B008"
+					/>
+				),
+				okType: 'danger',
+				okText: 'Đồng ý',
+				cancelText: 'Huỷ',
+				confirmLoading: deleteUser?.isLoading,
+				async onOk() {
+					deleteUser.mutateAsync(void 0, {
+						onSuccess: () => {
+							setUserId(null);
+							message.success('Xoá nhân viên thành công!');
+							return;
+						},
+						onError: () => {
+							message.error('Xoá nhân viên thất bại!');
+							return;
+						},
+					});
+					// setUserId(null);
+				},
+				onCancel() {
+					setUserId(null);
+				},
+			});
+		}
 	};
 
 	const handleChangePage = (page: number) => {
-		// create new search params with new value
-		const newSearchParams = updateSearchQuery(searchParams, {
-			page: page.toString(),
-		});
-
-		// Replace url
-		replace(`${pathname}?${newSearchParams}`);
+		setCurrentPage(page);
 	};
 
 	const columns = useMemo(
@@ -94,11 +105,31 @@ const AccountList = ({}: Props) => {
 		[users]
 	);
 
-	console.log('users', users);
+	const handleChangeDebounce = _.debounce(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const { value: inputValue } = e.target;
+
+			// Update search query
+			setSearchValue(inputValue);
+		},
+		500
+	);
+
 	return (
 		<Card className="w-full">
+			<Flex align="center" justify="space-between" className="pb-4">
+				<Title level={3}>Quản lý nhân viên</Title>
+				<Input
+					// size="small"
+					placeholder="Tìm kiếm nhân viên..."
+					name="search"
+					prefix={<Search size={16} />}
+					onChange={handleChangeDebounce}
+					className="w-[300px]"
+				/>
+			</Flex>
 			<Table
-				loading={isLoading}
+				loading={isLoading || isRefetching}
 				columns={columns}
 				dataSource={users}
 				rowKey="id"
@@ -111,7 +142,7 @@ const AccountList = ({}: Props) => {
 			/>
 			<FloatButton
 				className="absolute"
-				icon={<Plus color="white" />}
+				icon={<Plus color="white" size={20} strokeWidth={2} />}
 				type="primary"
 				onClick={onOpen}
 				data-testid="btnCreateAccount"

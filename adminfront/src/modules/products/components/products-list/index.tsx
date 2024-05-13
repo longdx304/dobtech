@@ -1,7 +1,16 @@
 'use client';
 
-import { CircleAlert, Plus } from 'lucide-react';
+import { CircleAlert, Plus, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import {
+	useAdminProducts,
+	useAdminProductCategories,
+	useAdminCollections,
+} from 'medusa-react';
+import { Product } from '@medusajs/medusa';
+import { Modal, message } from 'antd';
+import _ from 'lodash';
+import { useRouter } from 'next/navigation';
 
 import { deleteProduct } from '@/actions/products';
 import { FloatButton } from '@/components/Button';
@@ -10,30 +19,40 @@ import { Table } from '@/components/Table';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { updateSearchQuery } from '@/lib/utils';
 import { TResponse } from '@/types/common';
-import { IProductResponse } from '@/types/products';
-import { Product } from '@medusajs/medusa';
-import { Modal, message } from 'antd';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ProductModal } from '../products-modal';
 import productsColumns from './products-column';
+import { Flex } from '@/components/Flex';
+import { Title } from '@/components/Typography';
+import { Input } from '@/components/Input';
 
-interface Props {
-	data: TResponse<IProductResponse> | null;
-	categories: any;
-}
+const PAGE_SIZE = 10;
 
-const ProductList = ({ data, categories }: Props) => {
-	const searchParams = useSearchParams();
+interface Props {}
+
+const ProductList = ({}: Props) => {
 	const router = useRouter();
-	const pathname = usePathname();
-	const currentPage = searchParams.get('page') ?? 1;
-
 	const { state, onOpen, onClose } = useToggleState(false);
-	const [currentProduct, setCurrentProduct] = useState<IProductResponse | null>(
-		null
-	);
 
-	const handleEditProduct = (record: IProductResponse) => {
+	const [currentPage, setCurrentPage] = useState(1);
+	const [searchValue, setSearchValue] = useState('');
+	const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
+
+	const { products, isLoading, count, isRefetching } = useAdminProducts({
+		limit: PAGE_SIZE,
+		offset: (currentPage - 1) * PAGE_SIZE,
+		q: searchValue || undefined,
+	});
+	console.log('products', products)
+	const { product_categories, isLoading: isLoadingCategories } =
+		useAdminProductCategories({
+			parent_category_id: 'null',
+			include_descendants_tree: true,
+			is_internal: false,
+		});
+	const { collections, isLoading: isLoadingCollections } =
+		useAdminCollections();
+
+	const handleEditProduct = (record: Product) => {
 		router.push(`/products/${record.id}`);
 	};
 
@@ -74,47 +93,71 @@ const ProductList = ({ data, categories }: Props) => {
 
 	const columns = useMemo(
 		() => productsColumns({ handleDeleteProduct, handleEditProduct }),
-		[data]
+		[products]
 	);
 
 	const handleChangePage = (page: number) => {
-		// create new search params with new value
-		const newSearchParams = updateSearchQuery(searchParams, {
-			page: page.toString(),
-		});
-
-		// Replace url
-		router.replace(`${pathname}?${newSearchParams}`);
+		setCurrentPage(page);
 	};
 
+	const handleChangeDebounce = _.debounce(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const { value: inputValue } = e.target;
+
+			// Update search query
+			setSearchValue(inputValue);
+		},
+		500
+	);
+
 	return (
-		<Card className="w-full">
+		<>
+			<Flex align="center" justify="space-between" className="pb-4">
+				<Title level={3}>Quản lý sản phẩm</Title>
+				<Input
+					placeholder="Tìm kiếm sản phẩm..."
+					name="search"
+					prefix={<Search size={16} />}
+					onChange={handleChangeDebounce}
+					className="w-[300px]"
+				/>
+			</Flex>
 			<Table
+				loading={
+					isLoading ||
+					isRefetching ||
+					isLoadingCategories ||
+					isLoadingCollections
+				}
 				columns={columns}
-				dataSource={data?.data ?? []}
+				dataSource={products ?? []}
 				rowKey="id"
 				pagination={{
-					total: Math.floor(data?.count ?? 0 / (data?.limit ?? 0)),
-					pageSize: data?.limit,
+					total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
+					pageSize: PAGE_SIZE,
 					current: currentPage as number,
 					onChange: handleChangePage,
 				}}
+				scroll={{ x: 700 }}
 			/>
 			<FloatButton
-				className="fixed"
+				className="absolute"
 				icon={<Plus color="white" size={20} />}
 				type="primary"
 				onClick={onOpen}
 				data-testid="btnCreateProduct"
 			/>
-			<ProductModal
-				state={state}
-				handleOk={onClose}
-				handleCancel={handleCloseModal}
-				product={currentProduct}
-				productCategories={categories}
-			/>
-		</Card>
+			{product_categories && collections && (
+				<ProductModal
+					state={state}
+					handleOk={onClose}
+					handleCancel={handleCloseModal}
+					product={currentProduct}
+					productCategories={product_categories}
+					productCollections={collections}
+				/>
+			)}
+		</>
 	);
 };
 

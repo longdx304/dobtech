@@ -35,7 +35,7 @@ const CollectionList: FC<Props> = ({}) => {
 		{
 			q: '',
 			limit: 10,
-			offset: 0,
+			offset: offset,
 		},
 		{
 			keepPreviousData: true,
@@ -73,6 +73,7 @@ const CollectionList: FC<Props> = ({}) => {
 					deleteCollection.mutateAsync(void 0, {
 						onSuccess: () => {
 							message.success('Xóa bộ sưu tập thành công.');
+							setCollectionId(null);
 							return;
 						},
 						onError: (error) => {
@@ -83,7 +84,7 @@ const CollectionList: FC<Props> = ({}) => {
 				},
 				confirmLoading: deleteCollection.isLoading,
 				onCancel() {
-					console.log('Cancel');
+					setCollectionId(null);
 				},
 			});
 		}
@@ -123,11 +124,11 @@ const CollectionList: FC<Props> = ({}) => {
 					total: Math.floor(count ?? 0 / (limit ?? 0)),
 					pageSize: limit,
 					current: numPages || 1,
-					// onChange: handleChangePage,
+					onChange: handleChangePage,
 				}}
 			/>
 			<FloatButton
-				className="fixed"
+				className="absolute"
 				icon={<Plus color="white" size={20} />}
 				type="primary"
 				onClick={onOpen}

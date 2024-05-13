@@ -14,9 +14,10 @@ import type { CollapseProps } from 'antd';
 import { Form, message, type FormProps } from 'antd';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
-import { AdminPostProductsReq, ProductVariant } from '@medusajs/medusa';
+import { AdminPostProductsReq, ProductVariant, ProductCategory, ProductCollection, Product } from '@medusajs/medusa';
 import { useAdminCreateProduct } from 'medusa-react';
-import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation';
+
 
 import { createProduct, updateProduct } from '@/actions/products';
 import { prepareImages } from '@/actions/images';
@@ -47,8 +48,9 @@ interface Props {
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
-	product: IProductResponse | null;
-	productCategories: any;
+	product: Product | null;
+	productCategories: ProductCategory[];
+	productCollections: ProductCollection[];
 }
 
 export default function ProductModal({
@@ -57,6 +59,7 @@ export default function ProductModal({
 	handleCancel,
 	product,
 	productCategories,
+	productCollections,
 }: Props) {
 	const { isFeatureEnabled } = useFeatureFlag();
 	const { mutate, isLoading } = useAdminCreateProduct();
@@ -160,7 +163,7 @@ export default function ProductModal({
 		{
 			key: 'organizeForm',
 			label: 'Phân loại',
-			children: <OrganizeForm treeCategories={treeData} />,
+			children: <OrganizeForm treeCategories={treeData} productCollections={productCollections} />,
 		},
 		{
 			key: 'variantForm',

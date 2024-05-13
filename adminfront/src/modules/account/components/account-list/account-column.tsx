@@ -30,11 +30,13 @@ const accountColumns: TableProps<any>['columns'] = ({
 		dataIndex: 'first_name',
 		key: 'first_name',
 		width: 40,
+		className: 'text-xs',
 		render: (text: string) => <Avatar icon={<User />} />,
 	},
 	{
 		title: 'Thông tin',
 		key: 'information',
+		className: 'text-xs',
 		render: (_: any, record: any) => (
 			<Flex vertical gap="middle">
 				<Flex vertical>
@@ -57,9 +59,11 @@ const accountColumns: TableProps<any>['columns'] = ({
 		),
 	},
 	{
-		title: 'Action',
+		title: '',
 		key: 'action',
 		width: 40,
+		className: 'text-xs px-0',
+		align: 'center',
 		render: (_: any, record: any) => (
 			<Flex>
 				<Button

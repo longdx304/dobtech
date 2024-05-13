@@ -1,6 +1,6 @@
 import { FC, useEffect } from 'react';
 import { Form, message, typeFormProps, Row, Col } from 'antd';
-import { Product, ProductCategory } from '@medusajs/medusa';
+import { Product, ProductCategory, ProductCollection } from '@medusajs/medusa';
 import { useAdminUpdateProduct } from 'medusa-react';
 
 import { SubmitModal } from '@/components/Modal';
@@ -18,6 +18,7 @@ type Props = {
 	handleOk: () => void;
 	handleCancel: () => void;
 	treeData: any;
+	collections: ProductCollection[];
 };
 
 type GeneralFormProps = {
@@ -25,11 +26,12 @@ type GeneralFormProps = {
 	organize: OrganizeFormType;
 }
 
-const GeneralModal = ({ product, state, handleOk, handleCancel, treeData }) => {
+const GeneralModal = ({ product, state, handleOk, handleCancel, treeData, collections }) => {
 	const [form] = Form.useForm();
 	const updateProduct = useAdminUpdateProduct(product?.id);
 	const [messageApi, contextHolder] = message.useMessage();
 
+	console.log(product)
 	useEffect(() => {
 		form.setFieldsValue({
 			general: {
@@ -41,12 +43,12 @@ const GeneralModal = ({ product, state, handleOk, handleCancel, treeData }) => {
 			},
 			organize: {
 				type: product?.type || '',
-				collection: product?.collection || '',
+				collection: product?.collection_id || '',
 				categories:
 					product?.categories?.map((category) => (
 						category.id,
 					)) || [],
-				tags: product?.tags || [],
+				tags: product?.tags?.map((tag) => tag.value) || [],
 			},
 		});
 	}, [product]);
@@ -59,7 +61,7 @@ const GeneralModal = ({ product, state, handleOk, handleCancel, treeData }) => {
 			handle: values?.general?.handle || undefined,
 			description: values?.general?.description || undefined,
 			discountable: values?.general?.discounted,
-			collection_id: values?.organize?.collection.value || undefined,
+			collection_id: values?.organize?.collection || undefined,
 			tags: values?.organize?.tags?.length
 				? values?.organize?.tags?.map((tag) => ({ value: tag }))
 				: undefined,
@@ -100,7 +102,7 @@ const GeneralModal = ({ product, state, handleOk, handleCancel, treeData }) => {
 			</Title>
 			<Form form={form} onFinish={onFinish} className="pt-3">
 				<GeneralForm />
-				<OrganizeForm treeCategories={treeData} isEdit={true} />
+				<OrganizeForm treeCategories={treeData} isEdit={true} productCollections={collections} />
 			</Form>
 		</SubmitModal>
 	);

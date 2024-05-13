@@ -20,16 +20,19 @@ const collectionColumns = ({
 		dataIndex: 'title',
 		key: 'title',
 		fixed: 'left',
+		className: 'text-xs',
 	},
 	{
 		title: 'Định danh',
 		dataIndex: 'handle',
 		key: 'handle',
+		className: 'text-xs',
 	},
 	{
 		title: 'Đã tạo lúc',
 		dataIndex: 'created_at',
 		key: 'created_at',
+		className: 'text-xs',
 		render: (create_at: string) => {
 			return moment(create_at).format('L');
 		},
@@ -38,6 +41,7 @@ const collectionColumns = ({
 		title: 'Đã cập nhật lúc',
 		dataIndex: 'updated_at',
 		key: 'updated_at',
+		className: 'text-xs',
 		render: (updated_at: string) => {
 			return moment(updated_at).format('L');
 		},
@@ -46,6 +50,7 @@ const collectionColumns = ({
 		title: 'Sản phẩm',
 		dataIndex: 'products',
 		key: 'products',
+		className: 'text-xs',
 		render: (products: any) => {
 			return products?.length || '-';
 		},
@@ -55,6 +60,8 @@ const collectionColumns = ({
 		key: 'action',
 		width: 40,
 		fixed: 'right',
+		className: 'text-xs px-0',
+		align: 'center',
 		render: (_: any, record: ProductCollection) => {
 			const actions = [
 				{

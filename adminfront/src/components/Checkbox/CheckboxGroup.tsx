@@ -19,16 +19,12 @@ export default function CheckboxGroup({
 	...props
 }: Props) {
 	return (
-		<Flex vertical gap={4}>
-			<AntdCheckbox.Group
-				className={cn('', className)}
-				{...props}
-				onChange={() => {}}
-				options={options}
-			>
-				{children}
-			</AntdCheckbox.Group>
-			{error && <ErrorText error={error} />}
-		</Flex>
+		<AntdCheckbox.Group
+			className={cn('', className)}
+			{...props}
+			options={options}
+		>
+			{children}
+		</AntdCheckbox.Group>
 	);
 }

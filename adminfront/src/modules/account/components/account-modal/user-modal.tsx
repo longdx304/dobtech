@@ -1,9 +1,9 @@
 'use client';
-import { Form, message, type FormProps } from 'antd';
+import { Form, message, type FormProps , Checkbox} from 'antd';
 import { Mail, Phone, UserRound } from 'lucide-react';
 import { useEffect } from 'react';
 
-import { createUser, updateUser } from '@/actions/accounts';
+// import { createUser, updateUser } from '@/actions/accounts';
 import { CheckboxGroup } from '@/components/Checkbox';
 import { Input } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
@@ -15,8 +15,9 @@ import {
 	rolesEmployee,
 } from '@/types/account';
 import _ from 'lodash';
-import { useAdminCreateUser } from 'medusa-react';
+import { useAdminCreateUser, useAdminUpdateUser } from 'medusa-react';
 import { User } from '@medusajs/medusa';
+import { getErrorMessage } from '@/lib/utils';
 
 interface Props {
 	state: boolean;
@@ -33,76 +34,90 @@ export default function UserModal({
 }: Props) {
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
-	// const createUser = useAdminCreateUser();
+	const createUser = useAdminCreateUser();
+	const updateUser = useAdminUpdateUser(user?.id);
 
 	const titleModal = `${_.isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
 
 	useEffect(() => {
-		form &&
-			form?.setFieldsValue({
-				email: user?.email ?? '',
-				phone: user?.phone ?? '',
-				fullName: user?.first_name ?? '',
-				permissions: user?.permissions?.split(',') ?? [
-					EPermissions.WarehouseStaff,
-					EPermissions.WarehouseManager,
-					EPermissions.Driver,
-					EPermissions.InventoryChecker,
-					EPermissions.AssistantDriver,
-				],
-			});
+		form?.setFieldsValue({
+			email: user?.email ?? '',
+			phone: user?.phone ?? '',
+			fullName: user?.first_name ?? '',
+			permissions: user?.permissions?.split(',') ?? [
+				EPermissions.WarehouseStaff,
+				EPermissions.WarehouseManager,
+				EPermissions.Driver,
+				EPermissions.InventoryChecker,
+				EPermissions.AssistantDriver,
+			],
+		});
 	}, [user, form]);
+
+	const createPayload = (values: IUserRequest) => {
+		const { email, fullName, phone, permissions } = values;
+
+		return {
+			email,
+			password: '123456',
+			first_name: fullName,
+			phone,
+			permissions: permissions.join(','),
+		};
+	};
 
 	// Submit form
 	const onFinish: FormProps<IUserRequest>['onFinish'] = async (values) => {
-		try {
-			// Create user
-			if (_.isEmpty(user)) {
-				await createUser(values);
-
-				message.success('Đăng ký nhân viên thành công');
-			} else {
-				// Update user
-				await updateUser(user.id, values);
-				message.success('Cập nhật nhân viên thành công');
-			}
-			handleCancel();
-		} catch (error: any) {
-			// message.error(error?.message);
-			messageApi.open({
-				type: 'error',
-				content: error?.message,
+		// Create user
+		if (_.isEmpty(user)) {
+			const payload = createPayload(values);
+			createUser.mutateAsync(payload, {
+				onSuccess: () => {
+					message.success('Đăng ký nhân viên thành công');
+					handleCancel();
+				},
+				onError: (error) => {
+					message.error(getErrorMessage(error));
+				},
+			});
+		} else {
+			// Update user
+			const payload = {
+				first_name: values.fullName,
+				phone: values.phone,
+				permissions: values.permissions.join(','),
+			};
+			updateUser.mutateAsync(payload, {
+				onSuccess: () => {
+					message.success('Chỉnh sửa nhân viên thành công');
+					handleCancel();
+				},
+				onError: (error) => {
+					message.error(getErrorMessage(error));
+				},
 			});
 		}
-	};
-
-	const onFinishFailed: FormProps<IUserRequest>['onFinishFailed'] = (
-		errorInfo
-	) => {
-		console.log('Failed:', errorInfo);
 	};
 
 	return (
 		<SubmitModal
 			open={stateModal}
 			onOk={handleOk}
-			confirmLoading={false}
+			isLoading={createUser?.isLoading || updateUser?.isLoading}
 			handleCancel={handleCancel}
 			form={form}
 		>
 			<Title level={3} className="text-center">
 				{titleModal}
 			</Title>
-			<Form
-				id="form-user"
-				form={form}
-				onFinish={onFinish}
-				onFinishFailed={onFinishFailed}
-			>
+			<Form id="form-user" form={form} onFinish={onFinish}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name="email"
-					rules={[{ required: true, message: 'Email không đúng định dạng!' }]}
+					rules={[
+						{ required: true, message: 'Email bắt buộc phải có ký tự.' },
+						{ type: 'email', message: 'Email không đúng định dạng!' },
+					]}
 					label="Email:"
 				>
 					<Input
@@ -130,9 +145,9 @@ export default function UserModal({
 					rules={[
 						{
 							required: true,
-							message: 'Số điện thoại phải có ít nhất 2 ký tự!',
+							message: 'Số điện thoại bắt buộc phải có ký tự.',
 						},
-						{ min: 10, message: 'Số điện thoại phải có ' },
+						{ min: 10, message: 'Số điện thoại phải có ít nhất 10 chữ số.' },
 					]}
 					label="Số diện thoại:"
 				>

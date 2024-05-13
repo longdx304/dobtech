@@ -1,5 +1,6 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { Row, Col, Form } from 'antd';
+import { ProductCollection } from '@medusajs/medusa';
 
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
@@ -9,9 +10,20 @@ import { Switch } from '@/components/Switch';
 interface Props {
 	treeCategories: any;
 	isEdit?: boolean;
+	productCollections: ProductCollection[];
 }
 
-const OrganizeForm: FC<Props> = ({ treeCategories, isEdit = false }) => {
+const OrganizeForm: FC<Props> = ({
+	treeCategories,
+	isEdit = false,
+	productCollections,
+}) => {
+	const optionCollection = useMemo(() => {
+		return productCollections?.map((collection) => ({
+			label: collection.title,
+			value: collection.id,
+		}));
+	}, [productCollections]);
 	return (
 		<Row gutter={[16, 4]}>
 			<Col span={24}>
@@ -34,7 +46,10 @@ const OrganizeForm: FC<Props> = ({ treeCategories, isEdit = false }) => {
 					name={['organize', 'collection']}
 					label="Bộ sưu tập:"
 				>
-					<Select placeholder="Chọn một bộ sưu tập" options={[]} />
+					<Select
+						placeholder="Chọn một bộ sưu tập"
+						options={optionCollection}
+					/>
 				</Form.Item>
 			</Col>
 			<Col span={24}>
@@ -64,18 +79,20 @@ const OrganizeForm: FC<Props> = ({ treeCategories, isEdit = false }) => {
 					/>
 				</Form.Item>
 			</Col>
-			{!isEdit && <Col span={24}>
-				<Form.Item
-					name={['organize', 'salesChannels']}
-					label="Kênh bán hàng mới"
-					initialValue={false}
-					className="mb-0"
-					colon={false}
-				>
-					<Switch className="float-right" />
-				</Form.Item>
-				<div className="text-gray-500 text-xs">{`Sản phẩm này chỉ sẽ có sẵn trên kênh bán hàng mặc định nếu để không được bật đến.`}</div>
-			</Col>}
+			{!isEdit && (
+				<Col span={24}>
+					<Form.Item
+						name={['organize', 'salesChannels']}
+						label="Kênh bán hàng mới"
+						initialValue={false}
+						className="mb-0"
+						colon={false}
+					>
+						<Switch className="float-right" />
+					</Form.Item>
+					<div className="text-gray-500 text-xs">{`Sản phẩm này chỉ sẽ có sẵn trên kênh bán hàng mặc định nếu để không được bật đến.`}</div>
+				</Col>
+			)}
 		</Row>
 	);
 };
