@@ -7,12 +7,13 @@ import {
 	LogOut,
 	PackageSearch,
 	Settings,
-	User,
+	User as UserIcon,
 	Users,
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
 import { IAdminResponse } from '@/types/account';
+import { User } from '@medusajs/medusa';
 
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(
@@ -84,17 +85,17 @@ const itemUser = (
 			</a>
 		</Dropdown>,
 		'user-1',
-		<User />
+		<UserIcon />
 	),
 ];
 
 // Generation menu
 export const menuItems = (
-	user: IAdminResponse,
+	user: Omit<User, "password_hash">,
 	handleDropdownClick: (e: any) => void
 ) => {
 	const role = user.role;
-	const permissions = user?.permissions?.split(',');
+	const permissions = (user as any)?.permissions?.split(',');
 	return [
 		getItem(
 			'Tổng quan',
@@ -104,7 +105,7 @@ export const menuItems = (
 			'group'
 		),
 		getItem('Tuỳ chỉnh', 'option', null, itemOption, 'group'),
-		getItem('', 'user', null, itemUser(user, handleDropdownClick), 'group'),
+		getItem('', 'user', null, itemUser(user as any, handleDropdownClick), 'group'),
 	];
 };
 

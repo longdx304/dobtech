@@ -24,17 +24,16 @@ export default async function RootLayout({
 	login?: React.ReactNode;
 	children: React.ReactNode;
 }>) {
-	const adminUser = await getAdmin().catch(() => null);
+	// const adminUser = await getAdmin().catch(() => null);
 
-	let contentToRender;
-	if (adminUser && main) {
-		contentToRender = main;
-	} else if (!adminUser && login) {
-		contentToRender = login;
-	} else {
-		contentToRender = children;
-	}
-
+	// let contentToRender;
+	// if (adminUser && main) {
+	// 	contentToRender = main;
+	// } else if (!adminUser && login) {
+	// 	contentToRender = login;
+	// } else {
+	// 	contentToRender = children;
+	// }
 	return (
 		<html lang="en">
 			<body className={inter.className}>
@@ -42,8 +41,8 @@ export default async function RootLayout({
 					<ConfigProvider theme={theme}>
 						<MedusaProvider>
 							<FeatureFlagProvider>
-								{/* {adminUser ? main : login} */}
-								{contentToRender}
+								{children}
+								{/* {login} */}
 							</FeatureFlagProvider>
 						</MedusaProvider>
 					</ConfigProvider>

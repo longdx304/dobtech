@@ -26,7 +26,6 @@ const FeatureFlagContext = React.createContext(defaultFeatureFlagContext)
 
 export const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
   const { user, isLoading } = useAdminGetSession()
-	console.log("user", user)
 
   const [featureFlags, setFeatureFlags] = useState<
     { key: string; value: boolean }[]
@@ -45,7 +44,7 @@ export const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
     }
 
     setFeatureFlags([
-      ...store["feature_flags"],
+      ...store["feature_flags"] as { key: string; value: boolean }[],
       ...store["modules"].map((module) => ({
         key: module.module,
         value: true,

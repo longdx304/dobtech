@@ -24,11 +24,12 @@ export default async function Accounts({ searchParams }: Props) {
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
 			<AccountSearch />
-			<Suspense key={uuidv4()} fallback={<LoadingSkeleton />}>
+			{/* <Suspense key={uuidv4()} fallback={<LoadingSkeleton />}>
 				<Await promise={Promise.resolve(users)}>
 					{(users) => <AccountList data={users} />}
 				</Await>
-			</Suspense>
+			</Suspense> */}
+			<AccountList />
 		</Flex>
 	);
 }

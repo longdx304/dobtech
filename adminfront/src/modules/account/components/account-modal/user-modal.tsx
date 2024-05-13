@@ -15,6 +15,8 @@ import {
 	rolesEmployee,
 } from '@/types/account';
 import _ from 'lodash';
+import { useAdminCreateUser } from 'medusa-react';
+import { User } from '@medusajs/medusa';
 
 interface Props {
 	state: boolean;
@@ -30,8 +32,8 @@ export default function UserModal({
 	user,
 }: Props) {
 	const [form] = Form.useForm();
-	// const { message } = App.useApp();
 	const [messageApi, contextHolder] = message.useMessage();
+	// const createUser = useAdminCreateUser();
 
 	const titleModal = `${_.isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
 
@@ -51,18 +53,17 @@ export default function UserModal({
 			});
 	}, [user, form]);
 
-	console.log('user', user, form.getFieldValue('phone'));
-
 	// Submit form
 	const onFinish: FormProps<IUserRequest>['onFinish'] = async (values) => {
 		try {
 			// Create user
 			if (_.isEmpty(user)) {
-				const result = await createUser(values);
+				await createUser(values);
+
 				message.success('Đăng ký nhân viên thành công');
 			} else {
 				// Update user
-				const result = await updateUser(user.id, values);
+				await updateUser(user.id, values);
 				message.success('Cập nhật nhân viên thành công');
 			}
 			handleCancel();

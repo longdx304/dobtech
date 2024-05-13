@@ -12,54 +12,58 @@ import { cn } from '@/lib/utils';
 import { IAdminResponse } from '@/types/account';
 import DrawerMenu from './DrawerMenu';
 import Menubar from './Menubar';
+import { useAdminGetSession } from 'medusa-react';
 
 interface Props {
-	user: IAdminResponse;
+	// user: IAdminResponse;
 }
 
-const Header: FC<Props> = ({ user }) => {
+const Header: FC<Props> = ({}) => {
 	const { state, onClose, onOpen } = useToggleState(false);
 	const scrollDirection = useScrollDirection();
+	const { user, isLoading, remove } = useAdminGetSession();
 
 	return (
-		<Card
-			className={cn(
-				'fixed top-0 w-full p-0 [&_.ant-card-body]:py-2 transition-all ease-in-out duration-300',
-				'sm:w-[200px] md:w-[250px] sm:h-full sm:[&_.ant-card-body]:px-0',
-				scrollDirection === 'up'
-					? 'max-sm:translate-y-0'
-					: 'max-sm:-translate-y-14'
-			)}
-			rounded={false}
-		>
-			{/* Logo */}
-			<Flex
-				className="sm:justify-center"
-				justify="space-between"
-				align="center"
+		user && (
+			<Card
+				className={cn(
+					'fixed top-0 w-full p-0 [&_.ant-card-body]:py-2 transition-all ease-in-out duration-300',
+					'sm:w-[200px] md:w-[250px] sm:h-full sm:[&_.ant-card-body]:px-0',
+					scrollDirection === 'up'
+						? 'max-sm:translate-y-0'
+						: 'max-sm:-translate-y-14'
+				)}
+				bordered={false}
 			>
-				<div className="flex items-center">
-					<Image
-						src="/images/dob-icon.png"
-						width={28}
-						height={37}
-						alt="Dob Icon"
+				{/* Logo */}
+				<Flex
+					className="sm:justify-center"
+					justify="space-between"
+					align="center"
+				>
+					<div className="flex items-center">
+						<Image
+							src="/images/dob-icon.png"
+							width={28}
+							height={37}
+							alt="Dob Icon"
+						/>
+					</div>
+					{/* Mobile: Button Menu */}
+					<Button
+						icon={<Menu />}
+						shape="circle"
+						type="text"
+						onClick={() => onOpen()}
+						className="sm:hidden"
 					/>
-				</div>
-				{/* Mobile: Button Menu */}
-				<Button
-					icon={<Menu />}
-					shape="circle"
-					type="text"
-					onClick={() => onOpen()}
-					className="sm:hidden"
-				/>
-			</Flex>
-			{/* Desktop: Content Menu */}
-			<Menubar user={user} className="hidden sm:block" />
-			{/* Mobile: Drawer menu */}
-			<DrawerMenu state={state} onOpen={onOpen} onClose={onClose} user={user} />
-		</Card>
+				</Flex>
+				{/* Desktop: Content Menu */}
+				<Menubar user={user} remove={remove} className="hidden sm:block" />
+				{/* Mobile: Drawer menu */}
+				{/* <DrawerMenu state={state} onOpen={onOpen} onClose={onClose} user={user} /> */}
+			</Card>
+		)
 	);
 };
 

@@ -10,32 +10,32 @@ import { Title } from '@/components/Typography';
 import { Input } from '@/components/Input';
 import { SubmitButton } from '@/components/Button';
 import { updateSearchQuery } from '@/lib/utils';
+import useAdminAction from '@/lib/hooks/useAdminAction';
 
 interface Props {}
 
 const AccountSearch = ({}: Props) => {
-	const pathname = usePathname();
-	const searchParams = useSearchParams();
-	const { replace } = useRouter();
-
-	// Function handle change input
-	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-		const { value } = e.target;
-		console.log('e', value);
-	};
+	const { setQuery } = useAdminAction();
 
 	// Function use debounce for onChange input
-	const handleChangeDebounce = _.debounce((e: ChangeEvent<HTMLInputElement>) => {
-		const { value: inputValue } = e.target;
-		// create new search params with new value
-		const newSearchParams = updateSearchQuery(searchParams, {
-			q: inputValue,
-			page: '1',
-		});
+	const handleChangeDebounce = 
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const { value: inputValue } = e.target;
 
-		// Replace url
-		replace(`${pathname}?${newSearchParams}`);
-	}, 750);
+			console.log('inputValue', inputValue)
+			// Update search query
+			setQuery(inputValue);
+		}
+	// const handleChangeDebounce = _.debounce(
+	// 	(e: ChangeEvent<HTMLInputElement>) => {
+	// 		const { value: inputValue } = e.target;
+
+	// 		console.log('inputValue', inputValue)
+	// 		// Update search query
+	// 		setQuery(inputValue);
+	// 	},
+	// 	750
+	// );
 
 	return (
 		<Card className="w-full space-y-4" rounded={false}>
@@ -45,6 +45,7 @@ const AccountSearch = ({}: Props) => {
 				{/* Search */}
 				<Flex gap="small" className="w-full">
 					<Input
+						placeholder="Tìm kiếm nhân viên..."
 						name="search"
 						prefix={<Search />}
 						onChange={handleChangeDebounce}

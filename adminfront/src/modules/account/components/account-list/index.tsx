@@ -3,28 +3,39 @@ import { User } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
 import { CircleAlert, Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { deleteUser } from '@/actions/accounts';
 import { FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Table } from '@/components/Table';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import useAdminAction from '@/lib/hooks/useAdminAction';
 import { updateSearchQuery } from '@/lib/utils';
 import { UserModal } from '@/modules/account/components/account-modal';
-import { TResponse } from '@/types/common';
-import accountColumns from './account-column';
 import { IAdminResponse } from '@/types/account';
+import accountColumns from './account-column';
+import { TResponse } from '@/types/common';
+import { useAdminProducts, useAdminUsers } from 'medusa-react';
 
 interface Props {
-	data: TResponse<IAdminResponse> | null;
+	// data: TResponse<IAdminResponse> | null;
 }
 
-const AccountList = ({ data }: Props) => {
+const AccountList = ({}: Props) => {
 	const searchParams = useSearchParams();
 	const { replace } = useRouter();
 	const pathname = usePathname();
 	const currentPage = searchParams.get('page') ?? 1;
+
+	const { query } = useAdminAction();
+
+	const PAGE_SIZE = 10;
+	const { users, count, isLoading } = useAdminUsers({
+		limit: PAGE_SIZE,
+		q: query || undefined,
+	});
+	console.log('query', query);
 
 	const { state, onOpen, onClose } = useToggleState(false);
 	const [currentUser, setCurrentUser] = useState<IAdminResponse | null>(null);
@@ -80,18 +91,20 @@ const AccountList = ({ data }: Props) => {
 
 	const columns = useMemo(
 		() => accountColumns({ handleDeleteUser, handleEditUser }),
-		[data]
+		[users]
 	);
 
+	console.log('users', users);
 	return (
 		<Card className="w-full">
 			<Table
+				loading={isLoading}
 				columns={columns}
-				dataSource={data?.data ?? []}
+				dataSource={users}
 				rowKey="id"
 				pagination={{
-					total: Math.floor(data?.count ?? 0 / (data?.limit ?? 0)),
-					pageSize: data?.limit,
+					total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
+					pageSize: PAGE_SIZE,
 					current: currentPage as number,
 					onChange: handleChangePage,
 				}}

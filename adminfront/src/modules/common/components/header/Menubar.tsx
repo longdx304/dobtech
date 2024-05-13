@@ -1,19 +1,23 @@
-import { Menu } from 'antd';
-import { useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import { signOut } from '@/actions/accounts';
-import { IAdminResponse } from '@/types/account';
 import type { MenuProps } from 'antd';
+import { Menu, message } from 'antd';
+import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
 
+import { ERoutes } from '@/types/routes';
+import { User } from '@medusajs/medusa';
+import { useAdminDeleteSession } from 'medusa-react';
 import { menuItems, menuRoutes } from './MenuItem';
 
 interface Props {
-	user: IAdminResponse;
+	user: Omit<User, 'password_hash'>;
 	className?: string;
+	remove: () => void;
 }
 
-const Menubar = ({ user, className }: Props) => {
+const Menubar = ({ user, remove, className }: Props) => {
 	const router = useRouter();
+	const [messageApi, contextHolder] = message.useMessage();
+	const { mutate } = useAdminDeleteSession();
 
 	// Handle user click menu items
 	const handleClickMenu: MenuProps['onClick'] = (e) => {
@@ -24,11 +28,23 @@ const Menubar = ({ user, className }: Props) => {
 		}
 	};
 
+	const logOut = () => {
+		mutate(undefined, {
+			onSuccess: () => {
+				remove();
+				router.push(ERoutes.HOME);
+			},
+			onError: (err) => {
+				message.error('Đăng xuất thất bại!');
+			},
+		});
+	};
+
 	// Handle user click dropdown
 	const handleDropdownClick = (e: any) => {
 		const { key } = e;
 		if (key === 'logout') {
-			signOut();
+			logOut();
 		}
 	};
 

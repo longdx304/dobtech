@@ -4,6 +4,7 @@ export enum ERoutes {
 	HOME = '/',
 	ACCOUNTS = '/accounts',
 	PRODUCTS = '/products',
+	DASHBOARD = '/dashboard',
 }
 
 export interface TRouteConfig {
@@ -19,5 +20,15 @@ export const routesConfig: TRouteConfig[] = [
 	{
 		path: ERoutes.PRODUCTS,
 		mode: [EPermissions.WarehouseManager, EPermissions.InventoryChecker],
+	},
+	{
+		path: ERoutes.DASHBOARD,
+		mode: [
+			EPermissions.WarehouseManager,
+			EPermissions.InventoryChecker,
+			EPermissions.Driver,
+			EPermissions.AssistantDriver,
+			EPermissions.WarehouseStaff,
+		],
 	},
 ];
