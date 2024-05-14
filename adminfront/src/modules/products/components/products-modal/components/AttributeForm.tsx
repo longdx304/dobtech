@@ -28,7 +28,7 @@ const AttributeForm: FC<Props> = ({ }) => {
 					</Text>
 				</Flex>
 			</Col>
-			<Col span={6}>
+			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={['dimensions', 'width']}
@@ -38,7 +38,7 @@ const AttributeForm: FC<Props> = ({ }) => {
 					<InputNumber placeholder="100.." />
 				</Form.Item>
 			</Col>
-			<Col span={6}>
+			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={['dimensions', 'length']}
@@ -48,7 +48,7 @@ const AttributeForm: FC<Props> = ({ }) => {
 					<InputNumber placeholder="100.." />
 				</Form.Item>
 			</Col>
-			<Col span={6}>
+			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={['dimensions', 'height']}
@@ -58,7 +58,7 @@ const AttributeForm: FC<Props> = ({ }) => {
 					<InputNumber placeholder="100.." />
 				</Form.Item>
 			</Col>
-			<Col span={6}>
+			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={['dimensions', 'weight']}
@@ -75,7 +75,7 @@ const AttributeForm: FC<Props> = ({ }) => {
 					</Text>
 				</Flex>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={['customs', 'mid_code']}
@@ -86,7 +86,7 @@ const AttributeForm: FC<Props> = ({ }) => {
 					<Input placeholder="BDJSK39277W..." />
 				</Form.Item>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={['customs', 'hs_code']}
@@ -97,7 +97,7 @@ const AttributeForm: FC<Props> = ({ }) => {
 					<Input placeholder="XDSKLAD9999.." />
 				</Form.Item>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={['customs', 'origin_country']}

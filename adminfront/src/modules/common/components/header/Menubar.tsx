@@ -7,6 +7,7 @@ import { ERoutes } from '@/types/routes';
 import { User } from '@medusajs/medusa';
 import { useAdminDeleteSession } from 'medusa-react';
 import { menuItems, menuRoutes } from './MenuItem';
+import { removeCookie } from '@/actions/auth';
 
 interface Props {
 	user: Omit<User, 'password_hash'>;
@@ -17,7 +18,7 @@ interface Props {
 const Menubar = ({ user, remove, className }: Props) => {
 	const router = useRouter();
 	const [messageApi, contextHolder] = message.useMessage();
-	const { mutate } = useAdminDeleteSession();
+	const { mutateAsync } = useAdminDeleteSession();
 
 	// Handle user click menu items
 	const handleClickMenu: MenuProps['onClick'] = (e) => {
@@ -28,11 +29,12 @@ const Menubar = ({ user, remove, className }: Props) => {
 		}
 	};
 
-	const logOut = () => {
-		mutate(undefined, {
-			onSuccess: () => {
+	const logOut = async () => {
+		mutateAsync(undefined, {
+			onSuccess: async () => {
 				remove();
-				router.push(ERoutes.HOME);
+				await removeCookie();
+				router.push(ERoutes.LOGIN);
 			},
 			onError: (err) => {
 				message.error('Đăng xuất thất bại!');

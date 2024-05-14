@@ -1,6 +1,7 @@
 import { EPermissions } from './account';
 
 export enum ERoutes {
+	LOGIN = '/login',
 	HOME = '/',
 	ACCOUNTS = '/accounts',
 	PRODUCTS = '/products',
@@ -14,12 +15,22 @@ export interface TRouteConfig {
 
 export const routesConfig: TRouteConfig[] = [
 	{
+		path: ERoutes.LOGIN,
+		mode: [],
+	},
+	{
 		path: ERoutes.ACCOUNTS,
 		mode: [EPermissions.WarehouseManager],
 	},
 	{
 		path: ERoutes.PRODUCTS,
-		mode: [EPermissions.WarehouseManager, EPermissions.InventoryChecker],
+		mode: [
+			EPermissions.WarehouseManager,
+			EPermissions.InventoryChecker,
+			EPermissions.Driver,
+			EPermissions.AssistantDriver,
+			EPermissions.WarehouseStaff,
+		],
 	},
 	{
 		path: ERoutes.DASHBOARD,

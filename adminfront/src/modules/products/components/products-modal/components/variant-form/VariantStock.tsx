@@ -20,7 +20,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 			<Col span={24}>
 				<span>{'Cấu hình tồn kho và hàng tồn kho cho biến thể này.'}</span>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={[field.name, 'sku']}
@@ -30,7 +30,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 					<Input placeholder="SUN-G, JK123..." />
 				</Form.Item>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={[field.name, 'inventory_quantity']}
@@ -40,7 +40,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 					<InputNumber placeholder="100.." />
 				</Form.Item>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={[field.name,'ean']}
@@ -50,7 +50,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 					<Input placeholder="123456789102..." />
 				</Form.Item>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={[field.name, 'upc']}
@@ -60,7 +60,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 					<Input placeholder="123456789104.." />
 				</Form.Item>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={[field.name, 'barcode']}

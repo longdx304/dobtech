@@ -46,7 +46,7 @@ const GeneralForm: FC<Props> = () => {
 						<span>{`Độ dài 50-60 ký tự là độ dài được khuyến nghị cho các công cụ tìm kiếm.`}</span>
 					</Flex>
 				</Col>
-				<Col span={12}>
+				<Col xs={24} sm={12}>
 					<Form.Item
 						labelCol={{ span: 24 }}
 						name={['general', 'handle']}
@@ -65,7 +65,7 @@ const GeneralForm: FC<Props> = () => {
 						/>
 					</Form.Item>
 				</Col>
-				<Col span={12}>
+				<Col xs={24} sm={12}>
 					<Form.Item
 						labelCol={{ span: 24 }}
 						name={['general', 'material']}

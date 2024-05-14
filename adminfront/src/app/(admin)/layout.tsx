@@ -9,10 +9,6 @@ export default async function MainLayout({
 	children: React.ReactNode;
 }>) {
 	
-	// const adminUser = await getAdmin().catch(() => null);
-
-	// const user: IAdminResponse = adminUser && (adminUser as any) 
-
 	return (
 		<main className="w-full pt-[4.5rem] sm:pt-0">
 			<Header />

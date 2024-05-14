@@ -42,7 +42,7 @@ const ProductList = ({}: Props) => {
 		offset: (currentPage - 1) * PAGE_SIZE,
 		q: searchValue || undefined,
 	});
-	console.log('products', products)
+
 	const { product_categories, isLoading: isLoadingCategories } =
 		useAdminProductCategories({
 			parent_category_id: 'null',
@@ -112,8 +112,10 @@ const ProductList = ({}: Props) => {
 
 	return (
 		<>
-			<Flex align="center" justify="space-between" className="pb-4">
-				<Title level={3}>Quản lý sản phẩm</Title>
+			<Flex align="center" justify="flex-start" className="">
+				<Title level={3} className="text-start">Quản lý sản phẩm</Title>
+			</Flex>
+			<Flex align="center" justify="flex-end" className="pb-4">
 				<Input
 					placeholder="Tìm kiếm sản phẩm..."
 					name="search"

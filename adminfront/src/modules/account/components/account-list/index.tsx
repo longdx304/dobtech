@@ -117,8 +117,10 @@ const AccountList = ({}: Props) => {
 
 	return (
 		<Card className="w-full">
-			<Flex align="center" justify="space-between" className="pb-4">
+			<Flex align="center" justify="flex-start" className="">
 				<Title level={3}>Quản lý nhân viên</Title>
+			</Flex>
+			<Flex align="center" justify="flex-end" className="pb-4">
 				<Input
 					// size="small"
 					placeholder="Tìm kiếm nhân viên..."

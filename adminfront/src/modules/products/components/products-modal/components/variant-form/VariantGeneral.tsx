@@ -19,7 +19,7 @@ const VariantGeneral: FC<Props> = ({ form, field }) => {
 			<Col span={24}>
 				<span>{'Cấu hình thông tin chung cho biến thể này.'}</span>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={[field.name, 'title']}
@@ -51,7 +51,7 @@ const VariantGeneral: FC<Props> = ({ form, field }) => {
 						label: value,
 					}));
 					return (
-						<Col span={12} key={index}>
+						<Col xs={24} sm={12} key={index}>
 							<Form.Item
 								labelCol={{ span: 24 }}
 								name={[field.name, 'options', index, 'value']}

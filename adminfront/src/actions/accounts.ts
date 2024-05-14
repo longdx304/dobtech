@@ -55,14 +55,6 @@ export async function signOut() {
 	cookies().set('_medusa_jwt', '', {
 		maxAge: -1,
 	});
-	// const nextUrl = headers().get("next-url")
-	// const countryCode = nextUrl?.split("/")[1] || ""
-	revalidateTag('auth');
-	revalidateTag('admin');
-	redirect(`/`);
-	// if (nextUrl) {
-	//   redirect(`/${countryCode}/account`)
-	// }
 }
 
 /**

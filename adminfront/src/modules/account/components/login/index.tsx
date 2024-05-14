@@ -48,9 +48,8 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 				console.log('data', data);
 				await client.admin.auth
 					.getToken(values)
-					.then(({ access_token }) => {
-						setCookie(access_token);
-						// console.log('access_token', access_token);
+					.then(async ({ access_token }) => {
+						await setCookie(access_token);
 					});
 				message.success('Đăng nhập thành công!');
 				router.push(ERoutes.DASHBOARD);

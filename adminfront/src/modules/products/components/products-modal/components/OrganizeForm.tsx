@@ -31,7 +31,7 @@ const OrganizeForm: FC<Props> = ({
 					{'Phân loại cho sản phẩm về type, bộ sưu tập, thể loại, thẻ'}
 				</span>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={['organize', 'type']}
@@ -40,7 +40,7 @@ const OrganizeForm: FC<Props> = ({
 					<Select placeholder="Chọn một loại" options={[]} />
 				</Form.Item>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name={['organize', 'collection']}

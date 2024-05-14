@@ -12,3 +12,9 @@ export async function setCookie(access_token: any) {
 		});
 	return [];
 }
+export async function removeCookie() {
+	cookies().set('_medusa_jwt', '', {
+		maxAge: -1,
+	});
+	return [];
+}

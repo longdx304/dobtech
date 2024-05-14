@@ -35,6 +35,7 @@ const variantsColumns = ({handleEditVariant, handleDeleteVariant, handleCopyVari
 		title: '',
 		key: 'action',
 		width: 40,
+		fixed: 'right',
 		render: (_: any, record: ProductVariant) => {
 			const actions = [
 				{

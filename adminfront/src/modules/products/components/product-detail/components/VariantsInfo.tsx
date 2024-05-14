@@ -146,6 +146,7 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 								product?.variants?.length || 0
 							})`}</Text>
 							<Table
+								scroll={{ x: 400 }}
 								columns={columns}
 								dataSource={product?.variants ?? []}
 								rowKey="id"
@@ -185,7 +186,7 @@ export default VariantsInfo;
 
 const RenderOptions = ({ product }: { product: Product }) => {
 	return (
-		<Flex gap="middle" className="w-full pt-2">
+		<Flex gap="middle" wrap className="w-full pt-2 flex-wrap">
 			{product?.options?.length &&
 				product?.options.map((option) => (
 					<Flex
@@ -197,7 +198,7 @@ const RenderOptions = ({ product }: { product: Product }) => {
 					>
 						<Flex vertical gap="8px" className="w-full">
 							<Text className="text-sm font-semibold">{option.title}</Text>
-							<Flex align="center">
+							<Flex align="center" className="flex-wrap">
 								{option?.values
 									?.map((value) => value.value)
 									.filter((v, index, self) => self.indexOf(v) === index)

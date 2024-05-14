@@ -32,7 +32,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 					</span>
 				</Flex>
 			</Col>
-			<Col span={6}>
+			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name='width'
@@ -42,7 +42,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 					<InputNumber placeholder="100.." />
 				</Form.Item>
 			</Col>
-			<Col span={6}>
+			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name='length'
@@ -52,7 +52,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 					<InputNumber placeholder="100.." />
 				</Form.Item>
 			</Col>
-			<Col span={6}>
+			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name='height'
@@ -62,7 +62,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 					<InputNumber placeholder="100.." />
 				</Form.Item>
 			</Col>
-			<Col span={6}>
+			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name='weight'
@@ -82,7 +82,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 					</span>
 				</Flex>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name='mid_code'
@@ -93,7 +93,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 					<Input placeholder="BDJSK39277W..." />
 				</Form.Item>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name='hs_code'
@@ -104,7 +104,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 					<Input placeholder="XDSKLAD9999.." />
 				</Form.Item>
 			</Col>
-			<Col span={12}>
+			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name='origin_country'

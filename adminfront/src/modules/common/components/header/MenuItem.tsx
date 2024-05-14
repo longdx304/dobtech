@@ -94,7 +94,7 @@ export const menuItems = (
 	user: Omit<User, "password_hash">,
 	handleDropdownClick: (e: any) => void
 ) => {
-	const role = user.role;
+	const role = user?.role;
 	const permissions = (user as any)?.permissions?.split(',');
 	return [
 		getItem(

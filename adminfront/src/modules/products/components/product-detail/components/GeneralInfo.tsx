@@ -96,9 +96,9 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 		>
 			<Row gutter={[16, 16]}>
 				<Col span={24}>
-					<Flex align="center" justify="space-between">
+					<Flex align="center" justify="space-between" className="flex-wrap">
 						<Title level={3}>{product?.title}</Title>
-						<Flex align="center" justify="flex-end" gap="40px">
+						<Flex align="center" justify="flex-end" gap="40px" className="max-[390px]:w-full">
 							<Select
 								value={statusValue}
 								suffixIcon={null}

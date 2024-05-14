@@ -18,7 +18,7 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 	{
 		title: 'Tên sản phẩm',
 		key: 'information',
-		width: 200,
+		width: 150,
 		className: 'text-xs',
 		fixed: 'left',
 		render: (_: any, record: Product) => (
