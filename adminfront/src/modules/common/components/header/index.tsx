@@ -15,6 +15,8 @@ import { IAdminResponse } from '@/types/account';
 import DrawerMenu from './DrawerMenu';
 import Menubar from './Menubar';
 import SkeletonMenu from './SkeletonMenu';
+import Link from 'next/link';
+import { ERoutes } from '@/types/routes';
 
 interface Props {
 	// user: IAdminResponse;
@@ -36,20 +38,19 @@ const Header: FC<Props> = ({}) => {
 			bordered={false}
 		>
 			<Skeleton loading={isLoading} className="px-4 pt-4" active>
-
 				<Flex
 					className="sm:justify-center"
 					justify="space-between"
 					align="center"
 				>
-					<div className="flex items-center">
+					<Link href={ERoutes.DASHBOARD} className="flex items-center">
 						<Image
 							src="/images/dob-icon.png"
 							width={28}
 							height={37}
 							alt="Dob Icon"
 						/>
-					</div>
+					</Link>
 					{/* Mobile: Button Menu */}
 					<Button
 						icon={<Menu />}
@@ -62,7 +63,12 @@ const Header: FC<Props> = ({}) => {
 				{/* Desktop: Content Menu */}
 				<Menubar user={user} remove={remove} className="hidden sm:block" />
 				{/* Mobile: Drawer menu */}
-				<DrawerMenu state={state} onOpen={onOpen} onClose={onClose} user={user} />
+				<DrawerMenu
+					state={state}
+					onOpen={onOpen}
+					onClose={onClose}
+					user={user}
+				/>
 			</Skeleton>
 		</Card>
 	);
