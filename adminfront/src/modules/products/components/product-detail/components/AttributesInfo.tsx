@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Product } from '@medusajs/medusa';
-import { Row, Col } from 'antd';
+import { Row, Col, MenuProps } from 'antd';
 import { Pencil, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/Button';

@@ -6,8 +6,8 @@ import { MoneyAmount, Product } from "@medusajs/client-types"
 export function getAllProductPricesCurrencies(product: Product) {
   const currencyMap: Record<string, true> = {}
 
-  product.variants!.forEach((variant) => {
-    variant.prices!.forEach((price) => {
+  product.variants!.forEach((variant: any) => {
+    variant.prices!.forEach((price: any) => {
       if (
         price.price_list_id ||
         price.region_id ||

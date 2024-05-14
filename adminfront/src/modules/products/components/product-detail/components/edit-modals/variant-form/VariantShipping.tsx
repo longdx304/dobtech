@@ -11,7 +11,7 @@ import { Flex } from '@/components/Flex';
 
 type Props = {
 	form: any;
-	field: any;
+	field?: any;
 };
 
 const VariantShipping: FC<Props> = ({ form }) => {

@@ -10,7 +10,7 @@ import { Switch } from '@/components/Switch';
 
 type Props = {
 	form: any;
-	field: any;
+	field?: any;
 };
 
 const VariantStock: FC<Props> = ({ form, field }) => {

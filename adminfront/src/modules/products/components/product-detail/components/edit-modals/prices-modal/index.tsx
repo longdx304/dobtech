@@ -1,18 +1,17 @@
-import { FC, useMemo, useRef, useState } from 'react';
-import { Form, message, typeFormProps, Row, Col } from 'antd';
+import { Form, message } from 'antd';
+import { useRef, useState } from 'react';
 // import { Product } from '@medusajs/medusa';
+// import { MoneyAmount, Product } from '@medusajs/medusa';
 import { MoneyAmount, Product } from '@medusajs/client-types';
-import { useAdminUpdateVariant, adminProductKeys } from 'medusa-react';
 import _ from 'lodash';
+import { useAdminUpdateVariant } from 'medusa-react';
 
+import { Flex } from '@/components/Flex';
 import { Modal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import { Upload } from '@/components/Upload';
 import usePrices from '@/modules/products/hooks/usePrices';
 import EditPricesActions from './EditPricesAction';
 import EditPricesTable from './EditPricesTable';
-import { Flex } from '@/components/Flex';
-import { useMessage } from '@/components/Message';
 
 type Props = {
 	product?: Product;
@@ -21,10 +20,10 @@ type Props = {
 	handleCancel: () => void;
 };
 
-const PricesModal = ({ product, state, handleOk, handleCancel }) => {
+const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 	const editedPrices = useRef({});
 	const [form] = Form.useForm();
-	const { mutateAsync, isLoading } = useAdminUpdateVariant(product?.id);
+	const { mutateAsync, isLoading } = useAdminUpdateVariant(product?.id || '');
 	const [messageApi, contextHolder] = message.useMessage();
 
 	const {
@@ -33,7 +32,7 @@ const PricesModal = ({ product, state, handleOk, handleCancel }) => {
 		toggleCurrency,
 		toggleRegion,
 		storeRegions,
-	} = usePrices(product);
+	} = usePrices(product!);
 	const [isCancel, setIsCancel] = useState<boolean>(false);
 
 	const onFinish = async () => {
@@ -48,7 +47,7 @@ const PricesModal = ({ product, state, handleOk, handleCancel }) => {
 			priceKeys.forEach((priceKey) => {
 				// Find price by currency code
 				const findPrice =
-					variant?.prices?.find((item) => item.currency_code === priceKey) ||
+					variant?.prices?.find((item: any) => item.currency_code === priceKey) ||
 					{};
 				// Check if price is not empty
 				if (!_.isEmpty(findPrice)) {
@@ -120,7 +119,7 @@ const PricesModal = ({ product, state, handleOk, handleCancel }) => {
 					toggleRegion={toggleRegion}
 				/>
 				<EditPricesTable
-					product={product}
+					product={product!}
 					currencies={selectedCurrencies.sort()}
 					regions={selectedRegions.sort()}
 					onPriceUpdate={onPriceUpdate}

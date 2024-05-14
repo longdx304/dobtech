@@ -1,19 +1,21 @@
-import { Pencil, NotebookPen, Trash2 } from 'lucide-react';
+import { NotebookPen, PackagePlus, Pencil, Trash2 } from 'lucide-react';
 
-import { Button } from '@/components/Button';
-import { ProductCollection } from '@medusajs/medusa';
 import { ActionAbles } from '@/components/Dropdown';
+import { ProductCollection } from '@medusajs/medusa';
+import { MenuProps } from 'antd';
 import moment from 'moment';
 
 interface Props {
 	handleDeleteCollection: (collectionId: ProductCollection['id']) => void;
 	handleEditCollection: (record: ProductCollection) => void;
 	handleProductCollection: (record: ProductCollection) => void;
+	handleAddProduct: (record: ProductCollection) => void;
 }
 const collectionColumns = ({
 	handleEditCollection,
 	handleDeleteCollection,
 	handleProductCollection,
+	handleAddProduct,
 }: Props) => [
 	{
 		title: 'Tiêu đề',
@@ -68,7 +70,11 @@ const collectionColumns = ({
 					label: <span className="w-full">Chỉnh sửa bộ sưu tập</span>,
 					key: 'edit',
 					icon: <Pencil size={20} />,
-					// onClick: handleEditVariant(record),
+				},
+				{
+					label: <span className="w-full">Thêm sản phẩm</span>,
+					key: 'add',
+					icon: <PackagePlus size={20} />,
 				},
 				{
 					label: <span className="w-full">Quản lý sản phẩm</span>,
@@ -91,6 +97,10 @@ const collectionColumns = ({
 				// Case item is delete
 				if (key === 'delete') {
 					handleDeleteCollection(record.id);
+					return;
+				}
+				if (key === 'add') {
+					handleAddProduct(record);
 					return;
 				}
 				if (key === 'product') {

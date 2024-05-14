@@ -53,11 +53,11 @@ const itemOverview = (
 		role === 'admin' && getItem('Danh mục', 'overview-2', <LayoutList />),
 		getItem('Quản lý sản phẩm', 'overview-3', <ClipboardPenLine />),
 		getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
-		getItem('Label', 'overview-4', <Settings />, [
-			getItem('Option 5', '5'),
+		getItem('Label', 'overview-5', <Settings />, [
 			getItem('Option 6', '6'),
 			getItem('Option 7', '7'),
 			getItem('Option 8', '8'),
+			getItem('Option 9', '9'),
 		]),
 	].filter(() => true);
 

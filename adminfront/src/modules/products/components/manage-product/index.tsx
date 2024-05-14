@@ -1,12 +1,11 @@
 'use client';
-import { FC } from 'react';
 import { type TabsProps } from 'antd';
+import { FC } from 'react';
 
-import { Product } from '@medusajs/medusa';
 import { Card } from '@/components/Card';
 import { Tabs } from '@/components/Tabs';
-import ProductList from '@/modules/products/components/products-list';
 import CollectionList from '@/modules/products/components/collection-list';
+import ProductList from '@/modules/products/components/products-list';
 
 type Props = {};
 
@@ -15,7 +14,6 @@ const ManageProduct: FC<Props> = ({}) => {
 		{
 			key: 'products',
 			label: 'Sản phẩm',
-			// children: <div>Product</div>,
 			children: <ProductList />,
 		},
 		{

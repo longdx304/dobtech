@@ -2,7 +2,7 @@
 import { FC } from 'react';
 import { Product } from '@medusajs/medusa';
 import { ArrowLeft, CircleAlert } from 'lucide-react';
-import { Row, Col, Empty, Modal, message } from 'antd';
+import { Row, Col, Empty, Modal, message, MenuProps } from 'antd';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useAdminUpdateProduct } from 'medusa-react';
 
@@ -20,7 +20,7 @@ type Props = {
 	loadingProduct: boolean;
 };
 
-const ImageThumbnail: FC = ({ product, loadingProduct }) => {
+const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 	const { state, onOpen, onClose } = useToggleState(false);
 	const updateProduct = useAdminUpdateProduct(product?.id);
 
@@ -55,7 +55,7 @@ const ImageThumbnail: FC = ({ product, loadingProduct }) => {
 			cancelText: 'Huỷ',
 			async onOk() {
 				try {
-					updateProduct.mutateAsync({ thumbnail: null });
+					updateProduct.mutateAsync({ thumbnail: undefined });
 					message.success('Xoá thumbnail thành công!');
 				} catch (error) {
 					message.error('Xoá thumbnail thất bại!');

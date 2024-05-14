@@ -1,7 +1,7 @@
 'use client';
 import { FC } from 'react';
 import { Product } from '@medusajs/medusa';
-import { Row, Col, Empty } from 'antd';
+import { Row, Col, Empty, MenuProps } from 'antd';
 import { Pencil, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/Button';
@@ -18,7 +18,7 @@ type Props = {
 	loadingProduct: boolean;
 };
 
-const ImageMedia: FC = ({ product, loadingProduct }) => {
+const ImageMedia: FC<Props> = ({ product, loadingProduct }) => {
 	const { state, onOpen, onClose } = useToggleState(false);
 	const actions = [
 		{

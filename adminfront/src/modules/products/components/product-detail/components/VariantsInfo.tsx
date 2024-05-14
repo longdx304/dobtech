@@ -1,6 +1,6 @@
 import { FC, useMemo, useState } from 'react';
 import { Product } from '@medusajs/client-types';
-import { Row, Col, Empty, Modal, message } from 'antd';
+import { Row, Col, Empty, Modal, message, MenuProps } from 'antd';
 import { Plus, CircleDollarSign, Settings, CircleAlert } from 'lucide-react';
 import { useAdminDeleteVariant } from 'medusa-react';
 import { ProductVariant } from '@medusajs/medusa';
@@ -124,7 +124,12 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 	const handleMenuClick: MenuProps['onClick'] = ({ key }) => {};
 
 	const columns = useMemo(
-		() => variantsColumns({ handleEditVariant, handleDeleteVariant, handleCopyVariant }),
+		() =>
+			variantsColumns({
+				handleEditVariant,
+				handleDeleteVariant,
+				handleCopyVariant,
+			}),
 		[product]
 	);
 
@@ -175,7 +180,7 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 				state={stateVariants}
 				handleOk={onCloseVariants}
 				handleCancel={handleCloseVariant}
-				variant={editVariant}
+				variant={editVariant!}
 				typeVariant={typeVariant}
 			/>
 		</Card>
@@ -188,7 +193,7 @@ const RenderOptions = ({ product }: { product: Product }) => {
 	return (
 		<Flex gap="middle" wrap className="w-full pt-2 flex-wrap">
 			{product?.options?.length &&
-				product?.options.map((option) => (
+				product?.options.map((option: any) => (
 					<Flex
 						key={option.id}
 						vertical
@@ -200,9 +205,12 @@ const RenderOptions = ({ product }: { product: Product }) => {
 							<Text className="text-sm font-semibold">{option.title}</Text>
 							<Flex align="center" className="flex-wrap">
 								{option?.values
-									?.map((value) => value.value)
-									.filter((v, index, self) => self.indexOf(v) === index)
-									.map((value) => (
+									?.map((value: any) => value.value)
+									.filter(
+										(v: any, index: any, self: string | any[]) =>
+											self.indexOf(v) === index
+									)
+									.map((value: any) => (
 										<Tag
 											key={value}
 											className="text-xs font-semibold w-fit px-3 py-[6px] bg-[#F3F4F6] text-[#6b7280] rounded-lg"

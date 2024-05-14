@@ -13,7 +13,6 @@ interface Props {
 }
 
 export default async function Products({ searchParams }: Props) {
-
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
 			<ManageProduct />

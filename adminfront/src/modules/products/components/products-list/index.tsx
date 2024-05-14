@@ -1,29 +1,26 @@
 'use client';
 
-import { CircleAlert, Plus, Search } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import {
-	useAdminProducts,
-	useAdminProductCategories,
-	useAdminCollections,
-} from 'medusa-react';
 import { Product } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
 import _ from 'lodash';
+import { CircleAlert, Plus, Search } from 'lucide-react';
+import {
+	useAdminCollections,
+	useAdminProductCategories,
+	useAdminProducts,
+} from 'medusa-react';
 import { useRouter } from 'next/navigation';
+import { ChangeEvent, useMemo, useState } from 'react';
 
 import { deleteProduct } from '@/actions/products';
 import { FloatButton } from '@/components/Button';
-import { Card } from '@/components/Card';
+import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
+import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { updateSearchQuery } from '@/lib/utils';
-import { TResponse } from '@/types/common';
 import { ProductModal } from '../products-modal';
 import productsColumns from './products-column';
-import { Flex } from '@/components/Flex';
-import { Title } from '@/components/Typography';
-import { Input } from '@/components/Input';
 
 const PAGE_SIZE = 10;
 
@@ -113,7 +110,9 @@ const ProductList = ({}: Props) => {
 	return (
 		<>
 			<Flex align="center" justify="flex-start" className="">
-				<Title level={3} className="text-start">Quản lý sản phẩm</Title>
+				<Title level={3} className="text-start">
+					Quản lý sản phẩm
+				</Title>
 			</Flex>
 			<Flex align="center" justify="flex-end" className="pb-4">
 				<Input
@@ -131,7 +130,7 @@ const ProductList = ({}: Props) => {
 					isLoadingCategories ||
 					isLoadingCollections
 				}
-				columns={columns}
+				columns={columns as any}
 				dataSource={products ?? []}
 				rowKey="id"
 				pagination={{

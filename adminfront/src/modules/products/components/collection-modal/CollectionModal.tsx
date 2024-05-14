@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { Form, Row, Col, message } from 'antd';
+import { Form, Row, Col, message, FormProps } from 'antd';
 import { ProductCollection } from '@medusajs/medusa';
 import { CircleAlert } from 'lucide-react';
 import _ from 'lodash';
@@ -32,7 +32,7 @@ const CollectionModal: FC<Props> = ({
 }) => {
 	const [form] = Form.useForm();
 	const createCollection = useAdminCreateCollection();
-	const updateCollection = useAdminUpdateCollection(collection?.id);
+	const updateCollection = useAdminUpdateCollection(collection?.id || '');
 
 	useEffect(() => {
 		form.setFieldsValue({

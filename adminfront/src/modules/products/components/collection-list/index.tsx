@@ -1,17 +1,25 @@
 'use client';
-import { FC, useMemo, useState } from 'react';
-import { message, Modal } from 'antd';
-import { Plus, CircleAlert } from 'lucide-react';
-import { useAdminCollections, useAdminDeleteCollection } from 'medusa-react';
 import { ProductCollection } from '@medusajs/medusa';
+import { Modal, message } from 'antd';
+import { CircleAlert, Plus } from 'lucide-react';
+import {
+	useAdminCollections,
+	useAdminDeleteCollection,
+	useMedusa,
+} from 'medusa-react';
+import { FC, useMemo, useState } from 'react';
 
-import { Card } from '@/components/Card';
 import { FloatButton } from '@/components/Button';
-import collectionColumns from './CollectionColumn';
 import { Table } from '@/components/Table';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { CollectionModal, ManageProductModal } from '@/modules/products/components/collection-modal';
 import { getErrorMessage } from '@/lib/utils';
+import {
+	AddProductModal,
+	CollectionModal,
+	ManageProductModal,
+} from '@/modules/products/components/collection-modal';
+import { DataType } from '../collection-modal/AddProductModal';
+import collectionColumns from './CollectionColumn';
 
 type Props = {};
 
@@ -25,10 +33,17 @@ const CollectionList: FC<Props> = ({}) => {
 		onClose: onCloseProduct,
 	} = useToggleState(false);
 
+	const {
+		state: stateAddProduct,
+		onOpen: onOpenAddProduct,
+		onClose: onCloseAddProduct,
+	} = useToggleState(false);
+
+	const { client } = useMedusa();
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
 	const [currentCollection, setCurrentCollection] = useState<any>(null);
-	const [collectionId, setCollectionId] = useState<string>(null);
+	const [collectionId, setCollectionId] = useState<string>('');
 	const limit = DEFAULT_PAGE_SIZE;
 	const deleteCollection = useAdminDeleteCollection(collectionId);
 	const { collections, isLoading, isRefetching, count } = useAdminCollections(
@@ -42,6 +57,8 @@ const CollectionList: FC<Props> = ({}) => {
 		}
 	);
 
+	// manage and add product modal
+
 	const handleEditCollection = (data: ProductCollection) => {
 		setCurrentCollection(data);
 		onOpen();
@@ -50,6 +67,11 @@ const CollectionList: FC<Props> = ({}) => {
 	const handleProductCollection = (data: ProductCollection) => {
 		setCurrentCollection(data);
 		onOpenProduct();
+	};
+
+	const handleAddProduct = (data: ProductCollection) => {
+		setCurrentCollection(data);
+		onOpenAddProduct();
 	};
 
 	const handleDeleteCollection = (collectionId: ProductCollection['id']) => {
@@ -73,7 +95,7 @@ const CollectionList: FC<Props> = ({}) => {
 					deleteCollection.mutateAsync(void 0, {
 						onSuccess: () => {
 							message.success('Xóa bộ sưu tập thành công.');
-							setCollectionId(null);
+							setCollectionId(''); 
 							return;
 						},
 						onError: (error) => {
@@ -82,9 +104,9 @@ const CollectionList: FC<Props> = ({}) => {
 						},
 					});
 				},
-				confirmLoading: deleteCollection.isLoading,
+				// confirmLoading: deleteCollection.isLoading,
 				onCancel() {
-					setCollectionId(null);
+					setCollectionId('');
 				},
 			});
 		}
@@ -94,9 +116,15 @@ const CollectionList: FC<Props> = ({}) => {
 		setCurrentCollection(null);
 		onClose();
 	};
+
 	const handleCloseProduct = () => {
 		setCurrentCollection(null);
 		onCloseProduct();
+	};
+
+	const handleCloseAddProduct = () => {
+		setCurrentCollection(null);
+		onCloseAddProduct();
 	};
 
 	const columns = useMemo(() => {
@@ -104,6 +132,7 @@ const CollectionList: FC<Props> = ({}) => {
 			handleEditCollection,
 			handleDeleteCollection,
 			handleProductCollection,
+			handleAddProduct,
 		});
 	}, [collections]);
 
@@ -112,11 +141,32 @@ const CollectionList: FC<Props> = ({}) => {
 		setOffset((page - 1) * limit);
 	};
 
+	const handleAddProducts = async (
+		addedIds: string[],
+		removedIds: string[]
+	) => {
+		try {
+			if (addedIds.length > 0) {
+				await client.admin.collections.addProducts(currentCollection?.id, {
+					product_ids: addedIds,
+				});
+			}
+
+			if (removedIds.length > 0) {
+				await client.admin.collections.removeProducts(currentCollection?.id, {
+					product_ids: removedIds,
+				});
+			}
+		} catch (error) {
+			message.error('Thêm sản phẩm vào bộ sưu tập thất bại!');
+		}
+	};
+
 	return (
 		<>
 			<Table
 				loading={isLoading || isRefetching}
-				columns={columns}
+				columns={columns as any}
 				dataSource={collections ?? []}
 				rowKey="id"
 				scroll={{ x: 700 }}
@@ -140,12 +190,23 @@ const CollectionList: FC<Props> = ({}) => {
 				handleCancel={handleCloseModal}
 				collection={currentCollection}
 			/>
-			<ManageProductModal
-				state={stateProduct}
-				handleOk={onCloseProduct}
-				handleCancel={handleCloseProduct}
+			<AddProductModal
+				state={stateAddProduct}
+				handleOk={onCloseAddProduct}
+				onSubmit={handleAddProducts}
+				handleCancel={handleCloseAddProduct}
 				collection={currentCollection}
+				// selectedProducts={selectedProducts}
+				// setSelectedProducts={setSelectedProducts}
 			/>
+			{currentCollection && (
+				<ManageProductModal
+					state={stateProduct}
+					handleOk={onCloseProduct}
+					handleCancel={handleCloseProduct}
+					collection={currentCollection}
+				/>
+			)}
 		</>
 	);
 };

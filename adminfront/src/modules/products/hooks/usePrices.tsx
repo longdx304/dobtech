@@ -1,21 +1,19 @@
-import { useMemo, useState } from 'react';
-import {
-	useAdminRegions,
-	useAdminStore,
-	useAdminUpdateVariant,
-} from 'medusa-react';
 import { Product } from '@medusajs/medusa';
 import {
+	useAdminRegions,
+	useAdminStore
+} from 'medusa-react';
+import { useMemo, useState } from 'react';
+import {
 	getAllProductPricesCurrencies,
-	getAllProductPricesRegions,
-	getCurrencyPricesOnly,
-	getRegionPricesOnly,
+	getAllProductPricesRegions
 } from './utils';
 /**
  * Return map of regionIds <> currency_codes
  */
 function useRegionsCurrencyMap() {
-	const map = {};
+	let map: { [key: string]: string } = {}; 
+
 	const { regions: storeRegions } = useAdminRegions({
 		limit: 1000,
 	});
@@ -39,7 +37,7 @@ const usePrices = (product: Product) => {
 	// Default Vietnam Dong
 	const initialCurrencies = ['vnd'];
 	// const initialCurrencies =
-	// 	!currencies.length && !regions.length
+	// 		!currencies.length && !regions.length
 	// 		? store?.currencies.map((c) => c.code)
 	// 		: currencies;
 

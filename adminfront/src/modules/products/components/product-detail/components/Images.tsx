@@ -13,8 +13,7 @@ type Props = {
 	loadingProduct: boolean;
 };
 
-const Images: FC = ({ product, loadingProduct }) => {
-
+const Images: FC<Props> = ({ product, loadingProduct }) => {
 	return (
 		<Row gutter={[16, 16]}>
 			<Col flex="auto">

@@ -9,10 +9,11 @@ import { IProductResponse } from '@/types/products';
 import formatNumber from '@/lib/utils';
 import { ActionAbles } from '@/components/Dropdown';
 import Tooltip from '@/components/Tooltip/Tooltip';
+import { MenuProps } from 'antd';
 
 interface Props {
 	handleDeleteProduct: (userId: Product['id']) => void;
-	handleEditProduct: (record: IProductResponse) => void;
+	handleEditProduct: (record: Product) => void;
 }
 const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 	{

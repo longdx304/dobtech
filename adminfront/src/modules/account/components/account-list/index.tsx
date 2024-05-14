@@ -3,7 +3,7 @@ import { User } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
 import { CircleAlert, Plus, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import _ from 'lodash';
 import { useAdminDeleteUser } from 'medusa-react';
 
@@ -11,7 +11,6 @@ import { FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Table } from '@/components/Table';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import useAdminAction from '@/lib/hooks/useAdminAction';
 import { updateSearchQuery } from '@/lib/utils';
 import { UserModal } from '@/modules/account/components/account-modal';
 import { IAdminResponse } from '@/types/account';
@@ -44,7 +43,7 @@ const AccountList = ({}: Props) => {
 	const { state, onOpen, onClose } = useToggleState(false);
 	const [currentUser, setCurrentUser] = useState<IAdminResponse | null>(null);
 	const [userId, setUserId] = useState<string | null>(null);
-	const deleteUser = useAdminDeleteUser(userId);
+	const deleteUser = useAdminDeleteUser(userId!);
 
 	const handleEditUser = (record: IAdminResponse) => {
 		setCurrentUser(record);
@@ -132,7 +131,7 @@ const AccountList = ({}: Props) => {
 			</Flex>
 			<Table
 				loading={isLoading || isRefetching}
-				columns={columns}
+				columns={columns as any}
 				dataSource={users}
 				rowKey="id"
 				pagination={{
