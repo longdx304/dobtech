@@ -1,7 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { getAdmin } from '@/actions/accounts';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider } from 'antd';
 
@@ -24,16 +23,6 @@ export default async function RootLayout({
 	login?: React.ReactNode;
 	children: React.ReactNode;
 }>) {
-	// const adminUser = await getAdmin().catch(() => null);
-
-	// let contentToRender;
-	// if (adminUser && main) {
-	// 	contentToRender = main;
-	// } else if (!adminUser && login) {
-	// 	contentToRender = login;
-	// } else {
-	// 	contentToRender = children;
-	// }
 	return (
 		<html lang="en">
 			<body className={inter.className}>
@@ -42,12 +31,10 @@ export default async function RootLayout({
 						<MedusaProvider>
 							<FeatureFlagProvider>
 								{children}
-								{/* {login} */}
 							</FeatureFlagProvider>
 						</MedusaProvider>
 					</ConfigProvider>
 				</AntdRegistry>
-				{/* {children} */}
 			</body>
 		</html>
 	);

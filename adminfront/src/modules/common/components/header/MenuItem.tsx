@@ -9,11 +9,13 @@ import {
 	Settings,
 	User as UserIcon,
 	Users,
+	LayoutList
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
 import { IAdminResponse } from '@/types/account';
 import { User } from '@medusajs/medusa';
+import { ERoutes } from '@/types/routes';
 
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(
@@ -48,8 +50,9 @@ const itemOverview = (
 ) =>
 	[
 		role === 'admin' && getItem('Quản lý nhân viên', 'overview-1', <Users />),
-		getItem('Quản lý sản phẩm', 'overview-2', <ClipboardPenLine />),
-		getItem('Đơn hàng của bạn', 'overview-3', <CalendarRange />),
+		role === 'admin' && getItem('Danh mục', 'overview-2', <LayoutList />),
+		getItem('Quản lý sản phẩm', 'overview-3', <ClipboardPenLine />),
+		getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
 		getItem('Label', 'overview-4', <Settings />, [
 			getItem('Option 5', '5'),
 			getItem('Option 6', '6'),
@@ -110,6 +113,7 @@ export const menuItems = (
 };
 
 export const menuRoutes: Record<string, string> = {
-	'overview-1': '/accounts',
-	'overview-2': '/products',
+	'overview-1': ERoutes.ACCOUNTS,
+	'overview-2': ERoutes.PRODUCT_CATEGORIES,
+	'overview-3': ERoutes.PRODUCTS,
 };

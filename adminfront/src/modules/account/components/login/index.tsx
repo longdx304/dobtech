@@ -34,11 +34,6 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 	const router = useRouter();
 	const { client } = useMedusa();
 
-	// async function setCookie(token: any) {
-	// 	"use server"
-	// 	console.log('clg', token);
-	// };
-
 	const { mutateAsync, isLoading } = useAdminLogin();
 
 	const onFinish: FormProps<FormValues>['onFinish'] = async (values) => {

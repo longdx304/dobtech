@@ -2,7 +2,6 @@
 
 // Authentication actions
 import { medusaClient } from '@/lib/database/config';
-
 import { ProductCategory } from '@medusajs/medusa';
 import { getMedusaHeaders } from './common';
 

@@ -7,6 +7,7 @@ interface Props extends FlexProps {
 	children: ReactNode;
 	wrap?: boolean;
 }
+
 export default function Flex({
 	className,
 	wrap = false,
@@ -14,7 +15,7 @@ export default function Flex({
 	...props
 }: Props) {
 	return (
-		<AntdFlex wrap={true} className={cn('', className)} {...props}>
+		<AntdFlex wrap={wrap} className={cn('', className)} {...props}>
 			{children}
 		</AntdFlex>
 	);

@@ -116,7 +116,6 @@ export async function createUser(payload: IUserRequest) {
 			headers
 		)
 		.then(async (data) => {
-			console.log(data)
 			if (!_.isEmpty(data.user)) {
 				// await setMetadata(user.id, { phone, rolesUser });
 				revalidateTag('users');

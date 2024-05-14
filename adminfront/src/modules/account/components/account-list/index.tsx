@@ -58,7 +58,6 @@ const AccountList = ({}: Props) => {
 
 	const handleDeleteUser = (userId: User['id']) => {
 		setUserId(userId);
-		console.log('userId', userId)
 		if (userId) {
 			Modal.confirm({
 				title: 'Bạn có muốn xoá nhân viên này không ?',
@@ -100,6 +99,7 @@ const AccountList = ({}: Props) => {
 		setCurrentPage(page);
 	};
 
+	
 	const columns = useMemo(
 		() => accountColumns({ handleDeleteUser, handleEditUser }),
 		[users]

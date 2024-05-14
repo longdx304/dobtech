@@ -1,6 +1,5 @@
 import { EPermissions } from '@/types/account';
-// import createUser from '../../fixtures/accounts/create-user';
-describe('template spec', () => {
+describe('Login spec', () => {
 	const email = 'testcreateuser@test.com';
 	const phone = '0102030405';
 	const phoneUpdated = '0102030406';
@@ -18,6 +17,7 @@ describe('template spec', () => {
 		cy.login('admin@test.com', '123456');
 		cy.wait(1000);
 		cy.visit('/accounts');
+		
 	});
 
 	it('should show new user when successfully created user', () => {

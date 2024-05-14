@@ -18,6 +18,8 @@ export interface IAdminResponse{
 	permissions: string;
 	api_token: string | null;
 	metadata: JSON | null;
+	permissions?: any;
+	phone: string;
 }
 
 export enum ERole {

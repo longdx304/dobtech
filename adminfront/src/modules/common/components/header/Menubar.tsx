@@ -13,9 +13,10 @@ interface Props {
 	user: Omit<User, 'password_hash'>;
 	className?: string;
 	remove: () => void;
+	onClose?: () => void;
 }
 
-const Menubar = ({ user, remove, className }: Props) => {
+const Menubar = ({ user, remove, className, onClose = () => {} }: Props) => {
 	const router = useRouter();
 	const [messageApi, contextHolder] = message.useMessage();
 	const { mutateAsync } = useAdminDeleteSession();
@@ -25,6 +26,7 @@ const Menubar = ({ user, remove, className }: Props) => {
 		const { key } = e;
 		if (menuRoutes[key]) {
 			router.push(menuRoutes[key]);
+			onClose();
 			return;
 		}
 	};

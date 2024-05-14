@@ -5,8 +5,8 @@ import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import { Tag } from '@/components/Tag';
+import { IAdminResponse, rolesEmployee } from '@/types/account';
 import { User as TUser } from '@medusajs/medusa';
-import { rolesEmployee } from '@/types/account';
 
 const COLOR_PERMISSION = {
 	'warehouse-manager': 'red',
@@ -17,11 +17,11 @@ const COLOR_PERMISSION = {
 };
 
 interface Props {
-	handleDeleteUser: (userId: TUser['id']) => void;
-	handleEditUser: (record: TUser) => void;
+	handleDeleteUser: (userId: IAdminResponse['id']) => void;
+	handleEditUser: (record: IAdminResponse) => void;
 }
 
-const accountColumns: TableProps<any>['columns'] = ({
+const accountColumns= ({
 	handleDeleteUser,
 	handleEditUser,
 }: Props) => [
@@ -41,15 +41,15 @@ const accountColumns: TableProps<any>['columns'] = ({
 			<Flex vertical gap="middle">
 				<Flex vertical>
 					<Text strong>{record.first_name}</Text>
-					<Text type="secondary" className="text-xs">
+					<Text typeStyle={'secondary'} className="text-xs">
 						{record.phone}
 					</Text>
 				</Flex>
 				<Flex wrap="wrap" gap="small">
-					{record?.permissions?.split(',').map((permission) => (
+					{record?.permissions?.split(',').map((permission: string[]) => (
 						<Tag
 							key={permission}
-							color={COLOR_PERMISSION[permission] as keyof COLOR_PERMISSION}
+							color={COLOR_PERMISSION[permission as keyof typeof COLOR_PERMISSION]}
 						>
 							{rolesEmployee.find((item) => item.value === permission)?.label}
 						</Tag>
