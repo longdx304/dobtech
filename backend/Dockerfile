@@ -1,6 +1,6 @@
 FROM node:20.11.0-alpine3.18
 
-WORKDIR /app/medusa
+WORKDIR /app
 
 COPY package.json .
 COPY develop.sh .
