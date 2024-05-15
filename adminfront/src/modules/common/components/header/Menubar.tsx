@@ -48,7 +48,6 @@ const Menubar = ({ user, remove, className, onClose = () => {} }: Props) => {
 	const handleDropdownClick = (e: any) => {
 		const { key } = e;
 		if (key === 'logout') {
-			removeCookie();
 			logOut();
 		}
 	};
