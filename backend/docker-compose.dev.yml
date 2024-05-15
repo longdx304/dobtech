@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+    backend:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        image: backend:dev
+        container_name: medusa-server
+        env_file:
+            - ./.env
+        depends_on:
+            - redis
+        ports:
+            - 9000:9000
+            - 7001:7001
+        volumes:
+            - ./backend:/app/medusa
+            - backend_node_modules:/app/medusa/node_modules
+
+    redis:
+        image: redis:7.0.7-alpine
+        restart: always
+        container_name: cache
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+
+volumes:
+    redis_data:
+    backend_node_modules:
