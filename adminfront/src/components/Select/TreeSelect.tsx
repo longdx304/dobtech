@@ -8,8 +8,8 @@ interface Props extends TreeSelectProps {
 	className?: string;
 	title: string;
 	treeData: any;
-	value: any;
-	onChange: (value: any) => void;
+	value?: any;
+	onChange?: (value: any) => void;
 	dataTestId: string;
 }
 

@@ -1,11 +1,7 @@
+import { Col, Form, Row } from 'antd';
 import { FC } from 'react';
-import { Row, Col, Form } from 'antd';
-import { CircleAlert } from 'lucide-react';
 
 import { Input, InputNumber } from '@/components/Input';
-import { TooltipIcon } from '@/components/Tooltip';
-import { Text } from '@/components/Typography';
-import { Select } from '@/components/Select';
 import { Switch } from '@/components/Switch';
 
 type Props = {
@@ -14,7 +10,6 @@ type Props = {
 };
 
 const VariantStock: FC<Props> = ({ form, field }) => {
-
 	return (
 		<Row gutter={[16, 4]} className="w-full text-gray-500">
 			<Col span={24}>
@@ -43,7 +38,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name={[field.name,'ean']}
+					name={[field.name, 'ean']}
 					label="Mã EAN (Mã vạch)"
 					className="mb-2"
 				>

@@ -1,15 +1,15 @@
-import { FC, useEffect } from 'react';
-import { Form, message, typeFormProps, Row, Col } from 'antd';
 import { Product } from '@medusajs/medusa';
+import { Form, FormProps, message } from 'antd';
 import { useAdminUpdateProduct } from 'medusa-react';
+import { FC, useEffect } from 'react';
 
+import { prepareImages } from '@/actions/images';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import { Upload } from '@/components/Upload';
+import { getErrorMessage } from '@/lib/utils';
 import ThumbnailForm from '@/modules/products/components/products-modal/components/ThumbnailForm';
-import { ThumbnailFormType } from '@/types/products';
-import { prepareImages } from '@/actions/images';
 import { FormImage } from '@/types/common';
+import { ThumbnailFormType } from '@/types/products';
 
 type Props = {
 	product: Product;
@@ -22,7 +22,12 @@ type ThumbnailFormProps = {
 	thumbnail: ThumbnailFormType;
 };
 
-const ThumbnailModal = ({ product, state, handleOk, handleCancel }) => {
+const ThumbnailModal: FC<Props> = ({
+	product,
+	state,
+	handleOk,
+	handleCancel,
+}) => {
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 	const updateProduct = useAdminUpdateProduct(product?.id);
@@ -44,7 +49,7 @@ const ThumbnailModal = ({ product, state, handleOk, handleCancel }) => {
 	) => {
 		// Prepped images thumbnail
 		if (values.thumbnail?.length) {
-			let payload = {};
+			let payload: Record<string, unknown> = {};
 			let preppedImages: FormImage[] = [];
 			try {
 				preppedImages = await prepareImages(values.thumbnail);

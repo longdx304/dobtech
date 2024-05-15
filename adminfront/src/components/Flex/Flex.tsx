@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 interface Props extends FlexProps {
 	className?: string;
 	children: ReactNode;
-	wrap?: boolean;
+	wrap?: any;
 }
 
 export default function Flex({

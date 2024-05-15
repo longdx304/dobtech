@@ -8,11 +8,9 @@ export const metadata: Metadata = {
 	description: 'Trang quản lý sản phẩm.',
 };
 
-interface Props {
-	searchParams: Record<string, unknown>;
-}
+interface Props {}
 
-export default async function Products({ searchParams }: Props) {
+export default async function Products({}: Props) {
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
 			<ManageProduct />

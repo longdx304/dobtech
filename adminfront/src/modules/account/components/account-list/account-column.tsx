@@ -41,12 +41,12 @@ const accountColumns= ({
 			<Flex vertical gap="middle">
 				<Flex vertical>
 					<Text strong>{record.first_name}</Text>
-					<Text typeStyle={'secondary'} className="text-xs">
+					<Text type={'secondary'} className="text-xs">
 						{record.phone}
 					</Text>
 				</Flex>
 				<Flex wrap="wrap" gap="small">
-					{record?.permissions?.split(',').map((permission: string[]) => (
+					{record?.permissions?.split(',').map((permission: string) => (
 						<Tag
 							key={permission}
 							color={COLOR_PERMISSION[permission as keyof typeof COLOR_PERMISSION]}

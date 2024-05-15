@@ -1,22 +1,21 @@
-import { FC, useState, useEffect } from 'react';
-import { Product, ProductCategory } from '@medusajs/medusa';
-import { Row, Col, message } from 'antd';
-import { Pencil, Trash2, Dot } from 'lucide-react';
+import { Product, ProductStatus } from '@medusajs/medusa';
+import { Col, Row, message } from 'antd';
+import { Dot, Pencil } from 'lucide-react';
 import {
-	useAdminSalesChannels,
-	useAdminProductCategories,
 	useAdminCollections,
+	useAdminProductCategories,
+	useAdminSalesChannels,
 	useAdminUpdateProduct,
 } from 'medusa-react';
+import { FC, useEffect, useState } from 'react';
 
-import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { Flex } from '@/components/Flex';
-import { Title, Text } from '@/components/Typography';
 import { ActionAbles } from '@/components/Dropdown';
-import useToggleState from '@/lib/hooks/use-toggle-state';
+import { Flex } from '@/components/Flex';
 import { Select } from '@/components/Select';
 import { Tag } from '@/components/Tag';
+import { Text, Title } from '@/components/Typography';
+import useToggleState from '@/lib/hooks/use-toggle-state';
 import GeneralModal from './edit-modals/GeneralModal';
 
 type Props = {
@@ -30,11 +29,12 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 		product?.status
 	);
 	const { state, onOpen, onClose } = useToggleState(false);
-	const { product_categories, isLoadingCategory } = useAdminProductCategories({
-		parent_category_id: 'null',
-		include_descendants_tree: true,
-		is_internal: false,
-	});
+	const { product_categories, isLoading: isLoadingCategory } =
+		useAdminProductCategories({
+			parent_category_id: 'null',
+			include_descendants_tree: true,
+			is_internal: false,
+		});
 	const { collections, isLoading: isLoadingCollection } = useAdminCollections();
 
 	useEffect(() => {
@@ -50,7 +50,7 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 		},
 	];
 
-	const handleMenuClick: MenuProps['onClick'] = ({ key }) => {};
+	// const handleMenuClick: MenuProps['onClick'] = ({ key }) => {};
 
 	// recursive function to convert categories to tree data
 	const convertCategoriesToTreeData = (categories: any) => {
@@ -74,7 +74,7 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 
 	const treeData = convertCategoriesToTreeData(product_categories);
 
-	const onChangeStatus = (value) => {
+	const onChangeStatus = (value: ProductStatus) => {
 		updateProduct.mutateAsync(
 			{ status: value },
 			{
@@ -98,7 +98,12 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 				<Col span={24}>
 					<Flex align="center" justify="space-between" className="flex-wrap">
 						<Title level={3}>{product?.title}</Title>
-						<Flex align="center" justify="flex-end" gap="40px" className="max-[390px]:w-full">
+						<Flex
+							align="center"
+							justify="flex-end"
+							gap="40px"
+							className="max-[390px]:w-full"
+						>
 							<Select
 								value={statusValue}
 								suffixIcon={null}
@@ -110,7 +115,11 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 										value: 'published',
 										label: (
 											<Flex justify="flex-start" align="center" gap="2px">
-												<Dot color="rgb(52 211 153)" size={20} className="w-[20px]" />
+												<Dot
+													color="rgb(52 211 153)"
+													size={20}
+													className="w-[20px]"
+												/>
 												<Text>{'Đã xuất bản'}</Text>
 											</Flex>
 										),
@@ -119,14 +128,18 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 										value: 'draft',
 										label: (
 											<Flex justify="flex-start" align="center" gap="2px">
-												<Dot color="rgb(156 163 175)" size={20} className="w-[20px]" />
+												<Dot
+													color="rgb(156 163 175)"
+													size={20}
+													className="w-[20px]"
+												/>
 												<Text>{'Bản nháp'}</Text>
 											</Flex>
 										),
 									},
 								]}
 							/>
-							<ActionAbles actions={actions} onMenuClick={handleMenuClick} />
+							<ActionAbles actions={actions} onMenuClick={() => {}} />
 						</Flex>
 					</Flex>
 				</Col>
@@ -143,7 +156,7 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 				handleCancel={onClose}
 				product={product}
 				treeData={treeData}
-				collections={collections}
+				collections={collections || []}
 			/>
 		</Card>
 	);
@@ -151,7 +164,7 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 
 export default GeneralInfo;
 
-const ProductTags = ({ product }: Props) => {
+const ProductTags = ({ product }: { product: Product }) => {
 	if (product?.tags?.length === 0) {
 		return null;
 	}

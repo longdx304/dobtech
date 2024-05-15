@@ -1,10 +1,10 @@
-import { FC } from 'react';
-import { Row, Col, Form } from 'antd';
+import { Col, Form, MenuProps, Row } from 'antd';
 import { Trash2 } from 'lucide-react';
+import { FC } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Upload } from '@/components/Upload';
 import { ActionAbles } from '@/components/Dropdown';
+import { Upload } from '@/components/Upload';
 
 interface Props {
 	form: any;
@@ -32,9 +32,9 @@ const MediaForm: FC<Props> = ({ form }) => {
 	};
 
 	const removeImage = (id: string) => {
-		const newMedia = media.filter((item) => item.id !== id);
+		const newMedia = media.filter((item: any) => item.id !== id);
 		form.setFieldValue(`media`, newMedia);
-	}
+	};
 
 	return (
 		<Row gutter={[16, 16]}>
@@ -66,7 +66,7 @@ const MediaForm: FC<Props> = ({ form }) => {
 						<h2 className="inter-large-semibold mb-small">Upload</h2>
 
 						<div className="gap-y-2xsmall flex flex-col">
-							{media.map((field, index) => {
+							{media.map((field: any, index: number) => {
 								return (
 									<Image
 										key={index}

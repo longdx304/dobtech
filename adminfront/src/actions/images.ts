@@ -26,7 +26,7 @@ export const prepareImages = async (images: FormImage[]) => {
     const files = uploadImages.map((i) => i.nativeFile)
     uploadedImgs = await Medusa.uploads
       .create(files)
-      .then(({ data }) => data.uploads)
+      .then(({ data }) => (data as any).uploads)
   }
 
   return [...existingImages, ...uploadedImgs]

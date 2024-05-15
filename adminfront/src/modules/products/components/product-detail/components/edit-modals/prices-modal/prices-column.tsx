@@ -5,6 +5,7 @@ import { currencies as CURRENCY_MAP } from '@/types/currencies';
 type Props = {
 	currencies: string[];
 	storeRegions: any;
+	prices: any;
 };
 
 /**
@@ -19,10 +20,10 @@ function useCurrencyMeta(
 		return CURRENCY_MAP[currencyCode?.toUpperCase()];
 	}
 
-	if (storeRegions) {
-		const region = regions.find((r) => r.id === regionId);
-		return CURRENCY_MAP[storeRegions!.currency_code.toUpperCase()];
-	}
+	// if (storeRegions) {
+	// 	const region = regions.find((r) => r.id === regionId);
+	// 	return CURRENCY_MAP[storeRegions!.currency_code.toUpperCase()];
+	// }
 }
 
 const PricesColumn = ({ currencies, storeRegions }: Props) => {
@@ -33,7 +34,7 @@ const PricesColumn = ({ currencies, storeRegions }: Props) => {
 			key: currency,
 			editable: true,
 			render: (price: any, record: any) => {
-				const currencyMeta = useCurrencyMeta(storeRegions, currency);
+				const currencyMeta = useCurrencyMeta(storeRegions, currency, '');
 				return (
 					<Flex align="center" justify="space-between">
 						<Text className="text-gray-500 font-medium">

@@ -3,11 +3,11 @@ import { Menu, message } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 
+import { removeCookie } from '@/actions/auth';
 import { ERoutes } from '@/types/routes';
 import { User } from '@medusajs/medusa';
 import { useAdminDeleteSession } from 'medusa-react';
 import { menuItems, menuRoutes } from './MenuItem';
-import { removeCookie } from '@/actions/auth';
 
 interface Props {
 	user: Omit<User, 'password_hash'>;
@@ -48,7 +48,7 @@ const Menubar = ({ user, remove, className, onClose = () => {} }: Props) => {
 	const handleDropdownClick = (e: any) => {
 		const { key } = e;
 		if (key === 'logout') {
-			removeCookie()
+			removeCookie();
 			logOut();
 		}
 	};

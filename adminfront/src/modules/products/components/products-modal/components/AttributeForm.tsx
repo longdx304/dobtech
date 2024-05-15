@@ -1,19 +1,15 @@
-import { FC } from 'react';
-import { Row, Col, Form } from 'antd';
+import { Col, Form, Row } from 'antd';
 import { CircleAlert } from 'lucide-react';
+import { FC } from 'react';
 
-import { Input, InputNumber } from '@/components/Input';
-import { TooltipIcon } from '@/components/Tooltip';
-import { Text } from '@/components/Typography';
-import { Select } from '@/components/Select';
-import { Switch } from '@/components/Switch';
 import { Flex } from '@/components/Flex';
+import { Input, InputNumber } from '@/components/Input';
+import { Select } from '@/components/Select';
+import { Text } from '@/components/Typography';
 
-type Props = {
-};
+type Props = {};
 
-const AttributeForm: FC<Props> = ({ }) => {
-
+const AttributeForm: FC<Props> = ({}) => {
 	return (
 		<Row gutter={[16, 4]} className="w-full text-gray-500">
 			<Col span={24} className="text-[12px]">
@@ -80,7 +76,10 @@ const AttributeForm: FC<Props> = ({ }) => {
 					labelCol={{ span: 24 }}
 					name={['customs', 'mid_code']}
 					label="Mã MID"
-					tooltip={{ title: 'Mã số điểm tiếp nhận', icon: <CircleAlert size={18} /> }}
+					tooltip={{
+						title: 'Mã số điểm tiếp nhận',
+						icon: <CircleAlert size={18} />,
+					}}
 					className="mb-2"
 				>
 					<Input placeholder="BDJSK39277W..." />
@@ -91,7 +90,10 @@ const AttributeForm: FC<Props> = ({ }) => {
 					labelCol={{ span: 24 }}
 					name={['customs', 'hs_code']}
 					label="Mã HS"
-					tooltip={{ title: 'Mã hệ thống phân loại hàng hóa', icon: <CircleAlert size={18} /> }}
+					tooltip={{
+						title: 'Mã hệ thống phân loại hàng hóa',
+						icon: <CircleAlert size={18} />,
+					}}
 					className="mb-2"
 				>
 					<Input placeholder="XDSKLAD9999.." />

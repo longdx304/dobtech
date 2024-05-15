@@ -1,15 +1,13 @@
-import { FC, useEffect } from 'react';
-import { Form, message, typeFormProps, Row, Col } from 'antd';
-import { Product, ProductCategory } from '@medusajs/medusa';
+import { AdminPostProductsProductReq, Product } from '@medusajs/medusa';
+import { Form, FormProps, message } from 'antd';
 import { useAdminUpdateProduct } from 'medusa-react';
+import { FC, useEffect } from 'react';
 
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import { Upload } from '@/components/Upload';
-import MediaForm from '@/modules/products/components/products-modal/components/MediaForm';
-import AttributeForm from '@/modules/products/components/products-modal/components/AttributeForm';
 import { getErrorMessage } from '@/lib/utils';
-import { DimensionsFormType, CustomsFormType } from '@/types/products';
+import AttributeForm from '@/modules/products/components/products-modal/components/AttributeForm';
+import { CustomsFormType, DimensionsFormType } from '@/types/products';
 
 type Props = {
 	product: Product;
@@ -21,9 +19,14 @@ type Props = {
 type AttributeFormProps = {
 	dimensions: DimensionsFormType;
 	customs: CustomsFormType;
-}
+};
 
-const AttributeModal = ({ product, state, handleOk, handleCancel }) => {
+const AttributeModal: FC<Props> = ({
+	product,
+	state,
+	handleOk,
+	handleCancel,
+}) => {
 	const [form] = Form.useForm();
 	const updateProduct = useAdminUpdateProduct(product?.id);
 	const [messageApi, contextHolder] = message.useMessage();
@@ -44,8 +47,10 @@ const AttributeModal = ({ product, state, handleOk, handleCancel }) => {
 		});
 	}, [product]);
 
-	const onFinish: FormProps<AttributeFormProps>['onFinish'] = async (values) => {
-		const payload = {
+	const onFinish: FormProps<AttributeFormProps>['onFinish'] = async (
+		values
+	) => {
+		const payload: AdminPostProductsProductReq = {
 			// Dimensions
 			width: values?.dimensions?.width || undefined,
 			length: values?.dimensions?.length || undefined,
@@ -54,7 +59,7 @@ const AttributeModal = ({ product, state, handleOk, handleCancel }) => {
 			// Customs
 			hs_code: values?.customs?.hs_code || undefined,
 			mid_code: values?.customs?.mid_code || undefined,
-			origin_country: values?.customs?.origin_country || undefined,
+			origin_country: values?.customs?.origin_country as any || undefined,
 		};
 
 		updateProduct.mutate(payload, {

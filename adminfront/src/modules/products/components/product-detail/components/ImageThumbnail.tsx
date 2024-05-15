@@ -61,7 +61,6 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 					message.error('Xoá thumbnail thất bại!');
 				}
 			},
-			confirmLoading: updateProduct.isLoading,
 			onCancel() {
 				console.log('Cancel');
 			},

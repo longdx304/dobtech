@@ -1,13 +1,11 @@
-import { FC } from 'react';
-import { Row, Col, Form } from 'antd';
+import { Col, Form, Row } from 'antd';
 import { CircleAlert } from 'lucide-react';
+import { FC } from 'react';
 
-import { Input, InputNumber } from '@/components/Input';
-import { TooltipIcon } from '@/components/Tooltip';
-import { Text } from '@/components/Typography';
-import { Select } from '@/components/Select';
-import { Switch } from '@/components/Switch';
 import { Flex } from '@/components/Flex';
+import { Input, InputNumber } from '@/components/Input';
+import { Select } from '@/components/Select';
+import { Text } from '@/components/Typography';
 
 type Props = {
 	form: any;
@@ -35,7 +33,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='width'
+					name="width"
 					label="Chiều rộng"
 					className="mb-2"
 				>
@@ -45,7 +43,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='length'
+					name="length"
 					label="Chiều dài"
 					className="mb-2"
 				>
@@ -55,7 +53,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='height'
+					name="height"
 					label="Chiều cao"
 					className="mb-2"
 				>
@@ -65,7 +63,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 			<Col xs={12} sm={6}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='weight'
+					name="weight"
 					label="Trọng lượng"
 					className="mb-2"
 				>
@@ -77,17 +75,18 @@ const VariantShipping: FC<Props> = ({ form }) => {
 					<Text className="text-sm text-gray-800 font-medium">
 						{'Hải quan'}
 					</Text>
-					<span>
-						{'Cấu hình nếu bạn đang vận chuyển quốc tế.'}
-					</span>
+					<span>{'Cấu hình nếu bạn đang vận chuyển quốc tế.'}</span>
 				</Flex>
 			</Col>
 			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='mid_code'
+					name="mid_code"
 					label="Mã MID"
-					tooltip={{ title: 'Mã số điểm tiếp nhận', icon: <CircleAlert size={18} /> }}
+					tooltip={{
+						title: 'Mã số điểm tiếp nhận',
+						icon: <CircleAlert size={18} />,
+					}}
 					className="mb-2"
 				>
 					<Input placeholder="BDJSK39277W..." />
@@ -96,9 +95,12 @@ const VariantShipping: FC<Props> = ({ form }) => {
 			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='hs_code'
+					name="hs_code"
 					label="Mã HS"
-					tooltip={{ title: 'Mã hệ thống phân loại hàng hóa', icon: <CircleAlert size={18} /> }}
+					tooltip={{
+						title: 'Mã hệ thống phân loại hàng hóa',
+						icon: <CircleAlert size={18} />,
+					}}
 					className="mb-2"
 				>
 					<Input placeholder="XDSKLAD9999.." />
@@ -107,7 +109,7 @@ const VariantShipping: FC<Props> = ({ form }) => {
 			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='origin_country'
+					name="origin_country"
 					label="Quốc gia xuất xứ"
 					className="mb-2"
 				>

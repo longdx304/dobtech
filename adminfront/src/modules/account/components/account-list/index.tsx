@@ -1,35 +1,26 @@
 'use client';
 import { User } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
-import { CircleAlert, Plus, Search } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import _ from 'lodash';
+import { CircleAlert, Plus, Search } from 'lucide-react';
 import { useAdminDeleteUser } from 'medusa-react';
+import { ChangeEvent, useMemo, useState } from 'react';
 
 import { FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { Table } from '@/components/Table';
-import useToggleState from '@/lib/hooks/use-toggle-state';
-import { updateSearchQuery } from '@/lib/utils';
-import { UserModal } from '@/modules/account/components/account-modal';
-import { IAdminResponse } from '@/types/account';
-import accountColumns from './account-column';
-import { TResponse } from '@/types/common';
-import { useAdminUsers } from 'medusa-react';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
+import { Table } from '@/components/Table';
 import { Title } from '@/components/Typography';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import { UserModal } from '@/modules/account/components/account-modal';
+import { IAdminResponse } from '@/types/account';
+import { useAdminUsers } from 'medusa-react';
+import accountColumns from './account-column';
 
-interface Props {
-	// data: TResponse<IAdminResponse> | null;
-}
+interface Props {}
 
 const AccountList = ({}: Props) => {
-	const searchParams = useSearchParams();
-	const { replace } = useRouter();
-	const pathname = usePathname();
-
 	const PAGE_SIZE = 10;
 
 	const [currentPage, setCurrentPage] = useState(1);
@@ -72,7 +63,6 @@ const AccountList = ({}: Props) => {
 				okType: 'danger',
 				okText: 'Đồng ý',
 				cancelText: 'Huỷ',
-				confirmLoading: deleteUser?.isLoading,
 				async onOk() {
 					deleteUser.mutateAsync(void 0, {
 						onSuccess: () => {
@@ -98,7 +88,6 @@ const AccountList = ({}: Props) => {
 		setCurrentPage(page);
 	};
 
-	
 	const columns = useMemo(
 		() => accountColumns({ handleDeleteUser, handleEditUser }),
 		[users]
@@ -139,7 +128,7 @@ const AccountList = ({}: Props) => {
 					pageSize: PAGE_SIZE,
 					current: currentPage as number,
 					onChange: handleChangePage,
-					showTotal: (total) => `Total ${total} items`
+					showTotal: (total) => `Total ${total} items`,
 					// showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
 				}}
 			/>

@@ -15,7 +15,6 @@ export default function TextArea({
 	rows = 3,
 	error,
 	className,
-	...props
 }: Props) {
 	return (
 		<Flex vertical gap={4} className="w-full">
@@ -23,7 +22,6 @@ export default function TextArea({
 				rows={rows}
 				size="large"
 				className={cn('p-3 gap-2', className)}
-				{...props}
 			/>
 			{error && <ErrorText error={error} />}
 		</Flex>

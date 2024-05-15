@@ -1,16 +1,18 @@
-import { FC, useEffect } from 'react';
-import { Form, message, typeFormProps, Row, Col } from 'antd';
-import { Product, ProductCategory, ProductCollection } from '@medusajs/medusa';
+import {
+	AdminPostProductsProductReq,
+	Product,
+	ProductCollection,
+} from '@medusajs/medusa';
+import { Form, FormProps, message } from 'antd';
 import { useAdminUpdateProduct } from 'medusa-react';
+import { FC, useEffect } from 'react';
 
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import { Upload } from '@/components/Upload';
-import MediaForm from '@/modules/products/components/products-modal/components/MediaForm';
+import { getErrorMessage } from '@/lib/utils';
 import GeneralForm from '@/modules/products/components/products-modal/components/GeneralForm';
 import OrganizeForm from '@/modules/products/components/products-modal/components/OrganizeForm';
-import { getErrorMessage } from '@/lib/utils';
-import { OrganizeFormType, GeneralFormType } from '@/types/products';
+import { GeneralFormType, OrganizeFormType } from '@/types/products';
 
 type Props = {
 	product: Product;
@@ -24,14 +26,21 @@ type Props = {
 type GeneralFormProps = {
 	general: GeneralFormType;
 	organize: OrganizeFormType;
-}
+};
 
-const GeneralModal = ({ product, state, handleOk, handleCancel, treeData, collections }) => {
+const GeneralModal: FC<Props> = ({
+	product,
+	state,
+	handleOk,
+	handleCancel,
+	treeData,
+	collections,
+}) => {
 	const [form] = Form.useForm();
 	const updateProduct = useAdminUpdateProduct(product?.id);
 	const [messageApi, contextHolder] = message.useMessage();
 
-	console.log(product)
+	console.log(product);
 	useEffect(() => {
 		form.setFieldsValue({
 			general: {
@@ -44,24 +53,21 @@ const GeneralModal = ({ product, state, handleOk, handleCancel, treeData, collec
 			organize: {
 				type: product?.type || '',
 				collection: product?.collection_id || '',
-				categories:
-					product?.categories?.map((category) => (
-						category.id,
-					)) || [],
+				categories: product?.categories?.map((category) => category.id) || [],
 				tags: product?.tags?.map((tag) => tag.value) || [],
 			},
 		});
 	}, [product]);
 
 	const onFinish: FormProps<GeneralFormProps>['onFinish'] = async (values) => {
-		const payload = {
+		const payload: AdminPostProductsProductReq = {
 			title: values?.general?.title,
 			subtitle: values?.general?.subtitle || undefined,
 			material: values?.general?.material || undefined,
 			handle: values?.general?.handle || undefined,
 			description: values?.general?.description || undefined,
 			discountable: values?.general?.discounted,
-			collection_id: values?.organize?.collection || undefined,
+			collection_id: (values?.organize?.collection as any) || undefined,
 			tags: values?.organize?.tags?.length
 				? values?.organize?.tags?.map((tag) => ({ value: tag }))
 				: undefined,
@@ -102,7 +108,11 @@ const GeneralModal = ({ product, state, handleOk, handleCancel, treeData, collec
 			</Title>
 			<Form form={form} onFinish={onFinish} className="pt-3">
 				<GeneralForm />
-				<OrganizeForm treeCategories={treeData} isEdit={true} productCollections={collections} />
+				<OrganizeForm
+					treeCategories={treeData}
+					isEdit={true}
+					productCollections={collections}
+				/>
 			</Form>
 		</SubmitModal>
 	);

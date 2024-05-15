@@ -1,20 +1,18 @@
+import { Flex } from '@/components/Flex';
 import { cn } from '@/lib/utils';
 import { Tooltip as AntdTooltip, TooltipProps } from 'antd';
-import { Text } from '@/components/Typography';
-import { Flex } from '@/components/Flex';
 
 type Props = TooltipProps & {
 	className?: string;
-	title: string;
+	title: string | React.ReactNode | any;
 	icon: React.ReactNode;
-	children: React.ReactNode;
+	children?: React.ReactNode;
 };
 
 export default function TooltipIcon({
 	title,
 	className,
 	icon,
-	label,
 	children,
 	...props
 }: Props) {

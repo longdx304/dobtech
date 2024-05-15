@@ -1,12 +1,12 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider } from 'antd';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
 
-import theme from '../theme';
 import { FeatureFlagProvider } from '@/lib/providers/feature-flag-provider';
 import { MedusaProvider } from '@/lib/providers/medusa-provider';
+import theme from '../theme';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -15,12 +15,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-	main,
-	login,
 	children,
 }: Readonly<{
-	main?: React.ReactNode;
-	login?: React.ReactNode;
 	children: React.ReactNode;
 }>) {
 	return (
@@ -29,9 +25,7 @@ export default async function RootLayout({
 				<AntdRegistry>
 					<ConfigProvider theme={theme}>
 						<MedusaProvider>
-							<FeatureFlagProvider>
-								{children}
-							</FeatureFlagProvider>
+							<FeatureFlagProvider>{children}</FeatureFlagProvider>
 						</MedusaProvider>
 					</ConfigProvider>
 				</AntdRegistry>

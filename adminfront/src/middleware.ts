@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { ERole } from '@/types/account';
-import { routesConfig, ERoutes } from '@/types/routes';
+import { ERoutes, routesConfig } from '@/types/routes';
+import { ERole } from './types/account';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
 
@@ -33,7 +33,10 @@ export async function middleware(request: NextRequest) {
 	// If route is public, program executing
 	if (isPublicRoute || pathname === ERoutes.LOGIN) {
 		if (!_.isEmpty(data)) {
-			return NextResponse.redirect(new URL(ERoutes.DASHBOARD, request.url), 307);
+			return NextResponse.redirect(
+				new URL(ERoutes.DASHBOARD, request.url),
+				307
+			);
 		}
 		return res;
 	}
@@ -70,10 +73,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: [
-		'/((?!api|_next/static|favicon.ico|manifest.json|sw*|workbox-*|ios*|.*\\.png$|.*\\.jpg$).*)',
-	],
-	// matcher: ['/accounts/:path*', '/products/:path*'],
+	// matcher: [
+	// 	'/((?!api|_next/static|favicon.ico|manifest.json|sw*|workbox-*|ios*|.*\\.png$|.*\\.jpg$).*)',
+	// ],
+	matcher: ['/admin/:path*', '/login'],
 	runtime: 'experimental-edge',
 	unstable_allowDynamic: ['**/node_modules/lodash*/**/*.js'],
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { ProductCategory } from '@medusajs/medusa';
+import { AdminPostProductCategoriesReq, ProductCategory } from '@medusajs/medusa';
 import { App, Col, Form, Row, message, type FormProps } from 'antd';
 import _ from 'lodash';
 import { Highlighter } from 'lucide-react';
@@ -38,7 +38,7 @@ const CategoryModal: React.FC<Props> = ({
 	refetch,
 }) => {
 	const createCategory = useAdminCreateProductCategory();
-	const updateCategory = useAdminUpdateProductCategory(category?.id);
+	const updateCategory = useAdminUpdateProductCategory(category?.id ?? '');
 	const [form] = Form.useForm();
 	// const { message } = App.useApp();
 
@@ -96,12 +96,12 @@ const CategoryModal: React.FC<Props> = ({
 	const onFinish: FormProps<TCategoryRequest>['onFinish'] = async (values) => {
 		// Create user
 		if (_.isEmpty(category)) {
-			const payload = {
+			const payload: Record<string, unknown> = {
 				...values,
 				parent_category_id: parentCategory?.id ?? null,
 			};
 			// const result = await createCategory(payload);
-			await createCategory.mutateAsync(payload, {
+			await createCategory.mutateAsync(payload as any, {
 				onSuccess: () => {
 					message.success('Đăng ký danh mục sản phẩm thành công');
 					refetch();
@@ -114,7 +114,7 @@ const CategoryModal: React.FC<Props> = ({
 		} else {
 			// Update user
 			// const result = await updateCategory(category.id, values);
-			updateCategory.mutateAsync(values, {
+			updateCategory.mutateAsync(values as any, {
 				onSuccess: () => {
 					message.success('Cập nhật danh mục sản phẩm thành công');
 					handleCancel();

@@ -1,17 +1,18 @@
-import { ProductCollection, Product } from '@medusajs/medusa';
-import { TableColumnsType, Modal as AntdModal, message } from 'antd';
-import { Dot, Trash2, Search, CircleAlert } from 'lucide-react';
-import { FC, useState, useEffect } from 'react';
+import { Product, ProductCollection } from '@medusajs/medusa';
+import { Modal as AntdModal, TableColumnsType, message } from 'antd';
 import _ from 'lodash';
+import { CircleAlert, Dot, Search, Trash2 } from 'lucide-react';
 import {
 	useAdminProducts,
 	useAdminRemoveProductsFromCollection,
 } from 'medusa-react';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 
-import { Modal } from '@/components/Modal';
-import { Table } from '@/components/Table';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
+import { Modal } from '@/components/Modal';
+import { Table } from '@/components/Table';
+import { getErrorMessage } from '@/lib/utils';
 
 type Props = {
 	state: boolean;
@@ -20,15 +21,7 @@ type Props = {
 	collection: ProductCollection | null;
 };
 
-interface DataType {
-	key: React.Key;
-	title: string;
-	status: string;
-}
-
-const columns: TableColumnsType<DataType> = ({
-	handleRemoveProduct,
-}: any) => [
+const columns = ({ handleRemoveProduct }: any) => [
 	{
 		title: 'Sản phẩm',
 		dataIndex: 'title',
@@ -60,7 +53,11 @@ const columns: TableColumnsType<DataType> = ({
 		key: 'action',
 		render: (_: string, record: Product) => (
 			<Flex justify="center" align="center" className="cursor-pointer">
-				<Trash2 size={18} color="#FF4D4F" onClick={() => handleRemoveProduct(record?.id)} />
+				<Trash2
+					size={18}
+					color="#FF4D4F"
+					onClick={() => handleRemoveProduct(record?.id)}
+				/>
 			</Flex>
 		),
 	},
@@ -76,13 +73,14 @@ const ManageProductModal: FC<Props> = ({
 }) => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [searchValue, setSearchValue] = useState('');
-	const { products, isLoading, isRefetching, count, refetch } = useAdminProducts({
-		q: searchValue || undefined,
-		limit: PAGE_SIZE,
-		collection_id: [collection?.id ?? ''],
-		offset: (currentPage - 1) * PAGE_SIZE,
-	});
-	const removeProducts = useAdminRemoveProductsFromCollection(collection?.id);
+	const { products, isLoading, isRefetching, count, refetch } =
+		useAdminProducts({
+			q: searchValue || undefined,
+			limit: PAGE_SIZE,
+			collection_id: [collection?.id ?? ''],
+			offset: (currentPage - 1) * PAGE_SIZE,
+		});
+	const removeProducts = useAdminRemoveProductsFromCollection(collection!.id);
 
 	const handleRemoveProduct = (productId: string) => {
 		AntdModal.confirm({
@@ -116,7 +114,6 @@ const ManageProductModal: FC<Props> = ({
 				);
 			},
 			onCancel() {},
-		
 		});
 	};
 
@@ -124,7 +121,7 @@ const ManageProductModal: FC<Props> = ({
 		if (state) {
 			refetch();
 		}
-	}, [state])
+	}, [state]);
 
 	const columnsTable = columns({ handleRemoveProduct });
 

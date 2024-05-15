@@ -1,16 +1,16 @@
-import { FC, useMemo, useState, useEffect } from 'react';
 import { Product, Region } from '@medusajs/medusa';
+import { FC, useEffect, useMemo, useState } from 'react';
 
 import { Table } from '@/components/Table';
 import PricesColumn from './prices-column';
-import { EditableRow, EditableCell } from './prices-components';
+import { EditableCell, EditableRow } from './prices-components';
 
 type Props = {
 	product: Product;
 	currencies: string[];
 	regions: string[];
-	onPriceUpdate: (prices: Record<string, number | undefined>) => void;
-	storeRegions: Region;
+	onPriceUpdate: (prices: Record<string, number | undefined>[]) => void;
+	storeRegions: Region[] | undefined;
 	setIsCancel: (action: boolean) => void;
 	isCancel: boolean;
 };
@@ -22,9 +22,9 @@ const EditPricesTable: FC<Props> = ({
 	onPriceUpdate,
 	storeRegions,
 	isCancel,
-	setIsCancel
+	setIsCancel,
 }) => {
-	const [dataSource, setDataSource] = useState(null);
+	const [dataSource, setDataSource] = useState<any>(null);
 
 	const components = {
 		body: {
@@ -39,7 +39,7 @@ const EditPricesTable: FC<Props> = ({
 
 	const handleSave = (row: any) => {
 		setIsCancel(false);
-		const newVariants = [...dataSource];
+		const newVariants = [...(dataSource as any)];
 		const indexVariant = newVariants.findIndex(
 			(variant) => row.id === variant.id
 		);
@@ -49,7 +49,7 @@ const EditPricesTable: FC<Props> = ({
 			...row,
 		});
 
-		setDataSource(newVariants);
+		setDataSource(newVariants as any);
 		onPriceUpdate(newVariants);
 	};
 
@@ -59,13 +59,13 @@ const EditPricesTable: FC<Props> = ({
 			prices: product?.variants ?? [],
 			storeRegions,
 		});
-		const onCellColumn = pricesColumn.map((column) => {
+		const onCellColumn = pricesColumn.map((column: any) => {
 			if (!column?.editable) {
 				return column;
 			}
 			return {
 				...column,
-				onCell: (record) => ({
+				onCell: (record: any) => ({
 					record,
 					editable: column.editable,
 					dataIndex: column.dataIndex,
@@ -85,13 +85,16 @@ const EditPricesTable: FC<Props> = ({
 			setDataSource([]);
 			return;
 		}
-		variants.forEach((variant) => {
-			variant.pricesFormat = variant.prices.reduce((acc, price) => {
-				acc[price.currency_code] = price.amount;
-				return acc;
-			}, {});
+		variants.forEach((variant: any) => {
+			variant.pricesFormat = variant.prices.reduce(
+				(acc: Record<string, number>, price: any) => {
+					acc[price.currency_code] = price.amount;
+					return acc;
+				},
+				{}
+			);
 		});
-		setDataSource(variants);
+		setDataSource(variants as any);
 		return;
 	};
 

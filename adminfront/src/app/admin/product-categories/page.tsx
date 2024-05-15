@@ -8,12 +8,9 @@ export const metadata: Metadata = {
 	description: 'Categories Page',
 };
 
-interface Props {
-	searchParams: Record<string, unknown>;
-}
+interface Props {}
 
-export default async function ProductCategories({ searchParams }: Props) {
-
+export default async function ProductCategories({}: Props) {
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
 			<CategoryList />

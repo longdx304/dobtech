@@ -1,7 +1,8 @@
-import { Typography, TypographyProps } from 'antd';
+import { Typography } from 'antd';
 import { cn } from '@/lib/utils';
+import { ParagraphProps } from 'antd/es/typography/Paragraph';
 
-interface Props extends TypographyProps {
+interface Props extends ParagraphProps {
 	className?: string;
 	children?: React.ReactNode;
 }

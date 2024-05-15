@@ -1,8 +1,9 @@
 import { cn } from '@/lib/utils';
-import { Typography } from 'antd';
+import { Typography, TypographyProps } from 'antd';
+import { TextProps } from 'antd/es/typography/Text';
 import { ReactNode } from 'react';
 
-interface Props {
+type Props = TextProps & {
 	className?: string;
 	children?: ReactNode;
 	strong?: boolean;

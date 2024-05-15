@@ -1,12 +1,12 @@
-import { FC } from 'react';
-import { Row, Col, Form } from 'antd';
+import { Col, Form, Row } from 'antd';
 import { CircleAlert } from 'lucide-react';
-import { Product } from '@medusajs/client-types';
+import { FC } from 'react';
 
 import { Input } from '@/components/Input';
+import { Select } from '@/components/Select';
 import { TooltipIcon } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
-import { Select } from '@/components/Select';
+import { Product } from '@medusajs/medusa';
 
 type Props = {
 	form: any;
@@ -40,9 +40,9 @@ const VariantGeneral: FC<Props> = ({ form, options }) => {
 			</Col>
 			{options.map((option: any, index: number) => {
 				const optionsSelect = option.values
-					.map((value) => value.value)
-					.filter((v, index, self) => self.indexOf(v) === index)
-					.map((value) => ({
+					.map((value: any) => value.value)
+					.filter((v: any, index: any, self: any) => self.indexOf(v) === index)
+					.map((value: any) => ({
 						value,
 						label: value,
 					}));

@@ -1,15 +1,15 @@
-import { FC, useEffect } from 'react';
-import { Form, message, typeFormProps, Row, Col } from 'antd';
 import { Product } from '@medusajs/medusa';
+import { Form, FormProps, message } from 'antd';
 import { useAdminUpdateProduct } from 'medusa-react';
+import { FC, useEffect } from 'react';
 
+import { prepareImages } from '@/actions/images';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import { Upload } from '@/components/Upload';
 import MediaForm from '@/modules/products/components/products-modal/components/MediaForm';
-import { MediaFormType } from '@/types/products';
 import { FormImage } from '@/types/common';
-import { prepareImages } from '@/actions/images';
+import { MediaFormType } from '@/types/products';
+import { getErrorMessage } from '@/lib/utils';
 
 type Props = {
 	product: Product;
@@ -22,7 +22,7 @@ type MediaFormProps = {
 	media: MediaFormType;
 };
 
-const MediaModal = ({ product, state, handleOk, handleCancel }) => {
+const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 	const updateProduct = useAdminUpdateProduct(product?.id);
@@ -42,12 +42,12 @@ const MediaModal = ({ product, state, handleOk, handleCancel }) => {
 
 	const onFinish: FormProps<MediaFormProps>['onFinish'] = async (values) => {
 		if (values.media?.length) {
-			let payload = {};
+			let payload: Record<string, unknown> = {};
 			let preppedImages: FormImage[] = [];
 			try {
 				preppedImages = await prepareImages(values.media);
 			} catch (error) {
-				console.log('err', error)
+				console.log('err', error);
 				messageApi.error('Đã xảy ra lỗi khi tải hình ảnh lên.');
 				return;
 			}

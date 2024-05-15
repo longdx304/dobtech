@@ -8,14 +8,14 @@ interface Props extends InputNumberProps {
 }
 
 export default function InputNumber({ className, ...props }: Props) {
-	const formatter = (value) => {
+	const formatter = (value: any) => {
     if (value) {
       return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
     return value;
   };
 
-  const parser = (value) => {
+  const parser = (value: any) => {
     return value.replace(/\$\s?|(,*)/g, '');
   };
 

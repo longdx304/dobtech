@@ -1,13 +1,13 @@
+import { Col, Form, Row } from 'antd';
+import { CircleAlert, CircleCheck, Plus, Trash2 } from 'lucide-react';
 import { FC, useMemo } from 'react';
-import { Row, Col, Form } from 'antd';
-import { Plus, CircleAlert, Trash2, CircleCheck } from 'lucide-react';
 
-import { Flex } from '@/components/Flex';
 import { Button } from '@/components/Button';
-import { Text } from '@/components/Typography';
+import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
-import { TooltipIcon } from '@/components/Tooltip';
 import { Select } from '@/components/Select';
+import { TooltipIcon } from '@/components/Tooltip';
+import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import AddVariantModal from './AddVariantModal';
 
@@ -15,7 +15,7 @@ interface Props {
 	form: any;
 }
 
-const AddVariant = ({ form }) => {
+const AddVariant: FC<Props> = ({ form }) => {
 	const options = Form.useWatch('options', form) || undefined;
 
 	/**
@@ -29,7 +29,7 @@ const AddVariant = ({ form }) => {
 	const disabledBtnAddVariant = useMemo(() => {
 		if (options?.length > 0) {
 			return options.some(
-				(option) => !option?.title || option?.values?.length === 0
+				(option: any) => !option?.title || option?.values?.length === 0
 			);
 		}
 		return true;
@@ -89,7 +89,7 @@ type AddOptionsProps = {
 	form: any;
 };
 
-const AddOptions: FC<> = ({ form }) => {
+const AddOptions: FC<AddOptionsProps> = ({ form }) => {
 	return (
 		<Form.List name="options">
 			{(fields, { add, remove }, { errors }) => (
@@ -168,7 +168,7 @@ const AddOptions: FC<> = ({ form }) => {
 							</Col>
 						</Row>
 					))}
-					<div span={24} className="w-full">
+					<div className="w-full">
 						<Form.Item>
 							<Button
 								type="default"
@@ -222,7 +222,12 @@ const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant }) => {
 					)}
 					{fields.map((field, index) => {
 						return (
-							<Row key={field.key} gap="small" gutter={[16, 16]} wrap={false} align="middle">
+							<Row
+								key={field.key}
+								gutter={[16, 16]}
+								wrap={false}
+								align="middle"
+							>
 								<Col flex="200px">
 									{variants[index]?.title && (
 										<Flex vertical gap="2px" justify="center">
@@ -310,7 +315,7 @@ const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant }) => {
 							</Row>
 						);
 					})}
-					<div span={24} className="w-full">
+					<div className="w-full">
 						<Form.Item>
 							<Button
 								type="default"

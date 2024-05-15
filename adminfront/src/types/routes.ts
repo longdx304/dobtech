@@ -2,11 +2,11 @@ import { EPermissions } from './account';
 
 export enum ERoutes {
 	LOGIN = '/login',
-	HOME = '/',
-	ACCOUNTS = '/accounts',
-	PRODUCTS = '/products',
-	DASHBOARD = '/dashboard',
-	PRODUCT_CATEGORIES = '/product-categories',
+	HOME = '/admin',
+	ACCOUNTS = '/admin/accounts',
+	PRODUCTS = '/admin/products',
+	DASHBOARD = '/admin/dashboard',
+	PRODUCT_CATEGORIES = '/admin/product-categories',
 }
 
 export interface TRouteConfig {

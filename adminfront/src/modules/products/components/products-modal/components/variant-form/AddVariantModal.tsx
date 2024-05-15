@@ -54,8 +54,8 @@ const AddVariantModal: FC<Props> = ({
 	const handleOnOk = () => {
 		// Validate options
 		const optionsValidate = options
-			?.filter((item) => item)
-			.map((option, index) => [
+			?.filter((item: any) => item)
+			.map((option: any, index: number) => [
 				'variants',
 				field.name,
 				'options',
@@ -66,7 +66,7 @@ const AddVariantModal: FC<Props> = ({
 		// Validate with form antd
 		form
 			.validateFields([['variants', field.name, 'title'], ...optionsValidate])
-			.then((values) => {
+			.then((values: any) => {
 				const currentValues = values.variants[field.name];
 
 				// Remove current variant from variants
@@ -96,7 +96,7 @@ const AddVariantModal: FC<Props> = ({
 						]);
 					isExistVariantOptions &&
 						form.setFields(
-							optionsValidate.map((option) => ({
+							optionsValidate.map((option: any) => ({
 								name: option,
 								errors: ['Một phiên bản với những tuỳ chọn này đã tồn tại.'],
 							}))
@@ -114,7 +114,7 @@ const AddVariantModal: FC<Props> = ({
 			confirmLoading={false}
 			handleCancel={handleCancel}
 			width={600}
-			form={form}
+			// form={form}
 		>
 			<Title level={3} className="text-center">
 				{'Tạo phiên bản'}

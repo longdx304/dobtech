@@ -1,9 +1,9 @@
 'use client';
 import { Skeleton } from 'antd';
 import { Menu } from 'lucide-react';
+import { useAdminGetSession } from 'medusa-react';
 import Image from 'next/image';
 import { FC } from 'react';
-import { useAdminGetSession } from 'medusa-react';
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -11,16 +11,13 @@ import { Flex } from '@/components/Flex';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import useScrollDirection from '@/lib/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
-import { IAdminResponse } from '@/types/account';
+import { ERoutes } from '@/types/routes';
+import { User } from '@medusajs/medusa';
+import Link from 'next/link';
 import DrawerMenu from './DrawerMenu';
 import Menubar from './Menubar';
-import SkeletonMenu from './SkeletonMenu';
-import Link from 'next/link';
-import { ERoutes } from '@/types/routes';
 
-interface Props {
-	// user: IAdminResponse;
-}
+interface Props {}
 
 const Header: FC<Props> = ({}) => {
 	const { state, onClose, onOpen } = useToggleState(false);
@@ -61,13 +58,17 @@ const Header: FC<Props> = ({}) => {
 					/>
 				</Flex>
 				{/* Desktop: Content Menu */}
-				<Menubar user={user} remove={remove} className="hidden sm:block" />
+				<Menubar
+					user={user as Omit<User, 'password_hash'>}
+					remove={remove}
+					className="hidden sm:block"
+				/>
 				{/* Mobile: Drawer menu */}
 				<DrawerMenu
 					state={state}
 					onOpen={onOpen}
 					onClose={onClose}
-					user={user}
+					user={user as Omit<User, 'password_hash'>}
 				/>
 			</Skeleton>
 		</Card>

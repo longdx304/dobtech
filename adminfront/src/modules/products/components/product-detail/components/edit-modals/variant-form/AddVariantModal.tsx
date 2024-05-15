@@ -70,7 +70,7 @@ const AddVariantModal: FC<Props> = ({
 	];
 
 	useEffect(() => {
-		setDefaultActiveKey(['general'])
+		setDefaultActiveKey(['general']);
 		if (variant) {
 			if (typeVariant === 'UPDATE') {
 				form.setFieldsValue({
@@ -131,7 +131,9 @@ const AddVariantModal: FC<Props> = ({
 
 	const onFinish: FormProps<VariantFormType>['onFinish'] = async (values) => {
 		try {
-			const payload = createAddPayload(values);
+			const payload:
+				| AdminPostProductsProductVariantsReq
+				| AdminPostProductsProductVariantsVariantReq = createAddPayload(values);
 			// Update variant
 
 			if (typeVariant === 'UPDATE' && variant) {
@@ -154,9 +156,9 @@ const AddVariantModal: FC<Props> = ({
 				);
 				return;
 			}
-			if (['COPY', 'CREATE'].includes(typeVariant)) {
+			if (['COPY', 'CREATE'].includes(typeVariant || '')) {
 				// Create variant
-				createVariant.mutate(payload, {
+				createVariant.mutate(payload as AdminPostProductsProductVariantsReq, {
 					onSuccess: ({ product }) => {
 						messageApi.success('Tạo phiên bản thành công');
 						handleOk();
@@ -220,7 +222,7 @@ const createAddPayload = (
 		options: data.options.map((option) => ({
 			option_id: option.option_id,
 			value: option.value[0],
-		})),
+		}) as any),
 		prices: [],
 		inventory_quantity: data?.inventory_quantity || 0,
 	};

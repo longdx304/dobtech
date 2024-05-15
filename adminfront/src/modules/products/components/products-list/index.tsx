@@ -21,6 +21,7 @@ import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ProductModal } from '../products-modal';
 import productsColumns from './products-column';
+import { ERoutes } from '@/types/routes';
 
 const PAGE_SIZE = 10;
 
@@ -50,7 +51,7 @@ const ProductList = ({}: Props) => {
 		useAdminCollections();
 
 	const handleEditProduct = (record: Product) => {
-		router.push(`/products/${record.id}`);
+		router.push(`${ERoutes.PRODUCTS}/${record.id}`);
 	};
 
 	const handleCloseModal = () => {

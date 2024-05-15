@@ -1,22 +1,20 @@
 'use client';
 import { ProductCategory } from '@medusajs/medusa';
-import {
-	useAdminProductCategories,
-	useAdminDeleteProductCategory,
-	useMedusa,
-} from 'medusa-react';
-import { App, Divider, Modal, message } from 'antd';
+import { Divider, Modal, message } from 'antd';
 import _ from 'lodash';
 import {
 	ChevronDown,
 	CircleAlert,
 	GripVertical,
-	Plus,
-	Search,
+	Plus
 } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import {
+	useAdminDeleteProductCategory,
+	useAdminProductCategories,
+	useMedusa,
+} from 'medusa-react';
 import { useCallback, useMemo, useState } from 'react';
-import Nestable, { Item } from 'react-nestable';
+import Nestable from 'react-nestable';
 import 'react-nestable/dist/styles/index.css';
 import '../../styles/product-categories.css';
 
@@ -26,8 +24,6 @@ import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import CategoryItem from '../category-item';
 import CategoryModal from '../category-modal';
-import { Flex } from '@/components/Flex';
-import { Input } from '@/components/Input';
 
 interface Props {}
 
@@ -62,7 +58,7 @@ const CategoryList = () => {
 		parent_category_id: 'null',
 		include_descendants_tree: true,
 	});
-	const deleteCategory = useAdminDeleteProductCategory(categoryId);
+	const deleteCategory = useAdminDeleteProductCategory(categoryId!);
 
 	// Handle move item category
 	const onItemDrop = useCallback(
@@ -137,7 +133,6 @@ const CategoryList = () => {
 			okType: 'danger',
 			okText: 'Đồng ý',
 			cancelText: 'Huỷ',
-			confirmLoading: deleteCategory.isLoading,
 			async onOk() {
 				await deleteCategory.mutateAsync(void 0, {
 					onSuccess: () => {

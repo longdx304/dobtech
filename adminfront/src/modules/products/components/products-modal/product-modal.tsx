@@ -1,48 +1,39 @@
 'use client';
 
 import {
-	BadgeDollarSign,
-	CandlestickChart,
-	Layers,
-	Palette,
-	Sigma,
-	UserRound,
-	Plus,
-	Minus,
-} from 'lucide-react';
+	AdminPostProductsReq,
+	Product,
+	ProductCategory,
+	ProductCollection
+} from '@medusajs/medusa';
 import type { CollapseProps } from 'antd';
 import { Form, message, type FormProps } from 'antd';
-import _ from 'lodash';
-import { useEffect, useState } from 'react';
-import { AdminPostProductsReq, ProductVariant, ProductCategory, ProductCollection, Product } from '@medusajs/medusa';
+import {
+	Minus,
+	Plus
+} from 'lucide-react';
 import { useAdminCreateProduct } from 'medusa-react';
 import { redirect } from 'next/navigation';
 
-
-import { createProduct, updateProduct } from '@/actions/products';
 import { prepareImages } from '@/actions/images';
-import { Input, InputNumber } from '@/components/Input';
-import { SubmitModal } from '@/components/Modal';
 import { Collapse } from '@/components/Collapse';
 import { Flex } from '@/components/Flex';
-import { Select, TreeSelect } from '@/components/Select';
+import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import {
-	IProductRequest,
-	IProductResponse,
-	NewProductForm,
-	ProductStatus,
-} from '@/types/products';
+import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import { FormImage } from '@/types/common';
 import {
-	GeneralForm,
-	OrganizeForm,
+	NewProductForm,
+	ProductStatus
+} from '@/types/products';
+import {
 	AttributeForm,
-	ThumbnailForm,
+	GeneralForm,
 	MediaForm,
+	OrganizeForm,
+	ThumbnailForm,
 } from './components';
 import { AddVariant } from './components/variant-form';
-import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 
 interface Props {
 	state: boolean;
@@ -116,7 +107,7 @@ export default function ProductModal({
 					type: 'success',
 					content: 'Thêm sản phẩm thành công.',
 				});
-				redirect(`/products/${product.id}`)
+				redirect(`/products/${product.id}`);
 				handleOk();
 			},
 			onError: (error) => {
@@ -163,7 +154,12 @@ export default function ProductModal({
 		{
 			key: 'organizeForm',
 			label: 'Phân loại',
-			children: <OrganizeForm treeCategories={treeData} productCollections={productCollections} />,
+			children: (
+				<OrganizeForm
+					treeCategories={treeData}
+					productCollections={productCollections}
+				/>
+			),
 		},
 		{
 			key: 'variantForm',
@@ -231,7 +227,7 @@ const createPayload = (
 		discountable: data?.general?.discounted,
 		is_giftcard: false,
 		// Organize
-		collection_id: data?.organize?.collection || undefined,
+		collection_id: (data?.organize?.collection as any) || undefined,
 		categories: data?.organize?.categories?.length
 			? data.organize.categories.map((id) => ({ id }))
 			: undefined,
@@ -280,52 +276,13 @@ const createPayload = (
 		// Customs
 		hs_code: data?.customs?.hs_code || undefined,
 		mid_code: data?.customs?.mid_code || undefined,
-		origin_country: data?.customs?.origin_country || undefined,
+		origin_country: (data?.customs?.origin_country as any) || undefined,
 
 		// @ts-ignore
 		status: publish ? ProductStatus.PUBLISHED : ProductStatus.DRAFT,
 	};
 
 	return payload;
-};
-
-const createBlank = (): NewProductForm => {
-	return {
-		general: {
-			title: '',
-			material: null,
-			subtitle: null,
-			description: null,
-			handle: '',
-		},
-		customs: {
-			hs_code: null,
-			mid_code: null,
-			origin_country: null,
-		},
-		dimensions: {
-			height: null,
-			length: null,
-			weight: null,
-			width: null,
-		},
-		discounted: {
-			value: true,
-		},
-		media: [],
-		organize: {
-			categories: null,
-			collection: null,
-			tags: null,
-			type: null,
-		},
-		// salesChannels: {
-		//   channels: [],
-		// },
-		thumbnail: [],
-		variants: [],
-		options: [],
-	};
 };
 
 // const getVariantPrices = (prices: PricesFormType) => {

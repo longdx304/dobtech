@@ -2,8 +2,6 @@ import { Metadata } from 'next';
 
 import { Flex } from '@/components/Flex';
 import ProductDetail from '@/modules/products/components/product-detail';
-import { listCategories } from '@/actions/productCategories';
-import ManageProduct from '@/modules/products/components/manage-product';
 
 export const metadata: Metadata = {
 	title: 'Chi tiết sản phẩm',
@@ -15,7 +13,6 @@ interface Props {
 }
 
 export default async function ProductDetailPage({ params }: Props) {
-
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
 			<ProductDetail id={params.id} />

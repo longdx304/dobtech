@@ -1,17 +1,17 @@
+// @ts-nocheck
+import { currencies as CURRENCY_MAP } from '@/types/currencies';
+import { Region } from '@medusajs/medusa';
+import type { GetRef, InputRef } from 'antd';
+import { Form, InputNumber, message } from 'antd';
 import {
 	FC,
-	useMemo,
+	ReactNode,
 	createContext,
-	useState,
-	useRef,
 	useContext,
 	useEffect,
-	ReactNode,
+	useRef,
+	useState,
 } from 'react';
-import { currencies as CURRENCY_MAP } from '@/types/currencies';
-import { Form, InputNumber, message } from 'antd';
-import type { GetRef, InputRef } from 'antd';
-import { Region } from '@medusajs/medusa';
 
 type FormInstance<T> = GetRef<typeof Form<T>>;
 
@@ -42,10 +42,10 @@ function useCurrencyMeta(
 		return CURRENCY_MAP[currencyCode?.toUpperCase()];
 	}
 
-	if (storeRegions) {
-		const region = regions.find((r) => r.id === regionId);
-		return CURRENCY_MAP[storeRegions!.currency_code.toUpperCase()];
-	}
+	// if (storeRegions) {
+	// 	const region = regions.find((r) => r.id === regionId);
+	// 	return CURRENCY_MAP[storeRegions!.currency_code.toUpperCase()];
+	// }
 }
 
 interface EditableCellProps {
@@ -120,7 +120,7 @@ export const EditableCell: FC<EditableCellProps> = ({
 				},
 			});
 		}
-	}, [record, dataIndex])
+	}, [record, dataIndex]);
 	if (editable) {
 		childNode = editing ? (
 			<Form.Item

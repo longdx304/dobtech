@@ -1,9 +1,9 @@
 import { FC, useMemo, useState } from 'react';
-import { Product } from '@medusajs/client-types';
+// import { Product } from '@medusajs/client-types';
 import { Row, Col, Empty, Modal, message, MenuProps } from 'antd';
 import { Plus, CircleDollarSign, Settings, CircleAlert } from 'lucide-react';
 import { useAdminDeleteVariant } from 'medusa-react';
-import { ProductVariant } from '@medusajs/medusa';
+import { ProductVariant, Product } from '@medusajs/medusa';
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -103,7 +103,6 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 			okType: 'danger',
 			okText: 'Đồng ý',
 			cancelText: 'Huỷ',
-			confirmLoading: deleteVariant.isLoading,
 			async onOk() {
 				try {
 					deleteVariant.mutate(variantId, {
@@ -152,7 +151,7 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 							})`}</Text>
 							<Table
 								scroll={{ x: 400 }}
-								columns={columns}
+								columns={columns as any}
 								dataSource={product?.variants ?? []}
 								rowKey="id"
 								pagination={false}

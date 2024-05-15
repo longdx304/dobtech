@@ -1,11 +1,7 @@
+import { Col, Form, Row } from 'antd';
 import { FC } from 'react';
-import { Row, Col, Form } from 'antd';
-import { CircleAlert } from 'lucide-react';
 
 import { Input, InputNumber } from '@/components/Input';
-import { TooltipIcon } from '@/components/Tooltip';
-import { Text } from '@/components/Typography';
-import { Select } from '@/components/Select';
 import { Switch } from '@/components/Switch';
 
 type Props = {
@@ -14,7 +10,6 @@ type Props = {
 };
 
 const VariantStock: FC<Props> = ({ form, field }) => {
-
 	return (
 		<Row gutter={[16, 4]} className="w-full text-gray-500">
 			<Col span={24}>
@@ -23,7 +18,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='sku'
+					name="sku"
 					label="Đơn vị quản lý hàng tồn kho (SKU)"
 					className="mb-2"
 				>
@@ -33,7 +28,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='inventory_quantity'
+					name="inventory_quantity"
 					label="Số lượng trong kho"
 					className="mb-2"
 				>
@@ -43,7 +38,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='ean'
+					name="ean"
 					label="Mã EAN (Mã vạch)"
 					className="mb-2"
 				>
@@ -53,7 +48,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='upc'
+					name="upc"
 					label="Mã UPC (Mã vạch)"
 					className="mb-2"
 				>
@@ -63,7 +58,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
-					name='barcode'
+					name="barcode"
 					label="Mã vạch"
 					className="mb-2"
 				>
@@ -72,7 +67,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 			</Col>
 			<Col span={24}>
 				<Form.Item
-					name='manage_inventory'
+					name="manage_inventory"
 					label="Quản lý hàng tồn kho"
 					initialValue={true}
 					className="justify-end mb-0"
@@ -84,7 +79,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 			</Col>
 			<Col span={24}>
 				<Form.Item
-					name='allow_backorder'
+					name="allow_backorder"
 					label="Cho phép đặt hàng trước"
 					initialValue={false}
 					className="mb-0"

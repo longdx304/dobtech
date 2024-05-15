@@ -35,7 +35,7 @@ export default function UserModal({
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 	const createUser = useAdminCreateUser();
-	const updateUser = useAdminUpdateUser(user?.id);
+	const updateUser = useAdminUpdateUser(user?.id ?? '');
 
 	const titleModal = `${_.isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
 

@@ -1,11 +1,11 @@
-import { FC } from 'react';
-import { Row, Col, Form } from 'antd';
+import { Col, Form, Row } from 'antd';
 import { CircleAlert } from 'lucide-react';
+import { FC } from 'react';
 
 import { Input } from '@/components/Input';
+import { Select } from '@/components/Select';
 import { TooltipIcon } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
-import { Select } from '@/components/Select';
 
 type Props = {
 	form: any;
@@ -44,9 +44,9 @@ const VariantGeneral: FC<Props> = ({ form, field }) => {
 				</TooltipIcon>
 			</Col>
 			{options
-				?.filter((item) => item)
+				?.filter((item: any) => item)
 				.map((option: any, index: number) => {
-					const optionsSelect = option.values.map((value) => ({
+					const optionsSelect = option.values.map((value: any) => ({
 						value,
 						label: value,
 					}));

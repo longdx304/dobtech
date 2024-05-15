@@ -1,16 +1,15 @@
+import { Col, Form, Row } from 'antd';
+import { CircleAlert, CircleCheck, Plus, Trash2 } from 'lucide-react';
 import { FC, useMemo } from 'react';
-import { Row, Col, Form } from 'antd';
-import { Plus, CircleAlert, Trash2, CircleCheck } from 'lucide-react';
-import _ from 'lodash';
-import { Product } from '@medusajs/client-types';
 
-import { Flex } from '@/components/Flex';
 import { Button } from '@/components/Button';
-import { Text } from '@/components/Typography';
+import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
-import { TooltipIcon } from '@/components/Tooltip';
 import { Select } from '@/components/Select';
+import { TooltipIcon } from '@/components/Tooltip';
+import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import { Product } from '@medusajs/medusa';
 import AddVariantModal from './AddVariantModal';
 
 interface Props {
@@ -18,7 +17,7 @@ interface Props {
 	product: Product;
 }
 
-const AddVariant = ({ form, product }) => {
+const AddVariant: FC<Props> = ({ form, product }) => {
 	const options = Form.useWatch('options', form) || undefined;
 	/**
 	 * Determines if the "Add Variant" button should be disabled based on the options.
@@ -31,7 +30,7 @@ const AddVariant = ({ form, product }) => {
 	const disabledBtnAddVariant = useMemo(() => {
 		if (options?.length > 0) {
 			return options.some(
-				(option) =>
+				(option: any) =>
 					option?.values?.length === 0 && option?.initValues?.length === 0
 			);
 		}
@@ -94,9 +93,8 @@ type AddOptionsProps = {
 	options: any;
 };
 
-const AddOptions: FC<> = ({ form, options }) => {
-	const checkDuplicate = (field, value) => {
-
+const AddOptions: FC<AddOptionsProps> = ({ form, options }) => {
+	const checkDuplicate = (field: any, value: any) => {
 		if (!value || value.length === 0) {
 			return Promise.resolve();
 		}
@@ -108,7 +106,11 @@ const AddOptions: FC<> = ({ form, options }) => {
 		// Check duplicate value in the current init values
 		const valueSet = new Set([...value, ...currInitValues]);
 		if (valueSet.size !== value.length + currInitValues.length) {
-			return Promise.reject(new Error('Các giá trị không được trùng lặp với các biến thể được thêm trước đó'));
+			return Promise.reject(
+				new Error(
+					'Các giá trị không được trùng lặp với các biến thể được thêm trước đó'
+				)
+			);
 		}
 
 		return Promise.resolve();
@@ -186,9 +188,7 @@ const AddOptions: FC<> = ({ form, options }) => {
 							<Col flex="auto">
 								<Form.Item
 									{...field}
-									rules={[
-										{ validator: checkDuplicate },
-									]}
+									rules={[{ validator: checkDuplicate }]}
 									labelCol={{ span: 24 }}
 									name={[field.name, 'values']}
 									className="mb-0 text-xs"
@@ -218,7 +218,7 @@ const AddOptions: FC<> = ({ form, options }) => {
 							</Col>
 						</Row>
 					))}
-					<div span={24} className="w-full">
+					<div className="w-full">
 						<Form.Item>
 							<Button
 								type="default"
@@ -242,7 +242,11 @@ type AddVersionProps = {
 	product: Product;
 };
 
-const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant, product }) => {
+const AddVersions: FC<AddVersionProps> = ({
+	form,
+	disabledBtnAddVariant,
+	product,
+}) => {
 	const { state, onOpen, onClose } = useToggleState(false);
 	const variants = Form.useWatch('variants', form) || undefined;
 
@@ -275,7 +279,6 @@ const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant, product
 						return (
 							<Row
 								key={field.key}
-								gap="small"
 								gutter={[16, 16]}
 								wrap={false}
 								align="middle"
@@ -361,14 +364,15 @@ const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant, product
 										onClose();
 										remove(field.name);
 									}}
-									field={field}
-									form={form}
+									// field={field}
+									// form={form}
 									product={product}
+									typeVariant={'UPDATE'}
 								/>
 							</Row>
 						);
 					})}
-					<div span={24} className="w-full">
+					<div className="w-full">
 						<Form.Item>
 							<Button
 								type="default"

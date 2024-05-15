@@ -1,5 +1,3 @@
-import { Flex } from '@/components/Flex';
-import { ErrorText } from '@/components/Typography';
 import { cn } from '@/lib/utils';
 import { Checkbox as AntdCheckbox, CheckboxProps } from 'antd';
 import { ReactNode } from 'react';
@@ -9,6 +7,7 @@ interface Props extends CheckboxProps {
 	children?: ReactNode;
 	error?: string;
 	options?: any;
+	onChange?: any;
 }
 
 export default function CheckboxGroup({
@@ -16,6 +15,7 @@ export default function CheckboxGroup({
 	className,
 	children,
 	options,
+	onChange,
 	...props
 }: Props) {
 	return (
@@ -23,6 +23,7 @@ export default function CheckboxGroup({
 			className={cn('', className)}
 			{...props}
 			options={options}
+			onChange={onChange}
 		>
 			{children}
 		</AntdCheckbox.Group>

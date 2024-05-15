@@ -1,7 +1,7 @@
 import { ProductCollection, Product } from '@medusajs/medusa';
 import { TableColumnsType } from 'antd';
 import { Dot, Search } from 'lucide-react';
-import { FC, useEffect, useState } from 'react';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 import _ from 'lodash';
 
 import { Modal } from '@/components/Modal';
@@ -16,7 +16,7 @@ type Props = {
 	handleOk: (selectedProducts: DataType[]) => void;
 	handleCancel: () => void;
 	collection: ProductCollection | null;
-	onSubmit: (selectedIds: string[], removedIds: string[]) => void;
+	onSubmit: (selectedIds: string[]) => void;
 };
 
 export interface DataType {

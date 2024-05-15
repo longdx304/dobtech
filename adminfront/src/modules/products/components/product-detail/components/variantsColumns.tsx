@@ -1,16 +1,19 @@
-import { Pencil, Copy, Trash2 } from 'lucide-react';
+import { Copy, Pencil, Trash2 } from 'lucide-react';
 
-import { Button } from '@/components/Button';
-import { IProductResponse } from '@/types/products';
-import { Product, ProductVariant } from '@medusajs/medusa';
 import { ActionAbles } from '@/components/Dropdown';
+import { ProductVariant } from '@medusajs/medusa';
+import { MenuProps } from 'antd';
 
 interface Props {
 	handleDeleteVariant: (variantId: ProductVariant['id']) => void;
 	handleEditVariant: (record: ProductVariant) => void;
 	handleCopyVariant: (record: ProductVariant) => void;
 }
-const variantsColumns = ({handleEditVariant, handleDeleteVariant, handleCopyVariant}: Props) => [
+const variantsColumns = ({
+	handleEditVariant,
+	handleDeleteVariant,
+	handleCopyVariant,
+}: Props) => [
 	{
 		title: 'Tiêu đề',
 		dataIndex: 'title',
@@ -59,7 +62,7 @@ const variantsColumns = ({handleEditVariant, handleDeleteVariant, handleCopyVari
 
 			const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
 				if (key === 'edit') {
-					handleEditVariant(record)
+					handleEditVariant(record);
 					return;
 				}
 				// Case item is delete

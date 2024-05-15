@@ -1,9 +1,9 @@
-import { FC, useMemo } from 'react';
-import { Row, Col, Form } from 'antd';
-import { Trash2, Ellipsis } from 'lucide-react';
+import { Col, Form, MenuProps, Row } from 'antd';
+import { Trash2 } from 'lucide-react';
+import { FC } from 'react';
 
-import { Upload } from '@/components/Upload';
 import { ActionAbles } from '@/components/Dropdown';
+import { Upload } from '@/components/Upload';
 
 interface Props {
 	form: any;
@@ -51,7 +51,7 @@ const ThumbnailForm: FC<Props> = ({ form }) => {
 						<h2 className="inter-large-semibold mb-small">Upload</h2>
 
 						<div className="gap-y-2xsmall flex flex-col">
-							{thumbnail.map((field, index) => {
+							{thumbnail.map((field: any, index: number) => {
 								return (
 									<Image
 										key={index}

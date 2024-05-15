@@ -1,22 +1,20 @@
-import { FC, useEffect, useMemo } from 'react';
-import { Form, message, typeFormProps, Row, Col } from 'antd';
-import { Product } from '@medusajs/client-types';
+import { Col, Form, FormProps, Row, message } from 'antd';
+import _ from 'lodash';
 import { CircleAlert, Plus, Trash2 } from 'lucide-react';
 import {
 	useAdminCreateProductOption,
-	useAdminUpdateProductOption,
 	useAdminDeleteProductOption,
+	useAdminUpdateProductOption,
 } from 'medusa-react';
-import _ from 'lodash';
+import { FC, useEffect } from 'react';
 
-import { SubmitModal } from '@/components/Modal';
-import { Title, Text } from '@/components/Typography';
-import { Flex } from '@/components/Flex';
-import { TooltipIcon } from '@/components/Tooltip';
-import { Input } from '@/components/Input';
-import { Select } from '@/components/Select';
 import { Button } from '@/components/Button';
-import { AddVariant } from './variant-form';
+import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
+import { SubmitModal } from '@/components/Modal';
+import { TooltipIcon } from '@/components/Tooltip';
+import { Text, Title } from '@/components/Typography';
+import { Product, ProductOption } from '@medusajs/medusa';
 
 type Props = {
 	product: Product;
@@ -48,9 +46,11 @@ const OptionModal: FC<Props> = ({ state, product, handleOk, handleCancel }) => {
 		const { options } = values;
 		const optionsProduct = product.options;
 		// Create array of option ids
-		const optionIds = options.map((option) => option.id).filter((id) => id);
+		const optionIds = options
+			.map((option: ProductOption) => option.id)
+			.filter((id: string) => id);
 
-		const promiseUpsert = options.map((option) => {
+		const promiseUpsert = options.map((option: ProductOption) => {
 			const findOption = optionsProduct.find((o) => o.id === option?.id);
 			// if option not exists so create new option
 			if (_.isEmpty(findOption)) {
@@ -104,7 +104,11 @@ const OptionModal: FC<Props> = ({ state, product, handleOk, handleCancel }) => {
 		<SubmitModal
 			open={state}
 			onOk={handleOk}
-			isLoading={createOption.isLoading || updateOption.isLoading || deleteOption.isLoading}
+			isLoading={
+				createOption.isLoading ||
+				updateOption.isLoading ||
+				deleteOption.isLoading
+			}
 			handleCancel={onCancel}
 			width={400}
 			form={form}
@@ -132,20 +136,7 @@ type OptionFormProps = {
 	form: any;
 };
 
-const OptionForm = ({ form }) => {
-	const checkDuplicate = (_, value) => {
-		if (!value || value.length === 0) {
-			return Promise.resolve();
-		}
-
-		const valueSet = new Set(value);
-		if (valueSet.size !== value.length) {
-			return Promise.reject(new Error('Các giá trị không được trùng lặp'));
-		}
-
-		return Promise.resolve();
-	};
-
+const OptionForm: FC<OptionFormProps> = ({ form }) => {
 	return (
 		<Flex vertical>
 			<Flex gap="4px" className="pb-2" align="center">
@@ -205,7 +196,7 @@ const OptionForm = ({ form }) => {
 								</Col>
 							</Row>
 						))}
-						<div span={24} className="w-full">
+						<div className="w-full">
 							<Form.Item>
 								<Button
 									type="default"

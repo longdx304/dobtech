@@ -1,18 +1,21 @@
 'use client';
-import { ProductCollection, Product } from '@medusajs/medusa';
+import { Product, ProductCollection } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
+import _ from 'lodash';
 import { CircleAlert, Plus, Search } from 'lucide-react';
 import {
+	useAdminAddProductsToCollection,
 	useAdminCollections,
 	useAdminDeleteCollection,
 	useAdminRemoveProductsFromCollection,
-	useAdminAddProductsToCollection,
 } from 'medusa-react';
-import { FC, useMemo, useState } from 'react';
-import _ from 'lodash';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
 
 import { FloatButton } from '@/components/Button';
+import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
+import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import {
@@ -20,11 +23,7 @@ import {
 	CollectionModal,
 	ManageProductModal,
 } from '@/modules/products/components/collection-modal';
-import { DataType } from '../collection-modal/AddProductModal';
 import collectionColumns from './CollectionColumn';
-import { Flex } from '@/components/Flex';
-import { Input } from '@/components/Input';
-import { Title, Text } from '@/components/Typography';
 
 type Props = {};
 
@@ -156,7 +155,7 @@ const CollectionList: FC<Props> = ({}) => {
 
 	const handleAddProducts = async (selectedRowIds: string[]) => {
 		const currentCollectionIds = currentCollection?.products?.map(
-			(product: Product[]) => product?.id
+			(product: Product) => product?.id
 		);
 
 		// Close add product modal when no change

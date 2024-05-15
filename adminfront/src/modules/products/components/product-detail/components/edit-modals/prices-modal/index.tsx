@@ -1,8 +1,6 @@
 import { Form, message } from 'antd';
 import { useRef, useState } from 'react';
-// import { Product } from '@medusajs/medusa';
-// import { MoneyAmount, Product } from '@medusajs/medusa';
-import { MoneyAmount, Product } from '@medusajs/client-types';
+import { MoneyAmount, Product } from '@medusajs/medusa';
 import _ from 'lodash';
 import { useAdminUpdateVariant } from 'medusa-react';
 
@@ -21,7 +19,7 @@ type Props = {
 };
 
 const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
-	const editedPrices = useRef({});
+	const editedPrices = useRef<any>([]);
 	const [form] = Form.useForm();
 	const { mutateAsync, isLoading } = useAdminUpdateVariant(product?.id || '');
 	const [messageApi, contextHolder] = message.useMessage();
@@ -39,16 +37,17 @@ const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 		const newVariant = editedPrices?.current;
 
 		// Update prices for each variant
-		const promise = newVariant?.map((variant) => {
+		const promise = newVariant?.map((variant: any) => {
 			const pricesPayload: Partial<MoneyAmount>[] = [];
 			// Get all prices keys
-			const priceKeys = Object.keys(variant.pricesFormat);
+			const priceKeys = Object.keys(variant?.pricesFormat);
 			// Check if price key is in variant prices
 			priceKeys.forEach((priceKey) => {
 				// Find price by currency code
 				const findPrice =
-					variant?.prices?.find((item: any) => item.currency_code === priceKey) ||
-					{};
+					variant?.prices?.find(
+						(item: any) => item.currency_code === priceKey
+					) || {};
 				// Check if price is not empty
 				if (!_.isEmpty(findPrice)) {
 					// Check if price is different from current price
@@ -73,7 +72,7 @@ const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 					variant_id: variant.id,
 					prices: pricesPayload.map((p) =>
 						_.pick(p, ['id', 'amount', 'region_id', 'currency_code'])
-					),
+					) as any,
 				});
 			}
 		});
@@ -84,7 +83,7 @@ const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 				handleOk();
 			})
 			.catch((e: any) => {
-				console.log('e', e)
+				console.log('e', e);
 				messageApi.success('Có lỗi xảy ra, vui lòng thử lại sau.');
 			});
 	};
@@ -98,7 +97,7 @@ const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 		setIsCancel(true);
 		handleCancel();
 	};
-	
+
 	return (
 		<Modal
 			open={state}

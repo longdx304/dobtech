@@ -39,7 +39,7 @@ const EditPricesActions: FC<Props> = ({
 		console.log('key', key);
 	};
 
-	const renderCurrencyLabel = (currency) => {
+	const renderCurrencyLabel = (currency: any) => {
 		return (
 			<Flex gap="middle" align="center" justify="space-between">
 				<Text>{currency.code.toUpperCase()}</Text>
@@ -50,7 +50,7 @@ const EditPricesActions: FC<Props> = ({
 			</Flex>
 		);
 	};
-	const renderRegionLabel = (region) => {
+	const renderRegionLabel = (region: any) => {
 		return (
 			<Flex gap="middle" align="center" justify="space-between">
 				<Text>{region.name}</Text>
@@ -76,8 +76,8 @@ const EditPricesActions: FC<Props> = ({
 				key: 'regions',
 				label: 'Khu vực',
 				type: 'group',
-				children: regions?.map((region) => ({
-					key: region.code,
+				children: regions?.map((region: any) => ({
+					key: region.code ,
 					label: renderRegionLabel(region),
 					type: 'item',
 					onClick: () => toggleRegion(region.id),
