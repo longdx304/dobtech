@@ -1,25 +1,35 @@
 'use client';
 import { ProductCategory } from '@medusajs/medusa';
+import {
+	useAdminProductCategories,
+	useAdminDeleteProductCategory,
+	useMedusa,
+} from 'medusa-react';
 import { App, Divider, Modal, message } from 'antd';
 import _ from 'lodash';
-import { ChevronDown, CircleAlert, GripVertical, Plus } from 'lucide-react';
+import {
+	ChevronDown,
+	CircleAlert,
+	GripVertical,
+	Plus,
+	Search,
+} from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 import Nestable, { Item } from 'react-nestable';
 import 'react-nestable/dist/styles/index.css';
 import '../../styles/product-categories.css';
 
-import { deleteCategory, updateCategory } from '@/actions/productCategories';
 import { FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import CategoryItem from '../category-item';
 import CategoryModal from '../category-modal';
+import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
 
-interface Props {
-	data: ProductCategory | null;
-}
+interface Props {}
 
 /**
  * Product categories empty state placeholder.
@@ -36,13 +46,8 @@ const ProductCategoriesEmptyState = () => {
 	);
 };
 
-const CategoryList = ({ data }: Props) => {
-	const searchParams = useSearchParams();
-	const { replace } = useRouter();
-	const pathname = usePathname();
-	const currentPage = searchParams.get('page') ?? 1;
-
-	// const { message, modal } = App.useApp();
+const CategoryList = () => {
+	const { client } = useMedusa();
 	const { state, onOpen, onClose } = useToggleState(false);
 	const [isUpdating, enableUpdating, disableUpdating] = useToggleState(false);
 	const [isError, enableError, disableError] = useToggleState(false);
@@ -51,6 +56,13 @@ const CategoryList = ({ data }: Props) => {
 	const [parentCategory, setParentCategory] = useState<ProductCategory | null>(
 		null
 	);
+	const [categoryId, setCategoryId] = useState<string | null>(null);
+
+	const { product_categories: data, isLoading, refetch, isRefetching } = useAdminProductCategories({
+		parent_category_id: 'null',
+		include_descendants_tree: true,
+	});
+	const deleteCategory = useAdminDeleteProductCategory(categoryId);
 
 	// Handle move item category
 	const onItemDrop = useCallback(
@@ -80,11 +92,7 @@ const CategoryList = ({ data }: Props) => {
 			try {
 				disableError();
 				// Update category when drag & drop
-				// await client.admin.productCategories.update(dragItem.id, {
-				// 	parent_category_id: parentId,
-				// 	rank,
-				// });
-				await updateCategory(dragItem.id, {
+				await client.admin.productCategories.update(dragItem.id, {
 					parent_category_id: parentId,
 					rank,
 				});
@@ -114,6 +122,7 @@ const CategoryList = ({ data }: Props) => {
 	};
 
 	const handleDeleteCategory = async (categoryId: ProductCategory['id']) => {
+		setCategoryId(categoryId);
 		Modal.confirm({
 			title: 'Bạn có muốn xoá danh mục này không ?',
 			content:
@@ -128,15 +137,22 @@ const CategoryList = ({ data }: Props) => {
 			okType: 'danger',
 			okText: 'Đồng ý',
 			cancelText: 'Huỷ',
+			confirmLoading: deleteCategory.isLoading,
 			async onOk() {
-				try {
-					await deleteCategory(categoryId);
-					message.success('Xoá danh mục thành công');
-				} catch (error) {
-					message.error('Xoá danh mục thất bại');
-				}
+				await deleteCategory.mutateAsync(void 0, {
+					onSuccess: () => {
+						setCategoryId(null);
+						message.success('Xoá danh mục thành công');
+					},
+					onError: () => {
+						message.error('Xoá danh mục thất bại');
+					},
+				
+				});
 			},
-			onCancel() {},
+			onCancel() {
+				setCategoryId(null);
+			},
 		});
 	};
 
@@ -187,23 +203,13 @@ const CategoryList = ({ data }: Props) => {
 		onClose();
 	};
 
-	// const handleChangePage = (page: number) => {
-	// 	// create new search params with new value
-	// 	const newSearchParams = updateSearchQuery(searchParams, {
-	// 		page: page,
-	// 	});
-
-	// 	// Replace url
-	// 	replace(`${pathname}?${newSearchParams}`);
-	// };
-
 	return (
-		<Card className="w-full px-4 py-2">
+		<Card className="w-full px-4 py-2" loading={isLoading || isRefetching}>
 			{/* Title */}
 			<Title level={4}>Danh mục sản phẩm</Title>
 			<FloatButton
-				className="top-1/3 max-sm:right-0"
-				icon={<Plus color="white" />}
+				className="absolute"
+				icon={<Plus color="white" size={20} strokeWidth={2} />}
 				type="primary"
 				onClick={onOpen}
 				data-testid="btnAddCategories"
@@ -236,6 +242,7 @@ const CategoryList = ({ data }: Props) => {
 				category={currentCategory}
 				parentCategory={parentCategory}
 				categories={data as any as ProductCategory[]}
+				refetch={refetch}
 			/>
 		</Card>
 	);

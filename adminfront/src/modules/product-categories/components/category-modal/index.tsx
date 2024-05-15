@@ -5,8 +5,12 @@ import { App, Col, Form, Row, message, type FormProps } from 'antd';
 import _ from 'lodash';
 import { Highlighter } from 'lucide-react';
 import React, { useEffect } from 'react';
+import {
+	useAdminCreateProductCategory,
+	useAdminUpdateProductCategory,
+} from 'medusa-react';
 
-import { createCategory, updateCategory } from '@/actions/productCategories';
+// import { createCategory, updateCategory } from '@/actions/productCategories';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { Input, TextArea } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
@@ -22,6 +26,7 @@ interface Props {
 	category: ProductCategory | null;
 	parentCategory: ProductCategory | null;
 	categories: ProductCategory[];
+	refetch: () => void;
 }
 const CategoryModal: React.FC<Props> = ({
 	stateModal,
@@ -30,7 +35,10 @@ const CategoryModal: React.FC<Props> = ({
 	category,
 	parentCategory,
 	categories,
+	refetch,
 }) => {
+	const createCategory = useAdminCreateProductCategory();
+	const updateCategory = useAdminUpdateProductCategory(category?.id);
 	const [form] = Form.useForm();
 	// const { message } = App.useApp();
 
@@ -51,8 +59,6 @@ const CategoryModal: React.FC<Props> = ({
 	// Get tree category
 	const getAncestors = (targetNode: any, nodes: any, acc = []) => {
 		let parentCategory = null;
-
-		console.log('targetNode', targetNode);
 
 		acc.push(targetNode as never);
 
@@ -78,7 +84,7 @@ const CategoryModal: React.FC<Props> = ({
 		const newResult = result?.map((item: ProductCategory) => ({
 			title: item.name,
 		}));
-		
+
 		if (_.isEmpty(category) && newResult) {
 			newResult.push({ title: 'Danh mục mới' });
 		}
@@ -88,23 +94,35 @@ const CategoryModal: React.FC<Props> = ({
 
 	// Submit form
 	const onFinish: FormProps<TCategoryRequest>['onFinish'] = async (values) => {
-		try {
-			// Create user
-			if (_.isEmpty(category)) {
-				const payload = {
-					...values,
-					parent_category_id: parentCategory?.id ?? null,
-				};
-				const result = await createCategory(payload);
-				message.success('Đăng ký danh mục sản phẩm thành công');
-			} else {
-				// Update user
-				const result = await updateCategory(category.id, values);
-				message.success('Cập nhật danh mục sản phẩm thành công');
-			}
-			handleCancel();
-		} catch (error: any) {
-			message.error(error?.message);
+		// Create user
+		if (_.isEmpty(category)) {
+			const payload = {
+				...values,
+				parent_category_id: parentCategory?.id ?? null,
+			};
+			// const result = await createCategory(payload);
+			await createCategory.mutateAsync(payload, {
+				onSuccess: () => {
+					message.success('Đăng ký danh mục sản phẩm thành công');
+					refetch();
+					handleCancel();
+				},
+				onError: () => {
+					message.error('Đăng ký danh mục sản phẩm thất bại');
+				},
+			});
+		} else {
+			// Update user
+			// const result = await updateCategory(category.id, values);
+			updateCategory.mutateAsync(values, {
+				onSuccess: () => {
+					message.success('Cập nhật danh mục sản phẩm thành công');
+					handleCancel();
+				},
+				onError: () => {
+					message.error('Cập nhật danh mục sản phẩm thất bại');
+				},
+			});
 		}
 	};
 
@@ -112,7 +130,7 @@ const CategoryModal: React.FC<Props> = ({
 		<SubmitModal
 			open={stateModal}
 			onOk={handleOk}
-			confirmLoading={false}
+			isLoading={createCategory?.isLoading || updateCategory?.isLoading}
 			handleCancel={handleCancel}
 			form={form}
 		>

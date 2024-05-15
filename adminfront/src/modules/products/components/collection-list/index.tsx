@@ -1,13 +1,15 @@
 'use client';
-import { ProductCollection } from '@medusajs/medusa';
+import { ProductCollection, Product } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
-import { CircleAlert, Plus } from 'lucide-react';
+import { CircleAlert, Plus, Search } from 'lucide-react';
 import {
 	useAdminCollections,
 	useAdminDeleteCollection,
-	useMedusa,
+	useAdminRemoveProductsFromCollection,
+	useAdminAddProductsToCollection,
 } from 'medusa-react';
 import { FC, useMemo, useState } from 'react';
+import _ from 'lodash';
 
 import { FloatButton } from '@/components/Button';
 import { Table } from '@/components/Table';
@@ -20,10 +22,13 @@ import {
 } from '@/modules/products/components/collection-modal';
 import { DataType } from '../collection-modal/AddProductModal';
 import collectionColumns from './CollectionColumn';
+import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
+import { Title, Text } from '@/components/Typography';
 
 type Props = {};
 
-const DEFAULT_PAGE_SIZE = 15;
+const DEFAULT_PAGE_SIZE = 10;
 
 const CollectionList: FC<Props> = ({}) => {
 	const { state, onOpen, onClose } = useToggleState(false);
@@ -39,17 +44,25 @@ const CollectionList: FC<Props> = ({}) => {
 		onClose: onCloseAddProduct,
 	} = useToggleState(false);
 
-	const { client } = useMedusa();
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
 	const [currentCollection, setCurrentCollection] = useState<any>(null);
 	const [collectionId, setCollectionId] = useState<string>('');
-	const limit = DEFAULT_PAGE_SIZE;
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const [searchValue, setSearchValue] = useState('');
+
 	const deleteCollection = useAdminDeleteCollection(collectionId);
+	// Action with product from collection
+	const addProducts = useAdminAddProductsToCollection(currentCollection?.id);
+	const removeProducts = useAdminRemoveProductsFromCollection(
+		currentCollection?.id
+	);
+
 	const { collections, isLoading, isRefetching, count } = useAdminCollections(
 		{
-			q: '',
-			limit: 10,
+			q: searchValue || undefined,
+			limit: DEFAULT_PAGE_SIZE,
 			offset: offset,
 		},
 		{
@@ -95,7 +108,7 @@ const CollectionList: FC<Props> = ({}) => {
 					deleteCollection.mutateAsync(void 0, {
 						onSuccess: () => {
 							message.success('Xóa bộ sưu tập thành công.');
-							setCollectionId(''); 
+							setCollectionId('');
 							return;
 						},
 						onError: (error) => {
@@ -138,32 +151,87 @@ const CollectionList: FC<Props> = ({}) => {
 
 	const handleChangePage = (page: number) => {
 		setNumPages(page);
-		setOffset((page - 1) * limit);
+		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
-	const handleAddProducts = async (
-		addedIds: string[],
-		removedIds: string[]
-	) => {
-		try {
-			if (addedIds.length > 0) {
-				await client.admin.collections.addProducts(currentCollection?.id, {
-					product_ids: addedIds,
-				});
-			}
+	const handleAddProducts = async (selectedRowIds: string[]) => {
+		const currentCollectionIds = currentCollection?.products?.map(
+			(product: Product[]) => product?.id
+		);
 
-			if (removedIds.length > 0) {
-				await client.admin.collections.removeProducts(currentCollection?.id, {
-					product_ids: removedIds,
-				});
+		// Close add product modal when no change
+		if (_.isEqual(currentCollectionIds, selectedRowIds)) {
+			handleCloseAddProduct();
+			return;
+		}
+		// const currentCollection
+		try {
+			// Find the difference between the selected products and the current products
+			const updateCollectionIds = _.difference(
+				selectedRowIds,
+				currentCollectionIds
+			);
+			const deleteCollectionIds = _.difference(
+				currentCollectionIds,
+				selectedRowIds
+			);
+
+			if (updateCollectionIds?.length) {
+				await addProducts.mutateAsync(
+					{ product_ids: updateCollectionIds },
+					{
+						onError: (error) => {
+							message.error(getErrorMessage(error));
+							return;
+						},
+					}
+				);
 			}
+			if (deleteCollectionIds?.length) {
+				await removeProducts.mutateAsync(
+					{ product_ids: deleteCollectionIds },
+					{
+						onError: (error) => {
+							message.error(getErrorMessage(error));
+							return;
+						},
+					}
+				);
+			}
+			message.success('Cập nhật bộ sưu tập thành công.');
+			handleCloseAddProduct();
+			return;
 		} catch (error) {
-			message.error('Thêm sản phẩm vào bộ sưu tập thất bại!');
+			message.error(getErrorMessage(error));
+			return;
 		}
 	};
 
+	const handleChangeDebounce = _.debounce(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const { value: inputValue } = e.target;
+
+			// Update search query
+			setSearchValue(inputValue);
+		},
+		500
+	);
+
 	return (
 		<>
+			<Flex align="center" justify="flex-start" className="">
+				<Title level={3}>Quản lý bộ sưu tập</Title>
+			</Flex>
+			<Flex align="center" justify="flex-end" className="pb-4">
+				<Input
+					// size="small"
+					placeholder="Tìm kiếm bộ sưu tập..."
+					name="search"
+					prefix={<Search size={16} />}
+					onChange={handleChangeDebounce}
+					className="w-[300px]"
+				/>
+			</Flex>
 			<Table
 				loading={isLoading || isRefetching}
 				columns={columns as any}
@@ -171,10 +239,11 @@ const CollectionList: FC<Props> = ({}) => {
 				rowKey="id"
 				scroll={{ x: 700 }}
 				pagination={{
-					total: Math.floor(count ?? 0 / (limit ?? 0)),
-					pageSize: limit,
+					total: Math.floor(count ?? 0 / (DEFAULT_PAGE_SIZE ?? 0)),
+					pageSize: DEFAULT_PAGE_SIZE,
 					current: numPages || 1,
 					onChange: handleChangePage,
+					showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} bộ sưu tập`,
 				}}
 			/>
 			<FloatButton
@@ -196,8 +265,6 @@ const CollectionList: FC<Props> = ({}) => {
 				onSubmit={handleAddProducts}
 				handleCancel={handleCloseAddProduct}
 				collection={currentCollection}
-				// selectedProducts={selectedProducts}
-				// setSelectedProducts={setSelectedProducts}
 			/>
 			{currentCollection && (
 				<ManageProductModal

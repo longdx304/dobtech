@@ -45,6 +45,6 @@ export const routesConfig: TRouteConfig[] = [
 	},
 	{
 		path: ERoutes.PRODUCT_CATEGORIES,
-		mode: [],
+		mode: [EPermissions.WarehouseManager],
 	},
 ];

@@ -1,24 +1,21 @@
-import { ProductCollection } from '@medusajs/medusa';
+import { ProductCollection, Product } from '@medusajs/medusa';
 import { TableColumnsType } from 'antd';
-import { Dot } from 'lucide-react';
+import { Dot, Search } from 'lucide-react';
 import { FC, useEffect, useState } from 'react';
+import _ from 'lodash';
 
 import { Modal } from '@/components/Modal';
 import { Table } from '@/components/Table';
-import {
-	useAdminCreateCollection,
-	useAdminProducts,
-	useMedusa,
-} from 'medusa-react';
+import { useAdminCreateCollection, useAdminProducts } from 'medusa-react';
+import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
+import { Text } from '@/components/Typography';
 
 type Props = {
 	state: boolean;
-	// handleOk: () => void;
 	handleOk: (selectedProducts: DataType[]) => void;
 	handleCancel: () => void;
 	collection: ProductCollection | null;
-	// selectedProducts: DataType[];
-	// setSelectedProducts: (selectedProducts: DataType[]) => void;
 	onSubmit: (selectedIds: string[], removedIds: string[]) => void;
 };
 
@@ -52,94 +49,69 @@ const columns: TableColumnsType<DataType> = [
 		render: (status: string) => (
 			<div className="flex justify-center">
 				<Dot color={status === 'published' ? '#47B881' : '#E74C3C'} />
-				<span>{status}</span>
+				<span>{status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}</span>
 			</div>
 		),
 	},
 ];
+
+const PAGE_SIZE = 10;
 
 const AddProductModal: FC<Props> = ({
 	state,
 	handleOk,
 	handleCancel,
 	collection,
-	// selectedProducts,
-	// setSelectedProducts,
 	onSubmit,
 }) => {
-	const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>(
-		'checkbox'
-	);
-
-	const { client } = useMedusa();
 	// State to manage selected rows in the table
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-	const [selectedRows, setSelectedRows] = useState<DataType[]>([]);
 	const [selectedProducts, setSelectedProducts] = useState<DataType[]>([]);
-	const [removedProducts, setRemovedProducts] = useState<DataType[]>([]);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [searchValue, setSearchValue] = useState('');
 
-	const { products, isLoading, refetch } = useAdminProducts({
-		q: '',
-		limit: 10,
-		offset: 0,
+	const { products, isLoading, isRefetching, refetch, count } = useAdminProducts({
+		limit: PAGE_SIZE,
+		offset: (currentPage - 1) * PAGE_SIZE,
+		q: searchValue || undefined,
 	});
 
-	// Generate unique keys for each product
-	const productData = products
-		? (products as any).map((product: { id: any }, index: any) => ({
-				...product,
-				key: product.id || index,
-		  }))
-		: [];
-
-	const handleRowSelectionChange = (
-		selectedRowKeys: React.Key[],
-		selectedRows: DataType[]
-	) => {
+	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
 		setSelectedRowKeys(selectedRowKeys);
-		setSelectedRows(selectedRows);
 	};
-
-	// useEffect(() => {
-	// 	setSelectedProducts(selectedRows);
-
-	// 	setRemovedProducts((prev) => {
-	// 		const removed = prev.filter(
-	// 			(product) => !selectedRowKeys.includes(product.key)
-	// 		);
-	// 		return removed;
-	// 	});
-	// }, [selectedProducts]);
 
 	const handleSubmit = async () => {
-		onSubmit(
-			selectedRowKeys.map((product) => product as string),
-			removedProducts.map((product) => product.id as string)
-		);
+		const selectedRowIds = selectedRowKeys.map((key) => key as string);
+		onSubmit(selectedRowIds);
 	};
-
-	console.log('selectedProducts', selectedRowKeys);
 
 	// Reset selected rows when modal is closed
 	// Compare with the inil product in collection
 	useEffect(() => {
 		if (state && collection) {
 			const initialSelectedKeys = collection.products.map(
-				(product: any) => product.id
+				(product: Product) => product.id
 			);
-			const initialSelectedRows = collection.products.map((product: any) => ({
-				key: product.key,
-				id: product.id,
-				title: product.title,
-				status: product.status,
-				thumbnail: product.thumbnail,
-			}));
 			setSelectedRowKeys(initialSelectedKeys);
-			setSelectedRows(initialSelectedRows);
 		}
+		setCurrentPage(1);
+		setSearchValue('');
 	}, [state, collection]);
 
-	// console.log('collection', collection)
+	const handleChangePage = (page: number) => {
+		setCurrentPage(page);
+	};
+
+	const handleChangeDebounce = _.debounce(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const { value: inputValue } = e.target;
+
+			// Update search query
+			setSearchValue(inputValue);
+		},
+		500
+	);
+
 	return (
 		<Modal
 			title={'Thêm sản phẩm'}
@@ -147,15 +119,35 @@ const AddProductModal: FC<Props> = ({
 			handleOk={handleSubmit}
 			handleCancel={handleCancel}
 		>
+			<Flex align="center" justify="space-between" className="pb-4">
+				<Text>{`Đã chọn ${selectedRowKeys?.length || 0} sản phẩm`}</Text>
+				<Input
+					// size="small"
+					placeholder="Tìm kiếm sản phẩm..."
+					name="search"
+					prefix={<Search size={16} />}
+					onChange={handleChangeDebounce}
+					className="w-[200px]"
+				/>
+			</Flex>
 			<Table
 				rowSelection={{
-					type: selectionType,
+					type: 'checkbox',
 					selectedRowKeys: selectedRowKeys,
 					onChange: handleRowSelectionChange,
+					preserveSelectedRowKeys: true
 				}}
-				loading={isLoading}
+				loading={isLoading || isRefetching}
 				columns={columns}
-				dataSource={productData}
+				rowKey="id"
+				dataSource={products || []}
+				pagination={{
+					total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
+					pageSize: PAGE_SIZE,
+					current: currentPage as number,
+					onChange: handleChangePage,
+					showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} sản phẩm`,
+				}}
 			/>
 		</Modal>
 	);

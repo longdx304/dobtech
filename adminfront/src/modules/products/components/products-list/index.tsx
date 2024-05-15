@@ -138,6 +138,7 @@ const ProductList = ({}: Props) => {
 					pageSize: PAGE_SIZE,
 					current: currentPage as number,
 					onChange: handleChangePage,
+					showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} sản phẩm`,
 				}}
 				scroll={{ x: 700 }}
 			/>

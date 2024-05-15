@@ -139,6 +139,8 @@ const AccountList = ({}: Props) => {
 					pageSize: PAGE_SIZE,
 					current: currentPage as number,
 					onChange: handleChangePage,
+					showTotal: (total) => `Total ${total} items`
+					// showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
 				}}
 			/>
 			<FloatButton

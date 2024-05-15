@@ -46,9 +46,9 @@ export async function middleware(request: NextRequest) {
 	const { role, permissions } = data.user;
 
 	// If user has role admin, program executing
-	// if (role === ERole.ADMIN) {
-	// 	return res;
-	// }
+	if (role === ERole.ADMIN) {
+		return res;
+	}
 	// Find mode of routes
 	const { mode: routesMode } =
 		routesConfig.find((routes) => pathname.startsWith(routes.path)) ?? {};
