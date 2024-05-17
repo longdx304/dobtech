@@ -1,3 +1,4 @@
+
 export interface IAdminAuth {
 	email: string;
 	password: string;
@@ -13,12 +14,14 @@ export interface IAdminResponse {
 	first_name: string | null;
 	last_name: string | null;
 	api_token: string | null;
-	metadata: json | null;
+	metadata: JSON | null;
+	permissions?: any;
+	phone: string;
 }
 
 export enum ERole {
-  ADMIN = "admin",
-	MEMBER = "member"
+	ADMIN = 'admin',
+	MEMBER = 'member',
 }
 
 export enum EPermissions {

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-	background-color: #EFF0F3;
+	background-color: #eff0f3;
 	width: 100%;
 	height: 100%;
 	padding: 0;
@@ -11,24 +11,30 @@ body {
 }
 
 /* Custom for lucide icons */
-.lucide {
-  /* Change this! */
+/* .lucide {
   color: #9F9F9F;
   width: 20px;
   height: 20px;
   stroke-width: 1.5px;
-}
+} */
 
 /* Antd Form */
 .ant-form .ant-form-item-label {
 	padding: 0 0 0 !important;
 }
 
-.ant-form .ant-form-item-label label {
-	font-size: 16px !important;
+.ant-form-item-label label {
+	font-size: 14px !important;
 	font-weight: 500;
+	color: #6B7280 !important;
 }
 
 .ant-form .ant-form-item {
 	margin-bottom: 16px;
+}
+
+/* Antd Tooltip */
+.ant-tooltip .ant-tooltip-inner {
+	color: #6B7280 !important;
+	font-size: 12px;
 }

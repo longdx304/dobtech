@@ -1,3 +1,4 @@
+'use client';
 import React, { ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
 import { cn } from '@/lib/utils';
@@ -8,6 +9,7 @@ interface Props {
 	'data-testid'?: string;
 	children: ReactNode;
 	icons?: ReactNode;
+	form?: any;
 }
 
 const SubmitButton = ({
@@ -15,6 +17,7 @@ const SubmitButton = ({
 	'data-testid': dataTestId,
 	children,
 	icons,
+	form,
 	...props
 }: Props) => {
 	const { pending } = useFormStatus();

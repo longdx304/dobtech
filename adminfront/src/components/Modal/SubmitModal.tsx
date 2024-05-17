@@ -1,15 +1,16 @@
 'use client';
 import { Modal as AntdModal, ModalProps, Form } from 'antd';
-import { ReactNode, useState } from 'react';
 
 import { cn } from '@/lib/utils';
-import { Button, SubmitButton } from '@/components/Button';
+import { ReactNode } from 'react';
+import { Button } from '@/components/Button';
 
 interface Props extends ModalProps {
 	className?: string;
 	children?: ReactNode;
 	handleCancel: () => void;
-	form?: any; // Form action when submit modal
+	form: any;
+	isLoading?: boolean;
 }
 
 export default function SubmitModal({
@@ -17,6 +18,7 @@ export default function SubmitModal({
 	className,
 	form,
 	children,
+	isLoading,
 	...props
 }: Props) {
 	return (
@@ -25,18 +27,18 @@ export default function SubmitModal({
 			// afterClose={() => form.resetFields()}
 			onCancel={handleCancel}
 			footer={[
-				<Button key="1" type="default" danger onClick={handleCancel}>
+				<Button key="1" type="default" danger onClick={handleCancel} loading={isLoading}>
 					Huỷ
 				</Button>,
 				<Button
-					key="2"
 					htmlType="submit"
 					key="submit"
 					onClick={() => form?.submit()}
 					data-testid="submitButton"
+					loading={isLoading}
 				>
 					Xác nhận
-				</Button>,
+				</Button>
 			]}
 			{...props}
 		>

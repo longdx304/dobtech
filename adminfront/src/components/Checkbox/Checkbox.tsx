@@ -7,16 +7,9 @@ interface Props extends CheckboxProps {
 	children?: ReactNode;
 }
 
-export default function Checkbox({
-	className,
-	children,
-	...props
-}: Props) {
+export default function Checkbox({ className, children, ...props }: Props) {
 	return (
-		<AntdCheckbox
-			className={cn('', className)}
-			{...props}
-		>
+		<AntdCheckbox className={cn('', className)} {...props}>
 			{children}
 		</AntdCheckbox>
 	);

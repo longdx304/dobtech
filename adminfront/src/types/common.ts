@@ -4,3 +4,11 @@ export type TResponse<T> = {
 	offset: number;
 	limit: number;
 };
+
+export type FormImage = {
+  url: string;
+  name?: string;
+  size?: number;
+  nativeFile?: File;
+	selected?: boolean;
+}
