@@ -25,7 +25,6 @@
     "dev": "cross-env npm run build:server && medusa develop"
   },
   "dependencies": {
-    "@medusajs/admin": "latest",
     "@medusajs/cache-inmemory": "latest",
     "@medusajs/cache-redis": "latest",
     "@medusajs/event-bus-local": "latest",
@@ -87,14 +86,5 @@
     ],
     "coverageDirectory": "./coverage",
     "testEnvironment": "node"
-  },
-  "overrides": {
-    "@medusajs/admin-ui": {
-      "@medusajs/ui-preset": "^1.1.2"
-    }
-  },
-  "resolutions": {
-    "@medusajs/ui-preset": "^1.1.2",
-    "@medusajs/icons": "latest"
   }
 }
