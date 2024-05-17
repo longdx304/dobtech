@@ -35,6 +35,7 @@ const EditPricesTable: FC<Props> = ({
 
 	useEffect(() => {
 		formatProduct();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [product, isCancel]);
 
 	const handleSave = (row: any) => {
@@ -77,6 +78,7 @@ const EditPricesTable: FC<Props> = ({
 		});
 
 		return onCellColumn;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [product, currencies, regions, dataSource, isCancel]);
 
 	const formatProduct = () => {

@@ -14,15 +14,10 @@ interface Props {
 }
 
 const Header: FC<Props> = ({ categories }) => {
-  // const { state, onClose, onOpen } = useToggleState(false);
-  // const scrollDirection = useScrollDirection();
-
   return (
     <Card
       className={cn(
-        'fixed top-0 w-full shadow px-0 pt-2 pb-0 rounded-none transition-all ease-in-out duration-300 z-10',
-        // "sm:w-[200px] md:w-[250px] sm:h-full sm:[&_.ant-card-body]:px-0",
-        // scrollDirection === 'up' ? 'translate-y-0' : '-translate-y-24'
+        'fixed top-0 w-full shadow px-0 pt-2 pb-0 rounded-none transition-all ease-in-out duration-300 z-10'
       )}
       bordered={false}
     >

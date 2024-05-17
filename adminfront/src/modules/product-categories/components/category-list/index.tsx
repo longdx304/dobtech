@@ -101,6 +101,7 @@ const CategoryList = () => {
 				disableUpdating();
 			}
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[]
 	);
 
@@ -190,6 +191,7 @@ const CategoryList = () => {
 				)}
 			/>
 		),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[data, isError]
 	);
 

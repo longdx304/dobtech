@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 import { App } from 'antd';
 import type { MessageInstance } from 'antd/es/message/interface';
 import type { ModalStaticFunctions } from 'antd/es/modal/confirm';
@@ -8,12 +9,12 @@ let notification: NotificationInstance;
 let modal: Omit<ModalStaticFunctions, 'warn'>;
 
 export default () => {
-	const staticFunction = App.useApp();
+  const staticFunction = App.useApp();
 
-	message = staticFunction.message;
-	modal = staticFunction.modal;
-	notification = staticFunction.notification;
-	return null;
+  message = staticFunction.message;
+  modal = staticFunction.modal;
+  notification = staticFunction.notification;
+  return null;
 };
 
 export { message, modal, notification };

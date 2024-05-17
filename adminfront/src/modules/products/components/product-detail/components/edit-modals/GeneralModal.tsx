@@ -57,6 +57,7 @@ const GeneralModal: FC<Props> = ({
 				tags: product?.tags?.map((tag) => tag.value) || [],
 			},
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [product]);
 
 	const onFinish: FormProps<GeneralFormProps>['onFinish'] = async (values) => {

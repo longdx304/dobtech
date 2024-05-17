@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Col, Form, MenuProps, Row } from 'antd';
 import { Trash2 } from 'lucide-react';
 import { FC } from 'react';
@@ -68,6 +69,7 @@ const MediaForm: FC<Props> = ({ form }) => {
 						<div className="gap-y-2xsmall flex flex-col">
 							{media.map((field: any, index: number) => {
 								return (
+									// eslint-disable-next-line jsx-a11y/alt-text
 									<Image
 										key={index}
 										image={field}

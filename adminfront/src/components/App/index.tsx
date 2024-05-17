@@ -7,6 +7,7 @@ let message: MessageInstance;
 let notification: NotificationInstance;
 let modal: Omit<ModalStaticFunctions, 'warn'>;
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
 	const staticFunction = App.useApp();
 

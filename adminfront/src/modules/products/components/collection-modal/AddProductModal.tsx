@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { ProductCollection, Product } from '@medusajs/medusa';
 import { TableColumnsType } from 'antd';
 import { Dot, Search } from 'lucide-react';

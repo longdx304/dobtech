@@ -84,6 +84,7 @@ const EditPricesActions: FC<Props> = ({
 				})),
 			},
 		];
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedCurrencies, selectedRegions]);
 
 	return (

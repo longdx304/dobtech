@@ -16,19 +16,13 @@ interface Props {
 }
 
 export default async function Home({ searchParams }: Props) {
-  //  * * 
+  //  * *
   //  TODO: typescript type any
   //  */
   const { response } = await getProductsList({
     pageParam: searchParams,
     // queryParams,
   } as any);
-
-  const { product_categories } = await getCategoryByHandle(
-    ['pants']
-  ).then((product_categories) => product_categories);
-
-  console.log('product_categories', product_categories);
 
   return (
     <main className='w-full container pt-[8rem]'>

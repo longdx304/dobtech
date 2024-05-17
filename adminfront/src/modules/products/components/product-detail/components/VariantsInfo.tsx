@@ -129,6 +129,7 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 				handleDeleteVariant,
 				handleCopyVariant,
 			}),
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		[product]
 	);
 

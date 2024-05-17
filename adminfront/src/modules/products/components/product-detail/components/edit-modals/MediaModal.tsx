@@ -38,6 +38,7 @@ const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 				  }))
 				: [],
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [product]);
 
 	const onFinish: FormProps<MediaFormProps>['onFinish'] = async (values) => {

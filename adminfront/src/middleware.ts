@@ -5,6 +5,7 @@ import { ERoutes, routesConfig } from '@/types/routes';
 import { ERole } from './types/account';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
+// const BACKEND_URL = 'http://13.213.42.237:9000';
 
 async function getUser(accessToken: string | undefined) {
 	if (accessToken) {

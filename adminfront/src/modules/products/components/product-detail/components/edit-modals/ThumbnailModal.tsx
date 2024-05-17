@@ -42,6 +42,7 @@ const ThumbnailModal: FC<Props> = ({
 				  ]
 				: [],
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [product]);
 
 	const onFinish: FormProps<ThumbnailFormProps>['onFinish'] = async (

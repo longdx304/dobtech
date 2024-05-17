@@ -9,7 +9,6 @@ import LocalizedClientLink from '../localized-client-link';
 
 interface Props {}
 
-const { Search } = Input;
 
 const HeaderWrap: FC<Props> = ({}) => {
   return (

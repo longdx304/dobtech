@@ -55,6 +55,7 @@ const Menubar = ({ user, remove, className, onClose = () => {} }: Props) => {
 	// Render items menu
 	const _menuItems = useMemo(
 		() => menuItems(user, handleDropdownClick),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[user]
 	);
 

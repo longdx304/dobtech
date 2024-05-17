@@ -90,6 +90,7 @@ const CategoryModal: React.FC<Props> = ({
 		}
 
 		return newResult;
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [parentCategory, categories]);
 
 	// Submit form

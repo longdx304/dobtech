@@ -118,19 +118,19 @@ export const getProductsListWithSort = cache(
   async function getProductsListWithSort({
     page = 0,
     queryParams,
-    sortBy = "created_at",
+    sortBy = 'created_at',
     countryCode,
   }: {
-    page?: number
-    queryParams?: StoreGetProductsParams
-    sortBy?: SortOptions
-    countryCode: string
+    page?: number;
+    queryParams?: StoreGetProductsParams;
+    sortBy?: SortOptions;
+    countryCode: string;
   }): Promise<{
-    response: { products: ProductPreviewType[]; count: number }
-    nextPage: number | null
-    queryParams?: StoreGetProductsParams
+    response: { products: ProductPreviewType[]; count: number };
+    nextPage: number | null;
+    queryParams?: StoreGetProductsParams;
   }> {
-    const limit = queryParams?.limit || 12
+    const limit = queryParams?.limit || 12;
 
     const {
       response: { products, count },
@@ -141,15 +141,18 @@ export const getProductsListWithSort = cache(
         limit: 100,
       },
       countryCode,
-    })
+    });
 
-    const sortedProducts = sortProducts(products, sortBy)
+    const sortedProducts = sortProducts(products, sortBy);
 
-    const pageParam = (page - 1) * limit
+    const pageParam = (page - 1) * limit;
 
-    const nextPage = count > pageParam + limit ? pageParam + limit : null
+    const nextPage = count > pageParam + limit ? pageParam + limit : null;
 
-    const paginatedProducts = sortedProducts.slice(pageParam, pageParam + limit)
+    const paginatedProducts = sortedProducts.slice(
+      pageParam,
+      pageParam + limit
+    );
 
     return {
       response: {
@@ -158,6 +161,6 @@ export const getProductsListWithSort = cache(
       },
       nextPage,
       queryParams,
-    }
+    };
   }
-)
+);

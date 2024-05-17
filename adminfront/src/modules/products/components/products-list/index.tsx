@@ -91,6 +91,7 @@ const ProductList = ({}: Props) => {
 
 	const columns = useMemo(
 		() => productsColumns({ handleDeleteProduct, handleEditProduct }),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[products]
 	);
 

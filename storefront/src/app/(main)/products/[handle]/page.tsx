@@ -1,5 +1,4 @@
-import { getCategoryByHandle } from '@/actions/productCategory';
-import { getCollectionByHandle } from '@/actions/productCollection';
+import { getCategoriesList } from '@/actions/productCategory';
 import {
   getProductByHandle,
   getProductsList,
@@ -12,34 +11,16 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 type Props = {
-  params: { handle: string };
+  params: { handle: string | null };
 };
 
 export async function generateStaticParams() {
-  const countryCodes = await listRegions().then((regions) =>
-    regions?.map((r) => r.countries.map((c) => c.iso_2)).flat()
-  );
-
-  if (!countryCodes) {
-    return null;
-  }
-
-  const products = await Promise.all(
-    countryCodes.map((countryCode) => {
-      return getProductsList({ countryCode });
+  const staticParams = await getCategoriesList().then((responses) =>
+    responses.product_categories.map((category) => ({
+      handle: category.handle,
     })
-  ).then((responses) =>
-    responses.map(({ response }) => response.products).flat()
+  )
   );
-
-  const staticParams = countryCodes
-    ?.map((countryCode) =>
-      products.map((product) => ({
-        countryCode,
-        handle: product.handle,
-      }))
-    )
-    .flat();
 
   return staticParams;
 }
@@ -47,7 +28,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = params;
 
-  const { product } = await getProductByHandle(handle).then(
+  const { product } = await getProductByHandle(handle ?? '').then(
     (product) => product
   );
 
@@ -90,9 +71,11 @@ export default async function ProductPage({ params }: Props) {
     return notFound();
   }
 
-  const pricedProduct = await getPricedProductByHandle(params.handle, region);
+  const pricedProduct = await getPricedProductByHandle(
+    params?.handle ?? '',
+    region
+  );
 
-  
   if (!pricedProduct) {
     notFound();
   }

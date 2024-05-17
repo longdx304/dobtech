@@ -88,6 +88,7 @@ const AddVariantModal: FC<Props> = ({
 				});
 			}
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [variant, typeVariant]);
 
 	const handleOnOk = () => {

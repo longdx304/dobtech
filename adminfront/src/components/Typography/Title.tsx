@@ -10,7 +10,12 @@ interface Props {
 
 const { Title: AntdTitle } = Typography;
 
-export default function Title({ className, children, level, ...props }: Props) {
+export default function Title({
+	className,
+	children,
+	level = 1,
+	...props
+}: Props) {
 	return (
 		<AntdTitle {...props} className={cn('m-0', className)} level={level}>
 			{children}

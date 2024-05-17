@@ -146,6 +146,7 @@ const CollectionList: FC<Props> = ({}) => {
 			handleProductCollection,
 			handleAddProduct,
 		});
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [collections]);
 
 	const handleChangePage = (page: number) => {

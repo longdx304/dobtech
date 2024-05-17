@@ -10,6 +10,7 @@ import { Text } from '@/components/Typography';
 import { cn } from '@/lib/utils';
 import { TTreeCategories } from '@/types/productCategory';
 import LocalizedClientLink from '../localized-client-link';
+import { Tooltip, TooltipIcon } from '@/components/Tooltip';
 
 interface Props {
   categories: TTreeCategories[] | null;
@@ -140,7 +141,14 @@ const CategoryGroup = ({
                   className='cursor-pointer'
                 >
                   <LocalizedClientLink href={`categories/${child.key}`}>
-                    <Avatar>{child.label.toUpperCase().substring(0, 2)}</Avatar>
+                    <div className='flex items-center flex-col'>
+                      <Avatar>
+                        {child.label.toUpperCase().substring(0, 2)}
+                      </Avatar>
+                      <span className='text-[#666666]'>
+                        {child.label.toUpperCase()}
+                      </span>
+                    </div>
                   </LocalizedClientLink>
                 </Flex>
               ))}
