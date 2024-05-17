@@ -1,127 +1,103 @@
-"use client"
+'use client';
 
-import { PricedProduct } from "@medusajs/medusa/dist/types/pricing"
-
-import Back from "@modules/common/icons/back"
-import FastDelivery from "@modules/common/icons/fast-delivery"
-import Refresh from "@modules/common/icons/refresh"
-
-import Accordion from "./accordion"
+import { Collapse } from '@/components/Collapse';
+import { Panel } from '@/components/Collapse/Collapse';
+import { Text } from '@/components/Typography';
+import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
+import { CollapseProps } from 'antd';
+// import { Collapse } from 'antd';
+import { useState } from 'react';
 
 type ProductTabsProps = {
-  product: PricedProduct
-}
+  product: PricedProduct;
+};
 
-const ProductTabs = ({ product }: ProductTabsProps) => {
+const ProductTabs: React.FC<ProductTabsProps> = ({ product }) => {
+  const [activeKey, setActiveKey] = useState<string | string[]>(['0']);
+
+  console.log('product', product);
   const tabs = [
     {
-      label: "Product Information",
+      label: 'CHI TIẾT SẢN PHẨM',
       component: <ProductInfoTab product={product} />,
     },
     {
-      label: "Shipping & Returns",
-      component: <ShippingInfoTab />,
+      label: 'MÔ TẢ SẢN PHẨM',
+      component: <ProductDescTab product={product} />,
     },
-  ]
+  ];
+
+  const onTabChange = (key: string | string[]) => {
+    setActiveKey(key);
+  };
 
   return (
-    <div className="w-full">
-      <Accordion type="multiple">
+    <div className='product-details w-full rounded shadow mt-2'>
+      <Collapse activeKey={activeKey} onChange={onTabChange} ghost>
         {tabs.map((tab, i) => (
-          <Accordion.Item
-            key={i}
-            title={tab.label}
-            headingSize="medium"
-            value={tab.label}
-          >
+          <Panel header={tab.label} key={i}>
             {tab.component}
-          </Accordion.Item>
+          </Panel>
         ))}
-      </Accordion>
+      </Collapse>
     </div>
-  )
-}
+  );
+};
 
 const ProductInfoTab = ({ product }: ProductTabsProps) => {
   return (
-    <div className="text-small-regular py-8">
-      <div className="grid grid-cols-2 gap-x-8">
-        <div className="flex flex-col gap-y-4">
+    <div className='text-small-regular py-8'>
+      <div className='grid grid-cols-2 gap-x-8'>
+        <div className='flex flex-col gap-y-4'>
           <div>
-            <span className="font-semibold">Material</span>
-            <p>{product.material ? product.material : "-"}</p>
+            <span className='font-semibold'>Danh mục</span>
+            <p>{product.material ? product.material : '-'}</p>
           </div>
           <div>
-            <span className="font-semibold">Country of origin</span>
-            <p>{product.origin_country ? product.origin_country : "-"}</p>
+            <span className='font-semibold'>Chất liệu</span>
+            <p>{product.material ? product.material : '-'}</p>
           </div>
           <div>
-            <span className="font-semibold">Type</span>
-            <p>{product.type ? product.type.value : "-"}</p>
+            <span className='font-semibold'>Xuất xứ</span>
+            <p>{product.origin_country ? product.origin_country : '-'}</p>
           </div>
         </div>
-        <div className="flex flex-col gap-y-4">
+        <div className='flex flex-col gap-y-4'>
           <div>
-            <span className="font-semibold">Weight</span>
-            <p>{product.weight ? `${product.weight} g` : "-"}</p>
+            <span className='font-semibold'>Chất liệu</span>
+            <p>{product.type ? product.type.value : '-'}</p>
           </div>
           <div>
-            <span className="font-semibold">Dimensions</span>
+            <span className='font-semibold'>Trọng lượng</span>
+            <p>{product?.weight ? `${product?.weight} g` : '-'}</p>
+          </div>
+          <div>
+            <span className='font-semibold'>Kích thước phù hợp</span>
             <p>
               {product.length && product.width && product.height
                 ? `${product.length}L x ${product.width}W x ${product.height}H`
-                : "-"}
+                : '-'}
             </p>
           </div>
         </div>
       </div>
       {product.tags?.length ? (
         <div>
-          <span className="font-semibold">Tags</span>
+          <span className='font-semibold'>Tags</span>
         </div>
       ) : null}
     </div>
-  )
-}
+  );
+};
 
-const ShippingInfoTab = () => {
+const ProductDescTab = ({ product }: ProductTabsProps) => {
   return (
-    <div className="text-small-regular py-8">
-      <div className="grid grid-cols-1 gap-y-8">
-        <div className="flex items-start gap-x-2">
-          <FastDelivery />
-          <div>
-            <span className="font-semibold">Fast delivery</span>
-            <p className="max-w-sm">
-              Your package will arrive in 3-5 business days at your pick up
-              location or in the comfort of your home.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-start gap-x-2">
-          <Refresh />
-          <div>
-            <span className="font-semibold">Simple exchanges</span>
-            <p className="max-w-sm">
-              Is the fit not quite right? No worries - we&apos;ll exchange your
-              product for a new one.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-start gap-x-2">
-          <Back />
-          <div>
-            <span className="font-semibold">Easy returns</span>
-            <p className="max-w-sm">
-              Just return your product and we&apos;ll refund your money. No
-              questions asked – we&apos;ll do our best to make sure your return
-              is hassle-free.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+    <>
+      <Text className='text-medium' data-testid='product-description'>
+        {product.description}
+      </Text>
+    </>
+  );
+};
 
-export default ProductTabs
+export default ProductTabs;

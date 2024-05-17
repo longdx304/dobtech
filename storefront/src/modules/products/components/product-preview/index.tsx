@@ -1,55 +1,37 @@
-import { Text } from "@medusajs/ui"
+"use client";
+import { FC } from "react";
 
-import { ProductPreviewType } from "types/global"
+import { Flex } from "@/components/Flex";
+import { Text } from "@/components/Typography";
+import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+import Thumbnail from "@/modules/products/components/thumbnail";
+import { cn } from "@/lib/utils";
+import PreviewPrice from "./price";
+import { ProductPreviewType } from "@/types/product";
 
-import { retrievePricedProductById } from "@lib/data"
-import { getProductPrice } from "@lib/util/get-product-price"
-import { Region } from "@medusajs/medusa"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import Thumbnail from "../thumbnail"
-import PreviewPrice from "./price"
-
-export default async function ProductPreview({
-  productPreview,
-  isFeatured,
-  region,
-}: {
-  productPreview: ProductPreviewType
-  isFeatured?: boolean
-  region: Region
-}) {
-  const pricedProduct = await retrievePricedProductById({
-    id: productPreview.id,
-    regionId: region.id,
-  }).then((product) => product)
-
-  if (!pricedProduct) {
-    return null
-  }
-
-  const { cheapestPrice } = getProductPrice({
-    product: pricedProduct,
-    region,
-  })
-
-  return (
-    <LocalizedClientLink
-      href={`/products/${productPreview.handle}`}
-      className="group"
-    >
-      <div data-testid="product-wrapper">
-        <Thumbnail
-          thumbnail={productPreview.thumbnail}
-          size="full"
-          isFeatured={isFeatured}
-        />
-        <div className="flex txt-compact-medium mt-4 justify-between">
-          <Text className="text-ui-fg-subtle" data-testid="product-title">{productPreview.title}</Text>
-          <div className="flex items-center gap-x-2">
-            {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
-          </div>
-        </div>
-      </div>
-    </LocalizedClientLink>
-  )
+interface Props {
+	data: ProductPreviewType;
 }
+
+const ProductPreview: FC<Props> = ({ data }) => {
+	return (
+		<LocalizedClientLink
+			href={`products/${data.handle}`}
+			className={cn(
+				"shadow group rounded hover:shadow-lg hover:-translate-y-1.5 transition-all"
+			)}
+		>
+			<Flex vertical>
+				<Thumbnail thumbnail={data?.thumbnail} />
+				<Flex vertical className="p-2 w-full box-border">
+					<Text className="leading-5 text-[0.875rem] line-clamp-2 w-full">
+						{data?.title}
+					</Text>
+					<PreviewPrice price={data.price} />
+				</Flex>
+			</Flex>
+		</LocalizedClientLink>
+	);
+};
+
+export default ProductPreview;

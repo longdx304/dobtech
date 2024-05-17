@@ -1,3 +1,4 @@
+import React from 'react';
 import { getAdmin } from '@/actions/accounts';
 
 import Header from '@/modules/common/components/header';

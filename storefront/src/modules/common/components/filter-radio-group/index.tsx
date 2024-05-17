@@ -1,68 +1,65 @@
-import { EllipseMiniSolid } from "@medusajs/icons"
-import { Label, RadioGroup, Text, clx } from "@medusajs/ui"
-import { ChangeEvent } from "react"
+import { Button } from '@/components/Button';
+import { Dropdown } from '@/components/Dropdown';
+import { Space } from 'antd';
+import { ArrowDown, Filter } from 'lucide-react';
+import { ChangeEvent } from 'react';
 
 type FilterRadioGroupProps = {
-  title: string
   items: {
-    value: string
-    label: string
-  }[]
-  value: any
-  handleChange: (...args: any[]) => void
-  'data-testid'?: string
-}
+    value: string;
+    label: string;
+  }[];
+  value: any;
+  handleChange: (...args: any[]) => void;
+  'data-testid'?: string;
+};
 
 const FilterRadioGroup = ({
-  title,
   items,
   value,
   handleChange,
-  'data-testid': dataTestId
+  'data-testid': dataTestId,
 }: FilterRadioGroupProps) => {
-  return (
-    <div className="flex gap-x-3 flex-col gap-y-3">
-      <Text className="txt-compact-small-plus text-ui-fg-muted">{title}</Text>
-      <RadioGroup data-testid={dataTestId}>
-        {items?.map((i) => (
-          <div
-            key={i.value}
-            className={clx("flex gap-x-2 items-center", {
-              "ml-[-1.75rem]": i.value === value,
-            })}
-          >
-            {i.value === value && <EllipseMiniSolid />}
-            <RadioGroup.Item
-              checked={i.value === value}
-              onClick={(e) =>
-                handleChange(
-                  e as unknown as ChangeEvent<HTMLButtonElement>,
-                  i.value
-                )
-              }
-              className="hidden peer"
-              id={i.value}
-              value={i.value}
-            />
-            <Label
-              placeholder={i.label}
-              htmlFor={i.value}
-              className={clx(
-                "!txt-compact-small !transform-none text-ui-fg-subtle hover:cursor-pointer",
-                {
-                  "text-ui-fg-base": i.value === value,
-                }
-              )}
-              data-testid="radio-label"
-              data-active={i.value === value}
-            >
-              {i.label}
-            </Label>
-          </div>
-        ))}
-      </RadioGroup>
-    </div>
-  )
-}
+  console.log('value:', value);
 
-export default FilterRadioGroup
+  return (
+    <>
+      <h1 className='text-4xl font-bold tracking-tight text-gray-900'>
+        Category / Items
+      </h1>
+      <div className='flex items-center'>
+        <Dropdown
+          menu={{ selectedKeys: [value] }}
+          dropdownRender={(menu) => (
+            <ul className='space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900 list-none'>
+              {items.map((item) => (
+                <li key={item.value}>
+                  <a
+                    onClick={() => handleChange(item.value)}
+                    className='text-black'
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          className='cursor-pointer'
+          data-testid={dataTestId}
+        >
+          <a onClick={(e) => e.preventDefault()}>
+            <Space>
+              Sort by <ArrowDown />
+            </Space>
+          </a>
+        </Dropdown>
+
+        <Button className='-m-2 ml-4 bg-white shadow-none hover:border-slate-500'>
+          <Filter className='h-5 w-5' />
+        </Button>
+      </div>
+    </>
+  );
+};
+
+export default FilterRadioGroup;

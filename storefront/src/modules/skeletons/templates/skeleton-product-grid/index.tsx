@@ -1,16 +1,19 @@
-import repeat from "@lib/util/repeat"
-import SkeletonProductPreview from "@modules/skeletons/components/skeleton-product-preview"
+import repeat from '@/lib/utils/repeat';
+import SkeletonProductPreview from '../../components/skeleton-product-preview';
 
 const SkeletonProductGrid = () => {
   return (
-    <ul className="grid grid-cols-2 small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8 flex-1" data-testid="products-list-loader">
+    <ul
+      className='lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 list-none'
+      data-testid='products-list-loader'
+    >
       {repeat(8).map((index) => (
         <li key={index}>
           <SkeletonProductPreview />
         </li>
       ))}
     </ul>
-  )
-}
+  );
+};
 
-export default SkeletonProductGrid
+export default SkeletonProductGrid;

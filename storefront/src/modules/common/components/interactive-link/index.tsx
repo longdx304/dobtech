@@ -1,33 +1,34 @@
-import { ArrowUpRightMini } from "@medusajs/icons"
-import { Text } from "@medusajs/ui"
-import LocalizedClientLink from "../localized-client-link"
+import { ArrowUpRight } from 'lucide-react';
+import LocalizedClientLink from '../localized-client-link';
+import { Text } from '@/components/Typography';
 
 type InteractiveLinkProps = {
-  href: string
-  children?: React.ReactNode
-  onClick?: () => void
-}
+  href: string;
+  children?: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+  isIconHidden?: boolean;
+};
 
 const InteractiveLink = ({
   href,
   children,
   onClick,
+  className,
+  isIconHidden,
   ...props
 }: InteractiveLinkProps) => {
   return (
     <LocalizedClientLink
-      className="flex gap-x-1 items-center group"
+      className={className}
       href={href}
       onClick={onClick}
       {...props}
     >
-      <Text className="text-ui-fg-interactive">{children}</Text>
-      <ArrowUpRightMini
-        className="group-hover:rotate-45 ease-in-out duration-150"
-        color="var(--fg-interactive)"
-      />
+      <p>{children}</p>
+      {!isIconHidden && <ArrowUpRight />}
     </LocalizedClientLink>
-  )
-}
+  );
+};
 
-export default InteractiveLink
+export default InteractiveLink;

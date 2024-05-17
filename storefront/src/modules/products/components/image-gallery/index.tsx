@@ -1,39 +1,45 @@
-import { Image as MedusaImage } from "@medusajs/medusa"
-import { Container } from "@medusajs/ui"
-import Image from "next/image"
+'use client';
+
+import { Image as MedusaImage } from '@medusajs/medusa';
+import { Flex } from 'antd';
+import Image from 'next/image';
+import { useState } from 'react';
 
 type ImageGalleryProps = {
-  images: MedusaImage[]
-}
+  images: MedusaImage[];
+};
 
 const ImageGallery = ({ images }: ImageGalleryProps) => {
-  return (
-    <div className="flex items-start relative">
-      <div className="flex flex-col flex-1 small:mx-16 gap-y-4">
-        {images.map((image, index) => {
-          return (
-            <Container
-              key={image.id}
-              className="relative aspect-[29/34] w-full overflow-hidden bg-ui-bg-subtle"
-              id={image.id}
-            >
-              <Image
-                src={image.url}
-                priority={index <= 2 ? true : false}
-                className="absolute inset-0 rounded-rounded"
-                alt={`Product image ${index + 1}`}
-                fill
-                sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
-                style={{
-                  objectFit: "cover",
-                }}
-              />
-            </Container>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
+  const [selectedImage, setSelectedImage] = useState<number>(0);
 
-export default ImageGallery
+  return (
+    <Flex className='images flex justify-center items-center gap-4 w-[730px]'>
+      <Flex className='all-images flex flex-col justify-center'>
+        {images.map((img, index) => (
+          <div key={index} className='image relative rounded-lg'>
+            <Image
+              onClick={() => setSelectedImage(index)}
+              className='w-[70px] h-[70px] rounded-lg mb-3 p-1 object-cover object-top cursor-pointer'
+              src={img.url}
+              alt={`Image ${index + 1}`}
+              width={70}
+              height={70}
+              onMouseEnter={() => setSelectedImage(index)}
+            />
+          </div>
+        ))}
+      </Flex>
+      <Flex className='selected-image'>
+        <Image
+          src={images[selectedImage]?.url || images[0]?.url}
+          className='h-[600px] w-auto object-cover object-top'
+          alt=''
+          width={600}
+          height={600}
+        />
+      </Flex>
+    </Flex>
+  );
+};
+
+export default ImageGallery;

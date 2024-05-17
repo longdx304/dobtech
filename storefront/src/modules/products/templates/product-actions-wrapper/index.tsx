@@ -1,6 +1,6 @@
-import { retrievePricedProductById } from "@lib/data"
+import { retrievePricedProductById } from '@/actions/products'
 import { Region } from "@medusajs/medusa"
-import ProductActions from "@modules/products/components/product-actions"
+import ProductActions from '../../components/product-actions'
 
 /**
  * Fetches real time pricing for a product and renders the product actions component.
