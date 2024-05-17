@@ -1,17 +1,21 @@
 import type { MenuProps } from 'antd';
-import { Menu, Flex } from 'antd';
+import { Flex } from 'antd';
 import {
 	CalendarRange,
-	Settings,
-	User,
+	ClipboardPenLine,
 	Ellipsis,
-	Users,
 	LogOut,
+	PackageSearch,
+	Settings,
+	User as UserIcon,
+	Users,
+	LayoutList
 } from 'lucide-react';
 
-import { IAdminResponse } from '@/types/account.ts';
-import { Text } from '@/components/Typography';
 import { Dropdown } from '@/components/Dropdown';
+import { IAdminResponse } from '@/types/account';
+import { User } from '@medusajs/medusa';
+import { ERoutes } from '@/types/routes';
 
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(
@@ -40,18 +44,20 @@ const itemDropdown: MenuProps['items'] = [
 ];
 
 // Item menu overview
-const itemOverview: MenuProps['items'] = (
+const itemOverview = (
 	role: string,
 	permissions: string[]
 ) =>
 	[
 		role === 'admin' && getItem('Quản lý nhân viên', 'overview-1', <Users />),
-		getItem('Đơn hàng của bạn', 'overview-2', <CalendarRange />),
-		getItem('Label', 'overview-3', <Settings />, [
-			getItem('Option 5', '5'),
+		role === 'admin' && getItem('Danh mục', 'overview-2', <LayoutList />),
+		getItem('Quản lý sản phẩm', 'overview-3', <ClipboardPenLine />),
+		getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
+		getItem('Label', 'overview-5', <Settings />, [
 			getItem('Option 6', '6'),
 			getItem('Option 7', '7'),
 			getItem('Option 8', '8'),
+			getItem('Option 9', '9'),
 		]),
 	].filter(() => true);
 
@@ -82,30 +88,32 @@ const itemUser = (
 			</a>
 		</Dropdown>,
 		'user-1',
-		<User />
+		<UserIcon />
 	),
 ];
 
 // Generation menu
 export const menuItems = (
-	user: IAdminResponse,
+	user: Omit<User, "password_hash">,
 	handleDropdownClick: (e: any) => void
 ) => {
-	const role = user.role;
-	const permissions = user.permissions.split(',');
+	const role = user?.role;
+	const permissions = (user as any)?.permissions?.split(',');
 	return [
 		getItem(
 			'Tổng quan',
 			'overview',
 			null,
-			itemOverview(role, permissions),
+			itemOverview(role, permissions) as MenuItem[],
 			'group'
 		),
 		getItem('Tuỳ chỉnh', 'option', null, itemOption, 'group'),
-		getItem('', 'user', null, itemUser(user, handleDropdownClick), 'group'),
+		getItem('', 'user', null, itemUser(user as any, handleDropdownClick), 'group'),
 	];
 };
 
 export const menuRoutes: Record<string, string> = {
-	'overview-1': '/accounts',
+	'overview-1': ERoutes.ACCOUNTS,
+	'overview-2': ERoutes.PRODUCT_CATEGORIES,
+	'overview-3': ERoutes.PRODUCTS,
 };

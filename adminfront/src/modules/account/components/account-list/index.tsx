@@ -1,40 +1,42 @@
 'use client';
-import { Plus, CircleAlert } from 'lucide-react';
-import { useMemo, useState } from 'react';
 import { User } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import _ from 'lodash';
+import { CircleAlert, Plus, Search } from 'lucide-react';
+import { useAdminDeleteUser } from 'medusa-react';
+import { ChangeEvent, useMemo, useState } from 'react';
 
-import { Card } from '@/components/Card';
-import Table from '@/components/Table';
 import { FloatButton } from '@/components/Button';
-import { Title } from '@/components/Typography';
+import { Card } from '@/components/Card';
+import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
-import { SubmitButton } from '@/components/Button';
-import { UserModal } from '@/modules/account/components/account-modal';
-import accountColumns from './account-column';
+import { Table } from '@/components/Table';
+import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { TResponse } from '@/types/common';
-import { deleteUser } from '@/actions/accounts';
-import { updateSearchQuery } from '@/lib/utils';
+import { UserModal } from '@/modules/account/components/account-modal';
+import { IAdminResponse } from '@/types/account';
+import { useAdminUsers } from 'medusa-react';
+import accountColumns from './account-column';
 
-interface Props {
-	data: TResponse<Omit<User, 'password_hash'>> | null;
-}
+interface Props {}
 
-const AccountList = ({ data }: Props) => {
-	const searchParams = useSearchParams();
-	const { replace } = useRouter();
-	const pathname = usePathname();
-	const currentPage = searchParams.get('page') ?? 1;
+const AccountList = ({}: Props) => {
+	const PAGE_SIZE = 10;
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const [searchValue, setSearchValue] = useState('');
+	const { users, count, isLoading, isRefetching } = useAdminUsers({
+		limit: PAGE_SIZE,
+		offset: (currentPage - 1) * PAGE_SIZE,
+		q: searchValue || undefined,
+	});
 
 	const { state, onOpen, onClose } = useToggleState(false);
-	const [currentUser, setCurrentUser] = useState<Omit<
-		User,
-		'password_hash'
-	> | null>(null);
+	const [currentUser, setCurrentUser] = useState<IAdminResponse | null>(null);
+	const [userId, setUserId] = useState<string | null>(null);
+	const deleteUser = useAdminDeleteUser(userId!);
 
-	const handleEditUser = (record: User) => {
+	const handleEditUser = (record: IAdminResponse) => {
 		setCurrentUser(record);
 		onOpen();
 	};
@@ -45,68 +47,94 @@ const AccountList = ({ data }: Props) => {
 	};
 
 	const handleDeleteUser = (userId: User['id']) => {
-		Modal.confirm({
-			title: 'Bạn có muốn xoá nhân viên này không ?',
-			content:
-				'Nhân viên sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá nhân viên này chứ?',
-			icon: (
-				<CircleAlert
-					style={{ width: 32, height: 24 }}
-					className="mr-2"
-					color="#E7B008"
-				/>
-			),
-			okType: 'danger',
-			okText: 'Đồng ý',
-			cancelText: 'Huỷ',
-			async onOk() {
-				try {
-					await deleteUser(userId);
-					message.success('Xoá nhân viên thành công!');
-				} catch (error) {
-					message.error('Xoá nhân viên thất bại!');
-				}
-			},
-			onCancel() {
-				console.log('Cancel');
-			},
-		});
+		setUserId(userId);
+		if (userId) {
+			Modal.confirm({
+				title: 'Bạn có muốn xoá nhân viên này không ?',
+				content:
+					'Nhân viên sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá nhân viên này chứ?',
+				icon: (
+					<CircleAlert
+						style={{ width: 32, height: 24 }}
+						className="mr-2"
+						color="#E7B008"
+					/>
+				),
+				okType: 'danger',
+				okText: 'Đồng ý',
+				cancelText: 'Huỷ',
+				async onOk() {
+					deleteUser.mutateAsync(void 0, {
+						onSuccess: () => {
+							setUserId(null);
+							message.success('Xoá nhân viên thành công!');
+							return;
+						},
+						onError: () => {
+							message.error('Xoá nhân viên thất bại!');
+							return;
+						},
+					});
+					// setUserId(null);
+				},
+				onCancel() {
+					setUserId(null);
+				},
+			});
+		}
 	};
 
 	const handleChangePage = (page: number) => {
-		// create new search params with new value
-		const newSearchParams = updateSearchQuery(searchParams, {
-			page: page,
-		});
-
-		// Replace url
-		replace(`${pathname}?${newSearchParams}`);
+		setCurrentPage(page);
 	};
 
 	const columns = useMemo(
 		() => accountColumns({ handleDeleteUser, handleEditUser }),
-		[data]
+		[users]
+	);
+
+	const handleChangeDebounce = _.debounce(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const { value: inputValue } = e.target;
+
+			// Update search query
+			setSearchValue(inputValue);
+		},
+		500
 	);
 
 	return (
 		<Card className="w-full">
+			<Flex align="center" justify="flex-start" className="">
+				<Title level={3}>Quản lý nhân viên</Title>
+			</Flex>
+			<Flex align="center" justify="flex-end" className="pb-4">
+				<Input
+					// size="small"
+					placeholder="Tìm kiếm nhân viên..."
+					name="search"
+					prefix={<Search size={16} />}
+					onChange={handleChangeDebounce}
+					className="w-[300px]"
+				/>
+			</Flex>
 			<Table
-				columns={columns}
-				dataSource={data?.users ?? []}
+				loading={isLoading || isRefetching}
+				columns={columns as any}
+				dataSource={users}
 				rowKey="id"
 				pagination={{
-					total: Math.floor(data?.count / data?.limit),
-					pageSize: data?.limit,
-					current: currentPage,
+					total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
+					pageSize: PAGE_SIZE,
+					current: currentPage as number,
 					onChange: handleChangePage,
+					showTotal: (total) => `Total ${total} items`,
+					// showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
 				}}
-				// onRow={(record, rowIndex) => ({
-				// 	onClick: (event) => onClickRow(record),
-				// })}
 			/>
 			<FloatButton
 				className="absolute"
-				icon={<Plus color="white" />}
+				icon={<Plus color="white" size={20} strokeWidth={2} />}
 				type="primary"
 				onClick={onOpen}
 				data-testid="btnCreateAccount"

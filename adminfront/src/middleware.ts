@@ -1,15 +1,12 @@
+import _ from 'lodash';
 import { NextRequest, NextResponse } from 'next/server';
-import { isEmpty, intersection } from 'lodash';
 
-import { getAdmin } from '@/actions/accounts';
-import { medusaClient } from '@/lib/database/config';
-import { getMedusaHeaders } from './actions/common';
-import { ERole } from '@/types/account';
-import { routesConfig } from '@/types/routes';
+import { ERoutes, routesConfig } from '@/types/routes';
+import { ERole } from './types/account';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
 
-async function getUser(accessToken) {
+async function getUser(accessToken: string | undefined) {
 	if (accessToken) {
 		return fetch(`${BACKEND_URL}/admin/auth`, {
 			headers: {
@@ -19,16 +16,34 @@ async function getUser(accessToken) {
 	}
 	return null;
 }
+
+const publicRoutes = ['/login'];
+
 export async function middleware(request: NextRequest) {
 	const res = NextResponse.next();
-	const accessToken = request.cookies.get('_medusa_jwt')?.value;
+	// Get pathname of current routes
+	const pathname = request.nextUrl.pathname;
+	const isPublicRoute = publicRoutes.includes(pathname);
 
+	// Decrypt the session from the cookie
+	const accessToken = request.cookies.get('_medusa_jwt')?.value;
 	// Get current user information
 	const data = await getUser(accessToken);
 
-	// User not found return homepage
-	if (!data) {
-		return NextResponse.redirect(new URL('/', request.url), 307);
+	// If route is public, program executing
+	if (isPublicRoute || pathname === ERoutes.LOGIN) {
+		if (!_.isEmpty(data)) {
+			return NextResponse.redirect(
+				new URL(ERoutes.DASHBOARD, request.url),
+				307
+			);
+		}
+		return res;
+	}
+
+	// Redirect Login page if user hasn't logged in
+	if (_.isEmpty(data)) {
+		return NextResponse.redirect(new URL(ERoutes.LOGIN, request.url), 307);
 	}
 
 	const { role, permissions } = data.user;
@@ -37,29 +52,31 @@ export async function middleware(request: NextRequest) {
 	if (role === ERole.ADMIN) {
 		return res;
 	}
-	// Get pathname of current routes
-	const pathname = request.nextUrl.pathname;
 	// Find mode of routes
-	const { mode: routesMode } = routesConfig.find(
-		(routes) => routes.path === pathname
-	);
+	const { mode: routesMode } =
+		routesConfig.find((routes) => pathname.startsWith(routes.path)) ?? {};
 
-	// Routes mode isn't exists return homepage
-	if (!routesMode) {
-		return NextResponse.redirect(new URL('/', request.url), 307);
+	// Routes mode isn't exists program executing
+	if (!routesMode || routesMode?.length === 0) {
+		return res;
 	}
 
 	// Check current user has permission into routes
-	const hasPermissions = intersection(routesMode, permissions.split(','));
+	const hasPermissions = _.intersection(routesMode, permissions?.split(','));
 
 	// If user hasn't permission return homepage
-	if (isEmpty(hasPermissions)) {
-		return NextResponse.redirect(new URL('/', request.url), 307);
+	if (_.isEmpty(hasPermissions)) {
+		return NextResponse.redirect(new URL(ERoutes.DASHBOARD, request.url), 307);
 	}
 
 	return res;
 }
 
 export const config = {
-	matcher: ['/accounts/:path', '/products/:path'],
+	// matcher: [
+	// 	'/((?!api|_next/static|favicon.ico|manifest.json|sw*|workbox-*|ios*|.*\\.png$|.*\\.jpg$).*)',
+	// ],
+	matcher: ['/admin/:path*', '/login'],
+	runtime: 'experimental-edge',
+	unstable_allowDynamic: ['**/node_modules/lodash*/**/*.js'],
 };

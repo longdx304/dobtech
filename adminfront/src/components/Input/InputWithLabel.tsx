@@ -3,9 +3,10 @@ import { cn } from '@/lib/utils';
 import { Flex } from '@/components/Flex';
 import { Text, ErrorText } from '@/components/Typography';
 
+
 interface Props extends AntdInputProps {
 	className?: string;
-	label: string;
+	label?: string;
 	error?: string;
 }
 

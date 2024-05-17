@@ -1,11 +1,12 @@
-import './globals.css';
+import { AntdRegistry } from '@ant-design/nextjs-registry';
+import { ConfigProvider } from 'antd';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { getAdmin } from '@/actions/accounts';
-import { AntdRegistry } from '@ant-design/nextjs-registry';
+import './globals.css';
 
+import { FeatureFlagProvider } from '@/lib/providers/feature-flag-provider';
+import { MedusaProvider } from '@/lib/providers/medusa-provider';
 import theme from '../theme';
-import { ConfigProvider, App } from 'antd';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -14,24 +15,20 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-	main,
-	login,
 	children,
 }: Readonly<{
-	main?: React.ReactNode;
-	login?: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-	const adminUser = await getAdmin().catch(() => null);
-
 	return (
 		<html lang="en">
 			<body className={inter.className}>
 				<AntdRegistry>
 					<ConfigProvider theme={theme}>
-						<App>{adminUser ? main : login}</App>
+						<MedusaProvider>
+							<FeatureFlagProvider>{children}</FeatureFlagProvider>
+						</MedusaProvider>
 					</ConfigProvider>
 				</AntdRegistry>
-				{/* {children} */}
 			</body>
 		</html>
 	);

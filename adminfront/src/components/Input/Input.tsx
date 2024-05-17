@@ -10,9 +10,9 @@ interface Props extends AntdInputProps {
 
 export default function Input({ error, className, ...props }: Props) {
 	return (
-		<Flex vertical gap={4} className="w-full">
-			<AntdInput size="large" className={cn('p-3 gap-2', className)} {...props} />
-			{error && <ErrorText error={error} />}
+		<Flex vertical gap={4} className="">
+			<AntdInput className={cn('px-[6px] py-2 gap-2', className)} {...props} allowClear />
+			{/* {error && <ErrorText error={error} />} */}
 		</Flex>
 	);
 }
