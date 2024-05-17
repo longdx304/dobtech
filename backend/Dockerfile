@@ -5,6 +5,7 @@ WORKDIR /app
 COPY package.json .
 COPY develop.sh .
 COPY yarn.* .
+COPY .env .
 
 RUN apk update
 
