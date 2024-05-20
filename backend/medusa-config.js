@@ -21,6 +21,11 @@ try {
   dotenv.config({ path: process.cwd() + '/' + ENV_FILE_NAME });
 } catch (e) {}
 
+// CORS when consuming Medusa from admin
+const ADMIN_CORS =
+  process.env.ADMIN_CORS ||
+  'http://localhost:7001,http://localhost:3000,https://dob-ecommerce-admin.vercel.app';
+
 // CORS to avoid issues when consuming Medusa from a client
 const STORE_CORS = process.env.STORE_CORS || 'http://localhost:8000';
 
@@ -38,6 +43,16 @@ const plugins = [
       upload_dir: 'uploads',
     },
   },
+  // {
+  //   resolve: '@medusajs/admin',
+  //   /** @type {import('@medusajs/admin').PluginOptions} */
+  //   options: {
+  //     autoRebuild: true,
+  //     develop: {
+  //       open: process.env.OPEN_BROWSER !== 'false',
+  //     },
+  //   },
+  // },
   {
     resolve: `medusa-file-s3`,
     options: {
@@ -75,6 +90,7 @@ const projectConfig = {
   cookieSecret: process.env.COOKIE_SECRET,
   store_cors: STORE_CORS,
   database_url: DATABASE_URL,
+  admin_cors: ADMIN_CORS,
   // Uncomment the following lines to enable REDIS
   redis_url: REDIS_URL,
 };

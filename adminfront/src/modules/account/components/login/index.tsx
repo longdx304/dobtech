@@ -2,31 +2,22 @@
 
 import { Lock, LogIn, Mail } from 'lucide-react';
 
+import { setCookie } from '@/actions/auth';
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Input, InputPassword } from '@/components/Input';
 import { cn } from '@/lib/utils';
-import ErrorMessage from '@/modules/common/components/error-message';
-import { Button, SubmitButton } from '@/components/Button';
-import { adminLogIn } from '@/services/accounts';
-import { useFormState } from 'react-dom';
-import { ErrorText } from '@/components/Typography';
+import { ERoutes } from '@/types/routes';
 import { Form, FormProps, message } from 'antd';
 import { useAdminLogin, useMedusa } from 'medusa-react';
 import { useRouter } from 'next/navigation';
-import { ERoutes } from '@/types/routes';
-import { cookies } from 'next/headers';
-import { setCookie } from '@/actions/auth';
-
-// interface Props {}
 
 type FormValues = {
 	email: string;
 	password: string;
 };
 
-type LoginTemplateProps = {
-	// toResetPassword: () => void
-};
+type LoginTemplateProps = {};
 
 const LoginTemplate = ({}: LoginTemplateProps) => {
 	const [form] = Form.useForm();
