@@ -13,7 +13,9 @@ async function getUser(accessToken: string | undefined) {
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 			},
-		}).then((data) => data.json());
+		})
+			.then((data) => data.json())
+			.catch(() => null);
 	}
 	return null;
 }
