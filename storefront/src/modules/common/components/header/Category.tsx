@@ -18,7 +18,6 @@ interface Props {
 
 const Category: FC<Props> = ({ categories }) => {
 	const pathname = usePathname();
-	console.log('pathname', pathname)
 	const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
 	const handleMouseEnter = (categoryId: string) => {
@@ -66,12 +65,7 @@ const Category: FC<Props> = ({ categories }) => {
 							key={category.id}
 							onMouseEnter={() => handleMouseEnter(category.id)}
 						>
-							<LocalizedClientLink
-								href={`categories/${category.key}`}
-								className="text-[#666666]"
-							>
 								{category.label}
-							</LocalizedClientLink>
 						</Text>
 					))}
 				</Flex>
@@ -125,6 +119,7 @@ const CategoryNav = ({
 	return (
 		<Flex vertical className="w-full">
 			{categories?.map((category) => (
+				<LocalizedClientLink href={`categories/${category.key}`} key={category.id}>
 				<Flex
 					onMouseEnter={() => handleMouseEnter(category.id)}
 					justify="space-between"
@@ -133,20 +128,21 @@ const CategoryNav = ({
 						"group w-full cursor-pointer hover:bg-slate-200/30 rounded-[8px] py-2 px-2 box-border transition-all",
 						activeItem === category.id && "bg-slate-200/30"
 					)}
-					key={category.id}
+					
 				>
-					<LocalizedClientLink href={`categories/${category.key}`}>
 						<Text className="text-[12px] text-[#666666] font-normal">
 							{category.label}
 						</Text>
-					</LocalizedClientLink>
 					<ChevronRight
 						className={cn(
 							"group-hover:translate-x-1",
 							activeItem === category.id && "translate-x-1"
 						)}
-					/>
+						color="#767676"
+						size={20}
+						/>
 				</Flex>
+					</LocalizedClientLink>
 			))}
 		</Flex>
 	);
@@ -184,13 +180,13 @@ const CategoryGroup = ({
 									<LocalizedClientLink
 										href={`categories/${child.key}`}
 									>
-										<div className="flex items-center flex-col">
+										<div className="flex items-center flex-col gap-1">
 											<Avatar size={64} src={url}>
 												{child.label
 													.toUpperCase()
 													.substring(0, 2)}
 											</Avatar>
-											<span className="text-[#666666]">
+											<span className="text-[#666666] text-[11px]">
 												{formattedText(child.label)}
 											</span>
 										</div>
