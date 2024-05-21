@@ -2,13 +2,14 @@ import { FC, Suspense } from 'react';
 
 import { BadgeButton } from '@/components/Button';
 import CartButton from '@/modules/layout/components/cart-button';
-import { Flex, Input } from 'antd';
+import SearchInput from '@/modules/layout/components/search-input.tsx';
+import UserInformation from '@/modules/layout/components/user-information';
+import { Flex } from 'antd';
 import { ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import LocalizedClientLink from '../localized-client-link';
 
 interface Props {}
-
 
 const HeaderWrap: FC<Props> = ({}) => {
   return (
@@ -16,44 +17,20 @@ const HeaderWrap: FC<Props> = ({}) => {
       <div className='flex items-center'>
         <LocalizedClientLink href='/'>
           <Image
-            src='/images/dob-icon.png'
-            width={28}
-            height={37}
+            src='/images/CHAMDEP_logo.png'
+            width={125}
+            height={48}
             alt='Dob Icon'
           />
         </LocalizedClientLink>
       </div>
       <Flex gap='small' justify='center' align='center'>
-        <Suspense
-          fallback={
-            <LocalizedClientLink
-              className='hover:text-ui-fg-base flex gap-2'
-              href='cart'
-              data-testid='nav-cart-link'
-            >
-              {/* <Search
-                className='[&_.ant-input-outlined:focus]:shadow-none'
-                placeholder='Tìm kiếm'
-                // onSearch={() => {}}
-                enterButton
-              /> */}
-            </LocalizedClientLink>
-          }
-        >
-          {/* <Search
-            className='[&_.ant-input-outlined:focus]:shadow-none'
-            placeholder='Tìm kiếm'
-            // onSearch={() => {}}
-            enterButton
-          /> */}
-          Search
+        {/* Search */}
+        <Suspense>
+          <SearchInput />
         </Suspense>
-        {/* <BadgeButton
-          icon={<ShoppingCart className='stroke-2' />}
-          count={0}
-          showZero
-          offset={[0, 10]}
-        /> */}
+
+        {/* Cart */}
         <Suspense
           fallback={
             <LocalizedClientLink
@@ -73,32 +50,9 @@ const HeaderWrap: FC<Props> = ({}) => {
           <CartButton />
         </Suspense>
 
-        {/* User */}
-        <Suspense
-          fallback={
-            <LocalizedClientLink
-              className='hover:text-ui-fg-base flex gap-2'
-              href='cart'
-              data-testid='nav-cart-link'
-            >
-              {/* <Button
-                icon={<User className='stroke-2' />}
-                shape='circle'
-                type='text'
-                onClick={() => {}}
-                className=''
-              /> */}
-            </LocalizedClientLink>
-          }
-        >
-          {/* <Button
-            icon={<User className='stroke-2' />}
-            shape='circle'
-            type='text'
-            onClick={() => {}}
-            className=''
-          /> */}
-          User
+        {/* User Information */}
+        <Suspense>
+          <UserInformation />
         </Suspense>
       </Flex>
     </Flex>

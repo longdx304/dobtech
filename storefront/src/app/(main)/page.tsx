@@ -25,7 +25,7 @@ export default async function Home({ searchParams }: Props) {
   } as any);
 
   return (
-    <main className='w-full container pt-[8rem]'>
+    <main className='w-full container pt-[8rem] box-border'>
       <ProductList data={response} />
     </main>
   );

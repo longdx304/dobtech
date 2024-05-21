@@ -1,9 +1,7 @@
 'use client';
 
 import { BadgeButton, Button } from '@/components/Button';
-import { formatAmount } from '@/lib/utils/prices';
 import DeleteButton from '@/modules/common/components/delete-button';
-import LineItemOptions from '@/modules/common/components/line-item-options';
 import LineItemPrice from '@/modules/common/components/line-item-price';
 import LocalizedClientLink from '@/modules/common/components/localized-client-link';
 import Thumbnail from '@/modules/products/components/thumbnail';

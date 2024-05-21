@@ -1,8 +1,9 @@
 'use client';
 
-import { ChangeEvent } from 'react';
-
 import FilterRadioGroup from '@/modules/common/components/filter-radio-group';
+import { ProductCategory } from '@medusajs/medusa';
+import { useMemo, useState, useEffect } from 'react';
+import { useProductCategories } from 'medusa-react';
 
 export type SortOptions = 'price_asc' | 'price_desc' | 'created_at';
 
@@ -15,15 +16,15 @@ type SortProductsProps = {
 const sortOptions = [
   {
     value: 'created_at',
-    label: 'Latest Arrivals',
+    label: 'Mới nhất',
   },
   {
     value: 'price_asc',
-    label: 'Price: Low -> High',
+    label: 'Giá: Thấp -> Cao',
   },
   {
     value: 'price_desc',
-    label: 'Price: High -> Low',
+    label: 'Giá: Cao -> Thấp',
   },
 ];
 

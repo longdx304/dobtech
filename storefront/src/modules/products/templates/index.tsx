@@ -1,16 +1,16 @@
+import SkeletonRelatedProducts from '@/modules/skeletons/templates/skeleton-related-products';
+import { Region } from '@medusajs/medusa';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
+import { Divider } from 'antd';
 import { notFound } from 'next/navigation';
 import React, { Suspense } from 'react';
 import ImageGallery from '../components/image-gallery';
-import ProductInfo from '../components/product-info';
 import ProductActions from '../components/product-actions';
-import { Region } from '@medusajs/medusa';
-import ProductActionsWrapper from './product-actions-wrapper';
-import { Divider } from 'antd';
-import ProductTabs from '../components/product-tabs';
+import ProductInfo from '../components/product-info';
 import ProductReviews from '../components/product-reviews';
-import SkeletonRelatedProducts from '@/modules/skeletons/templates/skeleton-related-products';
+import ProductTabs from '../components/product-tabs';
 import RelatedProducts from '../components/related-products';
+import ProductActionsWrapper from './product-actions-wrapper';
 
 type ProductTemplateProps = {
   product: PricedProduct;
@@ -30,14 +30,12 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   return (
     <>
       {product && (
-        <div className='flex relative justify-around small:max-w-[300px] w-full py-8'>
-          <ImageGallery images={product?.images || []} />
-          <div className='flex flex-col w-[420px]'>
+        <div className='flex flex-col lg:flex-row justify-around w-full py-8'>
+          <div className='w-full lg:w-auto'>
+            <ImageGallery images={product?.images || []} />
+          </div>
+          <div className='flex flex-col w-full lg:w-auto mt-4'>
             <ProductInfo product={product} region={region} />
-
-            <Divider />
-
-            {/* Variant */}
             <Suspense
               fallback={
                 <ProductActions

@@ -46,18 +46,15 @@ export default function CategoryTemplate({
   const pageNumber = page ? parseInt(page) : 1;
 
   const category = categories[categories.length - 1];
-  const parents = categories.slice(0, categories.length - 1);
 
   if (!category || !countryCode) notFound();
 
   return (
-    <main
-      className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'
-      data-testid='category-container'
-    >
+    <main className='mx-auto max-w-7xl' data-testid='category-container'>
       <RefinementList
         sortBy={sortBy || 'created_at'}
         data-testid='sort-by-container'
+        category={category}
       />
       <section className='pb-24 pt-6'>
         <div className='grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4'>

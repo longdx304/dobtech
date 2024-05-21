@@ -7,6 +7,7 @@ import type { Metadata } from 'next';
 import { cache } from 'react';
 import '../../app/globals.css';
 import theme from '../../theme';
+import { MedusaProvider } from '@/lib/providers/medusa-provider';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -50,8 +51,10 @@ export default async function PageLayout({
     <AntdRegistry>
       <ConfigProvider theme={theme}>
         <App>
-          <Header categories={formatCategories} />
-          {children}
+          <MedusaProvider>
+            <Header categories={formatCategories} />
+            {children}
+          </MedusaProvider>
         </App>
       </ConfigProvider>
     </AntdRegistry>

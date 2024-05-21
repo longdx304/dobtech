@@ -63,21 +63,21 @@ const ProductInfo = ({ product, region }: ProductInfoProps) => {
   }, [options, variantRecord, variants]);
 
   return (
-    <div className='relative info'>
-      <h1 className='text-2xl font-semibold'>{product.title}</h1>
-      <h3 className='text-sm text-neutral-500'>{product.handle}</h3>
-      <div className='flex items-center space-x-12 mt-4 py-2'>
-        <Flex gap='middle'>
-          <Rate tooltips={desc} onChange={setValue} value={value} />
-          {value ? <span>{desc[value - 1]}</span> : null}
-        </Flex>
-      </div>
+    <div className='relative'>
       <ProductPrice
-        className='text-2xl font-semibold'
+        className='text-[18px] font-semibold'
         product={product}
         variant={variant}
         region={region}
       />
+      <h1 className='text-2xl font-semibold'>{product.title}</h1>
+      {/* Feedback */}
+      {/* <div className='flex items-center space-x-12 mt-4 py-2'>
+        <Flex gap='middle'>
+          <Rate tooltips={desc} onChange={setValue} value={value} />
+          {value ? <span>{desc[value - 1]}</span> : null}
+        </Flex>
+      </div> */}
     </div>
   );
 };

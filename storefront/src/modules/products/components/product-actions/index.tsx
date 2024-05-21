@@ -139,7 +139,7 @@ export default function ProductActions({
 
   return (
     <>
-      <div className='flex flex-col gap-y-2' ref={actionsRef}>
+      <div className='flex flex-col gap-y-2 mt-1' ref={actionsRef}>
         <div>
           {product.variants.length > 1 && (
             <div className='flex flex-col gap-y-4'>

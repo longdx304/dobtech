@@ -21,7 +21,7 @@ const Header: FC<Props> = ({ categories }) => {
       )}
       bordered={false}
     >
-      <Flex vertical className='container'>
+      <Flex vertical className='container box-border'>
         <HeaderWrap />
         <Category categories={categories} />
       </Flex>

@@ -2,7 +2,6 @@ import { Button } from '@/components/Button';
 import { Dropdown } from '@/components/Dropdown';
 import { Space } from 'antd';
 import { ArrowDown, Filter } from 'lucide-react';
-import { ChangeEvent } from 'react';
 
 type FilterRadioGroupProps = {
   items: {
@@ -24,9 +23,6 @@ const FilterRadioGroup = ({
 
   return (
     <>
-      <h1 className='text-4xl font-bold tracking-tight text-gray-900'>
-        Category / Items
-      </h1>
       <div className='flex items-center'>
         <Dropdown
           menu={{ selectedKeys: [value] }}

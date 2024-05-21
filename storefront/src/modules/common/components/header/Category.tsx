@@ -10,7 +10,6 @@ import { Text } from '@/components/Typography';
 import { cn } from '@/lib/utils';
 import { TTreeCategories } from '@/types/productCategory';
 import LocalizedClientLink from '../localized-client-link';
-import { Tooltip, TooltipIcon } from '@/components/Tooltip';
 
 interface Props {
   categories: TTreeCategories[] | null;
@@ -124,6 +123,13 @@ const CategoryGroup = ({
   categories: TTreeCategories[] | null;
   hoveredItem: string | null;
 }) => {
+  const formattedText = (text: string) => {
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
+
+  const url =
+    'https://ananas.vn/wp-content/uploads/Pro_AV00205_1.jpeg';
+    
   return (
     <Flex gap='middle' className='w-full'>
       {categories?.map(
@@ -142,11 +148,11 @@ const CategoryGroup = ({
                 >
                   <LocalizedClientLink href={`categories/${child.key}`}>
                     <div className='flex items-center flex-col'>
-                      <Avatar>
+                      <Avatar size={64} src={url}>
                         {child.label.toUpperCase().substring(0, 2)}
                       </Avatar>
                       <span className='text-[#666666]'>
-                        {child.label.toUpperCase()}
+                        {formattedText(child.label)}
                       </span>
                     </div>
                   </LocalizedClientLink>
