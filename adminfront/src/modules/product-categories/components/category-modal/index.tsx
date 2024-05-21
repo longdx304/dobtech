@@ -1,9 +1,12 @@
 'use client';
 
-import { AdminPostProductCategoriesReq, ProductCategory } from '@medusajs/medusa';
+import {
+	AdminPostProductCategoriesReq,
+	ProductCategory,
+} from '@medusajs/medusa';
 import { App, Col, Form, Row, message, type FormProps } from 'antd';
 import _ from 'lodash';
-import { Highlighter } from 'lucide-react';
+import { Highlighter, CircleAlert } from 'lucide-react';
 import React, { useEffect } from 'react';
 import {
 	useAdminCreateProductCategory,
@@ -18,6 +21,7 @@ import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
 import { TCategoryRequest } from '@/types/productCategories';
 import { useMemo } from 'react';
+import { getErrorMessage } from '@/lib/utils';
 
 interface Props {
 	stateModal: boolean;
@@ -50,6 +54,7 @@ const CategoryModal: React.FC<Props> = ({
 		form &&
 			form?.setFieldsValue({
 				name: category?.name ?? '',
+				handle: category?.handle ?? '',
 				description: category?.description ?? '',
 				is_active: category?.is_active ?? true,
 				is_internal: category?.is_internal ?? false,
@@ -90,7 +95,7 @@ const CategoryModal: React.FC<Props> = ({
 		}
 
 		return newResult;
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [parentCategory, categories]);
 
 	// Submit form
@@ -108,8 +113,10 @@ const CategoryModal: React.FC<Props> = ({
 					refetch();
 					handleCancel();
 				},
-				onError: () => {
-					message.error('Đăng ký danh mục sản phẩm thất bại');
+				onError: (error: any) => {
+					// message.error('Đăng ký danh mục sản phẩm thất bại');
+					message.error(getErrorMessage(error));
+					return;
 				},
 			});
 		} else {
@@ -120,8 +127,10 @@ const CategoryModal: React.FC<Props> = ({
 					message.success('Cập nhật danh mục sản phẩm thành công');
 					handleCancel();
 				},
-				onError: () => {
-					message.error('Cập nhật danh mục sản phẩm thất bại');
+				onError: (error: any) => {
+					// message.error('Cập nhật danh mục sản phẩm thất bại');
+					message.error(getErrorMessage(error));
+					return;
 				},
 			});
 		}
@@ -149,30 +158,58 @@ const CategoryModal: React.FC<Props> = ({
 				onFinish={onFinish}
 				// onFinishFailed={onFinishFailed}
 			>
-				<Form.Item
-					labelCol={{ span: 24 }}
-					name="name"
-					rules={[{ required: true, message: 'Tên không đúng định dạng' }]}
-					label="Tên danh mục:"
-				>
-					<Input
-						placeholder="Đặt tên cho danh mục này"
-						prefix={<Highlighter />}
-						data-testid="name"
-					/>
-				</Form.Item>
-				<Form.Item
-					labelCol={{ span: 24 }}
-					name="description"
-					// rules={[{ required: true, message: 'Tên phải có ít nhất 2 ký tự!' }]}
-					label="Mô tả:"
-				>
-					<TextArea
-						placeholder="Đặt mô tả cho danh mục này"
-						data-testid="description"
-					/>
-				</Form.Item>
 				<Row gutter={[16, 16]}>
+					<Col xs={24} sm={12}>
+						<Form.Item
+							labelCol={{ span: 24 }}
+							name="name"
+							rules={[{ required: true, message: 'Tên không đúng định dạng' }]}
+							label="Tên danh mục:"
+						>
+							<Input
+								placeholder="Đặt tên cho danh mục này"
+								prefix={<Highlighter />}
+								data-testid="name"
+							/>
+						</Form.Item>
+					</Col>
+					<Col xs={24} sm={12}>
+						<Form.Item
+							labelCol={{ span: 24 }}
+							name="handle"
+							rules={[
+								{
+									pattern: /^[A-Za-z0-9-_]+$/,
+									message: 'Url không được có dấu hoặc khoảng trắng.',
+								},
+							]}
+							label="Tiêu đề URL"
+							tooltip={{
+								title:
+									'URL Slug cho danh mục. Sẽ được tự động tạo nếu để trống',
+								icon: <CircleAlert size={18} />,
+							}}
+						>
+							<Input
+								placeholder="Đặt tên cho danh mục này"
+								prefix={<span className="text-gray-300">{'/'}</span>}
+								data-testid="name"
+							/>
+						</Form.Item>
+					</Col>
+					<Col span={24}>
+						<Form.Item
+							labelCol={{ span: 24 }}
+							name="description"
+							// rules={[{ required: true, message: 'Tên phải có ít nhất 2 ký tự!' }]}
+							label="Mô tả:"
+						>
+							<TextArea
+								placeholder="Đặt mô tả cho danh mục này"
+								data-testid="description"
+							/>
+						</Form.Item>
+					</Col>
 					<Col span={12}>
 						<Form.Item
 							labelCol={{ span: 24 }}

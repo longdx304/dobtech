@@ -34,6 +34,7 @@ import {
 	ThumbnailForm,
 } from './components';
 import { AddVariant } from './components/variant-form';
+import { getErrorMessage } from '@/lib/utils';
 
 interface Props {
 	state: boolean;
@@ -101,6 +102,7 @@ export default function ProductModal({
 			const urls = preppedImages.map((img) => img.url);
 			payload.images = urls;
 		}
+
 		mutate(payload, {
 			onSuccess: ({ product }) => {
 				messageApi.open({
@@ -110,11 +112,11 @@ export default function ProductModal({
 				redirect(`/products/${product.id}`);
 				handleOk();
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				console.log('error', error);
 				messageApi.open({
 					type: 'error',
-					content: 'Đã xảy ra lỗi khi thêm sản phẩm.',
+					content: getErrorMessage(error),
 				});
 			},
 		});
@@ -236,18 +238,18 @@ const createPayload = (
 					value: t,
 			  }))
 			: undefined,
-		type: data.organize.type
+		type: data?.organize?.type
 			? {
 					value: data.organize.type.label,
 					id: data.organize.type.value,
 			  }
 			: undefined,
 		// Options
-		options: data.options.map((o) => ({
+		options: data?.options?.length ? data.options.map((o) => ({
 			title: o.title,
-		})),
+		})) : undefined,
 		// Variants
-		variants: data.variants.map((v) => ({
+		variants: data?.variants?.map((v) => ({
 			title: v?.title!,
 			options: v?.options,
 			material: undefined,

@@ -23,56 +23,64 @@ async function getUser(accessToken: string | undefined) {
 const publicRoutes = ['/login'];
 
 export async function middleware(request: NextRequest) {
-	const res = NextResponse.next();
-	// Get pathname of current routes
-	const pathname = request.nextUrl.pathname;
-	const isPublicRoute = publicRoutes.includes(pathname);
+	try {
+		const res = NextResponse.next();
+		// Get pathname of current routes
+		const pathname = request.nextUrl.pathname;
+		const isPublicRoute = publicRoutes.includes(pathname);
 
-	// Decrypt the session from the cookie
-	const accessToken = request.cookies.get('_medusa_jwt')?.value;
-	// Get current user information
-	const data = await getUser(accessToken);
+		// Decrypt the session from the cookie
+		const accessToken = request.cookies.get('_medusa_jwt')?.value;
+		// Get current user information
+		const data = await getUser(accessToken);
 
-	// If route is public, program executing
-	if (isPublicRoute || pathname === ERoutes.LOGIN) {
-		if (!_.isEmpty(data)) {
+		// If route is public, program executing
+		if (isPublicRoute || pathname === ERoutes.LOGIN) {
+			if (!_.isEmpty(data)) {
+				return NextResponse.redirect(
+					new URL(ERoutes.DASHBOARD, request.url),
+					307
+				);
+			}
+			return res;
+		}
+
+		// Redirect Login page if user hasn't logged in
+		if (_.isEmpty(data)) {
+			return NextResponse.redirect(new URL(ERoutes.LOGIN, request.url), 307);
+		}
+
+		const { role, permissions } = data.user;
+
+		// If user has role admin, program executing
+		if (role === ERole.ADMIN) {
+			return res;
+		}
+		// Find mode of routes
+		const { mode: routesMode } =
+			routesConfig.find((routes) => pathname.startsWith(routes.path)) ?? {};
+
+		// Routes mode isn't exists program executing
+		if (!routesMode || routesMode?.length === 0) {
+			return res;
+		}
+
+		// Check current user has permission into routes
+		const hasPermissions = _.intersection(routesMode, permissions?.split(','));
+
+		// If user hasn't permission return homepage
+		if (_.isEmpty(hasPermissions)) {
 			return NextResponse.redirect(
 				new URL(ERoutes.DASHBOARD, request.url),
 				307
 			);
 		}
-		return res;
-	}
 
-	// Redirect Login page if user hasn't logged in
-	if (_.isEmpty(data)) {
+		return res;
+	} catch (error) {
+		console.error(error);
 		return NextResponse.redirect(new URL(ERoutes.LOGIN, request.url), 307);
 	}
-
-	const { role, permissions } = data.user;
-
-	// If user has role admin, program executing
-	if (role === ERole.ADMIN) {
-		return res;
-	}
-	// Find mode of routes
-	const { mode: routesMode } =
-		routesConfig.find((routes) => pathname.startsWith(routes.path)) ?? {};
-
-	// Routes mode isn't exists program executing
-	if (!routesMode || routesMode?.length === 0) {
-		return res;
-	}
-
-	// Check current user has permission into routes
-	const hasPermissions = _.intersection(routesMode, permissions?.split(','));
-
-	// If user hasn't permission return homepage
-	if (_.isEmpty(hasPermissions)) {
-		return NextResponse.redirect(new URL(ERoutes.DASHBOARD, request.url), 307);
-	}
-
-	return res;
 }
 
 export const config = {

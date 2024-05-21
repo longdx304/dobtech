@@ -104,7 +104,13 @@ const CollectionModal: FC<Props> = ({
 						<Form.Item
 							labelCol={{ span: 24 }}
 							name="handle"
-							label="Tiêu đề URL bộ sưu tập:"
+							label="Tiêu đề URL"
+							rules={[
+								{
+									pattern: /^[A-Za-z0-9-_]+$/,
+									message: 'Url không được có dấu hoặc khoảng trắng.',
+								},
+							]}
 							tooltip={{
 								title:
 									'URL Slug cho bộ sưu tập. Sẽ được tự động tạo nếu để trống',
