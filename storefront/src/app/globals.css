@@ -19,13 +19,6 @@ body {
 }
 
 /* Custom for lucide icons */
-.lucide {
-  /* Change this! */
-  color: #9F9F9F;
-  width: 20px;
-  height: 20px;
-  stroke-width: 1.5px;
-}
 
 /* Antd Form */
 .ant-form .ant-form-item-label {

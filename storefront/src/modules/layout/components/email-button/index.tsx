@@ -1,20 +1,20 @@
 'use client';
 import { Button } from '@/components/Button';
-import { User } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import React from 'react';
 
-const UserInformation = () => {
+const EmailButton = () => {
   return (
     <>
       <Button
-        icon={<User className='stroke-2' color="#767676" />}
+        icon={<Mail className='stroke-2' color="#767676" />}
         shape='circle'
         type='text'
         onClick={() => {}}
-        className='hidden lg:block'
+        className='block lg:hidden'
       />
     </>
   );
 };
 
-export default UserInformation;
+export default EmailButton;

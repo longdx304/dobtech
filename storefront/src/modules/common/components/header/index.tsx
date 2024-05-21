@@ -17,7 +17,7 @@ const Header: FC<Props> = ({ categories }) => {
   return (
     <Card
       className={cn(
-        'fixed top-0 w-full shadow px-0 pt-2 pb-0 rounded-none transition-all ease-in-out duration-300 z-10'
+        'fixed top-0 w-full shadow px-0 pt-0 pb-0 rounded-none transition-all ease-in-out duration-300 z-10'
       )}
       bordered={false}
     >
