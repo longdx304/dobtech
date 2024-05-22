@@ -28,10 +28,8 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 	const { mutateAsync, isLoading } = useAdminLogin();
 
 	const onFinish: FormProps<FormValues>['onFinish'] = async (values) => {
-		console.log('Success:', values);
 		mutateAsync(values, {
 			onSuccess: async (data) => {
-				console.log('data', data);
 				await client.admin.auth
 					.getToken(values)
 					.then(async ({ access_token }) => {

@@ -35,7 +35,7 @@ const ProductList = ({}: Props) => {
 	const [searchValue, setSearchValue] = useState('');
 	const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
 
-	const { products, isLoading, count, isRefetching } = useAdminProducts({
+	const { products, isLoading, count, isRefetching, refetch } = useAdminProducts({
 		limit: PAGE_SIZE,
 		offset: (currentPage - 1) * PAGE_SIZE,
 		q: searchValue || undefined,
@@ -79,6 +79,7 @@ const ProductList = ({}: Props) => {
 				try {
 					await deleteProduct(productId);
 					message.success('Xoá sản phẩm thành công!');
+					refetch();
 				} catch (error) {
 					message.error('Xoá sản phẩm thất bại!');
 				}

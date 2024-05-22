@@ -13,7 +13,7 @@ import {
 	Plus
 } from 'lucide-react';
 import { useAdminCreateProduct } from 'medusa-react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { prepareImages } from '@/actions/images';
 import { Collapse } from '@/components/Collapse';
@@ -35,6 +35,7 @@ import {
 } from './components';
 import { AddVariant } from './components/variant-form';
 import { getErrorMessage } from '@/lib/utils';
+import { ERoutes } from '@/types/routes';
 
 interface Props {
 	state: boolean;
@@ -53,8 +54,9 @@ export default function ProductModal({
 	productCategories,
 	productCollections,
 }: Props) {
+	const router = useRouter();
 	const { isFeatureEnabled } = useFeatureFlag();
-	const { mutate, isLoading } = useAdminCreateProduct();
+	const { mutateAsync, isLoading } = useAdminCreateProduct();
 
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
@@ -103,14 +105,16 @@ export default function ProductModal({
 			payload.images = urls;
 		}
 
-		mutate(payload, {
+		await mutateAsync(payload, {
 			onSuccess: ({ product }) => {
+				console.log('product', product)
 				messageApi.open({
 					type: 'success',
 					content: 'Thêm sản phẩm thành công.',
 				});
-				redirect(`/products/${product.id}`);
 				handleOk();
+				router.push(`${ERoutes.PRODUCTS}/${product.id}`);
+				return;
 			},
 			onError: (error: any) => {
 				console.log('error', error);
