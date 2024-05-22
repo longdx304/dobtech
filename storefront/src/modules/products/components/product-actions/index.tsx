@@ -6,15 +6,12 @@ import { Divider } from 'antd';
 import _ from 'lodash';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import ProductPrice from '../product-price';
 
-// import { addToCart } from "@modules/cart/actions"
-import OptionSelect from '../option-select';
-import { useIntersection } from '@/lib/hooks/use-in-view';
 import { Button } from '@/components/Button';
+import InputNumber from '@/components/Input/InputNumber';
 import { addToCart } from '@/modules/cart/action';
-
-// import MobileActions from "../mobile-actions"
+import OptionSelect from '../option-select';
+import { Minus, Plus } from 'lucide-react';
 
 type ProductActionsProps = {
   product: PricedProduct;
@@ -36,6 +33,7 @@ export default function ProductActions({
 }: ProductActionsProps) {
   const [options, setOptions] = useState<Record<string, string>>({});
   const [isAdding, setIsAdding] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   const countryCode = (useParams().countryCode as string) ?? 'vn';
 
@@ -46,7 +44,12 @@ export default function ProductActions({
     const optionObj: Record<string, string> = {};
 
     for (const option of product.options || []) {
-      Object.assign(optionObj, { [option.id]: undefined });
+      const firstVariantOption = option.values[0]?.value;
+      if (firstVariantOption) {
+        optionObj[option.id] = firstVariantOption;
+      } else {
+        Object.assign(optionObj, { [option.id]: undefined });
+      }
     }
 
     setOptions(optionObj);
@@ -119,22 +122,43 @@ export default function ProductActions({
 
   const actionsRef = useRef<HTMLDivElement>(null);
 
-  const inView = useIntersection(actionsRef, '0px');
-
   // add the selected variant to the cart
   const handleAddToCart = async () => {
-    if (!variant?.id) return null
-
-    setIsAdding(true)
+    if (!variant?.id) return null;
+    setIsAdding(true);
 
     await addToCart({
       variantId: variant.id,
-      quantity: 1,
+      quantity: quantity,
       countryCode,
-    })
+    });
 
-    setIsAdding(false)
-    console.log('add to cart');
+    setIsAdding(false);
+  };
+
+  // get the inventory quantity of a variant
+  const getInventoryQuantity = (optionId: any, value: any, variants: any) => {
+    const variant = variants.find((variant: any) =>
+      variant.options.some(
+        (opt: any) => opt.option_id === optionId && opt.value === value
+      )
+    );
+    // Return the inventory quantity if variant is found
+    return variant ? variant.inventory_quantity : 0;
+  };
+
+  const handleAddNumber = () => {
+    setQuantity(quantity + 1);
+  };
+
+  const handleSubtractNumber = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+    
+  };
+  const handleInputChange = (value: number) => {
+    setQuantity(value);
   };
 
   return (
@@ -154,6 +178,40 @@ export default function ProductActions({
                       data-testid='product-options'
                       disabled={!!disabled || isAdding}
                     />
+
+                    {/* quantity */}
+                    <div className='flex flex-col gap-y-3 mt-4'>
+                      <span className='text-sm'>Số lượng:</span>
+
+                      <InputNumber
+                        addonBefore={
+                          <Button
+                            onClick={handleSubtractNumber}
+                            icon={<Minus />}
+                            type='text'
+                            className='hover:bg-transparent w-[24px]'
+                          />
+                        }
+                        addonAfter={
+                          <Button
+                            onClick={handleAddNumber}
+                            icon={<Plus />}
+                            type='text'
+                            className='hover:bg-transparent w-[24px]'
+                          />
+                        }
+                        controls={false}
+                        value={quantity}
+                        className='max-w-[160px]'
+                        onChange={handleInputChange as any}
+                      />
+
+                      <span>{`${getInventoryQuantity(
+                        option.id,
+                        options[option.id],
+                        product.variants
+                      )} sản phẩm có sẵn`}</span>
+                    </div>
                   </div>
                 );
               })}
@@ -165,7 +223,6 @@ export default function ProductActions({
         <Button
           onClick={handleAddToCart}
           disabled={!inStock || !variant || !!disabled || isAdding}
-          // variant="primary"
           className='w-full h-10'
           isLoading={isAdding}
           data-testid='add-product-button'
@@ -176,18 +233,6 @@ export default function ProductActions({
             ? 'Hàng đã hết'
             : 'Thêm vào giỏ hàng'}
         </Button>
-        {/* <MobileActions
-          product={product}
-          variant={variant}
-          region={region}
-          options={options}
-          updateOptions={updateOptions}
-          inStock={inStock}
-          handleAddToCart={handleAddToCart}
-          isAdding={isAdding}
-          show={!inView}
-          optionsDisabled={!!disabled || isAdding}
-        /> */}
       </div>
     </>
   );

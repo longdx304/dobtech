@@ -1,13 +1,11 @@
 import SkeletonRelatedProducts from '@/modules/skeletons/templates/skeleton-related-products';
 import { Region } from '@medusajs/medusa';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
-import { Divider } from 'antd';
 import { notFound } from 'next/navigation';
 import React, { Suspense } from 'react';
 import ImageGallery from '../components/image-gallery';
 import ProductActions from '../components/product-actions';
 import ProductInfo from '../components/product-info';
-import ProductReviews from '../components/product-reviews';
 import ProductTabs from '../components/product-tabs';
 import RelatedProducts from '../components/related-products';
 import ProductActionsWrapper from './product-actions-wrapper';
@@ -30,23 +28,25 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   return (
     <>
       {product && (
-        <div className='flex flex-col lg:flex-row justify-around w-full pb-8'>
-          <div className='w-full lg:w-auto'>
+        <div className='flex flex-col lg:flex-row justify-between w-full pb-8 gap-4'>
+          <div className='w-full lg:flex-grow lg:pr-4'>
             <ImageGallery images={product?.images || []} />
           </div>
-          <div className='flex flex-col w-full lg:w-auto mt-4'>
+          <div className='w-full lg:flex-grow lg:pr-4'>
             <ProductInfo product={product} region={region} />
-            <Suspense
-              fallback={
-                <ProductActions
-                  disabled={true}
-                  product={product}
-                  region={region}
-                />
-              }
-            >
-              <ProductActionsWrapper id={product.id} region={region} />
-            </Suspense>
+            <div className='hidden lg:block'>
+              <Suspense
+                fallback={
+                  <ProductActions
+                    disabled={true}
+                    product={product}
+                    region={region}
+                  />
+                }
+              >
+                <ProductActionsWrapper id={product.id} region={region} />
+              </Suspense>
+            </div>
           </div>
         </div>
       )}
