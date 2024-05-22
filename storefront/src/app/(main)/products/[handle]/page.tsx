@@ -1,10 +1,9 @@
 import { getCategoriesList } from '@/actions/productCategory';
 import {
   getProductByHandle,
-  getProductsList,
-  retrievePricedProductById,
+  retrievePricedProductById
 } from '@/actions/products';
-import { getRegion, listRegions } from '@/actions/region';
+import { getRegion } from '@/actions/region';
 import ProductTemplate from '@/modules/products/templates';
 import { Region } from '@medusajs/medusa';
 import { Metadata } from 'next';
@@ -81,7 +80,7 @@ export default async function ProductPage({ params }: Props) {
   }
 
   return (
-    <div className='w-full container pt-[8rem] box-border'>
+    <div className='w-full pt-[8rem] box-border container'>
       <ProductTemplate
         product={pricedProduct}
         region={region}

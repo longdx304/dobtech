@@ -4,8 +4,6 @@ import { Collapse } from '@/components/Collapse';
 import { Panel } from '@/components/Collapse/Collapse';
 import { Text } from '@/components/Typography';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
-import { CollapseProps } from 'antd';
-// import { Collapse } from 'antd';
 import { useState } from 'react';
 
 type ProductTabsProps = {
@@ -32,7 +30,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ product }) => {
   };
 
   return (
-    <div className='product-details w-full rounded shadow mt-2'>
+    <div className='w-full rounded shadow mt-2'>
       <Collapse activeKey={activeKey} onChange={onTabChange} ghost>
         {tabs.map((tab, i) => (
           <Panel header={tab.label} key={i}>

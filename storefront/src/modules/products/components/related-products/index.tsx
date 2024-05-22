@@ -1,6 +1,4 @@
-import {
-  getProductsList
-} from '@/actions/products';
+import { getProductsList } from '@/actions/products';
 import { getRegion } from '@/actions/region';
 import { StoreGetProductsParams } from '@medusajs/medusa';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
@@ -67,7 +65,7 @@ export default async function RelatedProducts({
         <span className='font-bold text-xl mr-4'>Khách Hàng Cũng Được Xem</span>
       </div>
 
-      <ul className='grid grid-cols-5 gap-x-6 gap-y-8 list-none'>
+      <ul className='grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 w-full gap-x-6 gap-y-6'>
         {productPreviews.map((productPreview: any) => (
           <li key={productPreview.id}>
             <ProductPreview data={productPreview} />

@@ -23,7 +23,7 @@ const Menu: FC<Props> = ({ categories }) => {
 			<Flex
 				className="container box-border py-1 text-[#767676]"
 				justify="space-between"
-				algn="center"
+				align="center"
 			>
 				<Flex
 					vertical

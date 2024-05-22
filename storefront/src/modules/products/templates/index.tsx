@@ -30,7 +30,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   return (
     <>
       {product && (
-        <div className='flex flex-col lg:flex-row justify-around w-full py-8'>
+        <div className='flex flex-col lg:flex-row justify-around w-full pb-8'>
           <div className='w-full lg:w-auto'>
             <ImageGallery images={product?.images || []} />
           </div>
@@ -51,9 +51,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         </div>
       )}
       <ProductTabs product={product} />
-      <ProductReviews />
+      {/* <ProductReviews /> */}
       <div
-        className='content-container my-16 small:my-32'
+        className='my-16 small:my-32'
         data-testid='related-products-container'
       >
         <Suspense fallback={<SkeletonRelatedProducts />}>

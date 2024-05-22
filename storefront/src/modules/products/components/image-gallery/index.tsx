@@ -13,32 +13,40 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
   const [selectedImage, setSelectedImage] = useState<number>(0);
 
   return (
-    <div className='flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-[730px]'>
-      <div className='lg:flex-col flex-row justify-center flex gap-4 mt-4'>
+    <Flex className='flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-[730px]'>
+      <Flex className='flex flex-row lg:flex-col justify-center gap-2 lg:gap-4'>
         {images.map((img, index) => (
-          <div key={index} className='relative rounded-lg'>
+          <Flex
+            key={index}
+            className='relative rounded-lg w-[60px] h-[60px] md:w-[100px] md:h-[100px] cursor-pointer'
+            onClick={() => setSelectedImage(index)}
+            onMouseEnter={() => setSelectedImage(index)}
+          >
             <Image
-              onClick={() => setSelectedImage(index)}
-              className='w-[100px] h-[100px] rounded-lg mb-3 p-1 object-cover object-top cursor-pointer'
+              className='rounded-lg object-cover'
               src={img.url}
               alt={`Image ${index + 1}`}
-              width={70}
-              height={70}
-              onMouseEnter={() => setSelectedImage(index)}
+              layout='fill'
+              objectFit='cover'
+              objectPosition='top'
             />
-          </div>
+          </Flex>
         ))}
-      </div>
-      <div className='flex justify-center'>
-        <Image
-          src={images[selectedImage]?.url || images[0]?.url}
-          className='h-[600px] w-auto object-cover object-top'
-          alt=''
-          width={600}
-          height={600}
-        />
-      </div>
-    </div>
+      </Flex>
+
+      <Flex className='flex justify-center w-full lg:w-auto'>
+        <Flex className='relative h-[300px] w-full sm:h-[600px] lg:h-[600px] lg:w-[600px]'>
+          <Image
+            src={images[selectedImage]?.url || images[0]?.url}
+            className='object-cover'
+            alt=''
+            layout='fill'
+            objectFit='cover'
+            objectPosition='top'
+          />
+        </Flex>
+      </Flex>
+    </Flex>
   );
 };
 

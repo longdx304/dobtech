@@ -15,7 +15,7 @@ interface Props {}
 const HeaderWrap: FC<Props> = ({}) => {
   return (
     <Flex className='w-full' justify='space-between' align='center'>
-      <div className='flex items-center hidden lg:block'>
+      <div className='items-center hidden lg:block'>
         <LocalizedClientLink href='/'>
           <Image
             src='/images/CHAMDEP_logo.png'
@@ -25,8 +25,10 @@ const HeaderWrap: FC<Props> = ({}) => {
           />
         </LocalizedClientLink>
       </div>
-      <Flex gap='small' className='justify-between lg:justify-center items-center'>
-
+      <Flex
+        gap='small'
+        className='justify-between lg:justify-center items-center'
+      >
         <Suspense>
           <EmailButton />
         </Suspense>
@@ -44,7 +46,7 @@ const HeaderWrap: FC<Props> = ({}) => {
               data-testid='nav-cart-link'
             >
               <BadgeButton
-                icon={<ShoppingCart className='stroke-2' color="#767676" />}
+                icon={<ShoppingCart className='stroke-2' color='#767676' />}
                 count={0}
                 showZero
                 offset={[0, 10]}
