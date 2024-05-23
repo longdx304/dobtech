@@ -34,13 +34,19 @@ export default function ProductActions({
 	region,
 	disabled,
 }: ProductActionsProps) {
-	const { options, updateOptions, variant, inStock, inventoryQuantity, quantity,
+	const {
+		options,
+		updateOptions,
+		variant,
+		inStock,
+		inventoryQuantity,
+		quantity,
 		handleAddNumber,
 		handleSubtractNumber,
-		handleInputChange } =
-		useActionProduct({
-			product,
-		});
+		handleInputChange,
+	} = useActionProduct({
+		product,
+	});
 
 	const [isAdding, setIsAdding] = useState(false);
 
@@ -113,7 +119,9 @@ export default function ProductActions({
 									onChange={handleInputChange as any}
 								/>
 
-								<span>{`${inventoryQuantity || 0} sản phẩm có sẵn`}</span>
+								<span>{`${
+									inventoryQuantity || 0
+								} sản phẩm có sẵn`}</span>
 							</div>
 							<Divider />
 						</div>
