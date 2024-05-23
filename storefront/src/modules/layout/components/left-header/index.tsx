@@ -3,7 +3,7 @@ import { Button } from '@/components/Button';
 import { Mail } from 'lucide-react';
 import React from 'react';
 
-const EmailButton = () => {
+const LeftHeader = () => {
   return (
     <>
       <Button
@@ -11,10 +11,10 @@ const EmailButton = () => {
         shape='circle'
         type='text'
         onClick={() => {}}
-        className='block lg:hidden'
+        className=''
       />
     </>
   );
 };
 
-export default EmailButton;
+export default LeftHeader;

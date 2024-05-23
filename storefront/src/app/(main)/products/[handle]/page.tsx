@@ -36,10 +36,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${product.title} | DOB Ecommerce`,
+    title: `${product.title} | CHAMDEP VN`,
     description: `${product.title}`,
     openGraph: {
-      title: `${product.title} | DOB Ecommerce`,
+      title: `${product.title} | CHAMDEP VN`,
       description: `${product.title}`,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
@@ -80,7 +80,7 @@ export default async function ProductPage({ params }: Props) {
   }
 
   return (
-    <div className='w-full pt-[8rem] box-border container'>
+    <div className='w-full box-border container pt-[6rem] lg:pt-[8rem]'>
       <ProductTemplate
         product={pricedProduct}
         region={region}

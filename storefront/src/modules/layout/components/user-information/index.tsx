@@ -11,7 +11,7 @@ const UserInformation = () => {
         shape='circle'
         type='text'
         onClick={() => {}}
-        className='hidden lg:block'
+        className=''
       />
     </>
   );

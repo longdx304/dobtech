@@ -8,7 +8,7 @@ const SearchInput = () => {
   return (
     <>
       <Search
-        className='[&_.ant-input-outlined:focus]:shadow-none'
+        className='[&_.ant-input-outlined:focus]:shadow-none max-w-[300px]'
         placeholder='Tìm kiếm'
         onSearch={() => {}}
         enterButton

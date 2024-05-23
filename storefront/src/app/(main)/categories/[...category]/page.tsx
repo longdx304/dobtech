@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `${title} category.`;
 
     return {
-      title: `${title} | Medusa Store`,
+      title: `CHAMDEP VN | ${title}`,
       description,
       alternates: {
         canonical: `${params.category.join('/')}`,
@@ -68,7 +68,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   }
 
   return (
-    <div className='w-full container pt-[8rem] box-border'>
+    <div className='w-full container box-border pt-[6rem] lg:pt-[8rem]'>
       <CategoryTemplate
         categories={product_categories}
         sortBy={sortBy}

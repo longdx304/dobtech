@@ -14,8 +14,8 @@ interface Props {}
 
 const HeaderWrap: FC<Props> = ({}) => {
   return (
-    <Flex className='w-full' justify='space-between' align='center'>
-      <div className='items-center hidden lg:block'>
+    <Flex className='w-full hidden lg:flex' justify='space-between' align='center'>
+      <div className='items-center'>
         <LocalizedClientLink href='/'>
           <Image
             src='/images/CHAMDEP_logo.png'
@@ -25,13 +25,7 @@ const HeaderWrap: FC<Props> = ({}) => {
           />
         </LocalizedClientLink>
       </div>
-      <Flex
-        gap='small'
-        className='justify-between lg:justify-center items-center'
-      >
-        <Suspense>
-          <EmailButton />
-        </Suspense>
+      <Flex gap='small' className='justify-end w-full pr-3 lg:pr-0'>
         {/* Search */}
         <Suspense>
           <SearchInput />
@@ -41,7 +35,7 @@ const HeaderWrap: FC<Props> = ({}) => {
         <Suspense
           fallback={
             <LocalizedClientLink
-              className='hover:text-ui-fg-base flex gap-2'
+              className='flex gap-2'
               href='cart'
               data-testid='nav-cart-link'
             >
@@ -49,7 +43,7 @@ const HeaderWrap: FC<Props> = ({}) => {
                 icon={<ShoppingCart className='stroke-2' color='#767676' />}
                 count={0}
                 showZero
-                offset={[0, 10]}
+                offset={[-10, 10]}
               />
             </LocalizedClientLink>
           }

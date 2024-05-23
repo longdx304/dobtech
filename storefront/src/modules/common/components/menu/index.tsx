@@ -1,5 +1,5 @@
 "use client";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { Home, List, BadgePlus, ShoppingCart, UserRound } from "lucide-react";
 
 import { Card } from "@/components/Card";
@@ -7,12 +7,18 @@ import { Flex } from "@/components/Flex";
 import { cn } from "@/lib/utils";
 import { TTreeCategories } from "@/types/productCategory";
 import { Text } from "@/components/Typography";
+import { usePathname } from "next/navigation";
+import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+import DrawCategory from "./DrawCategory";
 
 interface Props {
 	categories: TTreeCategories[] | null;
 }
 
 const Menu: FC<Props> = ({ categories }) => {
+	const [open, setOpen] = useState(false);
+	const pathname = usePathname();
+
 	return (
 		<Card
 			className={cn(
@@ -21,26 +27,34 @@ const Menu: FC<Props> = ({ categories }) => {
 			bordered={false}
 		>
 			<Flex
-				className="container box-border py-1 text-[#767676]"
+				className="box-border py-1 text-[#767676]"
 				justify="space-between"
 				align="center"
 			>
-				<Flex
-					vertical
-					justify="center"
-					align="center"
-					className="flex-1"
+				<LocalizedClientLink
+					className="flex-1 gap-2"
+					href="/"
+					data-testid="nav-cart-link"
 				>
-					<Home size={22} strokeWidth={2} />
-					<Text className={cn("text-[11px] text-[#767676]")}>
-						{"Mua sắm"}
-					</Text>
-				</Flex>
+					<Flex
+						vertical
+						justify="center"
+						align="center"
+						className={cn(
+							"flex-1 text-[#767676]",
+							pathname === "/" && "text-black"
+						)}
+					>
+						<Home size={22} strokeWidth={2} />
+						<Text className={cn("text-[11px]")}>{"Mua sắm"}</Text>
+					</Flex>
+				</LocalizedClientLink>
 				<Flex
 					vertical
 					justify="center"
 					align="center"
 					className="flex-1"
+					onClick={() => setOpen(true)}
 				>
 					<List size={22} strokeWidth={2} />
 					<Text className={cn("text-[11px] text-[#767676]")}>
@@ -81,6 +95,11 @@ const Menu: FC<Props> = ({ categories }) => {
 					</Text>
 				</Flex>
 			</Flex>
+			<DrawCategory
+				open={open}
+				onClose={() => setOpen(false)}
+				categories={categories}
+			/>
 		</Card>
 	);
 };

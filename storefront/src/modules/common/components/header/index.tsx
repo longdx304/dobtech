@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { TTreeCategories } from '@/types/productCategory';
 import Category from './Category';
 import HeaderWrap from './HeaderWrap';
+import HeaderWrapMobile from './HeaderWrapMobile';
 
 interface Props {
   categories: TTreeCategories[] | null;
@@ -21,8 +22,9 @@ const Header: FC<Props> = ({ categories }) => {
       )}
       bordered={false}
     >
-      <Flex vertical className='container box-border'>
+      <Flex vertical className='lg:container box-border'>
         <HeaderWrap />
+        <HeaderWrapMobile />
         <Category categories={categories} />
       </Flex>
     </Card>
