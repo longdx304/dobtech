@@ -13,14 +13,14 @@ import { removeCookie } from '@/actions/auth';
 import { ERoutes } from '@/types/routes';
 
 type UserContextType = {
-	user: Omit<User, 'password_hash'> | null;
+	user: Omit<User, 'password_hash'> | undefined;
 	isLoading: boolean;
-	remote: () => void;
+	remove: () => void;
 };
 const defaultUserContext: UserContextType = {
-	user: null,
+	user: undefined,
 	isLoading: false,
-	remote: () => {},
+	remove: () => {},
 };
 
 const UserContext = React.createContext(defaultUserContext);
