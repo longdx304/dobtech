@@ -54,7 +54,7 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 			cancelText: 'Huỷ',
 			async onOk() {
 				try {
-					await updateProduct.mutateAsync({ thumbnail: null });
+					await updateProduct.mutateAsync({ thumbnail: undefined });
 					message.success('Xoá thumbnail thành công!');
 				} catch (error) {
 					message.error('Xoá thumbnail thất bại!');
