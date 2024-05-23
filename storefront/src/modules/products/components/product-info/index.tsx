@@ -5,6 +5,7 @@ import { useRegion } from '@/lib/providers/region-provider';
 import _ from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import ProductPrice from '../product-price';
+import { notFound } from 'next/navigation';
 
 type ProductInfoProps = {};
 
@@ -34,7 +35,8 @@ const ProductInfo = ({}: ProductInfoProps) => {
   const variantRecord = useMemo(() => {
     const map: Record<string, Record<string, string>> = {};
     if (_.isEmpty(variants)) return {};
-    for (const variant of variants) {
+
+    for (const variant of variants!) {
       if (!variant.options || !variant.id) continue;
 
       const temp: Record<string, string> = {};
@@ -60,9 +62,13 @@ const ProductInfo = ({}: ProductInfoProps) => {
       }
     }
 
-    return variants.find((v) => v.id === variantId);
+    return variants!.find((v) => v.id === variantId);
   }, [options, variantRecord, variants]);
 
+  if (!product || !region) {
+    notFound();
+  }
+  
   return (
     <div className='relative'>
       <ProductPrice

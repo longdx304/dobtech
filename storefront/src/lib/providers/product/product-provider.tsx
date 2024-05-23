@@ -8,7 +8,7 @@ import React, {
 import { PricedProduct } from "@medusajs/medusa/dist/types/pricing";
 
 type TProductContext = {
-	product: PricedProduct;
+	product: PricedProduct | null;
 	setProduct: (product: PricedProduct) => void;
 };
 const defaultProductContext: TProductContext = {
@@ -27,7 +27,7 @@ export const ProductProvider = ({
 	productData,
 }: PropsWithChildren & Props) => {
 	console.log("product sss", productData);
-	const [product, setProduct] = useState<PricedProduct>(null);
+	const [product, setProduct] = useState<PricedProduct | null>(null);
 
 	useEffect(() => {
 		// Fetch product data

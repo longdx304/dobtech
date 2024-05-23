@@ -8,6 +8,7 @@ import {
 } from "@/actions/products";
 import { ProductProvider } from "@/lib/providers/product/product-provider";
 import { getRegion } from '@/actions/region';
+import { Region } from '@medusajs/medusa';
 
 const getPricedProductByHandle = async (handle: string, region: Region) => {
 	const { product } = await getProductByHandle(handle).then(
@@ -50,7 +51,7 @@ export default async function ProductDetailLayout(props: Props) {
 
 	return (
 		<div className={cn("w-full box-border")}>
-			<ProductProvider productData={pricedProduct}>
+			<ProductProvider productData={pricedProduct!}>
 				<MenuProductDetail />
 				{props.children}
 			</ProductProvider>

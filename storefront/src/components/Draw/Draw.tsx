@@ -1,12 +1,12 @@
-import { FC, ReactNode } from 'react';
-import { Draw as AntdDraw, DrawProps } from 'antd';
 import { cn } from '@/lib/utils';
+import { Drawer as AntdDraw, DrawerProps } from 'antd';
+import { FC, ReactNode } from 'react';
 
-interface Props extends DrawProps {
+interface Props extends DrawerProps {
 	className?: string;
 	children?: ReactNode;
 }
-const Draw: FC<Props> = ({ className, children, ...props }) => {
+const Drawer: FC<Props> = ({ className, children, ...props }) => {
 	return (
 		<AntdDraw className={cn('', className)} {...props}>
 			{children}
@@ -14,4 +14,4 @@ const Draw: FC<Props> = ({ className, children, ...props }) => {
 	);
 };
 
-export default Draw;
+export default Drawer;

@@ -12,7 +12,7 @@ export default function ProductPrice({
   region,
   className,
 }: {
-  product: PricedProduct;
+  product: PricedProduct ;
   variant?: PricedVariant;
   region?: RegionInfo;
   className?: string;

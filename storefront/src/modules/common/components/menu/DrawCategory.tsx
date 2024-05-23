@@ -1,8 +1,8 @@
 import { FC, useState } from 'react';
-import { Drawer } from 'antd';
 
 import { TTreeCategories } from '@/types/productCategory';
 import CategoryMenu from '@/modules/common/components/category-menu';
+import Drawer from '@/components/Draw/Draw';
 
 interface Props {
   open: boolean;

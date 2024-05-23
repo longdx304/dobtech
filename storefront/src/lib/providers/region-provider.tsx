@@ -1,14 +1,14 @@
 "use client";
+import { Region } from '@medusajs/medusa';
 import React, {
 	PropsWithChildren,
 	useContext,
 	useEffect,
 	useState,
 } from "react";
-import { Region } from "@medusajs/medusa/dist/types/pricing";
 
 type TRegionContext = {
-	region: Region;
+	region: Region | null;
 };
 
 const defaultRegionContext: TRegionContext = {
@@ -18,14 +18,14 @@ const defaultRegionContext: TRegionContext = {
 const RegionContext = React.createContext(defaultRegionContext);
 
 type TRegionProvider = {
-	region: Region;
+	regionData: Region;
 };
 
 export const RegionProvider = ({
 	children,
 	regionData,
 }: PropsWithChildren & TRegionProvider) => {
-	const [region, setRegion] = useState<Region>(null);
+	const [region, setRegion] = useState<Region | null>(null);
 
 	useEffect(() => {
 		setRegion(regionData);

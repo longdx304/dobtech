@@ -1,16 +1,12 @@
 "use client";
-import { ShoppingCart, Heart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { FC, useState } from "react";
 
+import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Flex } from "@/components/Flex";
-import { Text } from "@/components/Typography";
 import { cn } from "@/lib/utils";
-import LocalizedClientLink from "@/modules/common/components/localized-client-link";
-import { TTreeCategories } from "@/types/productCategory";
 import { usePathname } from "next/navigation";
-import DrawCategory from "./DrawCategory";
-import { Button } from "@/components/Button";
 
 interface Props {}
 
