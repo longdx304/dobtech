@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 
 import { TTreeCategories } from '@/types/productCategory';
 import CategoryMenu from '@/modules/common/components/category-menu';
-import Drawer from '@/components/Draw/Draw';
+import Drawer from '@/components/Drawer/Drawer';
 
 interface Props {
   open: boolean;

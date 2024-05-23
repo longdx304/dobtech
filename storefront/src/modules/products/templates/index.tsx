@@ -21,15 +21,12 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           <ImageGallery />
         </div>
         <div className='w-full lg:flex-grow lg:pr-4'>
-          <ProductInfo />
-          <div className='hidden lg:block'>
-            <Suspense>
-              <ProductActionsWrapper
-                countryCode={countryCode}
-                handle={handle}
-              />
-            </Suspense>
-          </div>
+					<Suspense>
+						<ProductActionsWrapper
+							countryCode={countryCode}
+							handle={handle}
+						/>
+					</Suspense>
         </div>
       </div>
       <ProductTabs />
