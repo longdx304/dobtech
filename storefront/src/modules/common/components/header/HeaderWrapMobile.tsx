@@ -7,17 +7,20 @@ import { Flex } from '@/components/Flex';
 import CartButton from '@/modules/layout/components/cart-button';
 import LeftHeader from '@/modules/layout/components/left-header';
 import LocalizedClientLink from '../localized-client-link';
+import { TTreeCategories } from "@/types/productCategory";
 
-interface Props {}
+interface Props {
+	categories: TTreeCategories[] | null;
+}
 
-const HeaderWrapMobile: FC<Props> = ({}) => {
+const HeaderWrapMobile: FC<Props> = ({ categories }) => {
   return (
     <div className='relative items-center justify-between z-11 h-[42px] block lg:hidden box-border'>
       <div className='flex w-fit items-center absolute z-[12]'>
-        <LeftHeader />
+        <LeftHeader categories={categories} />
       </div>
       <div className='absolute z-11 w-full flex justify-center items-center'>
-        <LocalizedClientLink href='/'>
+        <LocalizedClientLink href='/' className="h-[42px]">
           <Image
             src='/images/CHAMDEP_logo.png'
             width={100}

@@ -80,7 +80,7 @@ export default async function ProductPage({ params }: Props) {
   }
 
   return (
-    <div className='w-full box-border container pt-[6rem] lg:pt-[8rem]'>
+    <div className='w-full box-border container pt-[4rem] lg:pt-[8rem]'>
       <ProductTemplate
         product={pricedProduct}
         region={region}
