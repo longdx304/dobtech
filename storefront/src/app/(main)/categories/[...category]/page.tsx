@@ -68,7 +68,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   }
 
   return (
-    <div className='w-full container box-border pt-[6rem] lg:pt-[8rem]'>
+    <div className='w-full container box-border pt-[4rem] lg:pt-[6rem]'>
       <CategoryTemplate
         categories={product_categories}
         sortBy={sortBy}

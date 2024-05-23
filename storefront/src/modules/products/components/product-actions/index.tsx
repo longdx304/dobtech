@@ -56,11 +56,11 @@ export default function ProductActions({
 
 	// add the selected variant to the cart
 	const handleAddToCart = async () => {
-		if (!variant?.id) return null;
+		if (_.isEmpty(variant) && !variant) return null;
 		setIsAdding(true);
 
 		await addToCart({
-			variantId: variant.id,
+			variantId: variant!.id || '',
 			quantity: quantity,
 			countryCode,
 		});

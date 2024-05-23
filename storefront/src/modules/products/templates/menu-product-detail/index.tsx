@@ -53,7 +53,7 @@ const MenuProductDetail: FC<Props> = ({}) => {
 				</Button>
 			</Flex>
 			<DrawPriceProduct
-				open={state}
+				open={state as boolean}
 				onClose={onClose}
 				product={product!}
 				region={region!}

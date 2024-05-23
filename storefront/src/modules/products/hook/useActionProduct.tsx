@@ -57,7 +57,7 @@ const useActionProduct = ({ product }: Props) => {
 	const variant = useMemo(() => {
 		let variantId: string | undefined = undefined;
 		if (_.isEmpty(variantRecord) || _.isEmpty(variants)) {
-			return {};
+			return undefined;
 		}
 		for (const key of Object.keys(variantRecord)) {
 			if (_.isEqual(variantRecord[key], options)) {
@@ -102,10 +102,9 @@ const useActionProduct = ({ product }: Props) => {
 			return variant.inventory_quantity;
 		}
 		const total = variants.reduce(
-			(acc, variant) => acc + variant.inventory_quantity,
+			(acc, variant) => acc + (variant?.inventory_quantity || 0),
 			0
 		);
-		console.log("total", total);
 		return total;
 	}, [variant, variants]);
 

@@ -24,7 +24,7 @@ type Props = {
 	disabled?: boolean;
 };
 
-const DrawPriceProduct: FC = ({ open, onClose, product, region, disabled }) => {
+const DrawPriceProduct: FC<Props> = ({ open, onClose, product, region, disabled }) => {
 	const [isAdding, setIsAdding] = useState(false);
 	const countryCode = (useParams().countryCode as string) ?? "vn";
 
