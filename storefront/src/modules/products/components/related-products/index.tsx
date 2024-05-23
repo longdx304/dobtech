@@ -1,17 +1,36 @@
-import { getProductsList } from '@/actions/products';
+import { getProductByHandle, getProductsList, retrievePricedProductById } from '@/actions/products';
 import { getRegion } from '@/actions/region';
-import { StoreGetProductsParams } from '@medusajs/medusa';
+import { Region, StoreGetProductsParams } from '@medusajs/medusa';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
 import ProductPreview from '../product-preview';
 
 type RelatedProductsProps = {
-  product: PricedProduct;
+  // product: PricedProduct;
   countryCode: string;
+  handle: string;
+};
+
+const getPricedProductByHandle = async (handle: string, region: Region) => {
+  const { product } = await getProductByHandle(handle).then(
+    (product) => product
+  );
+
+  if (!product || !product.id) {
+    return null;
+  }
+
+  const pricedProduct = await retrievePricedProductById({
+    id: product.id,
+    regionId: region.id,
+  });
+
+  return pricedProduct;
 };
 
 export default async function RelatedProducts({
-  product,
+  // product,
   countryCode,
+  handle,
 }: RelatedProductsProps) {
   const region = await getRegion(countryCode);
 
@@ -19,6 +38,19 @@ export default async function RelatedProducts({
     return null;
   }
 
+  const pricedProduct = await getPricedProductByHandle(
+    handle,
+    region as Region
+  );
+
+  const product = await retrievePricedProductById({
+    id: pricedProduct?.id as string,
+    regionId: region?.id as string,
+  });
+
+  if (!product) {
+    return null;
+  }
   // edit this function to define your related products logic
   const setQueryParams = (): StoreGetProductsParams => {
     const params: StoreGetProductsParams = {};
@@ -75,3 +107,4 @@ export default async function RelatedProducts({
     </div>
   );
 }
+

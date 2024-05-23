@@ -2,9 +2,9 @@ import {
   getProductByHandle,
   retrievePricedProductById,
 } from '@/actions/products';
+import { getRegion } from '@/actions/region';
 import { Region } from '@medusajs/medusa';
 import ProductActions from '../../components/product-actions';
-import { getRegion } from '@/actions/region';
 
 const getPricedProductByHandle = async (handle: string, region: Region) => {
   const { product } = await getProductByHandle(handle).then(

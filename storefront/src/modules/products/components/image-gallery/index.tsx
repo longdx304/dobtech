@@ -2,8 +2,7 @@
 
 import { Flex } from '@/components/Flex';
 import { Image } from '@/components/Image';
-import { Image as MedusaImage } from '@medusajs/medusa';
-import { use, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import SwiperCore from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
@@ -23,7 +22,7 @@ const ImageGallery = ({}: ImageGalleryProps) => {
       return '/images/product-img.png';
     }
   }, [product]);
-  
+
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const mainSwiperRef = useRef<SwiperCore>();
 
@@ -39,7 +38,7 @@ const ImageGallery = ({}: ImageGalleryProps) => {
   };
 
   return (
-    <Flex className='flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-[730px]'>
+    <Flex className='flex flex-col-reverse lg:flex-row items-center gap-4 w-full'>
       <Swiper
         direction={'horizontal'}
         breakpoints={{
@@ -53,9 +52,9 @@ const ImageGallery = ({}: ImageGalleryProps) => {
       >
         {typeof images === 'string' ? (
           <SwiperSlide className='w-auto'>
-            <div className='relative rounded-lg w-[60px] h-[60px] md:w-[100px] md:h-[100px] cursor-pointer'>
+            <div className='relative rounded-lg w-[60px] h-[60px] md:w-[80px] md:h-[80px] cursor-pointer'>
               <Image
-                className='rounded-lg object-cover'
+                className='rounded-lg object-contain'
                 src={images}
                 alt={`Image 1`}
                 width='inherit'
@@ -65,9 +64,9 @@ const ImageGallery = ({}: ImageGalleryProps) => {
             </div>
           </SwiperSlide>
         ) : (
-          <div className='relative rounded-lg w-[60px] h-[60px] md:w-[100px] md:h-[100px] cursor-pointer'>
+          <div className='relative rounded-lg w-[60px] h-[60px] md:w-[80px] md:h-[80px] cursor-pointer'>
             <Image
-              className='rounded-lg object-cover'
+              className='rounded-lg object-contain'
               src={'/images/product-img.png'}
               alt={`Image 1`}
               width='inherit'
@@ -111,11 +110,9 @@ const ImageGallery = ({}: ImageGalleryProps) => {
             <SwiperSlide>
               <div className='relative w-full h-full'>
                 <Image
-                  className='rounded-lg object-cover w-full sm:w-[400px] h-[350px] sm:h-[400px]'
+                  className='rounded-lg object-contain w-full sm:w-[500px] h-[350px] sm:h-[400px]'
                   src={images}
                   alt={`Image 1`}
-                  width='inherit'
-                  height='inherit'
                 />
               </div>
             </SwiperSlide>
@@ -125,8 +122,6 @@ const ImageGallery = ({}: ImageGalleryProps) => {
                 className='rounded-lg object-cover w-full sm:w-[400px] h-[350px] sm:h-[400px]'
                 src='/images/product-img.png'
                 alt={`Image 1`}
-                width='inherit'
-                height='inherit'
               />
             </div>
           )}
@@ -135,7 +130,7 @@ const ImageGallery = ({}: ImageGalleryProps) => {
               <SwiperSlide key={index}>
                 <div className='relative w-full h-full'>
                   <Image
-                    className='rounded-lg object-cover'
+                    className='rounded-lg object-contain'
                     src={img?.url}
                     alt={`Image ${index + 1}`}
                     width='inherit'

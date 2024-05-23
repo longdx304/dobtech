@@ -88,7 +88,7 @@ const useActionProduct = ({ product }: Props) => {
 		}
 
 		// If there is inventory available, we can add to cart
-		if (variant?.inventory_quantity && variant.inventory_quantity > 0) {
+		if (variant?.inventory_quantity && variant?.inventory_quantity > 0) {
 			return true;
 		}
 
@@ -99,9 +99,9 @@ const useActionProduct = ({ product }: Props) => {
 	// get the inventory quantity of a variant
 	const inventoryQuantity = useMemo(() => {
 		if (variant) {
-			return variant.inventory_quantity;
+			return variant?.inventory_quantity;
 		}
-		const total = variants.reduce(
+		const total = variants?.reduce(
 			(acc, variant) => acc + (variant?.inventory_quantity || 0),
 			0
 		);

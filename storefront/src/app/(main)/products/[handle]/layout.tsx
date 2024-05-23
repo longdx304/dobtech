@@ -1,60 +1,60 @@
-import { notFound } from "next/navigation";
+import { notFound } from 'next/navigation';
 
-import MenuProductDetail from "@/modules/products/templates/menu-product-detail";
-import { cn } from "@/lib/utils";
 import {
-	getProductByHandle,
-	retrievePricedProductById,
-} from "@/actions/products";
-import { ProductProvider } from "@/lib/providers/product/product-provider";
+  getProductByHandle,
+  retrievePricedProductById,
+} from '@/actions/products';
 import { getRegion } from '@/actions/region';
+import { ProductProvider } from '@/lib/providers/product/product-provider';
+import { cn } from '@/lib/utils';
+import MenuProductDetail from '@/modules/products/templates/menu-product-detail';
 import { Region } from '@medusajs/medusa';
 
 const getPricedProductByHandle = async (handle: string, region: Region) => {
-	const { product } = await getProductByHandle(handle).then(
-		(product) => product
-	);
+  const { product } = await getProductByHandle(handle).then(
+    (product) => product
+  );
 
-	if (!product || !product.id) {
-		return null;
-	}
+  if (!product || !product.id) {
+    return null;
+  }
 
-	const pricedProduct = await retrievePricedProductById({
-		id: product.id,
-		regionId: region.id,
-	});
+  const pricedProduct = await retrievePricedProductById({
+    id: product.id,
+    regionId: region.id,
+  });
 
-	return pricedProduct;
+  return pricedProduct;
 };
 
 type Props = {
-	children: React.ReactNode;
-	params: { handle: string };
+  children: React.ReactNode;
+  params: { handle: string };
 };
 
 export default async function ProductDetailLayout(props: Props) {
-	const { params } = props;
-	const region = await getRegion("vn");
+  const { params } = props;
+  const region = await getRegion('vn');
 
-	if (!region) {
-		return notFound();
-	}
+  if (!region) {
+    return notFound();
+  }
 
-	const pricedProduct = await getPricedProductByHandle(
-		params?.handle ?? "",
-		region
-	);
+  const pricedProduct = await getPricedProductByHandle(
+    params?.handle ?? '',
+    region
+  );
 
-	if (!pricedProduct) {
-		return notFound();
-	}
+  if (!pricedProduct) {
+    return notFound();
+  }
 
-	return (
-		<div className={cn("w-full box-border")}>
-			<ProductProvider productData={pricedProduct!}>
-				<MenuProductDetail />
-				{props.children}
-			</ProductProvider>
-		</div>
-	);
+  return (
+    <div className={cn('w-full box-border')}>
+      <ProductProvider productData={pricedProduct}>
+        <MenuProductDetail />
+        {props.children}
+      </ProductProvider>
+    </div>
+  );
 }

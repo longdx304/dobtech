@@ -1,16 +1,15 @@
 'use client';
-import { FC } from 'react';
 import { Product } from '@medusajs/medusa';
+import { Col, Empty, MenuProps, Modal, Row, message } from 'antd';
 import { CircleAlert, Pencil, Trash2 } from 'lucide-react';
-import { Row, Col, Empty, Modal, message, MenuProps } from 'antd';
 import { useAdminUpdateProduct } from 'medusa-react';
+import { FC } from 'react';
 
-import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { Flex } from '@/components/Flex';
-import { Title } from '@/components/Typography';
 import { ActionAbles } from '@/components/Dropdown';
+import { Flex } from '@/components/Flex';
 import { Image } from '@/components/Image';
+import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import ThumbnailModal from './edit-modals/ThumbnailModal';
 

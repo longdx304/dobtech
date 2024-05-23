@@ -1,20 +1,19 @@
+// @ts-nocheck
 "use client";
 
 import { Divider } from "antd";
-import _ from "lodash";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/Button";
 import InputNumber from "@/components/Input/InputNumber";
-import { useProduct } from "@/lib/providers/product/product-provider";
 import { addToCart } from "@/modules/cart/action";
-import { Minus, Plus } from "lucide-react";
-import OptionSelect from "../option-select";
-import { PricedProduct } from "@medusajs/medusa/dist/types/pricing";
-import { Region } from "@medusajs/medusa";
 import ProductInfo from "@/modules/products/components/product-info";
 import useActionProduct from "@/modules/products/hook/useActionProduct";
+import { Region } from "@medusajs/medusa";
+import { PricedProduct } from "@medusajs/medusa/dist/types/pricing";
+import { Minus, Plus } from "lucide-react";
+import OptionSelect from "../option-select";
 
 type ProductActionsProps = {
 	product: PricedProduct;
