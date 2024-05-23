@@ -1,7 +1,5 @@
-import { Empty as AntdEmpty, EmptyProps } from 'antd';
 import { cn } from '@/lib/utils';
-import { Flex } from '@/components/Flex';
-import { ErrorText } from '@/components/Typography';
+import { Empty as AntdEmpty, EmptyProps } from 'antd';
 
 interface Props extends EmptyProps {
 	className?: string;

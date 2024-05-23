@@ -1,7 +1,7 @@
-import { Button } from '@/components/Button';
-import { Dropdown } from '@/components/Dropdown';
-import { Space } from 'antd';
-import { ArrowDown, Filter } from 'lucide-react';
+import { Flex } from '@/components/Flex';
+import { ArrowDown, ArrowUp, Filter } from 'lucide-react';
+import { useState } from 'react';
+import DrawFilter from './DrawFilter';
 
 type FilterRadioGroupProps = {
   items: {
@@ -19,42 +19,47 @@ const FilterRadioGroup = ({
   handleChange,
   'data-testid': dataTestId,
 }: FilterRadioGroupProps) => {
-  console.log('value:', value);
+  const [open, setOpen] = useState(false);
 
   return (
-    <>
-      <div className='flex items-center'>
-        <Dropdown
-          menu={{ selectedKeys: [value] }}
-          dropdownRender={(menu) => (
-            <ul className='space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900 list-none'>
-              {items.map((item) => (
-                <li key={item.value}>
-                  <a
-                    onClick={() => handleChange(item.value)}
-                    className='text-black'
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-          className='cursor-pointer'
-          data-testid={dataTestId}
-        >
-          <a onClick={(e) => e.preventDefault()}>
-            <Space>
-              Sort by <ArrowDown />
-            </Space>
-          </a>
-        </Dropdown>
-
-        <Button className='-m-2 ml-4 bg-white shadow-none hover:border-slate-500'>
-          <Filter className='h-5 w-5' />
-        </Button>
-      </div>
-    </>
+    <Flex justify='space-between' align='center' className='w-full space-x-4'>
+      {items
+        .filter((item) => item.value === 'created_at')
+        .map((item) => (
+          <div
+            key={item.value}
+            className={`${value === item.value && 'text-black font-bold'}`}
+            onClick={() => handleChange(item.value)}
+          >
+            {item.label}
+          </div>
+        ))}
+      <Flex
+        className={`${
+          value === 'price_asc' || value === 'price_desc'
+            ? 'text-black font-bold'
+            : 'text-gray-900'
+        }`}
+        onClick={() =>
+          handleChange(value === 'price_asc' ? 'price_desc' : 'price_asc')
+        }
+      >
+        Giá{' '}
+        {value === 'price_asc' ? (
+          <ArrowUp className='h-5 w-5' />
+        ) : (
+          <ArrowDown className='h-5 w-5' />
+        )}
+      </Flex>
+      <Flex
+        className='flex bg-white shadow-none hover:border-slate-500'
+        onClick={() => setOpen(!open)}
+      >
+        <span>Sàng lọc</span>
+        <Filter className='h-5 w-5 text-black' />
+      </Flex>
+      <DrawFilter open={open} onClose={() => setOpen(false)} />
+    </Flex>
   );
 };
 

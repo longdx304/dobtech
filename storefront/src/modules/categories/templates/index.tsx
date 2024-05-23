@@ -50,50 +50,20 @@ export default function CategoryTemplate({
   if (!category || !countryCode) notFound();
 
   return (
-    <main className='mx-auto max-w-7xl' data-testid='category-container'>
+    <>
       <RefinementList
         sortBy={sortBy || 'created_at'}
         data-testid='sort-by-container'
-        category={category}
       />
-      <section className='pb-24 pt-6'>
-        <div className='grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4'>
-          {/* Filters */}
-          <div>
-            <LocalizedClientLink
-              href={`categories/${category.handle}`}
-              className='text-black'
-            >
-              <h3 className='pl-3'>{category.name}</h3>
-            </LocalizedClientLink>
-            <ul className='space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900 list-none'>
-              {category.category_children.map((childCategory) => (
-                <li key={childCategory.id}>
-                  <InteractiveLink
-                    href={`categories/${childCategory.handle}`}
-                    className='text-black '
-                    isIconHidden={true}
-                  >
-                    + {childCategory.name}
-                  </InteractiveLink>
-                </li>
-              ))}
-            </ul>
-
-            <OptionList color={COLOR_FILTERS} size={SIZE_FILTERS} />
-          </div>
-
-          {/* Products */}
-          <Suspense fallback={<SkeletonProductGrid />}>
-            <PaginatedProducts
-              sortBy={sortBy || 'created_at'}
-              page={pageNumber}
-              categoryId={category.id}
-              countryCode={countryCode}
-            />
-          </Suspense>
-        </div>
-      </section>
-    </main>
+      {/* Product */}
+      <Suspense fallback={<SkeletonProductGrid />}>
+        <PaginatedProducts
+          sortBy={sortBy || 'created_at'}
+          page={pageNumber}
+          categoryId={category.id}
+          countryCode={countryCode}
+        />
+      </Suspense>
+    </>
   );
 }

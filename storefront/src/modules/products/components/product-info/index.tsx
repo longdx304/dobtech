@@ -1,85 +1,86 @@
-"use client";
-import ProductPrice from "../product-price";
-import { useEffect, useMemo, useState } from "react";
-import _ from "lodash";
-import { Flex, Rate } from "antd";
-import { useProduct } from "@/lib/providers/product/product-provider";
-import { useRegion } from "@/lib/providers/region-provider";
+'use client';
+
+import { useProduct } from '@/lib/providers/product/product-provider';
+import { useRegion } from '@/lib/providers/region-provider';
+import _ from 'lodash';
+import { useEffect, useMemo, useState } from 'react';
+import ProductPrice from '../product-price';
 
 type ProductInfoProps = {};
 
-const desc = ["terrible", "bad", "normal", "good", "wonderful"];
+const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
 
 const ProductInfo = ({}: ProductInfoProps) => {
-	const { product } = useProduct();
-	const { region } = useRegion();
-	const [options, setOptions] = useState<Record<string, string>>({});
-	const [value, setValue] = useState(3);
+  const { product } = useProduct();
+  const { region } = useRegion();
+  const [options, setOptions] = useState<Record<string, string>>({});
+  const [value, setValue] = useState(3);
 
-	const variants = product?.variants;
+  const variants = product?.variants;
 
-	// initialize the option state
-	useEffect(() => {
-		const optionObj: Record<string, string> = {};
+  // initialize the option state
+  useEffect(() => {
+    const optionObj: Record<string, string> = {};
 
-		for (const option of product?.options || []) {
-			Object.assign(optionObj, { [option.id]: undefined });
-		}
+    for (const option of product?.options || []) {
+      optionObj[option.id] = option.values[0]?.value || '';
+    }
 
-		setOptions(optionObj);
-	}, [product]);
+    setOptions(optionObj);
+  }, [product]);
+  console.log('options', options);
 
-	// memoized record of the product's variants
-	const variantRecord = useMemo(() => {
-		const map: Record<string, Record<string, string>> = {};
-		if (_.isEmpty(variants)) return {};
-		for (const variant of variants) {
-			if (!variant.options || !variant.id) continue;
+  // memoized record of the product's variants
+  const variantRecord = useMemo(() => {
+    const map: Record<string, Record<string, string>> = {};
+    if (_.isEmpty(variants)) return {};
+    for (const variant of variants) {
+      if (!variant.options || !variant.id) continue;
 
-			const temp: Record<string, string> = {};
+      const temp: Record<string, string> = {};
 
-			for (const option of variant.options) {
-				temp[option.option_id] = option.value;
-			}
+      for (const option of variant.options) {
+        temp[option.option_id] = option.value;
+      }
 
-			map[variant.id] = temp;
-		}
+      map[variant.id] = temp;
+    }
 
-		return map;
-	}, [variants]);
+    return map;
+  }, [variants]);
 
-	// memoized function to check if the current options are a valid variant
-	const variant = useMemo(() => {
-		let variantId: string | undefined = undefined;
-		if (_.isEmpty(variantRecord)) return {};
+  // memoized function to check if the current options are a valid variant
+  const variant = useMemo(() => {
+    let variantId: string | undefined = undefined;
+    if (_.isEmpty(variantRecord)) return {};
 
-		for (const key of Object.keys(variantRecord)) {
-			if (_.isEqual(variantRecord[key], options)) {
-				variantId = key;
-			}
-		}
+    for (const key of Object.keys(variantRecord)) {
+      if (_.isEqual(variantRecord[key], options)) {
+        variantId = key;
+      }
+    }
 
-		return variants.find((v) => v.id === variantId);
-	}, [options, variantRecord, variants]);
+    return variants.find((v) => v.id === variantId);
+  }, [options, variantRecord, variants]);
 
-	return (
-		<div className="relative">
-			<ProductPrice
-				className="text-[18px] font-semibold"
-				product={product}
-				variant={variant}
-				region={region}
-			/>
-			<h1 className="text-2xl font-semibold">{product?.title}</h1>
-			{/* Feedback */}
-			{/* <div className='flex items-center space-x-12 mt-4 py-2'>
+  return (
+    <div className='relative'>
+      <ProductPrice
+        className='text-[18px] font-semibold'
+        product={product}
+        variant={variant as any}
+        region={region}
+      />
+      <h1 className='text-2xl font-semibold'>{product?.title}</h1>
+      {/* Feedback */}
+      {/* <div className='flex items-center space-x-12 mt-4 py-2'>
         <Flex gap='middle'>
           <Rate tooltips={desc} onChange={setValue} value={value} />
           {value ? <span>{desc[value - 1]}</span> : null}
         </Flex>
       </div> */}
-		</div>
-	);
+    </div>
+  );
 };
 
 export default ProductInfo;

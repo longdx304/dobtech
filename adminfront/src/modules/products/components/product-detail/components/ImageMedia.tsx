@@ -1,17 +1,16 @@
 'use client';
-import { FC } from 'react';
 import { Product } from '@medusajs/medusa';
-import { Row, Col, Empty, MenuProps } from 'antd';
+import { Col, Empty, MenuProps, Row } from 'antd';
 import { Pencil } from 'lucide-react';
+import { FC } from 'react';
 
-import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { Flex } from '@/components/Flex';
-import { Title } from '@/components/Typography';
 import { ActionAbles } from '@/components/Dropdown';
+import { Flex } from '@/components/Flex';
 import { Image } from '@/components/Image';
-import MediaModal from './edit-modals/MediaModal';
+import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import MediaModal from './edit-modals/MediaModal';
 
 type Props = {
 	product: Product;
@@ -64,7 +63,7 @@ const ImageMedia: FC<Props> = ({ product, loadingProduct }) => {
 										alt={`Product Image ${image.id}`}
 										width={120}
 										height={120}
-										className="rounded-md rounded-md hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer"
+										className="rounded-md hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer"
 									/>
 								</div>
 							))

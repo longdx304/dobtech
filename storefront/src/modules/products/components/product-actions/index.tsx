@@ -1,7 +1,5 @@
 'use client';
 
-import { Region } from '@medusajs/medusa';
-import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
 import { Divider } from 'antd';
 import _ from 'lodash';
 import { useParams } from 'next/navigation';
@@ -9,9 +7,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button';
 import InputNumber from '@/components/Input/InputNumber';
+import { useProduct } from '@/lib/providers/product/product-provider';
 import { addToCart } from '@/modules/cart/action';
-import OptionSelect from '../option-select';
 import { Minus, Plus } from 'lucide-react';
+import OptionSelect from '../option-select';
+import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
+import { Region } from '@medusajs/medusa';
 
 type ProductActionsProps = {
   product: PricedProduct;
@@ -28,16 +29,16 @@ export type PriceType = {
 
 export default function ProductActions({
   product,
-  region,
   disabled,
 }: ProductActionsProps) {
+  // const { product } = useProduct();
   const [options, setOptions] = useState<Record<string, string>>({});
   const [isAdding, setIsAdding] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
   const countryCode = (useParams().countryCode as string) ?? 'vn';
 
-  const variants = product.variants;
+  const variants = product?.variants;
 
   // initialize the option state
   useEffect(() => {
@@ -134,7 +135,7 @@ export default function ProductActions({
     });
 
     setIsAdding(false);
-    console.log('added to cart')
+    console.log('added to cart');
   };
 
   // get the inventory quantity of a variant
@@ -156,7 +157,6 @@ export default function ProductActions({
     if (quantity > 1) {
       setQuantity(quantity - 1);
     }
-    
   };
   const handleInputChange = (value: number) => {
     setQuantity(value);

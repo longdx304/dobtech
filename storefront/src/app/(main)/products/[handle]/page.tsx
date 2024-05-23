@@ -45,6 +45,7 @@ export default async function ProductPage({ params }: Props) {
 		<div className="w-full box-border container pt-[4rem] lg:pt-[8rem]">
 			<ProductTemplate
 				countryCode={"vn"}
+				handle={params.handle!}
 			/>
 		</div>
 	);

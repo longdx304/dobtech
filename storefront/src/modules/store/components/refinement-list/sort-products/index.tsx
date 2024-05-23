@@ -4,6 +4,8 @@ import FilterRadioGroup from '@/modules/common/components/filter-radio-group';
 import { ProductCategory } from '@medusajs/medusa';
 import { useMemo, useState, useEffect } from 'react';
 import { useProductCategories } from 'medusa-react';
+import FilterVariant from '@/modules/common/components/filter-variant';
+import { Divider } from 'antd';
 
 export type SortOptions = 'price_asc' | 'price_desc' | 'created_at';
 
@@ -38,12 +40,16 @@ const SortProducts = ({
   };
 
   return (
-    <FilterRadioGroup
-      items={sortOptions}
-      value={sortBy}
-      handleChange={handleChange}
-      data-testid={dataTestId}
-    />
+    <>
+      <FilterRadioGroup
+        items={sortOptions}
+        value={sortBy}
+        handleChange={handleChange}
+        data-testid={dataTestId}
+      />
+      <FilterVariant />
+      <Divider />
+    </>
   );
 };
 
