@@ -1,20 +1,23 @@
-// 'use client';
+'use client';
 import { FC } from 'react';
 
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
-import useScrollDirection from '@/lib/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
 import { TTreeCategories } from '@/types/productCategory';
 import Category from './Category';
 import HeaderWrap from './HeaderWrap';
 import HeaderWrapMobile from './HeaderWrapMobile';
+import { usePathname } from 'next/navigation';
+import SearchInput from '@/modules/layout/components/search-input.tsx';
 
 interface Props {
   categories: TTreeCategories[] | null;
 }
 
 const Header: FC<Props> = ({ categories }) => {
+  const pathname = usePathname();
+
   return (
     <Card
       className={cn(
@@ -23,9 +26,15 @@ const Header: FC<Props> = ({ categories }) => {
       bordered={false}
     >
       <Flex vertical className='lg:container box-border'>
-        <HeaderWrap />
-        <HeaderWrapMobile />
-        <Category categories={categories} />
+        {pathname === '/search' ? (
+          <div />
+        ) : (
+          <>
+            <HeaderWrap />
+            <HeaderWrapMobile />
+            <Category categories={categories} />
+          </>
+        )}
       </Flex>
     </Card>
   );

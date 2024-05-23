@@ -13,7 +13,6 @@ type ProductTabsProps = {
 const ProductTabs: React.FC<ProductTabsProps> = ({ product }) => {
   const [activeKey, setActiveKey] = useState<string | string[]>(['0']);
 
-  console.log('product', product);
   const tabs = [
     {
       label: 'CHI TIẾT SẢN PHẨM',

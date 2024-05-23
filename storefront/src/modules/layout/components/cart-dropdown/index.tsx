@@ -1,5 +1,3 @@
-'use client';
-
 import { BadgeButton, Button } from '@/components/Button';
 import DeleteButton from '@/modules/common/components/delete-button';
 import LineItemPrice from '@/modules/common/components/line-item-price';
@@ -133,22 +131,6 @@ const CartDropdown = ({
               ))}
           </div>
           <div className='p-4 flex flex-col gap-y-4 text-sm'>
-            {/* <div className='flex items-center justify-between'>
-              <span className='text-sm font-semibold'>
-                Subtotal <span className='font-normal'>(excl. taxes)</span>
-              </span>
-              <span
-                className='text-lg'
-                data-testid='cart-subtotal'
-                data-value={cartState.subtotal || 0}
-              >
-                {formatAmount({
-                  amount: cartState.subtotal || 0,
-                  region: cartState.region,
-                  includeTaxes: false,
-                })}
-              </span>
-            </div> */}
             <LocalizedClientLink href='cart' passHref>
               <Button
                 className='w-full'
@@ -169,14 +151,6 @@ const CartDropdown = ({
               width={100}
               height={100}
             />
-            {/* <div>
-              <LocalizedClientLink href='/store'>
-                <>
-                  <span className='sr-only'>Go to all products page</span>
-                  <Button onClick={close}>Explore products</Button>
-                </>
-              </LocalizedClientLink>
-            </div> */}
           </div>
         </div>
       )}

@@ -134,6 +134,7 @@ export default function ProductActions({
     });
 
     setIsAdding(false);
+    console.log('added to cart')
   };
 
   // get the inventory quantity of a variant

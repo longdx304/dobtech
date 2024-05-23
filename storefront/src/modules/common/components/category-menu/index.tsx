@@ -1,12 +1,13 @@
-import { FC, React } from "react";
-import { Row, Col } from "antd";
+import { Col, Row } from "antd";
 import { ChevronRight } from "lucide-react";
+import { FC } from "react";
 
+import { Avatar } from "@/components/Avatar";
 import { Flex } from "@/components/Flex";
 import { Text } from "@/components/Typography";
-import LocalizedClientLink from "@/modules/common/components/localized-client-link";
-import { Avatar } from "@/components/Avatar";
 import { cn } from "@/lib/utils";
+import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+import { TTreeCategories } from '@/types/productCategory';
 
 type Props = {
 	categories: TTreeCategories[] | null;
