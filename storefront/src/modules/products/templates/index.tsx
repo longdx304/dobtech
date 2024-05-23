@@ -12,36 +12,19 @@ import RelatedProducts from "../components/related-products";
 import ProductActionsWrapper from "./product-actions-wrapper";
 
 type ProductTemplateProps = {
-	product: PricedProduct;
-	region: Region;
 	countryCode: string;
 };
 
-const ProductTemplate: React.FC<ProductTemplateProps> = ({
-	product,
-	region,
-	countryCode,
-}) => {
-	if (!product || !product.id) {
-		return notFound();
-	}
-
+const ProductTemplate: React.FC<ProductTemplateProps> = ({ countryCode }) => {
 	return (
 		<>
-			{product && (
 				<div className="flex flex-col lg:flex-row justify-between w-full pb-8 gap-4">
 					<div className="w-full lg:flex-grow lg:pr-4">
-						<ImageGallery
-							images={
-								product?.images?.length
-									? product?.images
-									: [product?.thumbnail]
-							}
-						/>
+						<ImageGallery	/>
 					</div>
 					<div className="w-full lg:flex-grow lg:pr-4">
-						<ProductInfo product={product} region={region} />
-						<div className="hidden lg:block">
+						<ProductInfo />
+						{/* <div className="hidden lg:block">
 							<Suspense
 								fallback={
 									<ProductActions
@@ -56,13 +39,12 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 									region={region}
 								/>
 							</Suspense>
-						</div>
+						</div> */}
 					</div>
 				</div>
-			)}
-			<ProductTabs product={product} />
+			<ProductTabs />
 			{/* <ProductReviews /> */}
-			<div
+			{/* <div
 				className="my-16 small:my-32"
 				data-testid="related-products-container"
 			>
@@ -72,7 +54,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 						countryCode={countryCode}
 					/>
 				</Suspense>
-			</div>
+			</div> */}
 		</>
 	);
 };

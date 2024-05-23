@@ -7,11 +7,15 @@ import { useRef, useState } from "react";
 import SwiperCore from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 
+import { useProduct } from "@/lib/providers/product/product-provider";
+
 type ImageGalleryProps = {
 	images: MedusaImage[] | string[];
 };
 
 const ImageGallery = ({ images }: ImageGalleryProps) => {
+	const { product } = useProduct();
+
 	const [selectedImage, setSelectedImage] = useState<number>(0);
 	const mainSwiperRef = useRef<SwiperCore>();
 
@@ -39,7 +43,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
 				spaceBetween={10}
 				className="mySwiper img-thumbnail z-[1] w-full lg:w-auto overflow-y-visible gap-2 lg:gap-4 m-0"
 			>
-				{images.map((img, index) => (
+				{product?.images.map((img, index) => (
 					<SwiperSlide key={index} className="w-auto">
 						<div
 							className="relative rounded-lg w-[60px] h-[60px] md:w-[100px] md:h-[100px] cursor-pointer"
@@ -68,7 +72,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
 					className="relative w-full sm:w-[400px] h-[350px] sm:h-[400px]"
 					onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
 				>
-					{images.map((img, index) => (
+					{product?.images.map((img, index) => (
 						<SwiperSlide key={index}>
 							<Image
 								src={typeof img === "string" ? img : img?.url}
