@@ -60,18 +60,13 @@ export default async function PaginatedProducts({
 
   return (
     <>
-      <ul
-        className='grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 w-full gap-x-6 gap-y-6'
-        data-testid='products-list'
-      >
-        {products.map((product: any) => {
-          return (
-            <li key={product.id}>
-              <ProductPreview data={product} />
-            </li>
-          );
-        })}
-      </ul>
+      {products?.length > 0 && (
+        <div className='grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 w-full gap-x-6 gap-y-6'>
+          {products?.map((product) => (
+            <ProductPreview key={product.id} data={product} />
+          ))}
+        </div>
+      )}
     </>
   );
 }

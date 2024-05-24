@@ -37,6 +37,7 @@ const ImageGallery = ({}: ImageGalleryProps) => {
     setSelectedImage(swiper.activeIndex);
   };
 
+  const totalImages = Array.isArray(images) ? images.length : 1;
   return (
     <Flex className='flex flex-col-reverse lg:flex-row items-center gap-4 w-full'>
       <Swiper
@@ -64,16 +65,18 @@ const ImageGallery = ({}: ImageGalleryProps) => {
             </div>
           </SwiperSlide>
         ) : (
-          <div className='relative rounded-lg w-[60px] h-[60px] md:w-[80px] md:h-[80px] cursor-pointer'>
-            <Image
-              className='rounded-lg object-contain'
-              src={'/images/product-img.png'}
-              alt={`Image 1`}
-              width='inherit'
-              height='inherit'
-              preview={false}
-            />
-          </div>
+          <SwiperSlide className='w-auto'>
+            <div className='relative rounded-lg w-[60px] h-[60px] md:w-[80px] md:h-[80px] cursor-pointer'>
+              <Image
+                className='rounded-lg object-contain'
+                src={'/images/product-img.png'}
+                alt={`Image 1`}
+                width='inherit'
+                height='inherit'
+                preview={false}
+              />
+            </div>
+          </SwiperSlide>
         )}
         {Array.isArray(images) &&
           images.map((img, index) => (
@@ -103,39 +106,50 @@ const ImageGallery = ({}: ImageGalleryProps) => {
           initialSlide={selectedImage}
           spaceBetween={10}
           slidesPerView={1}
-          className='relative w-full sm:w-[400px] h-[350px] sm:h-[400px]'
+          className='w-full h-[350px] sm:h-[400px]'
           onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
         >
           {typeof images === 'string' ? (
-            <SwiperSlide>
-              <div className='relative w-full h-full'>
-                <Image
-                  className='rounded-lg object-contain w-full sm:w-[500px] h-[350px] sm:h-[400px]'
-                  src={images}
-                  alt={`Image 1`}
-                />
+            <SwiperSlide className='w-auto relative'>
+              <Image
+                className='rounded-lg object-contain w-full sm:w-[500px] h-[350px] sm:h-[400px]'
+                src={images}
+                alt={`Image 1`}
+              />
+              <div className='absolute sm:hidden flex items-center justify-center w-8 h-8 bottom-0 right-0 min-[400px]:!bottom-0 min-[360px]:!bottom-[24px] min-[300px]:!bottom-[36px] bg-white rounded shadow'>
+                <p className='text-sm text-gray-800'>
+                  {selectedImage + 1} / {totalImages}
+                </p>
               </div>
             </SwiperSlide>
           ) : (
-            <div className='relative w-full h-full'>
+            <SwiperSlide className='w-auto relative'>
               <Image
                 className='rounded-lg object-cover w-full sm:w-[400px] h-[350px] sm:h-[400px]'
                 src='/images/product-img.png'
                 alt={`Image 1`}
               />
-            </div>
+              <div className='absolute sm:hidden flex items-center justify-center w-8 h-8 bottom-0 right-0 min-[400px]:!bottom-0 min-[360px]:!bottom-[24px] min-[300px]:!bottom-[36px] bg-white rounded shadow'>
+                <p className='text-sm text-gray-800'>
+                  {selectedImage + 1} / {totalImages}
+                </p>
+              </div>
+            </SwiperSlide>
           )}
           {Array.isArray(images) &&
             images.map((img, index) => (
-              <SwiperSlide key={index}>
-                <div className='relative w-full h-full'>
-                  <Image
-                    className='rounded-lg object-contain'
-                    src={img?.url}
-                    alt={`Image ${index + 1}`}
-                    width='inherit'
-                    height='inherit'
-                  />
+              <SwiperSlide key={index} className='w-auto relative'>
+                <Image
+                  className='rounded-lg object-contain'
+                  src={img?.url}
+                  alt={`Image ${index + 1}`}
+                  width='inherit'
+                  height='inherit'
+                />
+                <div className='absolute sm:hidden flex items-center justify-center w-8 h-8 bottom-0 right-0 min-[400px]:!bottom-0 min-[360px]:!bottom-[24px] min-[300px]:!bottom-[36px] bg-white rounded shadow'>
+                  <p className='text-sm text-gray-800'>
+                    {selectedImage + 1} / {totalImages}
+                  </p>
                 </div>
               </SwiperSlide>
             ))}

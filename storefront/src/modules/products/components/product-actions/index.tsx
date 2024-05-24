@@ -130,7 +130,7 @@ export default function ProductActions({
 				<Button
 					onClick={handleAddToCart}
 					disabled={!inStock || !variant || !!disabled || isAdding}
-					className="w-full h-10"
+					className="max-w-[200px]"
 					isLoading={isAdding}
 					data-testid="add-product-button"
 				>
