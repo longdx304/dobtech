@@ -28,7 +28,11 @@ const DeleteButton = ({
         className='flex gap-x-1 cursor-pointer bg-transparent shadow-none'
         onClick={() => handleDelete(id)}
       >
-        {isDeleting ? <Loader className='animate-spin' /> : <Trash />}
+        {isDeleting ? (
+          <Loader className='animate-spin text-black' />
+        ) : (
+          <Trash className='text-black' />
+        )}
         <span>{children}</span>
       </Button>
     </div>

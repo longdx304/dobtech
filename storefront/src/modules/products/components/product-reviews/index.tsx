@@ -16,7 +16,7 @@ const ProductReviews = ({
   reviewDate,
 }: ReviewCardProps) => {
   return (
-    <div className='product-rating rounded-sm shadow mt-2 p-8'>
+    <div className='rounded-sm shadow mt-2 p-8'>
       <div className='flex items-center mb-4'>
         <div className='font-bold text-xl mr-4'>ĐÁNH GIÁ SẢN PHẨM</div>
       </div>

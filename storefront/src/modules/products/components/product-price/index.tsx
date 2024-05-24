@@ -12,7 +12,7 @@ export default function ProductPrice({
   region,
   className,
 }: {
-  product: PricedProduct;
+  product: PricedProduct ;
   variant?: PricedVariant;
   region?: RegionInfo;
   className?: string;
@@ -29,8 +29,17 @@ export default function ProductPrice({
     return <div className='block w-32 h-9 bg-gray-100 animate-pulse' />;
   }
 
+  const calculatedPrice = Number(
+    selectedPrice?.calculated_price.replace(/[^\d.-]/g, '')
+  );
+
+  const formattedPrice =
+    isNaN(calculatedPrice) || calculatedPrice === 0
+      ? '-'
+      : `₫${calculatedPrice.toLocaleString()}`;
+
   return (
-    <div className='flex flex-col text-ui-fg-base'>
+    <div className='flex flex-col'>
       <span
         className={cn('text-xl-semi', {
           'text-ui-fg-interactive': selectedPrice.price_type === 'sale',
@@ -42,10 +51,10 @@ export default function ProductPrice({
           data-testid='product-price'
           data-value={selectedPrice.calculated_price_number}
         >
-          {`${selectedPrice?.calculated_price}`}
+          {formattedPrice}
         </span>
       </span>
-      {selectedPrice.price_type === 'sale' && (
+      {/* {selectedPrice.price_type === 'sale' && (
         <>
           <p>
             <span className='text-ui-fg-subtle'>Original: </span>
@@ -61,7 +70,7 @@ export default function ProductPrice({
             -{selectedPrice.percentage_diff}%
           </span>
         </>
-      )}
+      )} */}
     </div>
   );
 }

@@ -44,12 +44,6 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 		});
 	};
 
-	const onFinishFailed: FormProps<FormValues>['onFinishFailed'] = (
-		errorInfo
-	) => {
-		console.log('Failed:', errorInfo);
-	};
-
 	return (
 		<div
 			className={cn(
@@ -67,7 +61,6 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 					id="form-user"
 					form={form}
 					onFinish={onFinish}
-					onFinishFailed={onFinishFailed}
 				>
 					<Form.Item
 						labelCol={{ span: 24 }}

@@ -40,7 +40,6 @@ const GeneralModal: FC<Props> = ({
 	const updateProduct = useAdminUpdateProduct(product?.id);
 	const [messageApi, contextHolder] = message.useMessage();
 
-	console.log(product);
 	useEffect(() => {
 		form.setFieldsValue({
 			general: {

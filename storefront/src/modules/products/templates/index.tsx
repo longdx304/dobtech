@@ -1,65 +1,41 @@
-import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
-import { notFound } from 'next/navigation';
 import React, { Suspense } from 'react';
-import ImageGallery from '../components/image-gallery';
-import ProductInfo from '../components/product-info';
-import ProductActions from '../components/product-actions';
-import { Region } from '@medusajs/medusa';
-import ProductActionsWrapper from './product-actions-wrapper';
-import { Divider } from 'antd';
-import ProductTabs from '../components/product-tabs';
-import ProductReviews from '../components/product-reviews';
+
 import SkeletonRelatedProducts from '@/modules/skeletons/templates/skeleton-related-products';
+import ImageGallery from '../components/image-gallery';
+import ProductTabs from '../components/product-tabs';
 import RelatedProducts from '../components/related-products';
+import ProductActionsWrapper from './product-actions-wrapper';
 
 type ProductTemplateProps = {
-  product: PricedProduct;
-  region: Region;
   countryCode: string;
+  handle: string;
 };
 
 const ProductTemplate: React.FC<ProductTemplateProps> = ({
-  product,
-  region,
   countryCode,
+  handle,
 }) => {
-  if (!product || !product.id) {
-    return notFound();
-  }
-
   return (
     <>
-      {product && (
-        <div className='flex relative justify-around small:max-w-[300px] w-full py-8'>
-          <ImageGallery images={product?.images || []} />
-          <div className='flex flex-col w-[420px]'>
-            <ProductInfo product={product} region={region} />
-
-            <Divider />
-
-            {/* Variant */}
-            <Suspense
-              fallback={
-                <ProductActions
-                  disabled={true}
-                  product={product}
-                  region={region}
-                />
-              }
-            >
-              <ProductActionsWrapper id={product.id} region={region} />
-            </Suspense>
-          </div>
+      <div className='flex flex-col lg:flex-row justify-between w-full pb-8 gap-4'>
+        <div className='w-full lg:w-fit lg:flex-grow lg:pr-4'>
+          <ImageGallery />
         </div>
-      )}
-      <ProductTabs product={product} />
-      <ProductReviews />
+        <div className='w-full lg:w-[40%] lg:flex-grow lg:pl-4'>
+          <Suspense>
+            <ProductActionsWrapper countryCode={countryCode} handle={handle} />
+          </Suspense>
+        </div>
+      </div>
+
+      <ProductTabs />
+      {/* <ProductReviews /> */}
       <div
-        className='content-container my-16 small:my-32'
+        className='my-16 small:my-32'
         data-testid='related-products-container'
       >
         <Suspense fallback={<SkeletonRelatedProducts />}>
-          <RelatedProducts product={product} countryCode={countryCode} />
+          <RelatedProducts handle={handle} countryCode={countryCode} />
         </Suspense>
       </div>
     </>

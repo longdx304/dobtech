@@ -3,7 +3,6 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 
-import { Divider } from 'antd';
 import SortProducts, { SortOptions } from './sort-products';
 
 type RefinementListProps = {
@@ -37,14 +36,11 @@ const RefinementList = ({
 
   return (
     <>
-      <div className='flex items-baseline justify-between'>
-        <SortProducts
-          sortBy={sortBy}
-          setQueryParams={setQueryParams}
-          data-testid={dataTestId}
-        />
-      </div>
-      <Divider />
+      <SortProducts
+        sortBy={sortBy}
+        setQueryParams={setQueryParams}
+        data-testid={dataTestId}
+      />
     </>
   );
 };

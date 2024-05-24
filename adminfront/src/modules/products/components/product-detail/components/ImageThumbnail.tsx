@@ -1,17 +1,15 @@
 'use client';
-import { FC } from 'react';
 import { Product } from '@medusajs/medusa';
-import { ArrowLeft, CircleAlert } from 'lucide-react';
-import { Row, Col, Empty, Modal, message, MenuProps } from 'antd';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Col, Empty, MenuProps, Modal, Row, message } from 'antd';
+import { CircleAlert, Pencil, Trash2 } from 'lucide-react';
 import { useAdminUpdateProduct } from 'medusa-react';
+import { FC } from 'react';
 
-import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { Flex } from '@/components/Flex';
-import { Title } from '@/components/Typography';
 import { ActionAbles } from '@/components/Dropdown';
-import Image from 'next/image';
+import { Flex } from '@/components/Flex';
+import { Image } from '@/components/Image';
+import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import ThumbnailModal from './edit-modals/ThumbnailModal';
 
@@ -34,11 +32,12 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 			label: <span className="w-full">Xoá</span>,
 			key: 'delete',
 			icon: <Trash2 size={20} />,
+			disabled: !product?.thumbnail,
 			danger: true,
 		},
 	];
 
-	const handleDeleteThumbnail = () => {
+	const handleDeleteThumbnail = async () => {
 		Modal.confirm({
 			title: 'Bạn có muốn xoá thumbnail này không ?',
 			content:
@@ -55,7 +54,8 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 			cancelText: 'Huỷ',
 			async onOk() {
 				try {
-					updateProduct.mutateAsync({ thumbnail: undefined });
+					// @ts-ignore
+					await updateProduct.mutateAsync({ thumbnail: null });
 					message.success('Xoá thumbnail thành công!');
 				} catch (error) {
 					message.error('Xoá thumbnail thất bại!');
@@ -84,7 +84,7 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 			<Row gutter={[16, 16]}>
 				<Col span={24}>
 					<Flex align="center" justify="space-between">
-						<Title level={3}>Thumbnail</Title>
+						<Title level={3}>Ảnh đại diện</Title>
 						<ActionAbles actions={actions} onMenuClick={handleMenuClick} />
 					</Flex>
 				</Col>
@@ -99,7 +99,7 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 								className="rounded-md hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer"
 							/>
 						) : (
-							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='Không có hình ảnh' />
 						)}
 					</Flex>
 				</Col>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default async function Cart() {
   return (
-    <div className='w-full container pt-[8rem]'>
+    <div className='w-full container pt-[6rem] lg:pt-[8rem]'>
       <CartTemplate />
     </div>
   );

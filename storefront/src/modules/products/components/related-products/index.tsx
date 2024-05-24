@@ -1,19 +1,40 @@
 import {
-  getProductsList
+  getProductByHandle,
+  getProductsList,
+  retrievePricedProductById,
 } from '@/actions/products';
 import { getRegion } from '@/actions/region';
-import { StoreGetProductsParams } from '@medusajs/medusa';
-import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
+import { Region, StoreGetProductsParams } from '@medusajs/medusa';
 import ProductPreview from '../product-preview';
+import ProductList from '../product-list';
 
 type RelatedProductsProps = {
-  product: PricedProduct;
+  // product: PricedProduct;
   countryCode: string;
+  handle: string;
+};
+
+const getPricedProductByHandle = async (handle: string, region: Region) => {
+  const { product } = await getProductByHandle(handle).then(
+    (product) => product
+  );
+
+  if (!product || !product.id) {
+    return null;
+  }
+
+  const pricedProduct = await retrievePricedProductById({
+    id: product.id,
+    regionId: region.id,
+  });
+
+  return pricedProduct;
 };
 
 export default async function RelatedProducts({
-  product,
+  // product,
   countryCode,
+  handle,
 }: RelatedProductsProps) {
   const region = await getRegion(countryCode);
 
@@ -21,6 +42,19 @@ export default async function RelatedProducts({
     return null;
   }
 
+  const pricedProduct = await getPricedProductByHandle(
+    handle,
+    region as Region
+  );
+
+  const product = await retrievePricedProductById({
+    id: pricedProduct?.id as string,
+    regionId: region?.id as string,
+  });
+
+  if (!product) {
+    return null;
+  }
   // edit this function to define your related products logic
   const setQueryParams = (): StoreGetProductsParams => {
     const params: StoreGetProductsParams = {};
@@ -61,19 +95,18 @@ export default async function RelatedProducts({
     return null;
   }
 
+  const response = {
+    products: productPreviews,
+    count: productPreviews.length,
+  };
+
   return (
     <div className='product-page-constraint'>
       <div className='flex flex-col items-center text-center mb-16'>
         <span className='font-bold text-xl mr-4'>Khách Hàng Cũng Được Xem</span>
       </div>
 
-      <ul className='grid grid-cols-5 gap-x-6 gap-y-8 list-none'>
-        {productPreviews.map((productPreview: any) => (
-          <li key={productPreview.id}>
-            <ProductPreview data={productPreview} />
-          </li>
-        ))}
-      </ul>
+      <ProductList data={response} />
     </div>
   );
 }

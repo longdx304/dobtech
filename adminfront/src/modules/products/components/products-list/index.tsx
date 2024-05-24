@@ -8,6 +8,7 @@ import {
 	useAdminCollections,
 	useAdminProductCategories,
 	useAdminProducts,
+	useMedusa,
 } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -28,6 +29,7 @@ const PAGE_SIZE = 10;
 interface Props {}
 
 const ProductList = ({}: Props) => {
+	const { client } = useMedusa();
 	const router = useRouter();
 	const { state, onOpen, onClose } = useToggleState(false);
 
@@ -35,11 +37,12 @@ const ProductList = ({}: Props) => {
 	const [searchValue, setSearchValue] = useState('');
 	const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
 
-	const { products, isLoading, count, isRefetching, refetch } = useAdminProducts({
-		limit: PAGE_SIZE,
-		offset: (currentPage - 1) * PAGE_SIZE,
-		q: searchValue || undefined,
-	});
+	const { products, isLoading, count, isRefetching, refetch } =
+		useAdminProducts({
+			limit: PAGE_SIZE,
+			offset: (currentPage - 1) * PAGE_SIZE,
+			q: searchValue || undefined,
+		});
 
 	const { product_categories, isLoading: isLoadingCategories } =
 		useAdminProductCategories({
@@ -90,8 +93,31 @@ const ProductList = ({}: Props) => {
 		});
 	};
 
+	const handleChangeStatus = async (productId: string, status: string) => {
+		await client.admin.products
+			.update(productId, { status } as any)
+			.then(async () => {
+				message.success('Cập nhật trạng thái thành công');
+				await refetch();
+			});
+	};
+
+	const handleRow = (id: string) => {
+		return {
+			onClick: () => {
+				router.push(`${ERoutes.PRODUCTS}/${id}`);
+			},
+		};
+	};
+
 	const columns = useMemo(
-		() => productsColumns({ handleDeleteProduct, handleEditProduct }),
+		() =>
+			productsColumns({
+				handleDeleteProduct,
+				handleEditProduct,
+				handleChangeStatus,
+				handleRow,
+			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[products]
 	);
@@ -141,7 +167,8 @@ const ProductList = ({}: Props) => {
 					pageSize: PAGE_SIZE,
 					current: currentPage as number,
 					onChange: handleChangePage,
-					showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} sản phẩm`,
+					showTotal: (total, range) =>
+						`${range[0]}-${range[1]} trong ${total} sản phẩm`,
 				}}
 				scroll={{ x: 700 }}
 			/>

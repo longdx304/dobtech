@@ -36,7 +36,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
     <div className='flex flex-col gap-y-3'>
       <span className='text-sm'>{translatedTitle}</span>
       <div
-        className='flex flex-wrap justify-between gap-2'
+        className='flex flex-wrap justify-start gap-2'
         data-testid={dataTestId}
       >
         {filteredOptions.map((v) => {
@@ -45,7 +45,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
               onClick={() => updateOption({ [option.id]: v })}
               key={v}
               className={cn(
-                'bg-[#fff] border-[#ccc] border h-10 rounded-rounded p-2 flex-1 shadow-none text-black relative',
+                'w-fit bg-[#fff] border-[#ccc] border h-10 rounded-rounded py-2 px-3 shadow-none text-black relative',
 
                 {
                   'border-black border-2': v === current,

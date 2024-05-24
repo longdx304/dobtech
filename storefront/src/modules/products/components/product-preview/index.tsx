@@ -18,7 +18,7 @@ const ProductPreview: FC<Props> = ({ data }) => {
 		<LocalizedClientLink
 			href={`products/${data.handle}`}
 			className={cn(
-				"shadow group rounded hover:shadow-lg hover:-translate-y-1.5 transition-all"
+				"shadow group rounded lg:hover:shadow-lg lg:hover:-translate-y-1.5 transition-all"
 			)}
 		>
 			<Flex vertical>

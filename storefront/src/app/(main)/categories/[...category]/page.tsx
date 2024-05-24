@@ -1,5 +1,4 @@
 import { getCategoryByHandle, listCategories } from '@/actions/productCategory';
-import { listRegions } from '@/actions/region';
 import CategoryTemplate from '@/modules/categories/templates';
 import { SortOptions } from '@/modules/store/components/refinement-list/sort-products';
 import { Metadata } from 'next';
@@ -46,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `${title} category.`;
 
     return {
-      title: `${title} | Medusa Store`,
+      title: `CHAMDEP VN | ${title}`,
       description,
       alternates: {
         canonical: `${params.category.join('/')}`,
@@ -69,7 +68,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   }
 
   return (
-    <div className='w-full container pt-[8rem]'>
+    <div className='w-full container box-border pt-[4rem] lg:pt-[6rem]'>
       <CategoryTemplate
         categories={product_categories}
         sortBy={sortBy}

@@ -19,7 +19,7 @@ const config: Config = {
 				// '2xl': '2rem',
 			},
 			screens: {
-				xs: '320px',
+				xs: '430px',
 				// => @media (min-width: 320px) { ... }
 
 				sm: '640px',

@@ -23,13 +23,13 @@ export const getProductsList = cache(async function ({
 }: {
   pageParam?: number;
   queryParams?: StoreGetProductsParams;
-  countryCode: string;
+  countryCode?: string;
 }): Promise<{
   response: { products: ProductPreviewType[]; count: number };
   nextPage: number | null;
   queryParams?: StoreGetProductsParams;
 }> {
-  const limit = queryParams?.limit || 12;
+  const limit = queryParams?.limit || 20;
   const region = await getRegion(countryCode);
   if (!region) {
     return emptyResponse;
