@@ -67,6 +67,7 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 			label: <span className="w-full">Chỉnh sửa giá</span>,
 			key: 'edit-price',
 			icon: <CircleDollarSign size={20} />,
+			disabled: !product?.variants?.length,
 			onClick: onOpenPrice,
 		},
 		{
@@ -120,8 +121,6 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 		});
 	};
 
-	const handleMenuClick: MenuProps['onClick'] = ({ key }) => {};
-
 	const columns = useMemo(
 		() =>
 			variantsColumns({
@@ -140,7 +139,7 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 				<Col span={24}>
 					<Flex align="center" justify="space-between">
 						<Title level={3}>Variants</Title>
-						<ActionAbles actions={actions} onMenuClick={handleMenuClick} />
+						<ActionAbles actions={actions} onMenuClick={() => {}} />
 					</Flex>
 				</Col>
 				{product?.options?.length ? (

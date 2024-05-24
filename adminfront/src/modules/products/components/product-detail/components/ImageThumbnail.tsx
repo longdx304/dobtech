@@ -32,6 +32,7 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 			label: <span className="w-full">Xoá</span>,
 			key: 'delete',
 			icon: <Trash2 size={20} />,
+			disabled: !product?.thumbnail,
 			danger: true,
 		},
 	];
@@ -53,7 +54,8 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 			cancelText: 'Huỷ',
 			async onOk() {
 				try {
-					await updateProduct.mutateAsync({ thumbnail: undefined });
+					// @ts-ignore
+					await updateProduct.mutateAsync({ thumbnail: null });
 					message.success('Xoá thumbnail thành công!');
 				} catch (error) {
 					message.error('Xoá thumbnail thất bại!');

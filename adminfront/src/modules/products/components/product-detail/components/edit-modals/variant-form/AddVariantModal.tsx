@@ -183,7 +183,7 @@ const AddVariantModal: FC<Props> = ({
 		<SubmitModal
 			open={state}
 			onOk={handleOnOk}
-			isLoading={createVariant?.isLoading}
+			isLoading={createVariant?.isLoading || updateVariant?.isLoading}
 			handleCancel={onCancel}
 			width={600}
 			form={form}
