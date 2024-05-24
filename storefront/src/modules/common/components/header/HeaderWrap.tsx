@@ -19,14 +19,14 @@ const HeaderWrap: FC<Props> = ({}) => {
       <div className='items-center'>
         <LocalizedClientLink href='/'>
           <Image
-            src='/images/CHAMDEP_logo.png'
+            src='/images/dob-icon.png'
             width={125}
             height={48}
             alt='Dob Icon'
           />
         </LocalizedClientLink>
       </div>
-      <Flex gap='small' className='justify-end w-full pr-3 lg:pr-0'>
+      <Flex gap='small' className='justify-end items-center w-full pr-3 lg:pr-0'>
         {/* Search */}
         <SearchInput />
         

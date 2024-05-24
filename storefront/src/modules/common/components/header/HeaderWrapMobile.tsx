@@ -22,7 +22,7 @@ const HeaderWrapMobile: FC<Props> = ({ categories }) => {
       <div className='absolute z-11 w-full flex justify-center items-center'>
         <LocalizedClientLink href='/' className="h-[42px]">
           <Image
-            src='/images/CHAMDEP_logo.png'
+            src='/images/dob-icon.png'
             width={100}
             height={42}
             alt='Dob Icon'
