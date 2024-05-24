@@ -30,8 +30,8 @@ ul {
 }
 
 .img-thumbnail > .swiper-wrapper {
-	display: flex;
-	justify-content: center;
+  display: flex;
+  justify-content: center;
   flex-direction: row;
 }
 
@@ -49,6 +49,7 @@ ul {
 /* Custom for lucide icons */
 
 /* Antd Form */
+
 .ant-form .ant-form-item-label {
   padding: 0 0 0 !important;
 }
