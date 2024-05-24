@@ -18,10 +18,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   return (
     <>
       <div className='flex flex-col lg:flex-row justify-between w-full pb-8 gap-4'>
-        <div className='w-full lg:w-[60%] lg:flex-grow lg:pr-4'>
+        <div className='w-full lg:w-fit lg:flex-grow lg:pr-4'>
           <ImageGallery />
         </div>
-        <div className='w-full lg:w-[40%] lg:flex-grow lg:pr-4'>
+        <div className='w-full lg:w-[40%] lg:flex-grow lg:pl-4'>
           <Suspense>
             <ProductActionsWrapper countryCode={countryCode} handle={handle} />
           </Suspense>

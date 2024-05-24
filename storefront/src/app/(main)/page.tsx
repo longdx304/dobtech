@@ -1,4 +1,3 @@
-import { getCategoryByHandle } from '@/actions/productCategory';
 import { getProductsList } from '@/actions/products';
 import ProductList from '@/modules/products/components/product-list';
 
