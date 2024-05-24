@@ -1,14 +1,12 @@
-import { Pencil, X, MonitorX, Trash2, Dot } from 'lucide-react';
-import Image from 'next/image';
 import { Product } from '@medusajs/medusa';
+import { Dot, MonitorX, Pencil, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 
-import { Button } from '@/components/Button';
-import { Flex } from '@/components/Flex';
-import { Text } from '@/components/Typography';
-import { IProductResponse } from '@/types/products';
-import formatNumber from '@/lib/utils';
 import { ActionAbles } from '@/components/Dropdown';
+import { Flex } from '@/components/Flex';
 import Tooltip from '@/components/Tooltip/Tooltip';
+import { Text } from '@/components/Typography';
+import formatNumber from '@/lib/utils';
 import { MenuProps } from 'antd';
 
 interface Props {

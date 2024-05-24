@@ -61,10 +61,7 @@ const ProductList: FC<ProductListProps> = ({ data, searchValue = null }) => {
           ref={ref}
         >
           {productData?.map((product) => (
-            <ProductPreview
-              key={product.id}
-              data={product}
-            />
+            <ProductPreview key={product.id} data={product} />
           ))}
         </div>
       )}
@@ -73,7 +70,12 @@ const ProductList: FC<ProductListProps> = ({ data, searchValue = null }) => {
           <Spin size='large' />
         </Flex>
       )}
-      {count === 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+      {count === 0 && (
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description='Không có sản phẩm'
+        />
+      )}
     </div>
   );
 };

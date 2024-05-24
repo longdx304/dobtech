@@ -93,10 +93,12 @@ const ProductList = ({}: Props) => {
 	};
 
 	const handleChangeStatus = async (productId: string, status: string) => {
-		await client.admin.products.update(productId, { status }).then(async () => {
-			message.success('Cập nhật trạng thái thành công');
-			await refetch();
-		});
+		await client.admin.products
+			.update(productId, { status } as any)
+			.then(async () => {
+				message.success('Cập nhật trạng thái thành công');
+				await refetch();
+			});
 	};
 
 	const handleRow = (id: string) => {

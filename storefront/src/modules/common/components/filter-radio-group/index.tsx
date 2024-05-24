@@ -22,7 +22,7 @@ const FilterRadioGroup = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <Flex justify='space-between' align='center' className='w-full space-x-4'>
+    <Flex align='center' className='w-full flex space-x-4 justify-between lg:justify-end'>
       {items
         .filter((item) => item.value === 'created_at')
         .map((item) => (

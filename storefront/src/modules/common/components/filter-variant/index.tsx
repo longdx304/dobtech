@@ -22,7 +22,7 @@ const FilterVariant = () => {
   };
 
   return (
-    <Flex className='pt-4'>
+    <Flex className='pt-4 flex justify-center w-full'>
       <Swiper spaceBetween={10} slidesPerView={3}>
         {items.map((item) => (
           <SwiperSlide key={item.value} className='w-[115px]'>

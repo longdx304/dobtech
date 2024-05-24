@@ -48,7 +48,7 @@ const ImageMedia: FC<Props> = ({ product, loadingProduct }) => {
 				<Col span={24}>
 					<Flex
 						align="center"
-						justify={product?.images?.length ? "flex-start" : 'center'}
+						justify={product?.images?.length ? 'flex-start' : 'center'}
 						gap="small"
 						className="w-full overflow-x-auto"
 					>
@@ -68,7 +68,10 @@ const ImageMedia: FC<Props> = ({ product, loadingProduct }) => {
 								</div>
 							))
 						) : (
-							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+							<Empty
+								image={Empty.PRESENTED_IMAGE_SIMPLE}
+								description="Không có hình ảnh"
+							/>
 						)}
 					</Flex>
 				</Col>

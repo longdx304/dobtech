@@ -99,7 +99,7 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 								className="rounded-md hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer"
 							/>
 						) : (
-							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='Không có hình ảnh' />
 						)}
 					</Flex>
 				</Col>

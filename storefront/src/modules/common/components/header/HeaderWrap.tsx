@@ -29,7 +29,7 @@ const HeaderWrap: FC<Props> = ({}) => {
       <Flex gap='small' className='justify-end w-full pr-3 lg:pr-0'>
         {/* Search */}
         <SearchInput />
-
+        
         {/* Cart */}
         <CartButton />
 

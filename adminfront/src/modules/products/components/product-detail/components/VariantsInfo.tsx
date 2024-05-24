@@ -128,7 +128,7 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 				handleDeleteVariant,
 				handleCopyVariant,
 			}),
-			// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[product]
 	);
 
@@ -159,7 +159,10 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 						</Flex>
 					</Col>
 				) : (
-					<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+					<Empty
+						image={Empty.PRESENTED_IMAGE_SIMPLE}
+						description="Không có biến thể"
+					/>
 				)}
 			</Row>
 			<PricesModal
