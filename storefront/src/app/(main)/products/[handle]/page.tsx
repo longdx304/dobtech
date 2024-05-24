@@ -11,7 +11,7 @@ type Props = {
 export async function generateStaticParams() {
 	const staticParams = await getCategoriesList().then((responses) =>
 		responses.product_categories.map((category) => ({
-			handle: category.handle,
+			handle: encodeURIComponent(category.handle),
 		}))
 	);
 
@@ -21,7 +21,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { handle } = params;
 
-	const { product } = await getProductByHandle(handle ?? "").then(
+	const { product } = await getProductByHandle(decodeURIComponent(handle) ?? "").then(
 		(product) => product
 	);
 
@@ -45,7 +45,7 @@ export default async function ProductPage({ params }: Props) {
 		<div className="w-full box-border container pt-[4rem] lg:pt-[8rem]">
 			<ProductTemplate
 				countryCode={"vn"}
-				handle={params.handle!}
+				handle={decodeURIComponent(params.handle)!}
 			/>
 		</div>
 	);
