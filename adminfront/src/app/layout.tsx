@@ -4,7 +4,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
-import { FeatureFlagProvider } from '@/lib/providers/feature-flag-provider';
 import { MedusaProvider } from '@/lib/providers/medusa-provider';
 import theme from '../theme';
 
@@ -25,7 +24,7 @@ export default async function RootLayout({
 				<AntdRegistry>
 					<ConfigProvider theme={theme}>
 						<MedusaProvider>
-							<FeatureFlagProvider>{children}</FeatureFlagProvider>
+							{children}
 						</MedusaProvider>
 					</ConfigProvider>
 				</AntdRegistry>

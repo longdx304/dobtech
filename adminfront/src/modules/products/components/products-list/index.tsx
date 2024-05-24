@@ -82,6 +82,7 @@ const ProductList = ({}: Props) => {
 				try {
 					await deleteProduct(productId);
 					message.success('Xoá sản phẩm thành công!');
+					refetch();
 				} catch (error) {
 					message.error('Xoá sản phẩm thất bại!');
 				}

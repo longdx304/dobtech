@@ -56,6 +56,12 @@ const GeneralForm: FC<Props> = () => {
 								'URL Slug cho sản phẩm. Sẽ được tự động tạo nếu để trống',
 							icon: <CircleAlert size={18} />,
 						}}
+						rules={[
+							{
+								pattern: /^[A-Za-z0-9-_]+$/,
+								message: 'Url không được có dấu hoặc khoảng trắng.',
+							},
+						]}
 						// initialValue={product?.title}
 					>
 						<Input

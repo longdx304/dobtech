@@ -13,7 +13,7 @@ import {
 	Plus
 } from 'lucide-react';
 import { useAdminCreateProduct } from 'medusa-react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { prepareImages } from '@/actions/images';
 import { Collapse } from '@/components/Collapse';
@@ -34,6 +34,8 @@ import {
 	ThumbnailForm,
 } from './components';
 import { AddVariant } from './components/variant-form';
+import { getErrorMessage } from '@/lib/utils';
+import { ERoutes } from '@/types/routes';
 
 interface Props {
 	state: boolean;
@@ -52,8 +54,9 @@ export default function ProductModal({
 	productCategories,
 	productCollections,
 }: Props) {
+	const router = useRouter();
 	const { isFeatureEnabled } = useFeatureFlag();
-	const { mutate, isLoading } = useAdminCreateProduct();
+	const { mutateAsync, isLoading } = useAdminCreateProduct();
 
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
@@ -101,20 +104,23 @@ export default function ProductModal({
 			const urls = preppedImages.map((img) => img.url);
 			payload.images = urls;
 		}
-		mutate(payload, {
+
+		await mutateAsync(payload, {
 			onSuccess: ({ product }) => {
+				console.log('product', product)
 				messageApi.open({
 					type: 'success',
 					content: 'Thêm sản phẩm thành công.',
 				});
-				redirect(`/products/${product.id}`);
 				handleOk();
+				router.push(`${ERoutes.PRODUCTS}/${product.id}`);
+				return;
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				console.log('error', error);
 				messageApi.open({
 					type: 'error',
-					content: 'Đã xảy ra lỗi khi thêm sản phẩm.',
+					content: getErrorMessage(error),
 				});
 			},
 		});
@@ -236,18 +242,18 @@ const createPayload = (
 					value: t,
 			  }))
 			: undefined,
-		type: data.organize.type
+		type: data?.organize?.type
 			? {
 					value: data.organize.type.label,
 					id: data.organize.type.value,
 			  }
 			: undefined,
 		// Options
-		options: data.options.map((o) => ({
+		options: data?.options?.length ? data.options.map((o) => ({
 			title: o.title,
-		})),
+		})) : undefined,
 		// Variants
-		variants: data.variants.map((v) => ({
+		variants: data?.variants?.map((v) => ({
 			title: v?.title!,
 			options: v?.options,
 			material: undefined,
