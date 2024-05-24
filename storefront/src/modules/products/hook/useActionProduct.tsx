@@ -16,12 +16,7 @@ const useActionProduct = ({ product }: Props) => {
 		const optionObj: Record<string, string> = {};
 		if (_.isEmpty(product?.options)) return;
 		for (const option of product.options || []) {
-			const firstVariantOption = option.values[0]?.value;
-			if (firstVariantOption) {
-				optionObj[option.id] = firstVariantOption;
-			} else {
-				Object.assign(optionObj, { [option.id]: undefined });
-			}
+			Object.assign(optionObj, { [option.id]: undefined });
 		}
 
 		setOptions(optionObj);
@@ -101,10 +96,11 @@ const useActionProduct = ({ product }: Props) => {
 		if (variant) {
 			return variant?.inventory_quantity;
 		}
-		const total = variants?.reduce(
-			(acc, variant) => acc + (variant?.inventory_quantity || 0),
-			0
-		);
+		const total =
+			variants?.reduce(
+				(acc, variant) => acc + (variant?.inventory_quantity || 0),
+				0
+			) || 0;
 		return total;
 	}, [variant, variants]);
 
