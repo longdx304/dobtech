@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { Flex } from "@/components/Flex";
 import { Text } from "@/components/Typography";
+import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
 
 type Props = {
 	searchValue?: string;
@@ -13,6 +14,7 @@ type Props = {
 const PAGE_SIZE = 10;
 
 const SuggestSearch: FC<Props> = ({ searchValue }) => {
+	const { setItem, getItem } = useLocalStorage("recentSearches");
 	const router = useRouter();
 
 	const { products } = useProducts({
@@ -22,6 +24,13 @@ const SuggestSearch: FC<Props> = ({ searchValue }) => {
 	});
 
 	const handleClick = (value: string) => {
+		const recentSearches = getItem() || [];
+		if (recentSearches && !recentSearches.includes(value)) {
+			const newRecentSearches = [...recentSearches, value];
+			setItem(newRecentSearches);
+		} else {
+			setItem([value]);
+		}
 		router.push(`/search/${value}`);
 	};
 
@@ -55,11 +64,11 @@ const SuggestSearch: FC<Props> = ({ searchValue }) => {
 					))}
 				</Flex>
 			)}
-			{
-				products?.length === 0 && (
-					<Text className="pt-2 w-full">{"Không tìm thấy kết quả phù hợp."}</Text>
-				)
-			}
+			{products?.length === 0 && (
+				<Text className="pt-2 w-full">
+					{"Không tìm thấy kết quả phù hợp."}
+				</Text>
+			)}
 		</Flex>
 	);
 };

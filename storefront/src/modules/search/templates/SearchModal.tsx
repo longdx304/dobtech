@@ -8,16 +8,25 @@ import { Flex } from "@/components/Flex";
 import { SortOptions } from "@/modules/store/components/refinement-list/sort-products";
 import SuggestSearch from "@/modules/search/components/suggest-search";
 import RecentSearch from "@/modules/search/components/recent-search";
+import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
 
 const { Search } = Input;
 
 type SearchModalProps = {};
 
 export default function SearchModal({}: SearchModalProps) {
+	const { setItem, getItem } = useLocalStorage("recentSearches");
 	const [searchValue, setSearchValue] = useState<string | null>(null);
 	const router = useRouter();
 
 	const onSearch = (value: string) => {
+		const recentSearches = getItem();
+		if (recentSearches && !recentSearches.includes(value)) {
+			const newRecentSearches = [...recentSearches, value];
+			setItem(newRecentSearches);
+		} else {
+			setItem([value]);
+		}
 		router.push(`/search/${value}`);
 	};
 
