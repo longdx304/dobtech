@@ -1,8 +1,8 @@
 import { Button } from '@/components/Button';
-import { Image } from '@/components/Image';
 import LocalizedClientLink from '@/modules/common/components/localized-client-link';
 import { ArrowLeft } from 'lucide-react';
 import { Metadata } from 'next';
+import Image from 'next/image';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -16,14 +16,20 @@ export default function NotFound() {
       <h1 className='text-red-600 text-4xl font-bold'>Oops!</h1>
       <p className='text-xl font-bold'>Trang này không tồn tại</p>
       <p className='text-gray-500'>
-        Rất tiếc, trang bạn tìm kiếm không tồn tại. Hãy quay lại trang chủ để tiếp tục mua sắm.
+        Rất tiếc, trang bạn tìm kiếm không tồn tại. Hãy quay lại trang chủ để
+        tiếp tục mua sắm.
       </p>
       <div className='w-full max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl mx-auto'>
-        <Image src='/images/404.png' alt='404' className='w-full object-contain' />
+        <Image
+          src='/images/404.png'
+          alt='404'
+          width={600}
+          height={400}
+          className='w-full object-contain'
+        />
       </div>
       <LocalizedClientLink href='/'>
         <Button
-          type='default'
           icon={<ArrowLeft size={16} />}
           className='flex items-center justify-center'
         >

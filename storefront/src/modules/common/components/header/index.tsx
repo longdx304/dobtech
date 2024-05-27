@@ -28,7 +28,7 @@ const Header: FC<Props> = ({ categories }) => {
 			)}
 			bordered={false}
 		>
-			<Flex vertical className="lg:container box-border">
+			<Flex vertical className="box-border container">
 				{!hiddenHeader.includes(pathname) && (
 					<>
 						<HeaderWrap />

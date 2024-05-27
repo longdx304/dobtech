@@ -1,4 +1,5 @@
 import { getProductsList } from '@/actions/products';
+import ProductBanner from '@/modules/products/components/product-banner';
 import ProductList from '@/modules/products/components/product-list';
 
 interface Props {
@@ -16,6 +17,7 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <main className='w-full container box-border pt-[6rem] lg:pt-[8rem]'>
+      <ProductBanner />
       <ProductList data={response} />
     </main>
   );

@@ -22,14 +22,14 @@ const HeaderWrapMobile: FC<Props> = ({ categories }) => {
       <div className='absolute z-11 w-full flex justify-center items-center'>
         <LocalizedClientLink href='/' className="h-[42px]">
           <Image
-            src='/images/CHAMDEP_logo.png'
+            src='/images/dob-icon.png'
             width={100}
             height={42}
             alt='Dob Icon'
           />
         </LocalizedClientLink>
       </div>
-      <div className='absolute right-[0] z-[12] pr-4'>
+      <div className='absolute right-[0] z-[12] pr-4 max-[320px]:pr-0'>
         <Flex gap='2px' className='justify-between w-full'>
           {/* Search */}
           <LocalizedClientLink href='search'>

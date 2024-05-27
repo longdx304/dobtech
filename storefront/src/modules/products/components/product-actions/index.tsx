@@ -83,7 +83,7 @@ export default function ProductActions({
                       updateOption={updateOptions}
                       title={option.title}
                       data-testid='product-options'
-                      disabled={!!disabled || isAdding || !variant}
+                      disabled={!!disabled || isAdding}
                     />
                   </div>
                 );
