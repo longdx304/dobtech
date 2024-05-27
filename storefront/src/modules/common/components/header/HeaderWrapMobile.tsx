@@ -29,7 +29,7 @@ const HeaderWrapMobile: FC<Props> = ({ categories }) => {
           />
         </LocalizedClientLink>
       </div>
-      <div className='absolute right-[0] z-[12] pr-4'>
+      <div className='absolute right-[0] z-[12] pr-4 max-[320px]:pr-0'>
         <Flex gap='2px' className='justify-between w-full'>
           {/* Search */}
           <LocalizedClientLink href='search'>

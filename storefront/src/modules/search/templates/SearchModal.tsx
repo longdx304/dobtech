@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { Input, Divider } from "antd";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { SortOptions } from "@/modules/store/components/refinement-list/sort-pro
 import SuggestSearch from "@/modules/search/components/suggest-search";
 import RecentSearch from "@/modules/search/components/recent-search";
 import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
+import _ from 'lodash';
 
 const { Search } = Input;
 

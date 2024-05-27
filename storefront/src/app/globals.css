@@ -41,9 +41,54 @@ ul {
   }
 }
 
+/* Swiper */
 .swiper-slide {
   text-align: center;
   font-size: 18px;
+}
+
+.banner {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+.banner .swiper-slide img {
+  border-radius: 10px !important;
+}
+
+.banner .swiper-button-prev,
+.banner .swiper-button-next {
+  color: #fff !important;
+  width: 36px !important;
+  height: 36px !important;
+  transition: 0.2s;
+  background: hsla(0, 0%, 100%, 0.6) !important;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.banner .swiper-button-prev:hover,
+.banner .swiper-button-next:hover {
+  background: #fff !important;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 16px !important;
+  color: #222 !important;
+  font-weight: bold !important;
+}
+
+.swiper-pagination-bullet {
+  border-radius: 5px !important;
+  background: #fff9f9 !important;
+  border: 1px solid #000 !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: #000 !important;
+  border: 1px solid #fff !important;
 }
 
 /* Custom for lucide icons */
