@@ -50,7 +50,7 @@ const RecentSearch: FC<Props> = ({}) => {
 							<Tag
 								key={index}
 								onClick={() => handleClick(hotSearch)}
-								className="text-sm px-3 py-2 text-gray-600"
+								className="text-sm px-3 py-2 text-gray-600 lg:cursor-pointer"
 							>
 								{hotSearch}
 							</Tag>
@@ -65,7 +65,7 @@ const RecentSearch: FC<Props> = ({}) => {
 						<Tag
 							key={index}
 							onClick={() => handleClick(hotSearch)}
-							className="text-sm px-3 py-2 text-gray-600"
+							className="text-sm px-3 py-2 text-gray-600 lg:cursor-pointer"
 						>
 							{hotSearch}
 						</Tag>

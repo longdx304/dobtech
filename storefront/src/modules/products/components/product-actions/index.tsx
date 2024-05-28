@@ -37,6 +37,7 @@ export default function ProductActions({
     options,
     updateOptions,
     variant,
+    price,
     inStock,
     inventoryQuantity,
     quantity,
@@ -124,7 +125,7 @@ export default function ProductActions({
 
         <Button
           onClick={handleAddToCart}
-          disabled={!inStock || !variant || !!disabled || isAdding || !options}
+          disabled={!inStock || !variant || !!disabled || isAdding || !options || !price}
           className='max-w-[200px]'
           isLoading={isAdding}
           data-testid='add-product-button'

@@ -31,7 +31,7 @@ const RefinementList = ({
 
   const setQueryParams = (name: string, value: string) => {
     const query = createQueryString(name, value);
-    router.push(`${pathname}?${query}`);
+    router.replace(`${pathname}?${query}`);
   };
 
   return (
