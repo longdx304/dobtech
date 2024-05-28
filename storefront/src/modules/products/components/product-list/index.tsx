@@ -48,6 +48,7 @@ const ProductList: FC<ProductListProps> = ({ data, searchValue = null }) => {
 
 		return () => {
 			if (observerTarget.current) {
+				// eslint-disable-next-line react-hooks/exhaustive-deps
 				observer.unobserve(observerTarget?.current);
 			}
 		};
@@ -80,7 +81,7 @@ const ProductList: FC<ProductListProps> = ({ data, searchValue = null }) => {
 			)}
 			{pagingEnd && (
 				<Flex justify="center" align="center">
-					<Text type="secondary">Không còn sản phẩm</Text>
+					<Text>Không còn sản phẩm</Text>
 				</Flex>
 			)}
 			{(isLoading || isRefetching) && (
