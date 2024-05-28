@@ -1,14 +1,13 @@
 "use client";
-import { ChangeEvent, useState } from "react";
+import { Divider, Input } from "antd";
 import { ChevronLeft } from "lucide-react";
-import { Input, Divider } from "antd";
 import { useRouter } from "next/navigation";
+import { ChangeEvent, useState } from "react";
 
 import { Flex } from "@/components/Flex";
-import { SortOptions } from "@/modules/store/components/refinement-list/sort-products";
-import SuggestSearch from "@/modules/search/components/suggest-search";
-import RecentSearch from "@/modules/search/components/recent-search";
 import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
+import RecentSearch from "@/modules/search/components/recent-search";
+import SuggestSearch from "@/modules/search/components/suggest-search";
 import _ from 'lodash';
 
 const { Search } = Input;

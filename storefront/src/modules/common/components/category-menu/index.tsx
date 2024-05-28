@@ -31,7 +31,7 @@ const CategoryMenu: FC<Props> = ({
     >
       <div className={cn(!isMobile && 'container')}>
         <Row className='' gutter={[16, 0]}>
-          <Col xs={8} sm={7}>
+          <Col xs={8} sm={7} lg={4}>
             <CategoryNav
               categories={categories}
               activeItem={activeItem!}
@@ -39,7 +39,7 @@ const CategoryMenu: FC<Props> = ({
               isMobile={isMobile}
             />
           </Col>
-          <Col xs={16} sm={17} className='border-l border-slate-200/80'>
+          <Col xs={16} sm={17} lg={20} className='border-l border-slate-200/80'>
             <CategoryGroup categories={categories!} activeItem={activeItem} />
           </Col>
         </Row>
