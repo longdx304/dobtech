@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+	--radius: 10px;
+}
 /* @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -27,6 +30,11 @@ ul {
 .swiper {
   width: 100%;
   height: 100%;
+}
+
+.swiperImage > .swiper-wrapper {
+	display: flex;
+	justify-content: center;
 }
 
 .img-thumbnail > .swiper-wrapper {

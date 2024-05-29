@@ -1,3 +1,4 @@
+'use client';
 import { FC } from 'react';
 import { ShoppingCart } from 'lucide-react';
 
@@ -18,17 +19,21 @@ const PreviewPrice: FC<Props> = ({ price }) => {
   const formattedPrice =
     isNaN(calculatedPrice) || calculatedPrice === 0
       ? '-'
-      : `₫${calculatedPrice.toLocaleString()}`;
+      : `${calculatedPrice.toLocaleString()}₫`;
 
   return (
-    <Flex justify='space-between' align='center' className=''>
-      <Text className='text-[0.875rem] font-semibold'>{formattedPrice}</Text>
-      <Button
-        type='text'
-        shape='circle'
-        icon={<ShoppingCart className='stroke-2' />}
-      />
-    </Flex>
+		<Flex vertical>
+			<Flex justify='space-between' align='center' className=''>
+				<Text className='text-[1.15rem] font-semibold'>{formattedPrice}</Text>
+				<Button
+					type='default'
+					shape='circle'
+					icon={<ShoppingCart className='stroke-2' size={20} />}
+					className="h-[28px] w-[38px] rounded-[20px] border-black/50"
+				/>
+			</Flex>
+			{/* <Text className='leading-4 text-[0.875rem]'>{''}</Text> */}
+		</Flex>
   );
 };
 

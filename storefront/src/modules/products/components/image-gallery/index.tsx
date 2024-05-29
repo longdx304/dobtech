@@ -48,14 +48,14 @@ const ImageGallery = ({}: ImageGalleryProps) => {
           },
         }}
         slidesPerView={'auto'}
-        spaceBetween={10}
+				spaceBetween={10}
         className='mySwiper img-thumbnail z-[1] w-full lg:w-auto overflow-y-visible gap-2 lg:gap-4 m-0'
       >
         {typeof images === 'string' ? (
           <SwiperSlide className='w-auto'>
-            <div className='relative rounded-lg w-[60px] h-[60px] md:w-[80px] md:h-[80px] cursor-pointer'>
+            <div className='relative rounded-md w-[60px] h-[60px] md:w-[80px] md:h-[80px] cursor-pointer'>
               <Image
-                className='rounded-lg object-contain'
+                className='rounded-md object-contain'
                 src={images}
                 alt={`Image 1`}
                 width='inherit'
@@ -66,9 +66,9 @@ const ImageGallery = ({}: ImageGalleryProps) => {
           </SwiperSlide>
         ) : (
           <SwiperSlide className='w-auto'>
-            <div className='relative rounded-lg w-[60px] h-[60px] md:w-[80px] md:h-[80px] cursor-pointer'>
+            <div className='relative rounded-sm w-[60px] h-[60px] md:w-[80px] md:h-[80px] cursor-pointer'>
               <Image
-                className='rounded-lg object-contain'
+                className='rounded-sm object-contain'
                 src={'/images/product-img.png'}
                 alt={`Image 1`}
                 width='inherit'
@@ -82,12 +82,12 @@ const ImageGallery = ({}: ImageGalleryProps) => {
           images.map((img, index) => (
             <SwiperSlide key={index} className='w-auto'>
               <div
-                className='relative rounded-lg w-[60px] h-[60px] md:w-[100px] md:h-[100px] cursor-pointer'
+                className='relative rounded-sm w-[60px] h-[60px] md:w-[100px] md:h-[100px] cursor-pointer'
                 onClick={() => handleThumbnailClick(index)}
                 onMouseEnter={() => handleThumbnailClick(index)}
               >
                 <Image
-                  className='rounded-lg object-cover w-[60px] h-[60px] md:w-[100px] md:h-[100px]'
+                  className='rounded-sm object-cover w-[60px] h-[60px] md:w-[100px] md:h-[100px]'
                   src={img?.url}
                   alt={`Image ${index + 1}`}
                   width='inherit'
@@ -104,20 +104,19 @@ const ImageGallery = ({}: ImageGalleryProps) => {
         <Swiper
           onSlideChange={handleSlideChange}
           initialSlide={selectedImage}
-          spaceBetween={10}
           slidesPerView={1}
-          className='w-full h-[350px] sm:h-[400px]'
+          className='swiperImage w-full h-[350px] sm:h-[400px]'
           onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
         >
           {typeof images === 'string' ? (
             <SwiperSlide className='w-auto relative'>
               <Image
-                className='rounded-lg object-contain w-full sm:w-[500px] h-[350px] sm:h-[400px]'
+                className='rounded-sm object-contain w-full sm:w-[500px] h-[350px] sm:h-[400px]'
                 src={images}
                 alt={`Image 1`}
               />
-              <div className='absolute sm:hidden flex items-center justify-center w-8 h-8 bottom-0 right-0 min-[400px]:!bottom-0 min-[360px]:!bottom-[24px] min-[300px]:!bottom-[36px] bg-white rounded shadow'>
-                <p className='text-sm text-gray-800'>
+              <div className='absolute w-full sm:hidden flex items-center justify-center bottom-0 min-[400px]:!bottom-0 min-[360px]:!bottom-[24px] min-[300px]:!bottom-[36px]'>
+                <p className='text-sm text-gray-800 px-2 py-[4px] bg-white/40 rounded shadow'>
                   {selectedImage + 1} / {totalImages}
                 </p>
               </div>
@@ -125,12 +124,12 @@ const ImageGallery = ({}: ImageGalleryProps) => {
           ) : (
             <SwiperSlide className='w-auto relative'>
               <Image
-                className='rounded-lg object-cover w-full sm:w-[400px] h-[350px] sm:h-[400px]'
+                className='rounded-sm object-cover w-full sm:w-[400px] h-[350px] sm:h-[400px]'
                 src='/images/product-img.png'
                 alt={`Image 1`}
               />
-              <div className='absolute sm:hidden flex items-center justify-center w-8 h-8 bottom-0 right-0 min-[400px]:!bottom-0 min-[360px]:!bottom-[24px] min-[300px]:!bottom-[36px] bg-white rounded shadow'>
-                <p className='text-sm text-gray-800'>
+              <div className='absolute w-full sm:hidden flex items-center justify-center bottom-0 min-[400px]:!bottom-0 min-[360px]:!bottom-[24px] min-[300px]:!bottom-[36px]'>
+                <p className='text-sm text-gray-800 px-2 py-[4px] bg-white/40 rounded shadow'>
                   {selectedImage + 1} / {totalImages}
                 </p>
               </div>
@@ -140,17 +139,17 @@ const ImageGallery = ({}: ImageGalleryProps) => {
             images.map((img, index) => (
               <SwiperSlide key={index} className='w-auto relative'>
                 <Image
-                  className='rounded-lg object-contain'
+                  className='rounded-sm object-contain'
                   src={img?.url}
                   alt={`Image ${index + 1}`}
                   width='inherit'
                   height='inherit'
                 />
-                <div className='absolute sm:hidden flex items-center justify-center w-8 h-8 bottom-0 right-0 min-[400px]:!bottom-0 min-[360px]:!bottom-[24px] min-[300px]:!bottom-[36px] bg-white rounded shadow'>
-                  <p className='text-sm text-gray-800'>
-                    {selectedImage + 1} / {totalImages}
-                  </p>
-                </div>
+                <div className='absolute w-full sm:hidden flex items-center justify-center bottom-0 min-[400px]:!bottom-0 min-[360px]:!bottom-[24px] min-[300px]:!bottom-[36px]'>
+                <p className='text-sm text-gray-800 px-2 py-[4px] bg-white/40 rounded shadow'>
+                  {selectedImage + 1} / {totalImages}
+                </p>
+              </div>
               </SwiperSlide>
             ))}
         </Swiper>
