@@ -24,9 +24,15 @@ type Props = {
   disabled?: boolean;
 };
 
-const DrawPriceProduct: FC<Props> = ({ open, onClose, product, region, disabled }) => {
-	const [isAdding, setIsAdding] = useState(false);
-	const countryCode = (useParams().countryCode as string) ?? "vn";
+const DrawPriceProduct: FC<Props> = ({
+  open,
+  onClose,
+  product,
+  region,
+  disabled,
+}) => {
+  const [isAdding, setIsAdding] = useState(false);
+  const countryCode = (useParams().countryCode as string) ?? 'vn';
 
   const {
     options,
@@ -93,34 +99,11 @@ const DrawPriceProduct: FC<Props> = ({ open, onClose, product, region, disabled 
       placement='bottom'
       onClose={onClose}
       open={open}
-      className='[&_.ant-drawer-body]:p-4 [&_.ant-drawer-header-title]:flex-row-reverse [&_.ant-drawer-header-title]:items-start [&_.ant-drawer-header]:py-3 [&_.ant-drawer-header]:pl-3'
+      className='h-auto [&_.ant-drawer-body]:p-4 [&_.ant-drawer-header-title]:flex-row-reverse [&_.ant-drawer-header-title]:items-start [&_.ant-drawer-header]:py-3 [&_.ant-drawer-header]:pl-3'
       footer={footer}
       title={title}
-      height='fit-content'
     >
       <Row>
-        <Col span={24}>
-          {/* <Flex justify="flex-start" gap="middle" align="flex-end">
-						<ImageGroup product={product} />
-						<Flex
-							vertical
-							align="flex-start"
-							justify="flex-end"
-							gap="4px"
-						>
-							<ProductPrice
-								className="text-[18px] font-semibold"
-								product={product}
-								variant={variant as any}
-								region={region}
-							/>
-							<Text className="text-sm text-gray-400">{`Kho: ${
-								inventoryQuantity || 0
-							}`}</Text>
-						</Flex>
-					</Flex> */}
-          {/* <Divider className="my-3" /> */}
-        </Col>
         <Col span={24}>
           {product?.variants?.length > 1 && (
             <div className='flex flex-col'>
