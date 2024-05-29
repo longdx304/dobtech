@@ -5,11 +5,10 @@ import { Card } from "@/components/Card";
 import { Flex } from "@/components/Flex";
 import { cn } from "@/lib/utils";
 import { TTreeCategories } from "@/types/productCategory";
+import { usePathname } from "next/navigation";
 import Category from "./Category";
 import HeaderWrap from "./HeaderWrap";
 import HeaderWrapMobile from "./HeaderWrapMobile";
-import { usePathname } from "next/navigation";
-import SearchInput from "@/modules/layout/components/search-input.tsx";
 
 interface Props {
 	categories: TTreeCategories[] | null;
