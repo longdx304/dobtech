@@ -10,7 +10,7 @@ interface Props {
 
 const Thumbnail: FC<Props> = ({ thumbnail, size, className }) => {
   return (
-    <div className='relative w-full overflow-hidden aspect-square '>
+    <div className='relative w-full overflow-hidden aspect-[3/4] rounded'>
       {thumbnail ? (
         <Image
           src={thumbnail}

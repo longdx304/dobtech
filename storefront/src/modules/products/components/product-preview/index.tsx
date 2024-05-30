@@ -23,8 +23,8 @@ const ProductPreview: FC<Props> = ({ data }) => {
 		>
 			<Flex vertical>
 				<Thumbnail thumbnail={data?.thumbnail} />
-				<Flex vertical className="p-2 w-full box-border">
-					<Text className="leading-5 text-[0.875rem] line-clamp-2 w-full">
+				<Flex vertical className="p-2 pb-3 w-full box-border">
+					<Text className="leading-4 text-[0.875rem] line-clamp-1 w-full text-black font-normal">
 						{data?.title}
 					</Text>
 					<PreviewPrice price={data.price} />

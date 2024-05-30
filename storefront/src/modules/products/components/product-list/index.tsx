@@ -73,7 +73,7 @@ const ProductList: FC<ProductListProps> = ({ data, searchValue = null }) => {
 	return (
 		<div className="flex flex-col items-center gap-4">
 			{productData?.length > 0 && (
-				<div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 sm:grid-cols-2 w-full gap-x-6 gap-y-6">
+				<div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 sm:grid-cols-2 w-full gap-x-3 gap-y-3 lg:gap-x-4 lg:gap-y-4">
 					{productData?.map((product, index) => (
 						<ProductPreview key={index} data={product} />
 					))}

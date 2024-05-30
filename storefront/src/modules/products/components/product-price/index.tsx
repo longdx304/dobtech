@@ -36,13 +36,13 @@ export default function ProductPrice({
   const formattedPrice =
     isNaN(calculatedPrice) || calculatedPrice === 0
       ? '-'
-      : `₫${calculatedPrice.toLocaleString()}`;
+      : `${calculatedPrice.toLocaleString()}₫`;
 
   return (
     <div className='flex flex-col'>
       <span
-        className={cn('text-xl-semi', {
-          'text-ui-fg-interactive': selectedPrice.price_type === 'sale',
+        className={cn('text-xl', {
+          'text-xs': selectedPrice.price_type === 'sale',
         })}
       >
         {!variant && ''}

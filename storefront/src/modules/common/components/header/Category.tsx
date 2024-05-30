@@ -1,17 +1,15 @@
 "use client";
 
-import { Avatar, Col, Row } from "antd";
-import { ChevronRight } from "lucide-react";
-import React, { FC, useMemo, useState, Fragment } from "react";
+import { FC, Fragment, useMemo, useState } from "react";
 
 import { Dropdown } from "@/components/Dropdown";
 import { Flex } from "@/components/Flex";
 import { Text } from "@/components/Typography";
 import { cn } from "@/lib/utils";
 import { TTreeCategories } from "@/types/productCategory";
-import LocalizedClientLink from "../localized-client-link";
 import { usePathname } from 'next/navigation';
 import CategoryMenu from '../category-menu';
+import LocalizedClientLink from "../localized-client-link";
 
 interface Props {
 	categories: TTreeCategories[] | null;

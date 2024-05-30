@@ -5,10 +5,10 @@ const useScrollDirection = () => {
 
 	useEffect(() => {
 		let lastScrollTop =
-			window.pageYOffset || document.documentElement.scrollTop;
+			window && window.pageYOffset || document.documentElement.scrollTop;
 		const handleScroll = () => {
 			const scrollTop =
-				window.pageYOffset || document.documentElement.scrollTop;
+				window && window.pageYOffset || document.documentElement.scrollTop;
 			if (scrollTop > lastScrollTop) {
 				setScrollDirection('down');
 			} else {
@@ -17,8 +17,8 @@ const useScrollDirection = () => {
 			lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
 		};
 
-		window.addEventListener('scroll', handleScroll);
-		return () => window.removeEventListener('scroll', handleScroll);
+		window && window.addEventListener('scroll', handleScroll);
+		return () => window && window.removeEventListener('scroll', handleScroll);
 	}, []);
 
 	return scrollDirection;
