@@ -71,7 +71,10 @@ const Menu: FC<Props> = ({ categories }) => {
           <Text className={cn('text-[11px] text-[#767676]')}>{'Giỏ hàng'}</Text>
         </Flex>
         <Flex vertical justify='center' align='center' className='flex-1'>
-          <LocalizedClientLink href='user'>
+          <LocalizedClientLink
+            href='user'
+            className='flex flex-col justify-center items-center text-[#767676]'
+          >
             <UserRound size={22} strokeWidth={2} />
             <Text className={cn('text-[11px] text-[#767676]')}>{'Tôi'}</Text>
           </LocalizedClientLink>
