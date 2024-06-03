@@ -14,7 +14,6 @@ type Props = {
 };
 
 const VariantGeneral: FC<Props> = ({ form, options }) => {
-	console.log('options');
 	return (
 		<Row gutter={[16, 0]} className="w-full text-gray-500">
 			<Col span={24}>

@@ -1,8 +1,7 @@
+import { Check, Settings2 } from 'lucide-react';
+import { useAdminRegions, useAdminStore } from 'medusa-react';
 import { FC, useMemo } from 'react';
-import { useAdminStore, useAdminRegions } from 'medusa-react';
-import { Settings2, Check } from 'lucide-react';
 
-import { Button } from '@/components/Button';
 import { Dropdown } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
@@ -44,7 +43,7 @@ const EditPricesActions: FC<Props> = ({
 			<Flex gap="middle" align="center" justify="space-between">
 				<Text>{currency.code.toUpperCase()}</Text>
 				<Flex gap="small">
-					<Text className='text-gray-400 text-xs'>{currency.name}</Text>
+					<Text className="text-gray-400 text-xs">{currency.name}</Text>
 					{selectedCurrencies.includes(currency.code) && <Check size={18} />}
 				</Flex>
 			</Flex>
@@ -77,18 +76,19 @@ const EditPricesActions: FC<Props> = ({
 				label: 'Khu vực',
 				type: 'group',
 				children: regions?.map((region: any) => ({
-					key: region.code ,
+					key: region.code,
 					label: renderRegionLabel(region),
 					type: 'item',
 					onClick: () => toggleRegion(region.id),
 				})),
 			},
 		];
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedCurrencies, selectedRegions]);
 
 	return (
 		<div>
-			<Dropdown menu={{ items: itemDropDown, onClick: () => {} }}>
+			<Dropdown menu={{ items: itemDropDown as any, onClick: () => {} }}>
 				<a onClick={(e) => e.preventDefault()} className="w-fit block">
 					<Flex
 						gap="small"

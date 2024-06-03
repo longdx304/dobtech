@@ -1,39 +1,95 @@
-import { Image as MedusaImage } from "@medusajs/medusa"
-import { Container } from "@medusajs/ui"
-import Image from "next/image"
+'use client';
+import { Flex } from '@/components/Flex';
+import { Image } from '@/components/Image';
+import { useProduct } from '@/lib/providers/product/product-provider';
+import { useMemo, useRef, useState } from 'react';
+import SwiperCore from 'swiper';
+import { Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
-type ImageGalleryProps = {
-  images: MedusaImage[]
-}
+import 'swiper/css';
+import 'swiper/css/pagination';
 
-const ImageGallery = ({ images }: ImageGalleryProps) => {
+export default function ImageGallery() {
+  const { product } = useProduct();
+
+  const images = useMemo(() => {
+    if (!product) return null;
+
+    if (!Array.isArray(product.images) || product.images.length === 0) {
+      if (!product.thumbnail) {
+        return ['/images/product-img.png'];
+      }
+      return [product.thumbnail];
+    }
+
+    return product.images;
+  }, [product]);
+
+  const [selectedImage, setSelectedImage] = useState<number>(0);
+  const mainSwiperRef = useRef<SwiperCore>();
+
+  const handleThumbnailClick = (index: number) => {
+    setSelectedImage(index);
+    if (mainSwiperRef.current) {
+      mainSwiperRef.current.slideTo(index);
+    }
+  };
+
+  const handleSlideChange = (swiper: SwiperCore) => {
+    setSelectedImage(swiper.activeIndex);
+  };
+
+  // const totalImages = Array.isArray(images) ? images.length : 1;
+
   return (
-    <div className="flex items-start relative">
-      <div className="flex flex-col flex-1 small:mx-16 gap-y-4">
-        {images.map((image, index) => {
-          return (
-            <Container
-              key={image.id}
-              className="relative aspect-[29/34] w-full overflow-hidden bg-ui-bg-subtle"
-              id={image.id}
-            >
-              <Image
-                src={image.url}
-                priority={index <= 2 ? true : false}
-                className="absolute inset-0 rounded-rounded"
-                alt={`Product image ${index + 1}`}
-                fill
-                sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
-                style={{
-                  objectFit: "cover",
-                }}
-              />
-            </Container>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
+    <Flex className='flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-[730px]'>
+      {/* Thumbnails */}
+      <Flex className='flex flex-wrap lg:flex-col justify-center w-full lg:w-fit gap-4'>
+        {images?.map((img, index) => (
+          <Flex
+            key={index}
+            onClick={() => handleThumbnailClick(index)}
+            className={`cursor-pointer w-16 h-16 lg:w-20 lg:h-20 rounded-sm overflow-hidden border border-gray-200 ${
+              selectedImage === index ? 'border-primary' : ''
+            }`}
+            onMouseEnter={() => handleThumbnailClick(index)}
+          >
+            <Image
+              src={typeof img === 'string' ? img : img.url}
+              className='object-cover'
+              alt={`Thumbnail ${index + 1}`}
+              width='inherit'
+              height='inherit'
+              preview={false}
+            />
+          </Flex>
+        ))}
+      </Flex>
 
-export default ImageGallery
+      {/* Main Image */}
+      <Flex className='flex justify-center w-full lg:w-auto'>
+        <Swiper
+          onSlideChange={handleSlideChange}
+          className='relative w-full sm:w-[400px] h-[350px] sm:h-[400px]'
+          onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
+          modules={[Pagination]}
+          slidesPerView={1}
+          pagination={{ clickable: true }}
+        >
+            {images?.map((img, index) => (
+              <SwiperSlide key={index}>
+                <Image
+                  src={typeof img === 'string' ? img : img.url}
+                  className='rounded-sm object-contain'
+                  alt={`Image ${index + 1}`}
+                  width='inherit'
+                  height='inherit'
+                />
+              </SwiperSlide>
+            ))}
+        </Swiper>
+      </Flex>
+    </Flex>
+  );
+}

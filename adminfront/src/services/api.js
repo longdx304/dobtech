@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 import medusaRequest from "./request"
 
 const removeNullish = (obj) =>

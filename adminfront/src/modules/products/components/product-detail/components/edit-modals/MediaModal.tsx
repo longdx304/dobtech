@@ -39,6 +39,7 @@ const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 				  }))
 				: [],
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [product]);
 
 	const checkUrlMatch = (
@@ -73,11 +74,13 @@ const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 				onSuccess: () => {
 					messageApi.success('Chỉnh sửa media thành công');
 					handleOk();
+					return;
 				},
 				onError: (error) => {
 					messageApi.error(getErrorMessage(error));
 				},
 			});
+			return;
 		}
 	};
 

@@ -1,27 +1,33 @@
-import { Pencil, X, MonitorX, Trash2, Dot } from 'lucide-react';
-import Image from 'next/image';
 import { Product } from '@medusajs/medusa';
+import { Dot, MonitorX, Pencil, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 
-import { Button } from '@/components/Button';
-import { Flex } from '@/components/Flex';
-import { Text } from '@/components/Typography';
-import { IProductResponse } from '@/types/products';
-import formatNumber from '@/lib/utils';
 import { ActionAbles } from '@/components/Dropdown';
+import { Flex } from '@/components/Flex';
 import Tooltip from '@/components/Tooltip/Tooltip';
+import { Text } from '@/components/Typography';
+import formatNumber from '@/lib/utils';
 import { MenuProps } from 'antd';
 
 interface Props {
 	handleDeleteProduct: (userId: Product['id']) => void;
 	handleEditProduct: (record: Product) => void;
+	handleChangeStatus: (id: string, status: string) => void;
+	handleRow: (id: string) => any;
 }
-const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
+const productsColumns = ({
+	handleDeleteProduct,
+	handleEditProduct,
+	handleChangeStatus,
+	handleRow,
+}: Props) => [
 	{
 		title: 'Tên sản phẩm',
 		key: 'information',
 		width: 150,
 		className: 'text-xs',
 		fixed: 'left',
+		onCell: (record: Product) => handleRow(record.id),
 		render: (_: any, record: Product) => (
 			<Flex className="flex items-center gap-3">
 				<Image
@@ -43,6 +49,7 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 		dataIndex: 'collection',
 		className: 'text-xs',
 		width: 150,
+		onCell: (record: Product) => handleRow(record.id),
 		render: (_: Product['collection']) => {
 			return _?.title || '-';
 		},
@@ -53,6 +60,7 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 		key: 'status',
 		className: 'text-xs',
 		width: 150,
+		onCell: (record: Product) => handleRow(record.id),
 		render: (_: Product['status'], record: Product) => {
 			const color = _ === 'published' ? 'rgb(52 211 153)' : 'rgb(156 163 175)';
 			return (
@@ -60,9 +68,12 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 					<Dot
 						color={_ === 'published' ? 'rgb(52 211 153)' : 'rgb(156 163 175)'}
 						size={20}
+						strokeWidth={3}
 						className="w-[20px]"
 					/>
-					<Text className="text-xs">{_ ? 'Đã xuất bản' : 'Bản nháp'}</Text>
+					<Text className="text-xs">
+						{_ === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+					</Text>
 				</Flex>
 			);
 		},
@@ -73,6 +84,7 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 		dataIndex: 'profile',
 		className: 'text-xs',
 		width: 200,
+		onCell: (record: Product) => handleRow(record.id),
 		render: (_: Product['profile']) => {
 			return _?.name || '-';
 		},
@@ -83,6 +95,7 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 		dataIndex: 'variants',
 		className: 'text-xs',
 		width: 250,
+		onCell: (record: Product) => handleRow(record.id),
 		render: (_: Product['variants']) => {
 			const total = _.reduce(
 				(acc, variant) => acc + variant.inventory_quantity,
@@ -106,7 +119,11 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 					icon: <Pencil size={20} />,
 				},
 				{
-					label: <span className="w-full">Ngừng xuất bản</span>,
+					label: (
+						<span className="w-full">
+							{record.status === 'published' ? 'Ngừng xuất bản' : 'Xuất bản'}
+						</span>
+					),
 					key: 'stop-publishing',
 					icon: <MonitorX size={20} />,
 				},
@@ -126,6 +143,13 @@ const productsColumns = ({ handleDeleteProduct, handleEditProduct }: Props) => [
 				// Case item is delete
 				if (key === 'delete') {
 					handleDeleteProduct(record.id);
+					return;
+				}
+				if (key === 'stop-publishing') {
+					handleChangeStatus(
+						record.id,
+						record.status === 'published' ? 'draft' : 'published'
+					);
 					return;
 				}
 			};

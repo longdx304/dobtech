@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--radius: 10px;
+}
+/* @layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+} */
+
+body {
+  /* background-color: #EFF0F3; */
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background: #fff;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Swiper */
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiperImage > .swiper-wrapper {
+	display: flex;
+	justify-content: center;
+}
+
+.img-thumbnail > .swiper-wrapper {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
+@media (min-width: 1024px) {
+  .img-thumbnail > .swiper-wrapper {
+    flex-direction: column;
+  }
+}
+
+/* Swiper */
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+}
+
+.banner {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+.banner .swiper-slide img {
+  border-radius: 10px !important;
+}
+
+.banner .swiper-button-prev,
+.banner .swiper-button-next {
+  color: #fff !important;
+  width: 36px !important;
+  height: 36px !important;
+  transition: 0.2s;
+  background: hsla(0, 0%, 100%, 0.6) !important;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.banner .swiper-button-prev:hover,
+.banner .swiper-button-next:hover {
+  background: #fff !important;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 16px !important;
+  color: #222 !important;
+  font-weight: bold !important;
+}
+
+.swiper-pagination-bullet {
+  border-radius: 5px !important;
+  background: #fff9f9 !important;
+  border: 1px solid #000 !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: #000 !important;
+  border: 1px solid #fff !important;
+}
+
+/* Custom for lucide icons */
+
+/* Antd Form */
+
+.ant-form .ant-form-item-label {
+  padding: 0 0 0 !important;
+}
+
+.ant-form .ant-form-item-label label {
+  font-size: 16px !important;
+  font-weight: 500;
+}
+
+.ant-form .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.ant-card-body {
+  padding: 0px !important;
+}
+
+.category > .ant-dropdown {
+  width: 100% !important;
+}
+
+.box-tick {
+  height: 1rem;
+  width: 1rem;
+  overflow: hidden;
+}
+
+.box-tick::before {
+  border: 1rem solid transparent;
+  border-bottom: 1rem solid #000;
+  content: '';
+  bottom: 0;
+  position: absolute;
+  right: -1rem;
+}

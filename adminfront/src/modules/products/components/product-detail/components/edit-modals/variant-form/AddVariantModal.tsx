@@ -88,6 +88,7 @@ const AddVariantModal: FC<Props> = ({
 				});
 			}
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [variant, typeVariant]);
 
 	const handleOnOk = () => {
@@ -182,7 +183,7 @@ const AddVariantModal: FC<Props> = ({
 		<SubmitModal
 			open={state}
 			onOk={handleOnOk}
-			isLoading={createVariant?.isLoading}
+			isLoading={createVariant?.isLoading || updateVariant?.isLoading}
 			handleCancel={onCancel}
 			width={600}
 			form={form}

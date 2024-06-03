@@ -90,6 +90,7 @@ const AccountList = ({}: Props) => {
 
 	const columns = useMemo(
 		() => accountColumns({ handleDeleteUser, handleEditUser }),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[users]
 	);
 

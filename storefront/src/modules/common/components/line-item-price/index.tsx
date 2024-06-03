@@ -1,8 +1,8 @@
-import { formatAmount } from "@lib/util/prices"
+import { cn } from '@/lib/utils';
+import { getPercentageDiff } from '@/lib/utils/get-precentage-diff';
+import { formatAmount } from '@/lib/utils/prices';
 import { LineItem, Region } from "@medusajs/medusa"
-import { clx } from "@medusajs/ui"
 
-import { getPercentageDiff } from "@lib/util/get-precentage-diff"
 import { CalculatedVariant } from "types/medusa"
 
 type LineItemPriceProps = {
@@ -21,15 +21,15 @@ const LineItemPrice = ({
   const hasReducedPrice = (item.total || 0) < originalPrice
 
   return (
-    <div className="flex flex-col gap-x-2 text-ui-fg-subtle items-end">
+    <div className="flex flex-col gap-x-2 text-md items-end">
       <div className="text-left">
         {hasReducedPrice && (
           <>
             <p>
               {style === "default" && (
-                <span className="text-ui-fg-subtle">Original: </span>
+                <span className="text-md">Original: </span>
               )}
-              <span className="line-through text-ui-fg-muted" data-testid="product-original-price">
+              <span className="line-through text-md" data-testid="product-original-price">
                 {formatAmount({
                   amount: originalPrice,
                   region: region,
@@ -38,15 +38,15 @@ const LineItemPrice = ({
               </span>
             </p>
             {style === "default" && (
-              <span className="text-ui-fg-interactive">
+              <span className="text-md">
                 -{getPercentageDiff(originalPrice, item.total || 0)}%
               </span>
             )}
           </>
         )}
         <span
-          className={clx("text-base-regular", {
-            "text-ui-fg-interactive": hasReducedPrice,
+          className={cn("text-md", {
+            "text-lg": hasReducedPrice,
           })}
           data-testid="product-price"
         >

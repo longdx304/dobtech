@@ -1,68 +1,66 @@
-import { EllipseMiniSolid } from "@medusajs/icons"
-import { Label, RadioGroup, Text, clx } from "@medusajs/ui"
-import { ChangeEvent } from "react"
+import { Flex } from '@/components/Flex';
+import { ArrowDown, ArrowUp, Filter } from 'lucide-react';
+import { useState } from 'react';
+import DrawFilter from './DrawFilter';
 
 type FilterRadioGroupProps = {
-  title: string
   items: {
-    value: string
-    label: string
-  }[]
-  value: any
-  handleChange: (...args: any[]) => void
-  'data-testid'?: string
-}
+    value: string;
+    label: string;
+  }[];
+  value: any;
+  handleChange: (...args: any[]) => void;
+  'data-testid'?: string;
+};
 
 const FilterRadioGroup = ({
-  title,
   items,
   value,
   handleChange,
-  'data-testid': dataTestId
+  'data-testid': dataTestId,
 }: FilterRadioGroupProps) => {
+  const [open, setOpen] = useState(false);
+
   return (
-    <div className="flex gap-x-3 flex-col gap-y-3">
-      <Text className="txt-compact-small-plus text-ui-fg-muted">{title}</Text>
-      <RadioGroup data-testid={dataTestId}>
-        {items?.map((i) => (
+    <Flex align='center' className='w-full flex space-x-4 justify-between lg:justify-end'>
+      {items
+        .filter((item) => item.value === 'created_at')
+        .map((item) => (
           <div
-            key={i.value}
-            className={clx("flex gap-x-2 items-center", {
-              "ml-[-1.75rem]": i.value === value,
-            })}
+            key={item.value}
+            className={`${value === item.value && 'text-black font-bold'}`}
+            onClick={() => handleChange(item.value)}
           >
-            {i.value === value && <EllipseMiniSolid />}
-            <RadioGroup.Item
-              checked={i.value === value}
-              onClick={(e) =>
-                handleChange(
-                  e as unknown as ChangeEvent<HTMLButtonElement>,
-                  i.value
-                )
-              }
-              className="hidden peer"
-              id={i.value}
-              value={i.value}
-            />
-            <Label
-              placeholder={i.label}
-              htmlFor={i.value}
-              className={clx(
-                "!txt-compact-small !transform-none text-ui-fg-subtle hover:cursor-pointer",
-                {
-                  "text-ui-fg-base": i.value === value,
-                }
-              )}
-              data-testid="radio-label"
-              data-active={i.value === value}
-            >
-              {i.label}
-            </Label>
+            {item.label}
           </div>
         ))}
-      </RadioGroup>
-    </div>
-  )
-}
+      <Flex
+        className={`${
+          value === 'price_asc' || value === 'price_desc'
+            ? 'text-black font-bold'
+            : 'text-gray-900'
+        }`}
+        onClick={() =>
+          handleChange(value === 'price_asc' ? 'price_desc' : 'price_asc')
+        }
+      >
+        Giá{' '}
+        {value === 'price_asc' ? (
+          <ArrowUp className='h-5 w-5' />
+        ) : (
+          <ArrowDown className='h-5 w-5' />
+        )}
+      </Flex>
+      <Flex
+        className='flex bg-white shadow-none hover:border-slate-500'
+        onClick={() => setOpen(!open)}
+      >
+        <span>Sàng lọc</span>
+        <Filter className='h-5 w-5 text-black' />
+      </Flex>
+      <DrawFilter open={open} onClose={() => setOpen(false)} />
+    </Flex>
+  );
+};
 
-export default FilterRadioGroup
+export default FilterRadioGroup;

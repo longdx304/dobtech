@@ -1,7 +1,7 @@
-import { getAdmin } from '@/actions/accounts';
+import React from 'react';
+import { UserProvider } from '@/lib/providers/user-provider';
 
 import Header from '@/modules/common/components/header';
-import { IAdminResponse } from '@/types/account';
 import { PollingProvider } from '@/lib/providers/polling-provider';
 import { ImportRefresh } from '@/lib/providers/import-refresh';
 import Notification from '@/modules/common/components/notification';
@@ -11,7 +11,6 @@ export default async function MainLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	
 	return (
 		<main className="w-full pt-[4.5rem] sm:pt-0">
 			<UserProvider>

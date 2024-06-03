@@ -1,11 +1,11 @@
-import { useState } from "react"
+import { useState } from 'react';
 
 export type StateType = [boolean, () => void, () => void, () => void] & {
-  state: boolean
-  open: () => void
-  close: () => void
-  toggle: () => void
-}
+	state: boolean;
+	onOpen: () => void;
+	onClose: () => void;
+	onToggle: () => void;
+};
 
 /**
  *
@@ -21,26 +21,26 @@ export type StateType = [boolean, () => void, () => void, () => void] & {
  */
 
 const useToggleState = (initialState = false) => {
-  const [state, setState] = useState<boolean>(initialState)
+	const [state, setState] = useState<boolean>(initialState);
 
-  const close = () => {
-    setState(false)
-  }
+	const onClose = () => {
+		setState(false);
+	};
 
-  const open = () => {
-    setState(true)
-  }
+	const onOpen = () => {
+		setState(true);
+	};
 
-  const toggle = () => {
-    setState((state) => !state)
-  }
+	const onToggle = () => {
+		setState((state) => !state);
+	};
 
-  const hookData = [state, open, close, toggle] as StateType
-  hookData.state = state
-  hookData.open = open
-  hookData.close = close
-  hookData.toggle = toggle
-  return hookData
-}
+	const hookData = [state, onOpen, onClose, onToggle] as StateType;
+	hookData.state = state;
+	hookData.onOpen = onOpen;
+	hookData.onClose = onClose;
+	hookData.onToggle = onToggle;
+	return hookData;
+};
 
-export default useToggleState
+export default useToggleState;

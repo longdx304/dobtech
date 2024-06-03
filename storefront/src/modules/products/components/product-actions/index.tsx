@@ -1,135 +1,81 @@
-"use client"
+'use client';
 
-import { Region } from "@medusajs/medusa"
-import { PricedProduct } from "@medusajs/medusa/dist/types/pricing"
-import { Button } from "@medusajs/ui"
-import { isEqual } from "lodash"
-import { useParams } from "next/navigation"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { Divider } from 'antd';
+import { useParams } from 'next/navigation';
+import { useRef, useState } from 'react';
 
-import { useIntersection } from "@lib/hooks/use-in-view"
-import { addToCart } from "@modules/cart/actions"
-import Divider from "@modules/common/components/divider"
-import OptionSelect from "@modules/products/components/option-select"
-
-import MobileActions from "../mobile-actions"
-import ProductPrice from "../product-price"
+import { Button } from '@/components/Button';
+import InputNumber from '@/components/Input/InputNumber';
+import { addToCart } from '@/modules/cart/action';
+import ProductInfo from '@/modules/products/components/product-info';
+import useActionProduct from '@/modules/products/hook/useActionProduct';
+import { Region } from '@medusajs/medusa';
+import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
+import { Minus, Plus } from 'lucide-react';
+import OptionSelect from '../option-select';
+import _ from 'lodash';
 
 type ProductActionsProps = {
-  product: PricedProduct
-  region: Region
-}
+  product: PricedProduct;
+  region: Region;
+  disabled?: boolean;
+};
 
 export type PriceType = {
-  calculated_price: string
-  original_price?: string
-  price_type?: "sale" | "default"
-  percentage_diff?: string
-}
+  calculated_price: string;
+  original_price?: string;
+  price_type?: 'sale' | 'default';
+  percentage_diff?: string;
+};
 
 export default function ProductActions({
   product,
   region,
+  disabled,
 }: ProductActionsProps) {
-  const [options, setOptions] = useState<Record<string, string>>({})
-  const [isAdding, setIsAdding] = useState(false)
+  const {
+    options,
+    updateOptions,
+    variant,
+    price,
+    inStock,
+    inventoryQuantity,
+    quantity,
+    handleAddNumber,
+    handleSubtractNumber,
+    handleInputChange,
+  } = useActionProduct({
+    product,
+  });
 
-  const countryCode = useParams().countryCode as string
+  const [isAdding, setIsAdding] = useState(false);
 
-  const variants = product.variants
+  const countryCode = (useParams().countryCode as string) ?? 'vn';
 
-  // initialize the option state
-  useEffect(() => {
-    const optionObj: Record<string, string> = {}
-
-    for (const option of product.options || []) {
-      Object.assign(optionObj, { [option.id]: undefined })
-    }
-
-    setOptions(optionObj)
-  }, [product])
-
-  // memoized record of the product's variants
-  const variantRecord = useMemo(() => {
-    const map: Record<string, Record<string, string>> = {}
-
-    for (const variant of variants) {
-      if (!variant.options || !variant.id) continue
-
-      const temp: Record<string, string> = {}
-
-      for (const option of variant.options) {
-        temp[option.option_id] = option.value
-      }
-
-      map[variant.id] = temp
-    }
-
-    return map
-  }, [variants])
-
-  // memoized function to check if the current options are a valid variant
-  const variant = useMemo(() => {
-    let variantId: string | undefined = undefined
-
-    for (const key of Object.keys(variantRecord)) {
-      if (isEqual(variantRecord[key], options)) {
-        variantId = key
-      }
-    }
-
-    return variants.find((v) => v.id === variantId)
-  }, [options, variantRecord, variants])
-
-  // if product only has one variant, then select it
-  useEffect(() => {
-    if (variants.length === 1 && variants[0].id) {
-      setOptions(variantRecord[variants[0].id])
-    }
-  }, [variants, variantRecord])
-
-  // update the options when a variant is selected
-  const updateOptions = (update: Record<string, string>) => {
-    setOptions({ ...options, ...update })
-  }
-
-  // check if the selected variant is in stock
-  const inStock = useMemo(() => {
-    if (variant && !variant.inventory_quantity) {
-      return false
-    }
-
-    if (variant && variant.allow_backorder === false) {
-      return true
-    }
-  }, [variant])
-
-  const actionsRef = useRef<HTMLDivElement>(null)
-
-  const inView = useIntersection(actionsRef, "0px")
+  const actionsRef = useRef<HTMLDivElement>(null);
 
   // add the selected variant to the cart
   const handleAddToCart = async () => {
-    if (!variant?.id) return null
-
-    setIsAdding(true)
+    if (_.isEmpty(variant) && !variant) return null;
+    setIsAdding(true);
 
     await addToCart({
-      variantId: variant.id,
-      quantity: 1,
+      variantId: variant!.id || '',
+      quantity: quantity,
       countryCode,
-    })
+    });
 
-    setIsAdding(false)
-  }
+    setIsAdding(false);
+  };
 
   return (
     <>
-      <div className="flex flex-col gap-y-2" ref={actionsRef}>
+      <ProductInfo product={product} region={region} variant={variant} />
+      <div className='hidden lg:flex flex-col gap-y-2 mt-1' ref={actionsRef}>
         <div>
-          {product.variants.length > 1 && (
-            <div className="flex flex-col gap-y-4">
-              {(product.options || []).map((option) => {
+          {product?.variants?.length && (
+            <div className='flex flex-col gap-y-4'>
+              {(product?.options || []).map((option) => {
                 return (
                   <div key={option.id}>
                     <OptionSelect
@@ -137,44 +83,60 @@ export default function ProductActions({
                       current={options[option.id]}
                       updateOption={updateOptions}
                       title={option.title}
-                      data-testid="product-options"
+                      data-testid='product-options'
+                      disabled={!!disabled || isAdding}
                     />
                   </div>
-                )
+                );
               })}
+              {/* quantity */}
+              <div className='flex flex-col gap-y-3 mt-4'>
+                <span className='text-sm'>Số lượng:</span>
+
+                <InputNumber
+                  addonBefore={
+                    <Button
+                      onClick={handleSubtractNumber}
+                      icon={<Minus />}
+                      type='text'
+                      className='hover:bg-transparent w-[24px]'
+                    />
+                  }
+                  addonAfter={
+                    <Button
+                      onClick={handleAddNumber}
+                      icon={<Plus />}
+                      type='text'
+                      className='hover:bg-transparent w-[24px]'
+                    />
+                  }
+                  controls={false}
+                  value={quantity}
+                  className='max-w-[160px] [&_input]:text-center'
+                  onChange={handleInputChange as any}
+                />
+
+                <span>{`${inventoryQuantity || 0} sản phẩm có sẵn`}</span>
+              </div>
               <Divider />
             </div>
           )}
         </div>
 
-        <ProductPrice product={product} variant={variant} region={region} />
-
         <Button
           onClick={handleAddToCart}
-          disabled={!inStock || !variant}
-          variant="primary"
-          className="w-full h-10"
+          disabled={!inStock || !variant || !!disabled || isAdding || !options || !price}
+          className='max-w-[200px]'
           isLoading={isAdding}
-          data-testid="add-product-button"
+          data-testid='add-product-button'
         >
           {!variant
-            ? "Select variant"
+            ? 'Thêm vào giỏ hàng'
             : !inStock
-            ? "Out of stock"
-            : "Add to cart"}
+            ? 'Hàng đã hết'
+            : 'Thêm vào giỏ hàng'}
         </Button>
-        <MobileActions
-          product={product}
-          variant={variant}
-          region={region}
-          options={options}
-          updateOptions={updateOptions}
-          inStock={inStock}
-          handleAddToCart={handleAddToCart}
-          isAdding={isAdding}
-          show={!inView}
-        />
       </div>
     </>
-  )
+  );
 }

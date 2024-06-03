@@ -33,6 +33,7 @@ const PAGE_SIZE = 10;
 interface Props {}
 
 const ProductList = ({}: Props) => {
+	const { client } = useMedusa();
 	const router = useRouter();
 	const { state, onOpen, onClose } = useToggleState(false);
 	const {
@@ -92,6 +93,7 @@ const ProductList = ({}: Props) => {
 				try {
 					await deleteProduct(productId);
 					message.success('Xoá sản phẩm thành công!');
+					refetch();
 				} catch (error) {
 					message.error('Xoá sản phẩm thất bại!');
 				}
@@ -102,8 +104,32 @@ const ProductList = ({}: Props) => {
 		});
 	};
 
+	const handleChangeStatus = async (productId: string, status: string) => {
+		await client.admin.products
+			.update(productId, { status } as any)
+			.then(async () => {
+				message.success('Cập nhật trạng thái thành công');
+				await refetch();
+			});
+	};
+
+	const handleRow = (id: string) => {
+		return {
+			onClick: () => {
+				router.push(`${ERoutes.PRODUCTS}/${id}`);
+			},
+		};
+	};
+
 	const columns = useMemo(
-		() => productsColumns({ handleDeleteProduct, handleEditProduct }),
+		() =>
+			productsColumns({
+				handleDeleteProduct,
+				handleEditProduct,
+				handleChangeStatus,
+				handleRow,
+			}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[products]
 	);
 
@@ -189,7 +215,8 @@ const ProductList = ({}: Props) => {
 					pageSize: PAGE_SIZE,
 					current: currentPage as number,
 					onChange: handleChangePage,
-					showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} sản phẩm`,
+					showTotal: (total, range) =>
+						`${range[0]}-${range[1]} trong ${total} sản phẩm`,
 				}}
 				scroll={{ x: 700 }}
 			/>

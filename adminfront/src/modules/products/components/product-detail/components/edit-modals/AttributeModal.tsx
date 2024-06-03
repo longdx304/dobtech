@@ -45,6 +45,7 @@ const AttributeModal: FC<Props> = ({
 				origin_country: product?.origin_country || undefined,
 			},
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [product]);
 
 	const onFinish: FormProps<AttributeFormProps>['onFinish'] = async (

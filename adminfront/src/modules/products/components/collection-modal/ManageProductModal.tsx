@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Product, ProductCollection } from '@medusajs/medusa';
 import { Modal as AntdModal, TableColumnsType, message } from 'antd';
 import _ from 'lodash';
@@ -121,6 +122,7 @@ const ManageProductModal: FC<Props> = ({
 		if (state) {
 			refetch();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [state]);
 
 	const columnsTable = columns({ handleRemoveProduct });

@@ -2,31 +2,22 @@
 
 import { Lock, LogIn, Mail } from 'lucide-react';
 
+import { setCookie } from '@/actions/auth';
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Input, InputPassword } from '@/components/Input';
 import { cn } from '@/lib/utils';
-import ErrorMessage from '@/modules/common/components/error-message';
-import { Button, SubmitButton } from '@/components/Button';
-import { adminLogIn } from '@/services/accounts';
-import { useFormState } from 'react-dom';
-import { ErrorText } from '@/components/Typography';
+import { ERoutes } from '@/types/routes';
 import { Form, FormProps, message } from 'antd';
 import { useAdminLogin, useMedusa } from 'medusa-react';
 import { useRouter } from 'next/navigation';
-import { ERoutes } from '@/types/routes';
-import { cookies } from 'next/headers';
-import { setCookie } from '@/actions/auth';
-
-// interface Props {}
 
 type FormValues = {
 	email: string;
 	password: string;
 };
 
-type LoginTemplateProps = {
-	// toResetPassword: () => void
-};
+type LoginTemplateProps = {};
 
 const LoginTemplate = ({}: LoginTemplateProps) => {
 	const [form] = Form.useForm();
@@ -37,10 +28,8 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 	const { mutateAsync, isLoading } = useAdminLogin();
 
 	const onFinish: FormProps<FormValues>['onFinish'] = async (values) => {
-		console.log('Success:', values);
 		mutateAsync(values, {
 			onSuccess: async (data) => {
-				console.log('data', data);
 				await client.admin.auth
 					.getToken(values)
 					.then(async ({ access_token }) => {
@@ -53,12 +42,6 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 				message.error('Đăng nhập thất bại!');
 			},
 		});
-	};
-
-	const onFinishFailed: FormProps<FormValues>['onFinishFailed'] = (
-		errorInfo
-	) => {
-		console.log('Failed:', errorInfo);
 	};
 
 	return (
@@ -78,7 +61,6 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 					id="form-user"
 					form={form}
 					onFinish={onFinish}
-					onFinishFailed={onFinishFailed}
 				>
 					<Form.Item
 						labelCol={{ span: 24 }}

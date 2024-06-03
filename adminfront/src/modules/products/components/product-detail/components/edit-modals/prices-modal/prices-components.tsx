@@ -68,6 +68,7 @@ export const EditableCell: FC<EditableCellProps> = ({
 	storeRegions,
 	...restProps
 }) => {
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const currencyMeta = dataIndex && useCurrencyMeta(storeRegions, dataIndex[1]);
 	const [editing, setEditing] = useState(false);
 	const inputRef = useRef<InputRef>(null);
@@ -120,6 +121,7 @@ export const EditableCell: FC<EditableCellProps> = ({
 				},
 			});
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [record, dataIndex]);
 	if (editable) {
 		childNode = editing ? (

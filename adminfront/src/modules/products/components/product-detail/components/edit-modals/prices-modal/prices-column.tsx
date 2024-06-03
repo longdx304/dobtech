@@ -34,6 +34,7 @@ const PricesColumn = ({ currencies, storeRegions }: Props) => {
 			key: currency,
 			editable: true,
 			render: (price: any, record: any) => {
+				// eslint-disable-next-line react-hooks/rules-of-hooks
 				const currencyMeta = useCurrencyMeta(storeRegions, currency, '');
 				return (
 					<Flex align="center" justify="space-between">

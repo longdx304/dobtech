@@ -12,15 +12,10 @@ const pwaConfig = {
 	skipWaiting: true,
 	cacheOnFrontEndNav: true,
 	reloadOnOnline: true,
-	// aggressiveFrontEndNavCaching: true,
-	// swcMinify: true,
 	fallbacks: {
 		// image: "/images/fallback.jpg",
 		document: "/offline",
 	},
-	// workboxOptions: {
-  //   disableDevLogs: true,
-  // },
 };
 
 const nextConfig = withStoreConfig({

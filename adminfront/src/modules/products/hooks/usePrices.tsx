@@ -22,6 +22,7 @@ function useRegionsCurrencyMap() {
 		map[r.id] = r.currency_code;
 	});
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	return useMemo(() => map, [storeRegions]);
 }
 

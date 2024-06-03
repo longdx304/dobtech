@@ -1,19 +1,19 @@
 'use client';
 import { Skeleton } from 'antd';
-import { useAdminGetSession } from 'medusa-react';
-import { Menu, Bell } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Image from 'next/image';
 import { FC } from 'react';
+import { User } from '@medusajs/medusa';
+import Link from 'next/link';
 
 import { Button, FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import useScrollDirection from '@/lib/hooks/useScrollDirection';
+import { useUser } from '@/lib/providers/user-provider';
 import { cn } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
-import { User } from '@medusajs/medusa';
-import Link from 'next/link';
 import DrawerMenu from './DrawerMenu';
 import Menubar from './Menubar';
 
@@ -22,7 +22,8 @@ interface Props {}
 const Header: FC<Props> = ({}) => {
 	const { state, onClose, onOpen } = useToggleState(false);
 	const scrollDirection = useScrollDirection();
-	const { user, isLoading, remove } = useAdminGetSession();
+	const { user, isLoading, remove } = useUser();
+
 	return (
 		<Card
 			className={cn(
