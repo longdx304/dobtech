@@ -14,6 +14,7 @@ import { ActionAbles } from '@/components/Dropdown';
 import Image from 'next/image';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import ThumbnailModal from './edit-modals/ThumbnailModal';
+import { deleteImages } from '@/actions/images';
 
 type Props = {
 	product: Product;
@@ -38,7 +39,11 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 		},
 	];
 
-	const handleDeleteThumbnail = () => {
+	const handleDeleteFile = async (url: string) => {
+		await deleteImages(url);
+	};
+
+	const handleDeleteThumbnail = async () => {
 		Modal.confirm({
 			title: 'Bạn có muốn xoá thumbnail này không ?',
 			content:
@@ -55,14 +60,21 @@ const ImageThumbnail: FC<Props> = ({ product, loadingProduct }) => {
 			cancelText: 'Huỷ',
 			async onOk() {
 				try {
-					updateProduct.mutateAsync({ thumbnail: undefined });
+					// @ts-ignore
+					await updateProduct.mutateAsync({ thumbnail: null }, {
+						onSuccess: async () => {
+							if (product?.thumbnail) {
+								await handleDeleteFile(product?.thumbnail);
+							}
+						}
+					});
 					message.success('Xoá thumbnail thành công!');
 				} catch (error) {
 					message.error('Xoá thumbnail thất bại!');
 				}
 			},
 			onCancel() {
-				console.log('Cancel');
+				return;
 			},
 		});
 	};

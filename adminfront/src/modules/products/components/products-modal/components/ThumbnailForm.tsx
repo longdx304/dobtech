@@ -21,7 +21,10 @@ const ThumbnailForm: FC<Props> = ({ form }) => {
 			selected: false,
 		}));
 
-		form.setFieldValue('thumbnail', toAppend);
+		if (toAppend?.length) {
+			form.setFieldValue('thumbnail', toAppend);
+			return;
+		}
 	};
 
 	const removeImage = () => {

@@ -10,6 +10,7 @@ interface Props extends ModalProps {
 	handleCancel: () => void;
 	handleOk: () => void;
 	isLoading?: boolean;
+	disabled?: boolean;
 }
 
 export default function Modal({
@@ -18,6 +19,7 @@ export default function Modal({
 	handleCancel,
 	isLoading,
 	children,
+	disabled = false,
 	...props
 }: Props) {
 	return (
@@ -29,10 +31,10 @@ export default function Modal({
 					Huỷ
 				</Button>,
 				<Button
-					htmlType="submit"
 					key="submit"
 					onClick={handleOk}
 					loading={isLoading}
+					disabled={disabled}
 					data-testid="submitButton"
 				>
 					Xác nhận
