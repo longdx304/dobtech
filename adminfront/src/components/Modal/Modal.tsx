@@ -10,6 +10,8 @@ interface Props extends ModalProps {
 	handleCancel: () => void;
 	handleOk: () => void;
 	isLoading?: boolean;
+	disabled?: boolean;
+	footer?: React.ReactNode;
 }
 
 export default function Modal({
@@ -18,26 +20,39 @@ export default function Modal({
 	handleCancel,
 	isLoading,
 	children,
+	disabled = false,
+	footer = null,
 	...props
 }: Props) {
+	const renderFooter = () => {
+		if (footer) return footer;
+		return [
+			<Button
+				key="1"
+				type="default"
+				danger
+				onClick={handleCancel}
+				loading={isLoading}
+			>
+				Huỷ
+			</Button>,
+			<Button
+				key="submit"
+				onClick={handleOk}
+				loading={isLoading}
+				disabled={disabled}
+				data-testid="submitButton"
+			>
+				Xác nhận
+			</Button>,
+		];
+	};
+
 	return (
 		<AntdModal
 			className={cn('', className)}
 			onCancel={handleCancel}
-			footer={[
-				<Button key="1" type="default" danger onClick={handleCancel} loading={isLoading}>
-					Huỷ
-				</Button>,
-				<Button
-					htmlType="submit"
-					key="submit"
-					onClick={handleOk}
-					loading={isLoading}
-					data-testid="submitButton"
-				>
-					Xác nhận
-				</Button>,
-			]}
+			footer={renderFooter()}
 			{...props}
 		>
 			{children}

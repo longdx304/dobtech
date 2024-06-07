@@ -7,6 +7,7 @@ export enum ERoutes {
 	PRODUCTS = '/admin/products',
 	DASHBOARD = '/admin/dashboard',
 	PRODUCT_CATEGORIES = '/admin/product-categories',
+	PRICING = '/admin/pricing',
 }
 
 export interface TRouteConfig {
@@ -46,5 +47,9 @@ export const routesConfig: TRouteConfig[] = [
 	{
 		path: ERoutes.PRODUCT_CATEGORIES,
 		mode: [EPermissions.WarehouseManager],
+	},
+	{
+		path: ERoutes.PRICING,
+		mode: [],
 	},
 ];

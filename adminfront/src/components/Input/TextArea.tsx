@@ -7,6 +7,7 @@ interface Props extends AntdInputProps {
 	className?: string;
 	error?: string;
 	rows?: number;
+	placeholder?: string;
 }
 
 const { TextArea: AntdTextArea } = AntdInput;
@@ -15,15 +16,20 @@ export default function TextArea({
 	rows = 3,
 	error,
 	className,
+	placeholder,
+	...props
 }: Props) {
 	return (
 		<Flex vertical gap={4} className="w-full">
 			<AntdTextArea
+				placeholder={placeholder}
 				rows={rows}
-				size="large"
+				size="small"
 				className={cn('p-3 gap-2', className)}
+				{...props}
 			/>
 			{error && <ErrorText error={error} />}
 		</Flex>
 	);
 }
+

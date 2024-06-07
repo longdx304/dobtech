@@ -5,11 +5,11 @@ import {
 	ClipboardPenLine,
 	Ellipsis,
 	LogOut,
-	PackageSearch,
 	Settings,
 	User as UserIcon,
 	Users,
-	LayoutList
+	LayoutList,
+	CircleDollarSign,
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -44,13 +44,11 @@ const itemDropdown: MenuProps['items'] = [
 ];
 
 // Item menu overview
-const itemOverview = (
-	role: string,
-	permissions: string[]
-) =>
+const itemOverview = (role: string, permissions: string[]) =>
 	[
 		role === 'admin' && getItem('Quản lý nhân viên', 'overview-1', <Users />),
 		role === 'admin' && getItem('Danh mục', 'overview-2', <LayoutList />),
+		role === 'admin' && getItem('Định giá', 'pricing', <CircleDollarSign />),
 		getItem('Quản lý sản phẩm', 'overview-3', <ClipboardPenLine />),
 		getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
 		getItem('Label', 'overview-5', <Settings />, [
@@ -94,7 +92,7 @@ const itemUser = (
 
 // Generation menu
 export const menuItems = (
-	user: Omit<User, "password_hash">,
+	user: Omit<User, 'password_hash'>,
 	handleDropdownClick: (e: any) => void
 ) => {
 	const role = user?.role;
@@ -108,7 +106,13 @@ export const menuItems = (
 			'group'
 		),
 		getItem('Tuỳ chỉnh', 'option', null, itemOption, 'group'),
-		getItem('', 'user', null, itemUser(user as any, handleDropdownClick), 'group'),
+		getItem(
+			'',
+			'user',
+			null,
+			itemUser(user as any, handleDropdownClick),
+			'group'
+		),
 	];
 };
 
@@ -116,4 +120,5 @@ export const menuRoutes: Record<string, string> = {
 	'overview-1': ERoutes.ACCOUNTS,
 	'overview-2': ERoutes.PRODUCT_CATEGORIES,
 	'overview-3': ERoutes.PRODUCTS,
+	pricing: ERoutes.PRICING,
 };

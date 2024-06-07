@@ -1,6 +1,6 @@
 'use client';
-import { Skeleton } from 'antd';
-import { Menu } from 'lucide-react';
+import { Skeleton, Badge } from 'antd';
+import { Menu, Bell } from 'lucide-react';
 import Image from 'next/image';
 import { FC } from 'react';
 import { User } from '@medusajs/medusa';
@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
 import DrawerMenu from './DrawerMenu';
 import Menubar from './Menubar';
+import { Dropdown } from '@/components/Dropdown';
+import DropdownRender from '../notification/Dropdown';
 
 interface Props {}
 
@@ -50,13 +52,34 @@ const Header: FC<Props> = ({}) => {
 						/>
 					</Link>
 					{/* Mobile: Button Menu */}
-					<Button
-						icon={<Menu />}
-						shape="circle"
-						type="text"
-						onClick={() => onOpen()}
-						className="sm:hidden"
-					/>
+					<Flex>
+						<Dropdown
+							dropdownRender={(menu) => DropdownRender()}
+							trigger={['click']}
+							overlayStyle={{
+								backgroundColor: 'transparent',
+								width: '300px',
+								height: 'calc(100% - 60px)',
+							}}
+							arrow={{ pointAtCenter: true }}
+							className="block lg:hidden"
+						>
+							<a onClick={(e) => e.preventDefault()} className="">
+								<Button type="text" shape="circle">
+									<Badge dot>
+										<Bell color="black" size={20} />
+									</Badge>
+								</Button>
+							</a>
+						</Dropdown>
+						<Button
+							icon={<Menu />}
+							shape="circle"
+							type="text"
+							onClick={() => onOpen()}
+							className="sm:hidden"
+						/>
+					</Flex>
 				</Flex>
 				{/* Desktop: Content Menu */}
 				<Menubar

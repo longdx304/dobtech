@@ -7,7 +7,7 @@ import { Dropdown } from '@/components/Dropdown';
 
 type Props = {
 	actions: MenuProps['items'];
-	onMenuClick: MenuProps['onClick'];
+	onMenuClick?: MenuProps['onClick'];
 };
 
 const ActionAbles: FC<Props> = ({ actions, onMenuClick }) => {

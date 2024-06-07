@@ -11,6 +11,7 @@ interface Props extends ModalProps {
 	handleCancel: () => void;
 	form: any;
 	isLoading?: boolean;
+	footer?: ReactNode;
 }
 
 export default function SubmitModal({
@@ -19,27 +20,38 @@ export default function SubmitModal({
 	form,
 	children,
 	isLoading,
+	footer = null,
 	...props
 }: Props) {
+	const renderFooter = () => {
+		if (footer) return footer;
+		return [
+			<Button
+				key="1"
+				type="default"
+				danger
+				onClick={handleCancel}
+				loading={isLoading}
+			>
+				Huỷ
+			</Button>,
+			<Button
+				htmlType="submit"
+				key="submit"
+				onClick={() => form?.submit()}
+				data-testid="submitButton"
+				loading={isLoading}
+			>
+				Xác nhận
+			</Button>,
+		];
+	};
 	return (
 		<AntdModal
 			className={cn('', className)}
 			// afterClose={() => form.resetFields()}
 			onCancel={handleCancel}
-			footer={[
-				<Button key="1" type="default" danger onClick={handleCancel} loading={isLoading}>
-					Huỷ
-				</Button>,
-				<Button
-					htmlType="submit"
-					key="submit"
-					onClick={() => form?.submit()}
-					data-testid="submitButton"
-					loading={isLoading}
-				>
-					Xác nhận
-				</Button>
-			]}
+			footer={renderFooter()}
 			{...props}
 		>
 			{children}

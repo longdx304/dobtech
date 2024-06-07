@@ -16,7 +16,7 @@ export default function Button({
 }: Props) {
 	return (
 		<AntdButton
-			className={cn('leading-none', className)}
+			className={cn('h-8 text-[14px] leading-none', className)}
 			type={type}
 			size="large"
 			icon={icons}

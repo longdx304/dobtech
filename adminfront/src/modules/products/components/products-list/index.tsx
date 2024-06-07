@@ -136,6 +136,24 @@ const ProductList = ({}: Props) => {
 		500
 	);
 
+	const handleCreateExport = () => {
+		const reqObj = {
+			type: 'product-export',
+			context: {},
+			dry_run: false,
+		};
+
+		createBatchJob.mutate(reqObj, {
+			onSuccess: () => {
+				resetInterval();
+				message.success('Khởi tạo file sản phẩm thành công!');
+			},
+			onError: (err) => {
+				message.error(getErrorMessage(err));
+			},
+		});
+	};
+
 	return (
 		<>
 			<Flex align="center" justify="flex-start" className="">
