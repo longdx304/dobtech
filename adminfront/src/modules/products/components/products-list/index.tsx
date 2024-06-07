@@ -1,14 +1,15 @@
 'use client';
 
 import { Product } from '@medusajs/medusa';
-import { Modal, message } from 'antd';
+import { Modal, message, notification } from 'antd';
 import _ from 'lodash';
-import { CircleAlert, Plus, Search } from 'lucide-react';
+import { CircleAlert, Plus, Search, CloudUpload, Download } from 'lucide-react';
 import {
 	useAdminCollections,
 	useAdminProductCategories,
 	useAdminProducts,
 	useMedusa,
+	useAdminCreateBatchJob,
 } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -19,11 +20,14 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { Title } from '@/components/Typography';
+import { Button } from '@/components/Button';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ProductModal } from '../products-modal';
 import productsColumns from './products-column';
 import { ERoutes } from '@/types/routes';
-
+import { getErrorMessage } from '@/lib/utils';
+import { usePolling } from '@/lib/providers/polling-provider';
+import ImportModal from './import-modal';
 const PAGE_SIZE = 10;
 
 interface Props {}
@@ -32,11 +36,18 @@ const ProductList = ({}: Props) => {
 	const { client } = useMedusa();
 	const router = useRouter();
 	const { state, onOpen, onClose } = useToggleState(false);
+	const {
+		state: stateImport,
+		onOpen: onOpenImport,
+		onClose: onCloseImport,
+	} = useToggleState(false);
+	const { resetInterval } = usePolling();
 
 	const [currentPage, setCurrentPage] = useState(1);
 	const [searchValue, setSearchValue] = useState('');
 	const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
 
+	const createBatchJob = useAdminCreateBatchJob();
 	const { products, isLoading, count, isRefetching, refetch } =
 		useAdminProducts({
 			limit: PAGE_SIZE,
@@ -170,6 +181,25 @@ const ProductList = ({}: Props) => {
 					className="w-[300px]"
 				/>
 			</Flex>
+			<Flex align="center" justify="flex-end" gap="small" className="pb-4">
+				<Button
+					type="default"
+					icon={<CloudUpload size={18} />}
+					className="flex items-center text-sm h-[34px]"
+					onClick={onOpenImport}
+				>
+					{'Nhập file sản phẩm'}
+				</Button>
+				<Button
+					type="default"
+					icon={<Download size={18} />}
+					className="flex items-center text-sm h-[34px]"
+					onClick={handleCreateExport}
+					loading={createBatchJob?.isLoading}
+				>
+					{'Xuất file sản phẩm'}
+				</Button>
+			</Flex>
 			<Table
 				loading={
 					isLoading ||
@@ -191,7 +221,7 @@ const ProductList = ({}: Props) => {
 				scroll={{ x: 700 }}
 			/>
 			<FloatButton
-				className="absolute"
+				// className="absolute"
 				icon={<Plus color="white" size={20} />}
 				type="primary"
 				onClick={onOpen}
@@ -207,6 +237,11 @@ const ProductList = ({}: Props) => {
 					productCollections={collections}
 				/>
 			)}
+			<ImportModal
+				state={stateImport}
+				handleOk={onCloseImport}
+				handleCancel={onCloseImport}
+			/>
 		</>
 	);
 };

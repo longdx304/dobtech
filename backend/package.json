@@ -25,6 +25,7 @@
     "dev": "cross-env npm run build:server && medusa develop"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.583.0",
     "@medusajs/cache-inmemory": "latest",
     "@medusajs/cache-redis": "latest",
     "@medusajs/event-bus-local": "latest",

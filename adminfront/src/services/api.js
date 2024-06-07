@@ -618,6 +618,10 @@ export default {
 
       return medusaRequest("POST", "/admin/uploads", formData)
     },
+		delete(payload) {
+			const path = `/admin/upload-file`
+			return medusaRequest("DELETE", path, payload)
+		}
   },
 
   draftOrders: {

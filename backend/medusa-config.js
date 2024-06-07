@@ -40,19 +40,9 @@ const plugins = [
   {
     resolve: `@medusajs/file-local`,
     options: {
-      upload_dir: 'uploads',
+      upload_dir: "uploads",
     },
   },
-  // {
-  //   resolve: '@medusajs/admin',
-  //   /** @type {import('@medusajs/admin').PluginOptions} */
-  //   options: {
-  //     autoRebuild: true,
-  //     develop: {
-  //       open: process.env.OPEN_BROWSER !== 'false',
-  //     },
-  //   },
-  // },
   {
     resolve: `medusa-file-s3`,
     options: {

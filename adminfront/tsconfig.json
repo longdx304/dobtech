@@ -25,7 +25,8 @@
 			"@/actions/*": ["actions/*"],
 			"@/services/*": ["services/*"],
 			"@/modules/*": ["modules/*"],
-			"@/types/*": ["types/*"]
+			"@/types/*": ["types/*"],
+			"@/utils/*": ["utils/*"]
 		}
 	},
 	"include": [

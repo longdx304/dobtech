@@ -6,7 +6,7 @@ import { FC } from 'react';
 import { User } from '@medusajs/medusa';
 import Link from 'next/link';
 
-import { Button } from '@/components/Button';
+import { Button, FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import useToggleState from '@/lib/hooks/use-toggle-state';
