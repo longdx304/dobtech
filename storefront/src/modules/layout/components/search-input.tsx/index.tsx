@@ -7,7 +7,7 @@ import SuggestSearch from '@/modules/search/components/suggest-search';
 import { Input, Menu } from 'antd';
 import _ from 'lodash';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 
 const { Search } = Input;
 

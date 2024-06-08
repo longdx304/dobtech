@@ -1,16 +1,24 @@
-import { Customer } from '@medusajs/medusa';
+'use client';
+
+import { ProductPreviewType } from '@/types/product';
+import OverviewDesktop from './OverviewDesktop';
 import OverviewMobile from './OverviewMobile';
 
 type OverviewProps = {
-  customer: Omit<Customer, 'password_hash'> | null;
+  products: {
+    products: ProductPreviewType[];
+    count: number;
+  };
 };
 
-const Overview = ({ customer }: OverviewProps) => {
+const Overview = ({ products }: OverviewProps) => {
   return (
     <>
-      <div className='hidden lg:block'>Desktop</div>
+      <div className='hidden lg:block'>
+        <OverviewDesktop />
+      </div>
       <div className='block lg:hidden'>
-        <OverviewMobile customer={customer} />
+        <OverviewMobile products={products} />
       </div>
     </>
   );
