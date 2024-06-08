@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
+import { getProductsList } from '@/actions/products';
 import Overview from '@/modules/user/components/overview';
-import { getCustomer } from '@/actions/customer';
 
 export const metadata: Metadata = {
   title: 'CHAMDEP VN | Trang cá nhân',
@@ -9,11 +9,13 @@ export const metadata: Metadata = {
 };
 
 export default async function UserPage() {
-  const customer = await getCustomer().catch(() => null)
-  
+  const { response } = await getProductsList({
+    pageParam: 0,
+  } as any);
+
   return (
-    <div className='w-full box-border pt-[4rem] lg:pt-[8rem]'>
-      <Overview customer={customer} />
-    </div>
+    <>
+      <Overview products={response} />
+    </>
   );
 }

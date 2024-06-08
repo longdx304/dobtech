@@ -19,7 +19,7 @@ const Menu: FC<Props> = ({ categories }) => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  const showMenu = ['/'];
+  const showMenu = ['/', '/user'];
 
   if (!showMenu.includes(pathname)) return null;
   return (

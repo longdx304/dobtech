@@ -1,4 +1,5 @@
 import { medusaClient } from '@/lib/database/config';
+import medusaError from '@/lib/utils/medusa-error';
 import { StorePostAuthReq } from '@medusajs/medusa';
 import { cookies } from 'next/headers';
 
@@ -47,4 +48,13 @@ export async function getToken(credentials: StorePostAuthReq) {
     .catch((err) => {
       throw new Error("Lỗi: Email hoặc mật khẩu không đúng")
     })
+}
+
+export async function authenticate(credentials: StorePostAuthReq) {
+  const headers = getMedusaHeaders(["auth"])
+
+  return medusaClient.auth
+    .authenticate(credentials, headers)
+    .then(({ customer }) => customer)
+    .catch((err) => medusaError(err))
 }

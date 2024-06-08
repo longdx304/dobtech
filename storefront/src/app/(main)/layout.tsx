@@ -62,7 +62,7 @@ export default async function PageLayout({
 						<RegionProvider regionData={region!}>
 							<Header categories={formatCategories} />
 							<Menu categories={formatCategories} />
-							<div className="pb-20">{children}</div>
+							<div className="">{children}</div>
 						</RegionProvider>
 					</MedusaProvider>
 				</App>

@@ -1,35 +1,25 @@
-'use client';
-
 import { Drawer } from '@/components/Drawer';
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { Customer } from '@medusajs/medusa';
-import {
-  ChevronRight,
-  CircleDollarSign,
-  Gift,
-  HandCoins,
-  Headset,
-  MessageSquareQuote,
-  NotebookPen,
-  PackageSearch,
-  Settings,
-  SquareArrowLeft,
-  SquareCheckBig,
-  TicketPercent,
-  Truck,
-  Wallet,
-  WalletMinimal,
-} from 'lucide-react';
+import ProductList from '@/modules/products/components/product-list';
+import { ProductPreviewType } from '@/types/product';
+import { Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import LoginTemplate from '../../templates/login-template';
+import { useCustomer } from '@/lib/providers/user/user-provider';
 
 type OverviewMobileProps = {
-  customer: Omit<Customer, 'password_hash'> | null;
+  products: {
+    products: ProductPreviewType[];
+    count: number;
+  };
 };
 
-const OverviewMobile = ({ customer }: OverviewMobileProps) => {
+const OverviewMobile = ({ products }: OverviewMobileProps) => {
   const { state, onOpen, onClose } = useToggleState(false);
+  const router = useRouter();
+  const { customer } = useCustomer();
 
   const handleLoginClick = () => {
     if (!customer) {
@@ -37,7 +27,12 @@ const OverviewMobile = ({ customer }: OverviewMobileProps) => {
     }
   };
 
+  console.log('customer', customer);
 
+  const onCloseDrawer = () => {
+    router.refresh();
+    onClose();
+  };
   return (
     <>
       {/* Login / Register */}
@@ -55,12 +50,13 @@ const OverviewMobile = ({ customer }: OverviewMobileProps) => {
         >
           <Text className='text-lg font-semibold'>
             {customer
-              ? `Welcome, ${customer.first_name}`
+              ? `Chào, ${customer.first_name} ${customer.last_name}`
               : 'Đăng nhập / Đăng ký'}
           </Text>
-          <Settings size={24} />
+          <Settings size={24} onClick={() => router.push('/user/setting')} />
         </Flex>
-        <Flex align='center' justify='space-between' className='px-4 pt-2 pb-4'>
+
+        {/* <Flex align='center' justify='space-between' className='px-4 pt-2 pb-4'>
           <Flex
             align='center'
             className='flex-col gap-1'
@@ -101,11 +97,11 @@ const OverviewMobile = ({ customer }: OverviewMobileProps) => {
             <Gift size={24} />
             <Text className='text-xs'>Quà tặng</Text>
           </Flex>
-        </Flex>
+        </Flex> */}
       </Flex>
 
       {/* My order */}
-      <Flex
+      {/* <Flex
         className='flex-col space-y-2 py-4'
         style={{ borderBottom: '11px solid #f6f6f6' }}
       >
@@ -167,10 +163,10 @@ const OverviewMobile = ({ customer }: OverviewMobileProps) => {
             <Text className='text-xs'>Trả lại</Text>
           </Flex>
         </Flex>
-      </Flex>
+      </Flex> */}
 
       {/* Services */}
-      <Flex
+      {/* <Flex
         className='flex-col space-y-2 py-4'
         style={{ borderBottom: '11px solid #f6f6f6' }}
       >
@@ -219,6 +215,16 @@ const OverviewMobile = ({ customer }: OverviewMobileProps) => {
             <Text className='text-xs'>Theo dõi</Text>
           </Flex>
         </Flex>
+      </Flex> */}
+
+      {/* Products */}
+      <Flex className='flex-col space-y-2 py-4'>
+        <h2 className='w-full h-[50px] flex justify-center items-center bg-[#f6f6f6] mt-0 text-sm'>
+          ⬥ Bạn có lẽ cũng thích ⬥
+        </h2>
+        <div className='px-4'>
+          <ProductList data={products} />
+        </div>
       </Flex>
 
       <Drawer
@@ -230,7 +236,7 @@ const OverviewMobile = ({ customer }: OverviewMobileProps) => {
           wrapper: { height: '100%' },
         }}
       >
-        <LoginTemplate onCloseDrawer={onClose} />
+        <LoginTemplate onCloseDrawer={onCloseDrawer} />
       </Drawer>
     </>
   );

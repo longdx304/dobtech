@@ -3,7 +3,6 @@ import { Checkbox } from '@/components/Checkbox';
 import { Input, InputPassword } from '@/components/Input';
 import { Form, message } from 'antd';
 import { Lock, Mail } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { logCustomerIn } from '../../actions';
 import { LOGIN_VIEW } from '../../templates/login-template';
 
@@ -14,13 +13,11 @@ type Props = {
 
 const Login = ({ setCurrentView, onCloseDrawer }: Props) => {
   const [form] = Form.useForm();
-  const router = useRouter();
 
   const onFinish = async (values: any) => {
     try {
       await logCustomerIn(values);
       message.success('Đăng nhập thành công!');
-      router.refresh();
       onCloseDrawer();
     } catch (error: any) {
       message.error(
@@ -66,7 +63,7 @@ const Login = ({ setCurrentView, onCloseDrawer }: Props) => {
             data-testid='password'
           />
         </Form.Item>
-        <Form.Item >
+        <Form.Item>
           <Form.Item name='remember' valuePropName='checked' noStyle>
             <Checkbox>Remember me</Checkbox>
           </Form.Item>
