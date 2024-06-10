@@ -93,8 +93,8 @@ const PricingCreate: FC<Props> = ({ state, handleOk, handleCancel }) => {
 	}) => {
 		let flag: boolean = false;
 		const payload: CreatePricingList = {
-			name: detailForm?.genral?.name || '',
-			description: detailForm?.genral?.description || '',
+			name: detailForm?.general?.name || '',
+			description: detailForm?.general?.description || '',
 			type: detailForm?.type?.value,
 			customer_groups:
 				detailForm?.customer_groups?.ids?.map((item) => ({

@@ -8,6 +8,6 @@ interface Props extends AntdDatePickerProps {
 
 export default function DatePicker({ error, className, ...props }: Props) {
 	return (
-			<AntdDatePicker className={cn('px-[6px] py-2 gap-2', className)} {...props} allowClear />
+			<AntdDatePicker className={cn('px-[6px] py-2 gap-2', className)} {...props} allowClear format="DD/MM/YYYY" />
 	);
 }

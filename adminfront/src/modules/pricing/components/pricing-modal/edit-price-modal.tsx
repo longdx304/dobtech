@@ -48,7 +48,7 @@ const PricesModal = ({
 	}, [product, isCancel, discountPercent]);
 
 	const formatProduct = () => {
-		const { variants } = product || [];
+		const { variants } = product || ([] as any);
 		if (!variants?.length) {
 			setDataSource([]);
 			return;
@@ -58,45 +58,11 @@ const PricesModal = ({
 	};
 
 	const onFinish = async () => {
-		console.log('variant', editedPrices?.current);
 		const newVariant = editedPrices?.current;
-		product.variants = newVariant;
+		if (product) {
+			product.variants = newVariant;
+		}
 		handleOk();
-		// setProductsData((prev) => [...prev, newVariant]);
-
-		// Update prices for each variant
-		// const promise = newVariant?.map((variant: any) => {
-		// 	const pricesPayload: Partial<MoneyAmount>[] = [];
-		// 	// Get all prices keys
-		// 	const priceKeys = Object.keys(variant?.pricesFormatEdit);
-		// 	// Check if price key is in variant prices
-		// 	priceKeys.forEach((priceKey) => {
-		// 		// Find price by currency code
-		// 		const findPrice =
-		// 			variant?.prices?.find(
-		// 				(item: any) => item.currency_code === priceKey
-		// 			) || {};
-		// 		// Check if price is not empty
-		// 		if (!_.isEmpty(findPrice)) {
-		// 			// Check if price is different from current price
-		// 			if (variant.pricesFormatEdit[priceKey] !== findPrice.amount) {
-		// 				pricesPayload.push({
-		// 					...findPrice,
-		// 					amount: variant.pricesFormatEdit[priceKey],
-		// 				});
-		// 			}
-		// 		} else {
-		// 			// If price is empty
-		// 			pricesPayload.push({
-		// 				currency_code: priceKey,
-		// 				amount: variant.pricesFormatEdit[priceKey],
-		// 			});
-		// 		}
-		// 	});
-		// 	// Update prices
-		// 	// @ts-ignore
-		// });
-
 	};
 
 	const onPriceUpdate = (prices: Record<string, number | undefined>[]) => {

@@ -2,40 +2,55 @@
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Title } from '@/components/Typography';
-import { Plus, Search } from 'lucide-react';
+import { CircleAlert, Plus, Search } from 'lucide-react';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import _ from 'lodash';
 import { Card } from '@/components/Card';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { Table } from '@/components/Table';
 import { FloatButton } from '@/components/Button';
-import { useAdminPriceLists } from 'medusa-react';
+import { useAdminPriceLists, useMedusa } from 'medusa-react';
 import pricingColumns from './pricing-column';
 import PricingCreate from '@/modules/pricing/components/pricing-modal/pricing-create';
+import { Modal, message } from 'antd';
+import { getErrorMessage } from '@/lib/utils';
+import { PriceList } from '@medusajs/medusa';
+import PriceDetailModal from '../components/pricing-detail-modal';
+import PriceProductModal from '../components/pricing-product-modal';
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
 
 const PricingList: FC<Props> = ({}) => {
+	const { client } = useMedusa();
 	const {
 		state: statePricing,
 		onOpen: onOpenPricing,
 		onClose: onClosePricing,
 	} = useToggleState(false);
+	const {
+		state: statePriceDetail,
+		onOpen: onOpenPriceDetail,
+		onClose: onClosePriceDetail,
+	} = useToggleState(false);
+	const {
+		state: statePriceList,
+		onOpen: onOpenPriceList,
+		onClose: onClosePriceList,
+	} = useToggleState(false);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
-	const [currentPricing, setCurrentPricing] = useState<any>(null);
-	const [pricingId, setPricingId] = useState<string>('');
+	const [currentPricing, setCurrentPricing] = useState<PriceList | null>(null);
 
-	const [currentPage, setCurrentPage] = useState(1);
-
-	const { price_lists, isLoading, isRefetching, count } = useAdminPriceLists({
-		offset,
-		limit: DEFAULT_PAGE_SIZE,
-		q: searchValue || undefined,
-	});
+	const { price_lists, isLoading, isRefetching, count, refetch } =
+		useAdminPriceLists({
+			offset,
+			limit: DEFAULT_PAGE_SIZE,
+			q: searchValue || undefined,
+			expand: 'customer_groups',
+		});
 
 	const handleChangeDebounce = _.debounce(
 		(e: ChangeEvent<HTMLInputElement>) => {
@@ -50,8 +65,71 @@ const PricingList: FC<Props> = ({}) => {
 		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
+	const handleEditPricing = (record: PriceList) => {
+		setCurrentPricing(record);
+		onOpenPriceDetail();
+	};
+
+	const handleListProduct = (record: PriceList) => {
+		setCurrentPricing(record);
+		onOpenPriceList();
+	};
+
+	const handleChangeStatue = (record: PriceList) => {
+		const { id, status } = record;
+		const statusValue = status === 'draft' ? 'active' : 'draft';
+		if (status) {
+			// @ts-ignore
+			client.admin.priceLists
+				.update(id, {
+					status: statusValue as any,
+				})
+				.then(() => {
+					message.success('Cập nhật trạng thái thành công');
+					refetch();
+				})
+				.catch((err) => {
+					message.error(getErrorMessage(err));
+				});
+		}
+	};
+
+	const handleDeletePricing = (id: string) => {
+		Modal.confirm({
+			title: 'Xác nhận muốn xoá định giá này?',
+			content: 'Bạn có chắc chắn muốn xóa định giá này không?',
+			icon: (
+				<CircleAlert
+					style={{ width: 32, height: 24 }}
+					className="mr-2"
+					color="#E7B008"
+				/>
+			),
+			okType: 'danger',
+			okText: 'Đồng ý',
+			cancelText: 'Huỷ',
+			async onOk() {
+				client.admin.priceLists
+					.delete(id)
+					.then(() => {
+						message.success('Xoá định giá thành công');
+						refetch();
+					})
+					.catch((err) => {
+						message.error(getErrorMessage(err));
+					});
+			},
+			onCancel() {},
+		});
+	};
+
 	const columns = useMemo(() => {
-		return pricingColumns({});
+		return pricingColumns({
+			handleEditPricing,
+			handleChangeStatue,
+			handleDeletePricing,
+			handleListProduct,
+		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [price_lists]);
 
@@ -97,6 +175,22 @@ const PricingList: FC<Props> = ({}) => {
 				handleOk={onClosePricing}
 				handleCancel={onClosePricing}
 			/>
+			{currentPricing && statePriceDetail && (
+				<PriceDetailModal
+					state={statePriceDetail}
+					handleOk={() => onClosePriceDetail()}
+					handleCancel={() => onClosePriceDetail()}
+					priceList={currentPricing}
+				/>
+			)}
+			{currentPricing && statePriceList && (
+				<PriceProductModal
+					state={statePriceList}
+					handleOk={() => onClosePriceList()}
+					handleCancel={() => onClosePriceList()}
+					id={currentPricing.id}
+				/>
+			)}
 		</Card>
 	);
 };

@@ -1,9 +1,22 @@
 import { ActionAbles } from '@/components/Dropdown';
-import { Pencil, Trash } from 'lucide-react';
+import { Flex } from '@/components/Flex';
+import { Text } from '@/components/Typography';
+import { PriceList } from '@medusajs/medusa';
+import { Dot, MonitorX, PackagePlus, Pencil, Trash } from 'lucide-react';
 
-type Props = {};
+type Props = {
+	handleDeletePricing: (id: string) => void;
+	handleEditPricing: (record: PriceList) => void;
+	handleChangeStatue: (record: PriceList) => void;
+	handleListProduct: (record: PriceList) => void;
+};
 
-const pricingColumns = ({}: Props) => [
+const pricingColumns = ({
+	handleEditPricing,
+	handleDeletePricing,
+	handleChangeStatue,
+	handleListProduct,
+}: Props) => [
 	{
 		title: 'Tên',
 		dataIndex: 'name',
@@ -25,13 +38,31 @@ const pricingColumns = ({}: Props) => [
 		key: 'status',
 		width: 150,
 		className: 'text-xs',
+		render: (_: string) => {
+			return (
+				<Flex justify="flex-start" align="center" gap="2px">
+					<Dot
+						color={_ === 'active' ? 'rgb(52 211 153)' : 'rgb(156 163 175)'}
+						size={20}
+						strokeWidth={3}
+						className="w-[20px]"
+					/>
+					<Text className="text-xs">
+						{_ === 'active' ? 'Đã xuất bản' : 'Bản nháp'}
+					</Text>
+				</Flex>
+			);
+		},
 	},
 	{
-		title: 'Nhom người dùng',
-		dataIndex: 'customer_group',
-		key: 'customer_group',
+		title: 'Nhóm người dùng',
+		dataIndex: 'customer_groups',
+		key: 'customer_groups',
 		width: 150,
 		className: 'text-xs',
+		render: (_: any) => {
+			return _?.length || '-';
+		},
 	},
 	{
 		title: '',
@@ -40,20 +71,40 @@ const pricingColumns = ({}: Props) => [
 		fixed: 'right',
 		className: 'text-xs',
 		align: 'center',
-		render: (_: any, record: any) => {
+		render: (_: any, record: PriceList) => {
 			const actions = [
 				{
-					label: 'Sửa',
+					label: 'Chỉnh sửa thông tin chung',
 					icon: <Pencil size={20} />,
 					onClick: () => {
-						console.log('edit', record);
+						handleEditPricing(record);
+					},
+				},
+				{
+					label: 'Danh sách sản phẩm',
+					icon: <PackagePlus size={20} />,
+					onClick: () => {
+						handleListProduct(record);
+					},
+				},
+				{
+					label: (
+						<span className="w-full">
+							{record.status === 'active' ? 'Ngừng xuất bản' : 'Xuất bản'}
+						</span>
+					),
+					key: 'stop-publishing',
+					icon: <MonitorX size={20} />,
+					onClick: () => {
+						handleChangeStatue(record);
 					},
 				},
 				{
 					label: 'Xóa',
 					icon: <Trash size={20} />,
+					danger: true,
 					onClick: () => {
-						console.log('delete', record);
+						handleDeletePricing(record.id);
 					},
 				},
 			];
