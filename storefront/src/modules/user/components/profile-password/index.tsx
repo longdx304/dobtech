@@ -5,17 +5,25 @@ import { Flex } from '@/components/Flex';
 import { InputPassword } from '@/components/Input';
 import { Text } from '@/components/Typography';
 import { useCustomer } from '@/lib/providers/user/user-provider';
-import { Form, message } from 'antd';
+import { Form, FormProps, message } from 'antd';
 import { ChevronLeft, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { updateCustomerPassword } from '../../actions';
+
+type ProfilePasswordProps = {
+  old_password: string;
+  new_password: string;
+  confirm_password: string;
+};
 
 const ProfilePassword = () => {
   const router = useRouter();
   const [form] = Form.useForm();
   const { customer } = useCustomer();
 
-  const onFinish = async (values: any) => {
+  const onFinish: FormProps<ProfilePasswordProps>['onFinish'] = async (
+    values
+  ) => {
     try {
       await updateCustomerPassword(customer!, values);
       message.success('Cập nhật mật khẩu thành công!');
@@ -47,7 +55,7 @@ const ProfilePassword = () => {
 
       <Form form={form} onFinish={onFinish} className='w-full p-3'>
         <Form.Item
-          name='oke_password'
+          name='old_password'
           rules={[
             { required: true, message: 'Mật khẩu phải có ít nhất 2 ký tự!' },
           ]}

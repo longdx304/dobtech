@@ -37,7 +37,7 @@ const UserSetting = () => {
       title: 'Sổ địa chỉ',
       href: ERoutes.USER_ADDRESSBOOK,
     },
-    { title: 'Về chúng tôi', href: ERoutes.DASHBOARD },
+    // { title: 'Về chúng tôi', href: ERoutes.DASHBOARD },
   ];
 
   const handleLogout = async () => {

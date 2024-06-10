@@ -1,6 +1,6 @@
 import { Button } from '@/components/Button';
 import { Customer } from '@medusajs/medusa';
-import { Form, message } from 'antd';
+import { Form, FormProps, message } from 'antd';
 import { useRouter } from 'next/navigation';
 import { updateCustomerEmail } from '../../actions';
 import { useEffect } from 'react';
@@ -10,6 +10,10 @@ import { useCustomer } from '@/lib/providers/user/user-provider';
 type TCustomer = {
   onClose: () => void;
   state: boolean;
+};
+
+type EmailProps = {
+  email: string;
 };
 
 const EditEmail = ({ onClose, state }: TCustomer) => {
@@ -23,7 +27,7 @@ const EditEmail = ({ onClose, state }: TCustomer) => {
     }
   }, [state, form]);
 
-  const onFinish = async (values: any) => {
+  const onFinish: FormProps<EmailProps>['onFinish'] = async (values) => {
     try {
       const result = await updateCustomerEmail(values);
       if (result.success) {

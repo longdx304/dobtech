@@ -3,7 +3,7 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Text } from '@/components/Typography';
 import { Customer } from '@medusajs/medusa';
-import { Form, message } from 'antd';
+import { Form, FormProps, message } from 'antd';
 import { Phone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -14,6 +14,10 @@ type EditPhoneProps = {
   onClose: () => void;
   state: boolean;
   customer: Omit<Customer, 'password_hash'> | null;
+};
+
+type PhoneProps = {
+  phone: string;
 };
 
 const EditPhone = ({ onClose, state, customer }: EditPhoneProps) => {
@@ -27,7 +31,7 @@ const EditPhone = ({ onClose, state, customer }: EditPhoneProps) => {
     }
   }, [state, form]);
 
-  const onFinish = async (values: any) => {
+  const onFinish: FormProps<PhoneProps>['onFinish'] = async (values) => {
     try {
       const result = await updateCustomerPhone(values);
       if (result.success) {

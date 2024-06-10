@@ -5,18 +5,23 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Text } from '@/components/Typography';
 import { Customer } from '@medusajs/medusa';
-import { Form, message } from 'antd';
+import { Form, FormProps, message } from 'antd';
 import { ChevronLeft, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { updateCustomerName } from '../../actions';
 import { useCustomer } from '@/lib/providers/user/user-provider';
+
+type ProfileNameProps = {
+  firstName: string;
+  lastName: string;
+};
 
 const ProfileName = () => {
   const { customer, setCustomer } = useCustomer();
   const router = useRouter();
   const [form] = Form.useForm();
 
-  const onFinish = async (values: any) => {
+  const onFinish: FormProps<ProfileNameProps>['onFinish'] = async (values) => {
     try {
       const result = await updateCustomerName(values);
       if (result.success) {
