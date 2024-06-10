@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { Input, InputPassword } from '@/components/Input';
-import { Form, message } from 'antd';
+import { Form, FormProps, message } from 'antd';
 import { Lock, Mail } from 'lucide-react';
 import { logCustomerIn } from '../../actions';
 import { LOGIN_VIEW } from '../../templates/login-template';
@@ -11,10 +11,15 @@ type Props = {
   onCloseDrawer: () => void;
 };
 
+type LoginProps = {
+  email: string;
+  password: string;
+};
+
 const Login = ({ setCurrentView, onCloseDrawer }: Props) => {
   const [form] = Form.useForm();
 
-  const onFinish = async (values: any) => {
+  const onFinish: FormProps<LoginProps>['onFinish'] = async (values) => {
     try {
       await logCustomerIn(values);
       message.success('Đăng nhập thành công!');

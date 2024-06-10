@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/Button';
 import { Input, InputPassword } from '@/components/Input';
-import { Form, message } from 'antd';
+import { Form, FormProps, message } from 'antd';
 import { Lock, Mail, Phone, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { signUp } from '../../actions';
@@ -13,11 +13,19 @@ type Props = {
   onCloseDrawer: () => void;
 };
 
+type RegisterProps = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+};
+
 const Register = ({ setCurrentView, onCloseDrawer }: Props) => {
   const [form] = Form.useForm();
   const router = useRouter();
 
-  const onFinish = async (values: any) => {
+  const onFinish: FormProps<RegisterProps>['onFinish'] = async (values) => {
     console.log('values onFinish:', values);
     try {
       await signUp(values);
