@@ -13,9 +13,5 @@ export default async function UserPage() {
     pageParam: 0,
   } as any);
 
-  return (
-    <>
-      <Overview products={response} />
-    </>
-  );
+  return <Overview products={response} />;
 }

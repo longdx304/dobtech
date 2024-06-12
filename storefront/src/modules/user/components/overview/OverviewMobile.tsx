@@ -27,12 +27,11 @@ const OverviewMobile = ({ products }: OverviewMobileProps) => {
     }
   };
 
-  console.log('customer', customer);
-
   const onCloseDrawer = () => {
     router.refresh();
     onClose();
   };
+  
   return (
     <>
       {/* Login / Register */}

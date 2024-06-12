@@ -5,10 +5,13 @@ import { Form, FormProps, message } from 'antd';
 import { Lock, Mail } from 'lucide-react';
 import { logCustomerIn } from '../../actions';
 import { LOGIN_VIEW } from '../../templates/login-template';
+import { useRouter } from 'next/navigation';
+import { ERoutes } from '@/types/routes';
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void;
-  onCloseDrawer: () => void;
+  onCloseDrawer?: () => void;
+  isDesktop: boolean;
 };
 
 type LoginProps = {
@@ -16,14 +19,19 @@ type LoginProps = {
   password: string;
 };
 
-const Login = ({ setCurrentView, onCloseDrawer }: Props) => {
+const Login = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
   const [form] = Form.useForm();
+  const router = useRouter();
 
   const onFinish: FormProps<LoginProps>['onFinish'] = async (values) => {
     try {
       await logCustomerIn(values);
       message.success('Đăng nhập thành công!');
-      onCloseDrawer();
+      if (!isDesktop) {
+        onCloseDrawer?.();
+      } else {
+        router.push(`/${ERoutes.USER}`);
+      }
     } catch (error: any) {
       message.error(
         error.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'
@@ -32,7 +40,7 @@ const Login = ({ setCurrentView, onCloseDrawer }: Props) => {
   };
 
   return (
-    <div className='login-form max-w-sm flex flex-col items-center'>
+    <div className='login-form flex flex-col items-center'>
       <h1 className='text-large-semi uppercase'>CHAMDEP</h1>
       <Form form={form} onFinish={onFinish}>
         <Form.Item

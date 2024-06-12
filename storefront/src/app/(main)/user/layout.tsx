@@ -1,16 +1,15 @@
-import { getCustomer } from '@/actions/customer';
-import { CustomerProvider } from '@/lib/providers/user/user-provider';
+import Sidebar from '@/modules/user/components/user-sidebar';
 import { ReactNode } from 'react';
 
 interface UserLayoutProps {
   children: ReactNode;
 }
-export default async function UserLayout({ children }: UserLayoutProps) {
-  const customer = await getCustomer();
 
+export default function UserLayout({ children }: UserLayoutProps) {
   return (
-    <CustomerProvider initialCustomer={customer}>
-      <div className='w-full box-border pt-[1rem]'>{children}</div>
-    </CustomerProvider>
+    <div className='w-full box-border lg:container pt-[1rem] lg:pt-[6rem] lg:flex'>
+      <Sidebar className='hidden lg:block' />
+      <div className='w-full lg:p-3'>{children}</div>
+    </div>
   );
 }
