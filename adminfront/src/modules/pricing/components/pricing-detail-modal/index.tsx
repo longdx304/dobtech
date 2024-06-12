@@ -34,6 +34,7 @@ const PriceDetailModal: FC<Props> = ({
 				description: priceList.description,
 			},
 		});
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [priceList]);
 

@@ -1,7 +1,7 @@
 import { Flex } from '@/components/Flex';
 import { Input, InputNumber } from '@/components/Input';
 import { Text, Title } from '@/components/Typography';
-import { Col, Form, FormProps, Row, Spin } from 'antd';
+import { Col, Row, Spin } from 'antd';
 import { Search } from 'lucide-react';
 import { ChangeEvent, FC, useState, useEffect } from 'react';
 import _ from 'lodash';
@@ -13,26 +13,22 @@ import { Product } from '@medusajs/medusa';
 import PricesModal from './edit-price-modal';
 
 type Props = {
-	setPriceForm: (data: any) => void;
-	setCurrentStep: (step: number) => void;
 	productForm: string[] | null;
 	productsData: any | null;
 	setProductsData: (data: any) => void;
+	priceListId?: string;
 };
 
 const PriceForm: FC<Props> = ({
-	setPriceForm,
-	setCurrentStep,
 	productForm,
 	productsData,
 	setProductsData,
+	priceListId,
 }) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const { state, onOpen, onClose } = useToggleState(false);
 	const [product, setProduct] = useState<any>(null);
-	// const [productsData, setProductsData] = useState<any>(null);
 	const [discountPercent, setDiscountPercent] = useState<number>(0);
-	const [editPriceData, setEditPriceData] = useState<any>(null);
 
 	const { products, isLoading, isError } = useAdminProducts(
 		{
@@ -56,18 +52,31 @@ const PriceForm: FC<Props> = ({
 				variants.forEach((variant: any) => {
 					variant.pricesFormat = variant.prices.reduce(
 						(acc: Record<string, number>, price: any) => {
-							acc[price.currency_code] = price.amount;
+							if (
+								(priceListId && price?.price_list_id === priceListId) ||
+								(!priceListId && !price?.price_list_id)
+							) {
+								acc[price.currency_code] = price.amount;
+								return acc;
+							}
 							return acc;
 						},
 						{}
 					);
 					// Add prices format edit
 					variant.pricesFormatEdit = variant.prices.reduce(
-						(acc: Record<string, number>, price: any) => {
-							const amount = price.amount;
-							const discountValue = (amount * discountPercent) / 100 || 0;
-							const priceValue = amount ? amount - discountValue : 0;
-							acc[price.currency_code] = Math.floor(priceValue);
+						(acc: Record<string, number | string>, price: any) => {
+							if (
+								(priceListId && price?.price_list_id === priceListId) ||
+								(!priceListId && !price?.price_list_id)
+							) {
+								const amount = price.amount;
+								const discountValue = (amount * discountPercent) / 100 || 0;
+								const priceValue = amount ? amount - discountValue : 0;
+								acc[price.currency_code] = Math.floor(priceValue);
+								priceListId && (acc[`${price.currency_code}_id`] = price.id);
+								return acc;
+							}
 							return acc;
 						},
 						{}
@@ -93,12 +102,9 @@ const PriceForm: FC<Props> = ({
 		onOpen();
 	};
 
-	const onChangeDiscountPercent = _.debounce(
-		(value: number | string | undefined) => {
-			setDiscountPercent(value);
-		},
-		150
-	);
+	const onChangeDiscountPercent = _.debounce((value: number) => {
+		setDiscountPercent(value);
+	}, 150);
 
 	if (isLoading) {
 		return (
@@ -140,7 +146,7 @@ const PriceForm: FC<Props> = ({
 					className="w-full"
 					variant="borderless"
 					placeholder="Nhập số % giảm giá"
-					onChange={onChangeDiscountPercent}
+					onChange={onChangeDiscountPercent as any}
 				/>
 			</Col>
 			<Col span={24} className="">
@@ -158,7 +164,7 @@ const PriceForm: FC<Props> = ({
 				span={24}
 				className="relative flex h-[400px] flex-1 flex-col overflow-y-auto"
 			>
-				{productsData?.map((product) => {
+				{productsData?.map((product: Product) => {
 					return (
 						<div key={product.id}>
 							<div className="bg-gray-100 border-solid border-gray-200 border-0 border-b sticky top-0 flex items-center justify-between p-4">

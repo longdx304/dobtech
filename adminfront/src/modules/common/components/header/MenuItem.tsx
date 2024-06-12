@@ -10,6 +10,7 @@ import {
 	Users,
 	LayoutList,
 	CircleDollarSign,
+	UsersRound,
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -49,6 +50,7 @@ const itemOverview = (role: string, permissions: string[]) =>
 		role === 'admin' && getItem('Quản lý nhân viên', 'overview-1', <Users />),
 		role === 'admin' && getItem('Danh mục', 'overview-2', <LayoutList />),
 		role === 'admin' && getItem('Định giá', 'pricing', <CircleDollarSign />),
+		role === 'admin' && getItem('Khách hàng', 'customers', <UsersRound />),
 		getItem('Quản lý sản phẩm', 'overview-3', <ClipboardPenLine />),
 		getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
 		getItem('Label', 'overview-5', <Settings />, [
@@ -121,4 +123,5 @@ export const menuRoutes: Record<string, string> = {
 	'overview-2': ERoutes.PRODUCT_CATEGORIES,
 	'overview-3': ERoutes.PRODUCTS,
 	pricing: ERoutes.PRICING,
+	customers: ERoutes.CUSTOMERS,
 };

@@ -8,15 +8,12 @@ import { FC, useMemo, useState } from 'react';
 import DetailForm from './detail-form';
 import ProductsForm from './products-form';
 import PriceForm from './price-form';
-import {
-	CreatePricingType,
-	DetailFormType,
-	CreatePricingList,
-} from '@/types/price';
+import { DetailFormType, CreatePricingList, PricePayload } from '@/types/price';
 import { CircleAlert } from 'lucide-react';
 import _ from 'lodash';
 import { useAdminCreatePriceList } from 'medusa-react';
 import { getErrorMessage } from '@/lib/utils';
+import { MoneyAmount, Product } from '@medusajs/medusa';
 
 type Props = {
 	state: boolean;
@@ -95,17 +92,21 @@ const PricingCreate: FC<Props> = ({ state, handleOk, handleCancel }) => {
 		const payload: CreatePricingList = {
 			name: detailForm?.general?.name || '',
 			description: detailForm?.general?.description || '',
-			type: detailForm?.type?.value,
+			type: detailForm?.type?.value || undefined,
 			customer_groups:
 				detailForm?.customer_groups?.ids?.map((item) => ({
 					id: item,
 				})) || undefined,
 			status,
-			starts_at: detailForm?.dates?.starts_at ? new Date(detailForm?.dates?.starts_at) : undefined,
-			ends_at: detailForm?.dates?.ends_at ? new Date(detailForm?.dates?.ends_at) : undefined,
+			starts_at: detailForm?.dates?.starts_at
+				? new Date(detailForm?.dates?.starts_at)
+				: undefined,
+			ends_at: detailForm?.dates?.ends_at
+				? new Date(detailForm?.dates?.ends_at)
+				: undefined,
 			prices: _.flatten(
-				products?.map((product) => {
-					const variants = product.variants.map((variant) => {
+				products?.map((product: Product) => {
+					const variants = product.variants.map((variant: any) => {
 						const pricesPayload: Partial<MoneyAmount>[] = [];
 						const priceKeys = Object.keys(variant?.pricesFormatEdit);
 						priceKeys.forEach((priceKey) => {
@@ -131,13 +132,13 @@ const PricingCreate: FC<Props> = ({ state, handleOk, handleCancel }) => {
 						return;
 					}
 				})
-			).filter((item) => item),
+			).filter((item) => item) as PricePayload[],
 		};
 		return { payload, flag };
 	};
 
 	const createPriceList = async (payload: CreatePricingList) => {
-		await mutateAsync(payload, {
+		await mutateAsync(payload as any, {
 			onSuccess: () => {
 				message.success('Tạo định giá cho các sản phẩm thành công');
 			},
@@ -174,10 +175,10 @@ const PricingCreate: FC<Props> = ({ state, handleOk, handleCancel }) => {
 		});
 	};
 
-	const onSaveDraft = (products) => {
+	const onSaveDraft = (products: any) => {
 		const isValidateStep = onValidateStep();
 		if (isValidateStep) {
-			const { payload, flag } = createPayload({products, status:'draft'});
+			const { payload, flag } = createPayload({ products, status: 'draft' });
 			if (flag) {
 				notificationConfirm(payload);
 				return;
@@ -186,10 +187,10 @@ const PricingCreate: FC<Props> = ({ state, handleOk, handleCancel }) => {
 		}
 	};
 
-	const onSavePublish = () => {
+	const onSavePublish = (products: any) => {
 		const isValidateStep = onValidateStep();
 		if (isValidateStep) {
-			const { payload, flag } = createPayload({products, status:'active'});
+			const { payload, flag } = createPayload({ products, status: 'active' });
 			if (flag) {
 				notificationConfirm(payload);
 				return;
@@ -259,9 +260,7 @@ const PricingCreate: FC<Props> = ({ state, handleOk, handleCancel }) => {
 			)}
 			{currentStep === 2 && (
 				<PriceForm
-					setCurrentStep={setCurrentStep}
 					productForm={productForm}
-					setPriceForm={setPriceForm}
 					productsData={productsData}
 					setProductsData={setProductsData}
 				/>

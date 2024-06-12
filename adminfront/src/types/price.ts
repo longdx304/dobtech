@@ -23,14 +23,18 @@ export type CreatePricingType = {
 export type CreatePricingList = {
 	name: string;
 	description: string;
-	type: 'sale' | 'override';
+	type: 'sale' | 'override' | undefined;
 	customer_groups?: { id: string }[];
 	status?: 'draft' | 'active';
-	starts_at?: string;
-	ends_at?: string;
-	prices?: {
-		amount: number;
-		variant_id: string;
-		currency_code: string;
-	}[];
+	starts_at?: Date | undefined;
+	ends_at?: Date | undefined;
+	prices?: PricePayload[];
+};
+
+export type PricePayload = {
+	id?: string;
+	amount: number;
+	currency_code?: string;
+	region_id?: string;
+	variant_id: string;
 };

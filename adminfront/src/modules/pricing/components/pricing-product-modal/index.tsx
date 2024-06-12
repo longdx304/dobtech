@@ -2,14 +2,25 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import { CircleDollarSign, PackagePlus, Search } from 'lucide-react';
+import {
+	CircleAlert,
+	CircleDollarSign,
+	PackagePlus,
+	Search,
+} from 'lucide-react';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import _ from 'lodash';
-import { useAdminPriceListProducts } from 'medusa-react';
+import { useAdminPriceListProducts, useMedusa } from 'medusa-react';
 import { Table } from '@/components/Table';
 import productsColumns from './products-column';
 import { Product } from '@medusajs/medusa';
 import { ActionAbles } from '@/components/Dropdown';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import ProductModal from './product-modal';
+import EditPricesModal from './edit-prices-modal';
+import { Modal as AntdModal, message } from 'antd';
+import { getErrorMessage } from '@/lib/utils';
+import EditPriceModal from './edit-price-modal';
 
 type Props = {
 	id: string;
@@ -25,23 +36,51 @@ const PriceProductModal: FC<Props> = ({
 	handleOk,
 	handleCancel,
 }) => {
+	const { client } = useMedusa();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
 
-	const { products, isLoading, count } = useAdminPriceListProducts(
+	const {
+		state: stateProduct,
+		onOpen: onOpenProduct,
+		onClose: onCloseProduct,
+	} = useToggleState(false);
+	const {
+		state: stateEditPrices,
+		onOpen: onOpenEditPrices,
+		onClose: onCloseEditPrices,
+	} = useToggleState(false);
+	const {
+		state: stateEditPrice,
+		onOpen: onOpenEditPrice,
+		onClose: onCloseEditPrice,
+	} = useToggleState(false);
+
+	const { products, isLoading, count, refetch, isRefetching } =
+		useAdminPriceListProducts(
+			id,
+			{
+				limit: PAGE_SIZE,
+				offset: (currentPage - 1) * PAGE_SIZE,
+				q: searchValue || undefined,
+				expand: 'variants,collection',
+			},
+			{
+				keepPreviousData: true,
+			}
+		);
+
+	const { products: allProducts } = useAdminPriceListProducts(
 		id,
 		{
-			limit: PAGE_SIZE,
-			offset: (currentPage - 1) * PAGE_SIZE,
-			q: searchValue || undefined,
-			expand: 'variants,collection',
+			limit: count,
+			fields: 'id',
 		},
 		{
-			keepPreviousData: true,
+			enabled: !!count,
 		}
 	);
-
-	console.log('products', products);
 
 	const handleChangeDebounce = _.debounce(
 		(e: ChangeEvent<HTMLInputElement>) => {
@@ -56,11 +95,41 @@ const PriceProductModal: FC<Props> = ({
 	};
 
 	const handleEditPricing = (record: Product) => {
-		console.log('record', record);
+		setCurrentProduct(record);
+		onOpenEditPrice();
 	};
 
-	const handleDeletePricing = (id: Product['id']) => {
-		console.log('id', id);
+	const handleDeletePricing = (productId: Product['id']) => {
+		AntdModal.confirm({
+			title: 'Bạn chắc chắn muốn xoá ?',
+			content:
+				'Sản phẩm sẽ được xoá khỏi danh giá. Bạn có muốn tiếp tục không ?',
+			icon: (
+				<CircleAlert
+					style={{ width: 32, height: 24 }}
+					className="mr-2"
+					color="#E7B008"
+				/>
+			),
+			okType: 'danger',
+			okText: 'Đồng ý',
+			cancelText: 'Huỷ',
+			async onOk() {
+				await client.admin.priceLists
+					.deleteProductPrices(id, productId)
+					.then(() => {
+						message.success('Xoá sản phẩm khỏi danh sách giá thành công');
+						refetch();
+					})
+					.catch((error: any) => {
+						message.error(getErrorMessage(error));
+					});
+				return;
+			},
+			onCancel() {
+				return false;
+			},
+		});
 	};
 
 	const actions = [
@@ -68,14 +137,14 @@ const PriceProductModal: FC<Props> = ({
 			label: 'Chỉnh sửa tất cả giá',
 			icon: <CircleDollarSign size={20} />,
 			onClick: () => {
-				// handleEditAllPricing();
+				onOpenEditPrices();
 			},
 		},
 		{
 			label: 'Thêm sản phẩm',
 			icon: <PackagePlus size={20} />,
 			onClick: () => {
-				// handleDe();
+				onOpenProduct();
 			},
 		},
 	];
@@ -112,7 +181,7 @@ const PriceProductModal: FC<Props> = ({
 			<Table
 				columns={columns as any}
 				dataSource={products ?? []}
-				loading={isLoading}
+				loading={isLoading || isRefetching}
 				rowKey="id"
 				scroll={{ x: 700 }}
 				pagination={{
@@ -124,6 +193,29 @@ const PriceProductModal: FC<Props> = ({
 						`${range[0]}-${range[1]} trong ${total} sản phẩm`,
 				}}
 			/>
+			<ProductModal
+				state={stateProduct}
+				handleOk={onCloseProduct}
+				handleCancel={onCloseProduct}
+				productIds={allProducts?.map((p) => p.id as string) || []}
+				priceListId={id}
+			/>
+			<EditPricesModal
+				state={stateEditPrices}
+				handleOk={onCloseEditPrices}
+				handleCancel={onCloseEditPrices}
+				priceListId={id}
+				productIds={products?.map((p) => p.id as string) || []}
+			/>
+			{currentProduct && (
+				<EditPriceModal
+					state={stateEditPrice}
+					handleOk={onCloseEditPrice}
+					handleCancel={onCloseEditPrice}
+					priceListId={id}
+					productId={currentProduct.id}
+				/>
+			)}
 		</Modal>
 	);
 };

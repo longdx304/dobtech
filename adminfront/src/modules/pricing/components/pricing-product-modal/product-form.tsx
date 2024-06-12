@@ -7,16 +7,23 @@ import _ from 'lodash';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { useAdminProducts } from 'medusa-react';
-import productsColumns from './products-column';
 import { Button } from '@/components/Button';
+import productsColumns from '../pricing-modal/products-column';
 
 type Props = {
 	setProductForm: (data: string[]) => void;
+	handleCancel: () => void;
 	setCurrentStep: (nextStep: number) => void;
+	productIds: string[];
 };
 
 const PAGE_SIZE = 10;
-const ProductsForm: FC<Props> = ({ setProductForm, setCurrentStep }) => {
+const ProductsForm: FC<Props> = ({
+	setProductForm,
+	setCurrentStep,
+	handleCancel,
+	productIds,
+}) => {
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
@@ -44,6 +51,13 @@ const ProductsForm: FC<Props> = ({ setProductForm, setCurrentStep }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[products]
 	);
+	useEffect(() => {
+		if (productIds) {
+			setSelectedRowKeys(productIds);
+		} else {
+			setSelectedRowKeys([]);
+		}
+	}, [productIds]);
 
 	const handleChangePage = (page: number) => {
 		setCurrentPage(page);
@@ -51,16 +65,17 @@ const ProductsForm: FC<Props> = ({ setProductForm, setCurrentStep }) => {
 
 	const onSubmit = () => {
 		const selectedRowIds = selectedRowKeys.map((key) => key as string);
-		if (selectedRowIds.length === 0) {
-			message.error('Phải chọn ít nhất một sản phẩm');
+		const newSelectedRowIds = _.difference(selectedRowIds, productIds);
+		if (newSelectedRowIds.length === 0) {
+			message.error('Phải chọn ít nhất 1 sản phẩm');
 			return;
 		}
-		setProductForm(selectedRowIds);
-		setCurrentStep(2);
+		setProductForm(newSelectedRowIds);
+		setCurrentStep(1);
 	};
 
-	const onBack = () => {
-		setCurrentStep(0);
+	const onCancel = () => {
+		handleCancel();
 	};
 
 	return (
@@ -90,6 +105,9 @@ const ProductsForm: FC<Props> = ({ setProductForm, setCurrentStep }) => {
 						selectedRowKeys: selectedRowKeys,
 						onChange: handleRowSelectionChange,
 						preserveSelectedRowKeys: true,
+						getCheckboxProps: (record) => ({
+							disabled: productIds?.includes(record.id),
+						}),
 					}}
 					loading={isLoading}
 					columns={columns as any}
@@ -108,8 +126,8 @@ const ProductsForm: FC<Props> = ({ setProductForm, setCurrentStep }) => {
 			</Col>
 			<Col span={24}>
 				<Flex justify="flex-end" gap="small" className="mt-4">
-					<Button type="default" onClick={onBack}>
-						Quay lại
+					<Button type="default" onClick={onCancel}>
+						Hủy
 					</Button>
 					<Button onClick={onSubmit}>Tiếp tục</Button>
 				</Flex>
