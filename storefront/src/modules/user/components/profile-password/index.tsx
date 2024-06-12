@@ -9,6 +9,8 @@ import { Form, FormProps, message } from 'antd';
 import { ChevronLeft, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { updateCustomerPassword } from '../../actions';
+import { ERoutes } from '@/types/routes';
+import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
 
 type ProfilePasswordProps = {
   old_password: string;
@@ -16,10 +18,15 @@ type ProfilePasswordProps = {
   confirm_password: string;
 };
 
-const ProfilePassword = () => {
+type Props = {
+  onClose?: () => void;
+};
+
+const ProfilePassword = ({ onClose }: Props) => {
   const router = useRouter();
   const [form] = Form.useForm();
   const { customer } = useCustomer();
+  const isDesktop = useIsDesktop();
 
   const onFinish: FormProps<ProfilePasswordProps>['onFinish'] = async (
     values
@@ -27,11 +34,16 @@ const ProfilePassword = () => {
     try {
       await updateCustomerPassword(customer!, values);
       message.success('Cập nhật mật khẩu thành công!');
-      router.push('/user/setting');
+      if (!isDesktop) {
+        router.push(`/${ERoutes.USER_SETTING}`);
+      } else {
+        onClose?.();
+        router.refresh();
+      }
     } catch (error: any) {
       message.error(
         error.message ||
-          'Cập nhật họ tên thất bại. Vui lòng kiểm tra lại thông tin.'
+          'Cập nhật mật khẩu thất bại. Vui lòng kiểm tra lại thông tin.'
       );
     }
   };
@@ -42,7 +54,7 @@ const ProfilePassword = () => {
         align='center'
         justify='space-between'
         style={{ borderBottom: '2px solid #f6f6f6' }}
-        className='pb-2'
+        className='pb-2 flex lg:hidden'
       >
         <div className='flex' onClick={() => router.back()}>
           <ChevronLeft size={24} className='text-[#767676] pl-[12px]' />

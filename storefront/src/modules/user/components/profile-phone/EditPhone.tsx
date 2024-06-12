@@ -10,19 +10,18 @@ import { useEffect } from 'react';
 import { updateCustomerPhone } from '../../actions';
 import { useCustomer } from '@/lib/providers/user/user-provider';
 
-type EditPhoneProps = {
+type Props = {
   onClose: () => void;
-  state: boolean;
-  customer: Omit<Customer, 'password_hash'> | null;
+  state?: boolean;
 };
 
 type PhoneProps = {
   phone: string;
 };
 
-const EditPhone = ({ onClose, state, customer }: EditPhoneProps) => {
+const EditPhone = ({ onClose, state }: Props) => {
   const [form] = Form.useForm();
-  const { setCustomer } = useCustomer();
+  const { customer, setCustomer } = useCustomer();
   const router = useRouter();
 
   useEffect(() => {

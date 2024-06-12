@@ -20,8 +20,6 @@ const Header: FC<Props> = ({ categories }) => {
   const showCategory = ['/'];
   const hiddenHeader = ['/search', '/user/*'];
 
-  const hiddenHeaderPatterns = ['/search', /^\/user/];
-
   const isHeaderHidden = hiddenHeader.some((path) => {
     const regex = new RegExp(`^${path}(/|$)`);
     return regex.test(pathname);
@@ -35,15 +33,21 @@ const Header: FC<Props> = ({ categories }) => {
       bordered={false}
     >
       <Flex vertical className='box-border lg:container'>
-        {!isHeaderHidden && (
-          <>
-            <HeaderWrap />
-            <HeaderWrapMobile categories={categories} />
-            {showCategory.includes(pathname) && (
-              <Category categories={categories} />
-            )}
-          </>
-        )}
+        {/* For Desktop */}
+        <div className='hidden lg:block'>
+          <HeaderWrap />
+          {showCategory.includes(pathname) && (
+            <Category categories={categories} />
+          )}
+        </div>
+
+        {/* For Mobile */}
+        <div className={cn('lg:hidden', { hidden: isHeaderHidden })}>
+          <HeaderWrapMobile categories={categories} />
+          {showCategory.includes(pathname) && (
+            <Category categories={categories} />
+          )}
+        </div>
       </Flex>
     </Card>
   );

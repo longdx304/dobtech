@@ -17,7 +17,7 @@ import {
 } from '@medusajs/medusa';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
-import { AddressProps } from './components/addressbook/AddAddress';
+import { AddressProps } from './components/addressbook/FormAddress';
 
 export async function signUp(values: {
   email: string;

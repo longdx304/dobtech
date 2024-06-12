@@ -12,7 +12,7 @@ import {
 } from '../../actions';
 import { Address } from '@medusajs/medusa';
 
-type AddAddressProps = {
+type FormAddressProps = {
   region: Region;
   onClose: () => void;
   editingAddress: Address | null;
@@ -30,7 +30,7 @@ export type AddressProps = {
   countryCode: string;
 };
 
-const AddAddress = ({ region, onClose, editingAddress }: AddAddressProps) => {
+const FormAddress = ({ region, onClose, editingAddress }: FormAddressProps) => {
   const [form] = Form.useForm();
 
   const {
@@ -247,4 +247,4 @@ const AddAddress = ({ region, onClose, editingAddress }: AddAddressProps) => {
   );
 };
 
-export default AddAddress;
+export default FormAddress;

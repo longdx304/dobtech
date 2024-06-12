@@ -69,7 +69,7 @@ const ProfilePhone = () => {
         onClose={onClose}
         className='[&_.ant-drawer-title]:flex [&_.ant-drawer-title]:justify-center [&_.ant-drawer-title]:items-center'
       >
-        <EditPhone onClose={onClose} state={state} customer={customer} />
+        <EditPhone onClose={onClose} state={state} />
       </Drawer>
     </>
   );

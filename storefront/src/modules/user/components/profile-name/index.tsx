@@ -10,16 +10,22 @@ import { ChevronLeft, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { updateCustomerName } from '../../actions';
 import { useCustomer } from '@/lib/providers/user/user-provider';
+import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
 
 type ProfileNameProps = {
   firstName: string;
   lastName: string;
 };
 
-const ProfileName = () => {
+type Props = {
+  onClose?: () => void;
+};
+
+const ProfileName = ({ onClose }: Props) => {
   const { customer, setCustomer } = useCustomer();
   const router = useRouter();
   const [form] = Form.useForm();
+  const isDesktop = useIsDesktop();
 
   const onFinish: FormProps<ProfileNameProps>['onFinish'] = async (values) => {
     try {
@@ -34,7 +40,12 @@ const ProfileName = () => {
             } as Customer)
         );
         message.success('Cập nhật họ tên thành công!');
-        router.back();
+        if (!isDesktop) {
+          router.back();
+        } else {
+          onClose?.();
+          router.refresh();
+        }
       } else {
         throw new Error(result.error);
       }
@@ -52,7 +63,7 @@ const ProfileName = () => {
         align='center'
         justify='space-between'
         style={{ borderBottom: '2px solid #f6f6f6' }}
-        className='pb-2'
+        className='pb-2 flex lg:hidden'
       >
         <div className='flex' onClick={() => router.back()}>
           <ChevronLeft size={24} className='text-[#767676] pl-[12px]' />

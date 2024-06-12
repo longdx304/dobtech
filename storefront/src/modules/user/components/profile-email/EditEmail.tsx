@@ -9,7 +9,7 @@ import { useCustomer } from '@/lib/providers/user/user-provider';
 
 type TCustomer = {
   onClose: () => void;
-  state: boolean;
+  state?: boolean;
 };
 
 type EmailProps = {
@@ -36,7 +36,7 @@ const EditEmail = ({ onClose, state }: TCustomer) => {
         onClose();
         router.refresh();
       } else {
-        throw new Error(result.error);
+        throw new Error("Email đã tồn tại");
       }
     } catch (error: any) {
       message.error(

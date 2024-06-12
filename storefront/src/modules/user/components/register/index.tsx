@@ -7,10 +7,12 @@ import { Lock, Mail, Phone, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { signUp } from '../../actions';
 import { LOGIN_VIEW } from '../../templates/login-template';
+import { ERoutes } from '@/types/routes';
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void;
-  onCloseDrawer: () => void;
+  onCloseDrawer?: () => void;
+  isDesktop: boolean;
 };
 
 type RegisterProps = {
@@ -21,7 +23,7 @@ type RegisterProps = {
   password: string;
 };
 
-const Register = ({ setCurrentView, onCloseDrawer }: Props) => {
+const Register = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
   const [form] = Form.useForm();
   const router = useRouter();
 
@@ -30,8 +32,12 @@ const Register = ({ setCurrentView, onCloseDrawer }: Props) => {
     try {
       await signUp(values);
       message.success('Đăng ký thành công!');
-      router.refresh();
-      onCloseDrawer();
+      if (!isDesktop) {
+        router.refresh();
+        onCloseDrawer?.();
+      } else {
+        router.push(`/${ERoutes.USER}`);
+      }
     } catch (error: any) {
       message.error(
         error.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.'
@@ -40,7 +46,7 @@ const Register = ({ setCurrentView, onCloseDrawer }: Props) => {
   };
 
   return (
-    <div className='register-form max-w-sm flex flex-col items-center'>
+    <div className='register-form flex flex-col items-center'>
       <h1 className='text-large-semi uppercase mt-0'>CHAMDEP</h1>
       <Form form={form} onFinish={onFinish}>
         <Form.Item
