@@ -1,6 +1,7 @@
 export enum ERoutes {
   DASHBOARD = '/',
   CATEGORY = 'category',
+  AUTH = 'user/auth',
 
   // user
 	USER = 'user',
