@@ -152,6 +152,7 @@ const ProductModal: FC<Props> = ({
 					onClick={() => onSave(productsData)}
 					loading={isSubmitting}
 					disabled={isSubmitting}
+					data-testid="submit-add-product"
 				>
 					Lưu
 				</Button>,

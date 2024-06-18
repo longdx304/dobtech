@@ -102,6 +102,7 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 							icons={<LogIn color="white" />}
 							className="flex items-center justify-center w-full"
 							loading={isLoading}
+							data-testid="submitBtn"
 						>
 							Submit
 						</Button>

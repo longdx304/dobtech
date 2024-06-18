@@ -111,6 +111,7 @@ const PriceListCustomerGroups = ({
 						value={isCustomerGroups}
 						onChange={(checked: boolean) => setIsCustomerGroups(checked)}
 						className=""
+						data-tesid="customer-group"
 					/>
 				</Flex>
 			</Col>

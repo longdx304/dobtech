@@ -79,7 +79,7 @@ const productsColumns = ({ handleEditPricing, handleDeletePricing }: Props) => [
 				},
 			];
 
-			return <ActionAbles actions={actions as any} />;
+			return <ActionAbles id="detail-product" actions={actions as any} />;
 		},
 	},
 ];

@@ -139,6 +139,7 @@ const CustomerGroupList: FC<Props> = ({}) => {
 				icon={<Plus color="white" size={20} />}
 				type="primary"
 				onClick={onOpenCustomers}
+				data-testid="btn-add-customer-group"
 			/>
 			{stateCustomers && (
 				<CustomerGroupModal

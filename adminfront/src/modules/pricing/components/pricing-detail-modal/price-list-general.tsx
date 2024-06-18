@@ -60,7 +60,7 @@ const PriceListGeneral = ({ form, priceList }: Props) => {
 					className="mb-0"
 					rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
 				>
-					<Input placeholder="Khuyến mãi Black Friday" />
+					<Input data-testid="input-name" placeholder="Khuyến mãi Black Friday" />
 				</Form.Item>
 			</Col>
 			<Col xs={24}>
@@ -71,7 +71,7 @@ const PriceListGeneral = ({ form, priceList }: Props) => {
 					className="mb-0"
 					rules={[{ required: true, message: 'Vui lòng nhập mô tả' }]}
 				>
-					<TextArea placeholder="Mô tả về chương trình khuyến mãi" rows={2} />
+					<TextArea data-testid="input-description" placeholder="Mô tả về chương trình khuyến mãi" rows={2} />
 				</Form.Item>
 			</Col>
 			<Col span={24} className="mt-2">

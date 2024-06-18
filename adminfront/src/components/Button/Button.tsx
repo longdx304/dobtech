@@ -20,6 +20,7 @@ export default function Button({
 			type={type}
 			size="large"
 			icon={icons}
+			data-testid={props['data-testid']}
 			{...props}
 		>
 			{children}

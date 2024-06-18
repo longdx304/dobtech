@@ -146,6 +146,7 @@ const PriceForm: FC<Props> = ({
 					className="w-full"
 					variant="borderless"
 					placeholder="Nhập số % giảm giá"
+					data-testid="discount-percent"
 					onChange={onChangeDiscountPercent as any}
 				/>
 			</Col>

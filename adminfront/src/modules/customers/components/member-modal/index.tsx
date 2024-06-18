@@ -91,44 +91,47 @@ const MemberModal: FC<Props> = ({ state, handleOk, handleCancel, groupId }) => {
 			handleCancel={handleCancel}
 			width={800}
 		>
-			<Title level={3}>Khách hàng</Title>
-			<Flex
-				align="center"
-				justify="flex-end"
-				gap="middle"
-				className="p-4 border-0 border-b border-solid border-gray-200"
-			>
-				<Input
-					placeholder="Tìm kiếm..."
-					className="w-[250px] text-xs"
-					size="small"
-					prefix={<Search size={16} />}
-					onChange={handleChangeDebounce}
-				/>
-				<Button
-					type="primary"
-					icon={<Plus size={20} />}
-					className="flex justify-center items-center"
-					onClick={onOpen}
+			<div id="table-customer-group">
+				<Title level={3}>Khách hàng</Title>
+				<Flex
+					align="center"
+					justify="flex-end"
+					gap="middle"
+					className="p-4 border-0 border-b border-solid border-gray-200"
 				>
-					Thay đổi khách hàng
-				</Button>
-			</Flex>
-			<Table
-				columns={columns as any}
-				dataSource={customers ?? []}
-				loading={isLoading}
-				rowKey="id"
-				scroll={{ x: 700 }}
-				pagination={{
-					total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
-					pageSize: PAGE_SIZE,
-					current: currentPage || 1,
-					onChange: handleChangePage,
-					showTotal: (total, range) =>
-						`${range[0]}-${range[1]} trong ${total} khách hàng`,
-				}}
-			/>
+					<Input
+						placeholder="Tìm kiếm..."
+						className="w-[250px] text-xs"
+						size="small"
+						prefix={<Search size={16} />}
+						onChange={handleChangeDebounce}
+					/>
+					<Button
+						type="primary"
+						icon={<Plus size={20} />}
+						className="flex justify-center items-center"
+						onClick={onOpen}
+						data-testid="btn-add-member"
+					>
+						Thay đổi khách hàng
+					</Button>
+				</Flex>
+				<Table
+					columns={columns as any}
+					dataSource={customers ?? []}
+					loading={isLoading}
+					rowKey="id"
+					scroll={{ x: 700 }}
+					pagination={{
+						total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
+						pageSize: PAGE_SIZE,
+						current: currentPage || 1,
+						onChange: handleChangePage,
+						showTotal: (total, range) =>
+							`${range[0]}-${range[1]} trong ${total} khách hàng`,
+					}}
+				/>
+			</div>
 			<AddCustomerGroup
 				state={stateCustomers}
 				handleOk={() => {

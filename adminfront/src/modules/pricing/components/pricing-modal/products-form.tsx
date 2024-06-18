@@ -83,7 +83,7 @@ const ProductsForm: FC<Props> = ({ setProductForm, setCurrentStep }) => {
 					/>
 				</Flex>
 			</Col>
-			<Col span={24}>
+			<Col span={24} id="table-product">
 				<Table
 					rowSelection={{
 						type: 'checkbox',
@@ -111,7 +111,7 @@ const ProductsForm: FC<Props> = ({ setProductForm, setCurrentStep }) => {
 					<Button type="default" onClick={onBack}>
 						Quay lại
 					</Button>
-					<Button onClick={onSubmit}>Tiếp tục</Button>
+					<Button onClick={onSubmit} data-testid="add-product">Tiếp tục</Button>
 				</Flex>
 			</Col>
 		</Row>

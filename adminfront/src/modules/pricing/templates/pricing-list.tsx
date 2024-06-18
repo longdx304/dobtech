@@ -168,7 +168,7 @@ const PricingList: FC<Props> = ({}) => {
 				icon={<Plus color="white" size={20} />}
 				type="primary"
 				onClick={onOpenPricing}
-				// data-testid="btnCreateProduct"
+				data-testid="btn-add-customer-group"
 			/>
 			<PricingCreate
 				state={statePricing}

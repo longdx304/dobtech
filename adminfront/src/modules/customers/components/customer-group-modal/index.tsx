@@ -105,7 +105,7 @@ const CustomerGroupModal: FC<Props> = ({
 						},
 					]}
 				>
-					<Input placeholder="Tên Nhóm" />
+					<Input placeholder="Tên Nhóm" data-testid="input-name" />
 				</Form.Item>
 			</Form>
 		</SubmitModal>

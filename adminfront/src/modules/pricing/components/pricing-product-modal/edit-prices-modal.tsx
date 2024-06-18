@@ -131,7 +131,6 @@ const EditPricesModal: FC<Props> = ({
 
 	const onSave = async (products: any) => {
 		const { payload, flag } = createPayload({ products, status: 'draft' });
-		console.log('payload', payload);
 		if (flag) {
 			notificationConfirm(payload);
 			return;
@@ -155,6 +154,7 @@ const EditPricesModal: FC<Props> = ({
 				onClick={() => onSave(productsData)}
 				loading={isSubmitting}
 				disabled={isSubmitting}
+				data-testid="submit-all-price"
 			>
 				Lưu
 			</Button>,

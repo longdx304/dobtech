@@ -161,38 +161,43 @@ const PriceProductModal: FC<Props> = ({
 			handleOk={handleOk}
 			handleCancel={handleCancel}
 			width={800}
-		>
-			<Title level={3}>Danh sách sản phẩm</Title>
-			<Flex
-				align="center"
-				justify="flex-end"
-				gap="middle"
-				className="p-4 border-0 border-b border-solid border-gray-200"
 			>
-				<Input
-					placeholder="Nhập tên sản phẩm"
-					className="w-[250px] text-xs"
-					size="small"
-					prefix={<Search size={16} />}
-					onChange={handleChangeDebounce}
+			<div id="action-product">
+				<Title level={3}>Danh sách sản phẩm</Title>
+				<Flex
+					align="center"
+					justify="flex-end"
+					gap="middle"
+					className="p-4 border-0 border-b border-solid border-gray-200"
+				>
+					<Input
+						placeholder="Nhập tên sản phẩm"
+						className="w-[250px] text-xs"
+						size="small"
+						prefix={<Search size={16} />}
+						onChange={handleChangeDebounce}
+					/>
+					<ActionAbles actions={actions as any} />
+				</Flex>
+			</div>
+			<div id="table-product">
+				<Table
+					columns={columns as any}
+					dataSource={products ?? []}
+					loading={isLoading || isRefetching}
+					rowKey="id"
+					scroll={{ x: 700 }}
+					pagination={{
+						total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
+						pageSize: PAGE_SIZE,
+						current: currentPage || 1,
+						onChange: handleChangePage,
+						showTotal: (total, range) =>
+							`${range[0]}-${range[1]} trong ${total} sản phẩm`,
+					}}
 				/>
-				<ActionAbles actions={actions as any} />
-			</Flex>
-			<Table
-				columns={columns as any}
-				dataSource={products ?? []}
-				loading={isLoading || isRefetching}
-				rowKey="id"
-				scroll={{ x: 700 }}
-				pagination={{
-					total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
-					pageSize: PAGE_SIZE,
-					current: currentPage || 1,
-					onChange: handleChangePage,
-					showTotal: (total, range) =>
-						`${range[0]}-${range[1]} trong ${total} sản phẩm`,
-				}}
-			/>
+				</div>
+
 			<ProductModal
 				state={stateProduct}
 				handleOk={onCloseProduct}

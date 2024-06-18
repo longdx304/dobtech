@@ -12,6 +12,7 @@ interface Props extends ModalProps {
 	isLoading?: boolean;
 	disabled?: boolean;
 	footer?: React.ReactNode;
+	id?: string;
 }
 
 export default function Modal({
@@ -22,6 +23,7 @@ export default function Modal({
 	children,
 	disabled = false,
 	footer = null,
+	id,
 	...props
 }: Props) {
 	const renderFooter = () => {
@@ -53,6 +55,7 @@ export default function Modal({
 			className={cn('', className)}
 			onCancel={handleCancel}
 			footer={renderFooter()}
+			id={id}
 			{...props}
 		>
 			{children}

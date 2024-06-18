@@ -14,6 +14,7 @@ import {
 import { getErrorMessage } from '@/lib/utils';
 import addCustomerColumns from './add-customer-columns';
 import { message } from 'antd';
+import { Button } from '@/components/Button';
 
 type Props = {
 	state: boolean;
@@ -123,12 +124,35 @@ const AddCustomerGroup: FC<Props> = ({
 		setCurrentPage(page);
 	};
 
+	const renderFooter = () => {
+		return [
+			<Button
+				key="1"
+				type="default"
+				danger
+				onClick={handleCancel}
+				loading={addCustomers.isLoading || deleteCustomers.isLoading}
+			>
+				Huỷ
+			</Button>,
+			<Button
+				key="submit"
+				onClick={onSubmit}
+				loading={addCustomers.isLoading || deleteCustomers.isLoading}
+				data-testid="submit-button-edit-customer"
+			>
+				Xác nhận
+			</Button>,
+		];
+	};
+
 	return (
 		<Modal
 			open={state}
 			handleOk={onSubmit}
 			isLoading={addCustomers.isLoading || deleteCustomers.isLoading}
 			handleCancel={handleCancel}
+			footer={renderFooter}
 			width={800}
 		>
 			<Title level={3}>Chỉnh sửa khách hàng</Title>

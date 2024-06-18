@@ -31,7 +31,7 @@ const DetailForm: FC<Props> = ({ setDetailForm, setCurrentStep, onCancel }) => {
 				<Button type="default" onClick={onCancel}>
 					Huỷ
 				</Button>
-				<Button htmlType="submit">Tiếp theo</Button>
+				<Button htmlType="submit" data-testid="add-detail-form">Tiếp theo</Button>
 			</Flex>
 		</Form>
 	);

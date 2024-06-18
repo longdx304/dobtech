@@ -216,6 +216,7 @@ const PricingCreate: FC<Props> = ({ state, handleOk, handleCancel }) => {
 					onClick={() => onSaveDraft(productsData)}
 					loading={isSubmitting}
 					disabled={isSubmitting}
+					data-testid="submit-draft"
 				>
 					Lưu nháp
 				</Button>,
@@ -224,6 +225,7 @@ const PricingCreate: FC<Props> = ({ state, handleOk, handleCancel }) => {
 					onClick={() => onSavePublish(productsData)}
 					loading={isSubmitting}
 					disabled={isSubmitting}
+					data-testid="submit-active"
 				>
 					Lưu và xuất bản
 				</Button>,
