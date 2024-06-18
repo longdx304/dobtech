@@ -1,12 +1,11 @@
-'use client';
-
 import { Button } from '@/components/Button';
 import { Drawer } from '@/components/Drawer';
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import { useCustomer } from '@/lib/providers/user/user-provider';
 import { Region } from '@/types/medusa';
-import { Address, Customer } from '@medusajs/medusa';
+import { Address } from '@medusajs/medusa';
 import { Modal } from 'antd';
 import { ChevronLeft, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
@@ -14,13 +13,12 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { deleteCustomerShippingAddress } from '../../actions';
 import FormAddress from './FormAddress';
-import { useCustomer } from '@/lib/providers/user/user-provider';
 
-type AddressBookMobileProps = {
+type Props = {
   region: Region;
 };
 
-const AddressBookMobile = ({ region }: AddressBookMobileProps) => {
+const AddressBookMobile = ({ region }: Props) => {
   const router = useRouter();
   const { customer } = useCustomer();
   const { state, onOpen, onClose } = useToggleState(false);

@@ -21,9 +21,9 @@ const UserInformation = () => {
         {
           key: '1',
           label: (
-            <span>
+            <a href={`/${ERoutes.USER}`}>
               {customer.first_name} {customer.last_name}
-            </span>
+            </a>
           ),
           icon: <User />,
         },
