@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import AddressBookDesktop from './AddressBookDesktop';
 import AddressBookMobile from './AddressBookMobile';
@@ -11,7 +13,7 @@ const AddressBook = ({ region }: AddressBookProps) => {
   return (
     <>
       <div className='hidden lg:block'>
-        <AddressBookDesktop />
+        <AddressBookDesktop region={region} />
       </div>
       <div className='block lg:hidden'>
         <AddressBookMobile region={region} />
