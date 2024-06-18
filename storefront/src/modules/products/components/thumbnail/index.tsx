@@ -1,3 +1,4 @@
+'use client'
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import Image from 'next/image';
 import { FC } from 'react';

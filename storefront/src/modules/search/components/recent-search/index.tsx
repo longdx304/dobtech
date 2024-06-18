@@ -1,9 +1,7 @@
-import { FC } from "react";
-import { useProducts } from "medusa-react";
-import { Divider } from "antd";
-import { useRouter } from "next/navigation";
 import _ from "lodash";
 import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { FC } from "react";
 
 import { Flex } from "@/components/Flex";
 import { Tag } from "@/components/Tag";

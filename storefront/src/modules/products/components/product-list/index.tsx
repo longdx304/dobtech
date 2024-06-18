@@ -1,13 +1,9 @@
-"use client";
-import { Empty, Spin } from "antd";
-import { useProducts } from "medusa-react";
-import { FC, useEffect, useRef, useState } from "react";
-import _ from 'lodash';
+// "use client";
+import { FC } from "react";
 
-import { Flex } from "@/components/Flex";
 import ProductPreview from "@/modules/products/components/product-preview";
 import { ProductPreviewType } from "@/types/product";
-import { Text } from "@/components/Typography";
+import { Region } from '@medusajs/medusa';
 
 interface ProductListProps {
 	data: {
@@ -15,71 +11,71 @@ interface ProductListProps {
 		count: number;
 	};
 	searchValue?: string | null;
+	region: Region;
 }
 
-const PAGE_SIZE = 10;
-const ProductList: FC<ProductListProps> = ({ data, searchValue = null }) => {
-	const observerTarget = useRef(null);
-	const [productData, setProductData] = useState<ProductPreviewType[]>(
-		data?.products || []
-	);
-	const [pageNum, setPageNum] = useState(1);
-	const { products, isLoading, refetch, isRefetching, count } = useProducts({
-		q: searchValue || undefined,
-		limit: PAGE_SIZE,
-		offset: (pageNum - 1) * PAGE_SIZE,
-	});
+const ProductList: FC<ProductListProps> = ({ data, searchValue = null, region }) => {
+	// const observerTarget = useRef(null);
+	// const [productData, setProductData] = useState<ProductPreviewType[]>(
+	// 	data?.products || []
+	// );
+	// const [pageNum, setPageNum] = useState(1);
+	// const { products, isLoading, refetch, isRefetching, count } = useProducts({
+	// 	q: searchValue || undefined,
+	// 	limit: PAGE_SIZE,
+	// 	offset: (pageNum - 1) * PAGE_SIZE,
+	// });
 
-	const [pagingEnd, setPagingEnd] = useState(false);
+	// const [pagingEnd, setPagingEnd] = useState(false);
 
-	useEffect(() => {
-		const observer = new IntersectionObserver(
-			(entries) => {
-				if (entries[0].isIntersecting && !pagingEnd) {
-					setPageNum((prev) => prev + 1);
-				}
-			},
-			{ threshold: 1 }
-		);
+	// useEffect(() => {
+	// 	const observer = new IntersectionObserver(
+	// 		(entries) => {
+	// 			if (entries[0].isIntersecting && !pagingEnd) {
+	// 				setPageNum((prev) => prev + 1);
+	// 			}
+	// 		},
+	// 		{ threshold: 1 }
+	// 	);
 
-		if (observerTarget.current) {
-			observer.observe(observerTarget.current);
-		}
+	// 	if (observerTarget.current) {
+	// 		observer.observe(observerTarget.current);
+	// 	}
 
-		return () => {
-			if (observerTarget.current) {
-				// eslint-disable-next-line react-hooks/exhaustive-deps
-				observer.unobserve(observerTarget?.current);
-			}
-		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [observerTarget, pagingEnd]);
+	// 	return () => {
+	// 		if (observerTarget.current) {
+	// 			// eslint-disable-next-line react-hooks/exhaustive-deps
+	// 			observer.unobserve(observerTarget?.current);
+	// 		}
+	// 	};
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [observerTarget, pagingEnd]);
 
-	useEffect(() => {
-		if (pageNum > 1 && products?.length) {
-			setProductData(
-				(prev) => [...prev, ...products] as ProductPreviewType[]
-			);
-		}
-		if (count === productData?.length) {
-			setPagingEnd(true);
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [products, count]);
+	// useEffect(() => {
+	// 	if (pageNum > 1 && products?.length) {
+	// 		setProductData(
+	// 			(prev) => [...prev, ...products] as ProductPreviewType[]
+	// 		);
+	// 	}
+	// 	if (count === productData?.length) {
+	// 		setPagingEnd(true);
+	// 	}
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [products, count]);
 
-	useEffect(() => {
-		setProductData(data?.products || []);
-	}, [data]);
+	// useEffect(() => {
+	// 	setProductData(data?.products || []);
+	// }, [data]);
 	return (
 		<div className="flex flex-col items-center gap-4">
-			{productData?.length > 0 && (
+			{data.products?.length > 0 && (
 				<div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 sm:grid-cols-2 w-full gap-x-3 gap-y-3 lg:gap-x-4 lg:gap-y-4">
-					{productData?.map((product, index) => (
-						<ProductPreview key={index} data={product} />
+					{data.products?.map((product, index) => (
+						<ProductPreview key={index} data={product} region={region} />
 					))}
 				</div>
 			)}
-			{pagingEnd && (
+			{/* {pagingEnd && (
 				<Flex justify="center" align="center">
 					<Text>Không còn sản phẩm</Text>
 				</Flex>
@@ -95,7 +91,7 @@ const ProductList: FC<ProductListProps> = ({ data, searchValue = null }) => {
 					description="Không có sản phẩm"
 				/>
 			)}
-			<div ref={observerTarget} />
+			<div ref={observerTarget} /> */}
 		</div>
 	);
 };

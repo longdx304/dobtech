@@ -1,3 +1,4 @@
+'use client'
 import { Flex as AntdFlex, FlexProps } from 'antd';
 import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';

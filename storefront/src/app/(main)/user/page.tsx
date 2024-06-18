@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 
 import { getProductsList } from '@/actions/products';
 import Overview from '@/modules/user/components/overview';
+import { getRegion } from '@/actions/region';
 
 export const metadata: Metadata = {
   title: 'CHAMDEP VN | Trang cá nhân',
@@ -13,5 +14,8 @@ export default async function UserPage() {
     pageParam: 0,
   } as any);
 
-  return <Overview products={response} />;
+  const region = await getRegion('vn');
+
+
+  return <Overview products={response} region={region!} />;
 }

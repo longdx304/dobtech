@@ -1,9 +1,6 @@
 'use client';
 
 import FilterRadioGroup from '@/modules/common/components/filter-radio-group';
-import { ProductCategory } from '@medusajs/medusa';
-import { useMemo, useState, useEffect } from 'react';
-import { useProductCategories } from 'medusa-react';
 import FilterVariant from '@/modules/common/components/filter-variant';
 import { Divider } from 'antd';
 

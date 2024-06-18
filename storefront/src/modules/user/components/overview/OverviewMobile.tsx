@@ -8,15 +8,17 @@ import { Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import LoginTemplate from '../../templates/login-template';
 import { useCustomer } from '@/lib/providers/user/user-provider';
+import { Region } from '@medusajs/medusa';
 
 type OverviewMobileProps = {
   products: {
     products: ProductPreviewType[];
     count: number;
   };
+  region: Region | null;
 };
 
-const OverviewMobile = ({ products }: OverviewMobileProps) => {
+const OverviewMobile = ({ products, region }: OverviewMobileProps) => {
   const { state, onOpen, onClose } = useToggleState(false);
   const router = useRouter();
   const { customer } = useCustomer();
@@ -217,14 +219,14 @@ const OverviewMobile = ({ products }: OverviewMobileProps) => {
       </Flex> */}
 
       {/* Products */}
-      <Flex className='flex-col space-y-2 py-4'>
+      {/* <Flex className='flex-col space-y-2 py-4'>
         <h2 className='w-full h-[50px] flex justify-center items-center bg-[#f6f6f6] mt-0 text-sm'>
           ⬥ Bạn có lẽ cũng thích ⬥
         </h2>
         <div className='px-4'>
-          <ProductList data={products} />
+          <ProductList data={products} region={region!} />
         </div>
-      </Flex>
+      </Flex> */}
 
       <Drawer
         open={state}
