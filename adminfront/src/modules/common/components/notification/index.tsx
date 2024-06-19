@@ -21,7 +21,7 @@ const Notification = ({}) => {
 				left: 'auto',
 				right: '16px',
 				top: '60px',
-				height: 'calc(100%)',
+				height: 'calc(100% - 100px)',
 			}}
 		>
 			<a onClick={(e) => e.preventDefault()} className="">
@@ -48,7 +48,7 @@ export default Notification;
 const DropdownRender = () => {
 	const { batchJobs, hasPollingError, refetch } = usePolling();
 	return (
-		<div className="bg-white lg:max-h-[calc(100%)] overflow-auto rounded-lg shadow px-2 box-border">
+		<div className="bg-white sm:max-h-[calc(100%)] overflow-auto rounded-lg shadow px-2 box-border">
 			<div className="flex justify-between items-center p-2 border-b border-gray-200">
 				<span className="text-lg font-semibold">Thông báo</span>
 			</div>

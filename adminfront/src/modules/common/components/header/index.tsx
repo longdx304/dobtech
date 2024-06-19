@@ -62,7 +62,7 @@ const Header: FC<Props> = ({}) => {
 								height: 'calc(100% - 60px)',
 							}}
 							arrow={{ pointAtCenter: true }}
-							className="block lg:hidden"
+							className="block sm:hidden"
 						>
 							<a onClick={(e) => e.preventDefault()} className="">
 								<Button type="text" shape="circle">
