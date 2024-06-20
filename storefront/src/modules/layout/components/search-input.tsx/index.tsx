@@ -42,7 +42,7 @@ const SearchInput = () => {
   );
 
   const dropdownContent = (
-    <Menu style={{padding: '24px'}}>
+    <Menu style={{ padding: '24px' }}>
       {searchValue ? (
         <SuggestSearch searchValue={searchValue} />
       ) : (

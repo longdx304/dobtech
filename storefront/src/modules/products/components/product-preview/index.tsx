@@ -46,7 +46,6 @@ const ProductPreview: FC<Props> = async ({ data, region }) => {
           </Text>
           {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
         </Flex>
-        
       </Flex>
     </LocalizedClientLink>
   );

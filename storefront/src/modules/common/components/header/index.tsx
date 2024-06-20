@@ -1,4 +1,5 @@
 'use client';
+
 import { FC } from 'react';
 
 import { Card } from '@/components/Card';
