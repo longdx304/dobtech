@@ -76,7 +76,7 @@ export default function ProductModal({
 		if (values.thumbnail?.length) {
 			let preppedImages: FormImage[] = [];
 			try {
-				preppedImages = await prepareImages(values.thumbnail);
+				preppedImages = await prepareImages(values.thumbnail, []);
 			} catch (error) {
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
 				messageApi.open({
@@ -92,7 +92,7 @@ export default function ProductModal({
 		if (values.media?.length) {
 			let preppedImages: FormImage[] = [];
 			try {
-				preppedImages = await prepareImages(values.media);
+				preppedImages = await prepareImages(values.media, []);
 			} catch (error) {
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
 				messageApi.open({

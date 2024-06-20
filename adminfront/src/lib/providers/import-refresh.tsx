@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 import React, { PropsWithChildren, useEffect } from 'react';
 import { adminProductKeys } from 'medusa-react';

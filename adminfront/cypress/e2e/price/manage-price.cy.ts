@@ -16,12 +16,16 @@ describe('Customers spec', () => {
 		cy.findByTestId('input-description').should('exist').type(description);
 		cy.findByTestId('add-detail-form').should('exist').click();
 		cy.wait(1000);
-		cy.get('#table-product tbody tr:nth-child(2) input[type="checkbox"]').check();
+		cy.get(
+			'#table-product tbody tr:nth-child(2) input[type="checkbox"]'
+		).check();
 		cy.findByTestId('add-product').should('exist').click();
-		cy.findByTestId('discount-percent').type(10);
+		cy.findByTestId('discount-percent').type(10 as unknown as string);
 		cy.findByTestId('submit-draft').click();
 		cy.findByText('Đồng ý').click();
-		cy.findByText('Tạo định giá cho các sản phẩm thành công').should('be.visible');
+		cy.findByText('Tạo định giá cho các sản phẩm thành công').should(
+			'be.visible'
+		);
 	});
 
 	it('should show update status active price list when successfully update status', () => {
@@ -61,9 +65,11 @@ describe('Customers spec', () => {
 			.should('exist')
 			.click();
 		cy.findByText('Danh sách sản phẩm').should('exist').click();
-		cy.get('#action-product a[data-testid="action-ables"]').should('exist').click();
+		cy.get('#action-product a[data-testid="action-ables"]')
+			.should('exist')
+			.click();
 		cy.findByText('Chỉnh sửa tất cả giá').should('exist').click();
-		cy.findByTestId('discount-percent').type(10);
+		cy.findByTestId('discount-percent').type(10 as unknown as string);
 		cy.findByTestId('submit-all-price').should('exist').click();
 		cy.wait(500);
 		cy.findByText('Chỉnh sửa định giá thành công').should('be.visible');
@@ -76,15 +82,21 @@ describe('Customers spec', () => {
 			.should('exist')
 			.click();
 		cy.findByText('Danh sách sản phẩm').should('exist').click();
-		cy.get('#action-product a[data-testid="action-ables"]').should('exist').click();
+		cy.get('#action-product a[data-testid="action-ables"]')
+			.should('exist')
+			.click();
 		cy.findByText('Thêm sản phẩm').should('exist').click();
 		cy.wait(500);
-		cy.get('#table-product tbody tr:nth-child(3) input[type="checkbox"]').check();
+		cy.get(
+			'#table-product tbody tr:nth-child(3) input[type="checkbox"]'
+		).check();
 		cy.findByTestId('add-product').should('exist').click();
-		cy.findByTestId('discount-percent').type(10);
+		cy.findByTestId('discount-percent').type(10 as unknown as string);
 		cy.findByTestId('submit-add-product').should('exist').click();
 		cy.wait(500);
-		cy.findByText('Thêm sản phẩm vào danh sách định giá thành công').should('be.visible');
+		cy.findByText('Thêm sản phẩm vào danh sách định giá thành công').should(
+			'be.visible'
+		);
 	});
 
 	// it('should show remove product when successfully remove product', () => {
@@ -94,7 +106,7 @@ describe('Customers spec', () => {
 	// 		.should('exist')
 	// 		.click();
 	// 	cy.findByText('Danh sách sản phẩm').should('exist').click();
-		
+
 	// 	cy.wait(500);
 	// 	// cy.get('#table-product tbody tr:nth-child(1) a[data-testid="action-ables"]').should('exist').click();
 	// 	cy.contains('#table-product td', 2)
@@ -117,6 +129,5 @@ describe('Customers spec', () => {
 		cy.findByText('Đồng ý').should('exist').click();
 		cy.wait(500);
 		cy.findByText('Xoá định giá thành công').should('be.visible');
-	})
-
+	});
 });

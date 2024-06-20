@@ -64,7 +64,7 @@ const ThumbnailModal: FC<Props> = ({
 			let preppedImages: FormImage[] = [];
 			try {
 				preppedImages = await prepareImages(values.thumbnail, [
-					product?.thumbnail,
+					product?.thumbnail || '',
 				]);
 			} catch (error) {
 				messageApi.error('Đã xảy ra lỗi khi tải hình ảnh lên.');

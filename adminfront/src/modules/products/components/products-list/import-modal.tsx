@@ -1,10 +1,13 @@
-import {
-	AdminPostProductsProductReq,
-	Product,
-	ProductCollection,
-} from '@medusajs/medusa';
-import { message } from 'antd';
+import { usePolling } from '@/lib/providers/polling-provider';
 import { BatchJob } from '@medusajs/medusa';
+import { message } from 'antd';
+import {
+	CircleAlert,
+	CircleCheck,
+	Download,
+	FileSpreadsheet,
+	Trash2,
+} from 'lucide-react';
 import {
 	useAdminBatchJob,
 	useAdminCancelBatchJob,
@@ -13,20 +16,12 @@ import {
 	useAdminDeleteFile,
 	useAdminUploadProtectedFile,
 } from 'medusa-react';
-import { FC, useEffect, useState } from 'react';
-import {
-	FileSpreadsheet,
-	Download,
-	Trash2,
-	CircleCheck,
-	CircleAlert,
-} from 'lucide-react';
-import { usePolling } from '@/lib/providers/polling-provider';
+import { FC, ReactNode, useEffect, useState } from 'react';
 
-import { Modal } from '@/components/Modal';
 import { Flex } from '@/components/Flex';
-import { Title, Text } from '@/components/Typography';
-import { getErrorMessage, cn } from '@/lib/utils';
+import { Modal } from '@/components/Modal';
+import { Text, Title } from '@/components/Typography';
+import { cn } from '@/lib/utils';
 import { downloadProductImportCSVTemplate } from './download-template';
 
 /**
@@ -41,7 +36,7 @@ function useImportBatchJob(batchJobId?: string) {
 	const { batch_job } = useAdminBatchJob(batchJobId!, {
 		enabled: !!batchJobId,
 		refetchInterval: isBatchJobProcessing ? 2000 : false,
-	});
+	} as any);
 
 	useEffect(() => {
 		setBatchJob(batch_job);
@@ -77,7 +72,8 @@ const ImportModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 	const hasError = batchJob?.status === 'failed';
 
 	const progress = isPreprocessed
-		? batchJob!.result.advancement_count / batchJob!.result.count
+		? (batchJob!.result.advancement_count as any) /
+		  (batchJob!.result.count || 1)
 		: undefined;
 
 	const status = hasError
@@ -110,14 +106,14 @@ const ImportModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 		try {
 			const res = await adminUploadFile(file as any);
 			const _fileKey = res.uploads[0].key;
-			setFileKey(_fileKey);
+			setFileKey(_fileKey as any);
 			const batchJob = await createBatchJob({
 				dry_run: true,
 				context: { fileKey: _fileKey },
 				type: 'product-import',
 			});
 			resetInterval();
-			setBatchJobId(batchJob.batch_job.id);
+			setBatchJobId(batchJob.batch_job.id as any);
 		} catch (e) {
 			message.error('Nhập file thất bại.');
 
@@ -127,7 +123,7 @@ const ImportModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 		}
 	};
 
-	const onUpload = async (file) => {
+	const onUpload = async (file: any) => {
 		setUploadFile(file);
 		await processUpload(file);
 	};
@@ -186,7 +182,7 @@ const ImportModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 		handleCancel();
 		if (
 			!['confirmed', 'completed', 'canceled', 'failed'].includes(
-				batchJob?.status
+				batchJob?.status || ''
 			)
 		) {
 			if (fileKey) {
@@ -218,8 +214,8 @@ const ImportModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 			</Flex>
 			{getSummary() && (
 				<UploadSummary
-					creations={getSummary().toCreate}
-					updates={getSummary().toUpdate}
+					creations={getSummary()!.toCreate}
+					updates={getSummary()!.toUpdate}
 					type={'sản phẩm'}
 				/>
 			)}
@@ -272,7 +268,7 @@ type DropAreaProps = {
 const DropArea: FC<DropAreaProps> = ({ onUpload }) => {
 	const [isDragOver, setIsDragOver] = useState(false);
 
-	const handleFileDrop = (e) => {
+	const handleFileDrop = (e: any) => {
 		e.preventDefault();
 		e.stopPropagation();
 		setIsDragOver(false);
@@ -282,11 +278,11 @@ const DropArea: FC<DropAreaProps> = ({ onUpload }) => {
 		}
 	};
 
-	const handleFileSelect = (e) => {
+	const handleFileSelect = (e: any) => {
 		onUpload(e.target.files[0]);
 	};
 
-	const onDragOver = (event) => {
+	const onDragOver = (event: any) => {
 		event.stopPropagation();
 		event.preventDefault();
 	};

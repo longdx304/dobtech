@@ -30,7 +30,7 @@ export function getAllProductPricesRegions(product: Product) {
 	const regionMap: Record<string, true> = {};
 
 	product.variants!.forEach((variant) => {
-		variant.prices!.forEach((price) => {
+		variant.prices!.forEach((price: any) => {
 			if (
 				price.price_list_id ||
 				price.min_quantity ||

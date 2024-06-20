@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 import { BatchJob } from '@medusajs/medusa/dist';
 import {

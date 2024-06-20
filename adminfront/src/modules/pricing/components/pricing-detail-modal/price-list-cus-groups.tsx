@@ -16,7 +16,7 @@ const PriceListCustomerGroups = ({
 	priceList,
 }: {
 	form: any;
-	priceList: PriceList;
+	priceList?: PriceList;
 }) => {
 	const [isCustomerGroups, setIsCustomerGroups] = useState<boolean>(false);
 	const [searchValue, setSearchValue] = useState<string>('');

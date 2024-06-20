@@ -152,7 +152,7 @@ const AddCustomerGroup: FC<Props> = ({
 			handleOk={onSubmit}
 			isLoading={addCustomers.isLoading || deleteCustomers.isLoading}
 			handleCancel={handleCancel}
-			footer={renderFooter}
+			footer={renderFooter()}
 			width={800}
 		>
 			<Title level={3}>Chỉnh sửa khách hàng</Title>

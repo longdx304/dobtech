@@ -26,7 +26,7 @@ const DetailForm: FC<Props> = ({ setDetailForm, setCurrentStep, onCancel }) => {
 		<Form form={form} onFinish={onFinish} className="px-4">
 			<PriceListType />
 			<PriceListGeneral />
-			<PriceListCustomerGroups form={form} />
+			<PriceListCustomerGroups form={form}  />
 			<Flex justify="flex-end" gap="small" className="mt-4">
 				<Button type="default" onClick={onCancel}>
 					Huỷ

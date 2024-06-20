@@ -55,7 +55,6 @@ export default function Modal({
 			className={cn('', className)}
 			onCancel={handleCancel}
 			footer={renderFooter()}
-			id={id}
 			{...props}
 		>
 			{children}
