@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { getProductsList } from '@/actions/products';
 import ProductList from '@/modules/products/components/product-list';
 import RefinementList from '@/modules/store/components/refinement-list';
+import { SortOptions } from '@/modules/store/components/refinement-list/sort-products';
 
 export const metadata: Metadata = {
   title: 'CHAMDEP VN | Tìm kiếm',
@@ -25,12 +26,12 @@ export default async function SearchPage({ params, searchParams }: Params) {
   const { response } = await getProductsList({
     pageParam: 0,
     queryParams,
-  } as any);
+  });
 
   return (
     <div className='w-full box-border container pt-[4rem] lg:pt-[6rem]'>
       <RefinementList
-        sortBy={searchValue as any}
+        sortBy={searchValue as SortOptions}
         data-testid='sort-by-container'
       />
       <ProductList data={response} searchValue={searchValue} />

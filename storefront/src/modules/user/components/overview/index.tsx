@@ -1,5 +1,3 @@
-'use client';
-
 import { ProductPreviewType } from '@/types/product';
 import OverviewDesktop from './OverviewDesktop';
 import OverviewMobile from './OverviewMobile';

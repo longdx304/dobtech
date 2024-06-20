@@ -1,5 +1,9 @@
+import { getCustomer } from '@/actions/customer';
 import { listCategories } from '@/actions/productCategory';
+import { getRegion } from '@/actions/region';
 import { MedusaProvider } from '@/lib/providers/medusa-provider';
+import { RegionProvider } from '@/lib/providers/region-provider';
+import { CustomerProvider } from '@/lib/providers/user/user-provider';
 import Header from '@/modules/common/components/header';
 import Menu from '@/modules/common/components/menu';
 import { TTreeCategories } from '@/types/productCategory';
@@ -9,10 +13,6 @@ import type { Metadata } from 'next';
 import { cache } from 'react';
 import '../../app/globals.css';
 import theme from '../../theme';
-import { RegionProvider } from '@/lib/providers/region-provider';
-import { getRegion } from '@/actions/region';
-import { CustomerProvider } from '@/lib/providers/user/user-provider';
-import { getCustomer } from '@/actions/customer';
 
 export const metadata: Metadata = {
   title: 'CHAMDEP VN | Giày dép nam nữ trẻ em',

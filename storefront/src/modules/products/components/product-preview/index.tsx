@@ -1,27 +1,25 @@
 import { FC } from 'react';
 
+import { retrievePricedProductById } from '@/actions/products';
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
+import { cn } from '@/lib/utils';
+import { getProductPrice } from '@/lib/utils/get-product-price';
 import LocalizedClientLink from '@/modules/common/components/localized-client-link';
 import Thumbnail from '@/modules/products/components/thumbnail';
-import { cn } from '@/lib/utils';
-import PreviewPrice from './price';
 import { ProductPreviewType } from '@/types/product';
 import { Region } from '@medusajs/medusa';
-import { getProductPrice } from '@/lib/utils/get-product-price';
-import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
-import { useProducts } from 'medusa-react';
-import { retrievePricedProductById } from '@/actions/products';
+import PreviewPrice from './price';
 
 interface Props {
   data: ProductPreviewType;
-  region: Region;
+  region?: Region;
 }
 
 const ProductPreview: FC<Props> = async ({ data, region }) => {
   const pricedProduct = await retrievePricedProductById({
     id: data.id,
-    regionId: region.id,
+    regionId: region?.id || '',
   }).then((product) => product);
 
   if (!pricedProduct) {
@@ -48,6 +46,7 @@ const ProductPreview: FC<Props> = async ({ data, region }) => {
           </Text>
           {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
         </Flex>
+        
       </Flex>
     </LocalizedClientLink>
   );
