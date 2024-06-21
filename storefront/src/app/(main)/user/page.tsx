@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { getProductsList } from '@/actions/products';
 import Overview from '@/modules/user/components/overview';
 import { getRegion } from '@/actions/region';
+import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
   title: 'CHAMDEP VN | Trang cá nhân',
@@ -15,7 +16,6 @@ export default async function UserPage() {
   } as any);
 
   const region = await getRegion('vn');
-
 
   return <Overview products={response} region={region!} />;
 }

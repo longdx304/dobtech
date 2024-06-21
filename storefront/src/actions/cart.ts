@@ -51,7 +51,9 @@ export async function addItem({
 
   return medusaClient.carts.lineItems
     .create(cartId, { variant_id: variantId, quantity }, headers)
-    .then(({ cart }) => cart)
+    .then(({ cart }) => {
+      return cart;
+    })
     .catch((err) => {
       console.log(err);
       return null;
@@ -94,10 +96,10 @@ export async function removeItem({
 }
 
 export async function completeCart(cartId: string) {
-  const headers = getMedusaHeaders(["cart"])
+  const headers = getMedusaHeaders(['cart']);
 
   return medusaClient.carts
     .complete(cartId, headers)
     .then((res) => res)
-    .catch((err) => medusaError(err))
+    .catch((err) => medusaError(err));
 }

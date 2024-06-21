@@ -17,7 +17,6 @@ interface Props {
 
 const Header: FC<Props> = ({ categories }) => {
   const pathname = usePathname();
-
   const showCategory = ['/'];
   const hiddenHeader = ['/search', '/user/*'];
 

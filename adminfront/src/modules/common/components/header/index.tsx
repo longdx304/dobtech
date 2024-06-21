@@ -1,23 +1,23 @@
 'use client';
-import { Skeleton, Badge } from 'antd';
-import { Menu, Bell } from 'lucide-react';
-import Image from 'next/image';
-import { FC } from 'react';
 import { User } from '@medusajs/medusa';
+import { Badge, Skeleton } from 'antd';
+import { Bell, Menu } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { FC } from 'react';
 
-import { Button, FloatButton } from '@/components/Button';
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { Dropdown } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import useScrollDirection from '@/lib/hooks/useScrollDirection';
 import { useUser } from '@/lib/providers/user-provider';
 import { cn } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
+import DropdownRender from '../notification/Dropdown';
 import DrawerMenu from './DrawerMenu';
 import Menubar from './Menubar';
-import { Dropdown } from '@/components/Dropdown';
-import DropdownRender from '../notification/Dropdown';
 
 interface Props {}
 

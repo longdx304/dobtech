@@ -1,4 +1,5 @@
 import { Button } from '@/components/Button';
+import { useCart } from '@/lib/providers/cart/cart-provider';
 import { cn } from '@/lib/utils';
 import { deleteLineItem } from '@/modules/cart/action';
 import { Loader, Trash } from 'lucide-react';
@@ -14,12 +15,15 @@ const DeleteButton = ({
   className?: string;
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { refreshCart } = useCart();
 
   const handleDelete = async (id: string) => {
     setIsDeleting(true);
     await deleteLineItem(id).catch((err) => {
       setIsDeleting(false);
     });
+
+    refreshCart();
   };
 
   return (

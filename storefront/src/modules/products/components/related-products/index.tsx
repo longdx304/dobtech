@@ -5,11 +5,9 @@ import {
 } from '@/actions/products';
 import { getRegion } from '@/actions/region';
 import { Region, StoreGetProductsParams } from '@medusajs/medusa';
-import ProductPreview from '../product-preview';
 import ProductList from '../product-list';
 
 type RelatedProductsProps = {
-  // product: PricedProduct;
   countryCode: string;
   handle: string;
 };
@@ -106,7 +104,7 @@ export default async function RelatedProducts({
         <span className='font-bold text-xl mr-4'>Khách Hàng Cũng Được Xem</span>
       </div>
 
-      <ProductList data={response} />
+      <ProductList data={response} region={region} />
     </div>
   );
 }

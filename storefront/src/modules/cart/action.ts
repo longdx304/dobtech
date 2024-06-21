@@ -1,6 +1,13 @@
 'use server';
 
-import { addItem, createCart, getCart, removeItem, updateCart, updateItem } from '@/actions/cart';
+import {
+  addItem,
+  createCart,
+  getCart,
+  removeItem,
+  updateCart,
+  updateItem,
+} from '@/actions/cart';
 import { getProductsById } from '@/actions/products';
 import { getRegion } from '@/actions/region';
 import { LineItem } from '@medusajs/medusa';
@@ -16,54 +23,54 @@ import { cookies } from 'next/headers';
  * const cart = await getOrSetCart()
  */
 export async function getOrSetCart(countryCode: string) {
-  const cartId = cookies().get("_medusa_cart_id")?.value
-  let cart
+  const cartId = cookies().get('_medusa_cart_id')?.value;
+  let cart;
 
   if (cartId) {
-    cart = await getCart(cartId).then((cart) => cart)
+    cart = await getCart(cartId).then((cart) => cart);
   }
 
-  const region = await getRegion(countryCode)
+  const region = await getRegion(countryCode);
 
   if (!region) {
-    return null
+    return null;
   }
 
-  const region_id = region.id
+  const region_id = region.id;
 
   if (!cart) {
-    cart = await createCart({ region_id }).then((res) => res)
+    cart = await createCart({ region_id }).then((res) => res);
     cart &&
-      cookies().set("_medusa_cart_id", cart.id, {
+      cookies().set('_medusa_cart_id', cart.id, {
         maxAge: 60 * 60 * 24 * 7,
         httpOnly: true,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
-      })
-    revalidateTag("cart")
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+      });
+    revalidateTag('cart');
   }
 
   if (cart && cart?.region_id !== region_id) {
-    await updateCart(cart.id, { region_id })
-    revalidateTag("cart")
+    await updateCart(cart.id, { region_id });
+    revalidateTag('cart');
   }
 
-  return cart
+  return cart;
 }
 
 export async function retrieveCart() {
-  const cartId = cookies().get("_medusa_cart_id")?.value
+  const cartId = cookies().get('_medusa_cart_id')?.value;
 
   if (!cartId) {
-    return null
+    return null;
   }
 
   try {
-    const cart = await getCart(cartId).then((cart) => cart)
-    return cart
+    const cart = await getCart(cartId).then((cart) => cart);
+    return cart;
   } catch (e) {
-    console.log(e)
-    return null
+    console.log(e);
+    return null;
   }
 }
 
@@ -72,25 +79,25 @@ export async function addToCart({
   quantity,
   countryCode,
 }: {
-  variantId: string
-  quantity: number
-  countryCode: string
+  variantId: string;
+  quantity: number;
+  countryCode: string;
 }) {
-  const cart = await getOrSetCart(countryCode).then((cart) => cart)
+  const cart = await getOrSetCart(countryCode).then((cart) => cart);
 
   if (!cart) {
-    return "Missing cart ID"
+    return 'Missing cart ID';
   }
 
   if (!variantId) {
-    return "Missing product variant ID"
+    return 'Missing product variant ID';
   }
 
   try {
-    await addItem({ cartId: cart.id, variantId, quantity })
-    revalidateTag("cart")
+    await addItem({ cartId: cart.id, variantId, quantity });
+    revalidateTag('cart');
   } catch (e) {
-    return "Error adding item to cart"
+    return 'Error adding item to cart';
   }
 }
 
@@ -98,51 +105,51 @@ export async function updateLineItem({
   lineId,
   quantity,
 }: {
-  lineId: string
-  quantity: number
+  lineId: string;
+  quantity: number;
 }) {
-  const cartId = cookies().get("_medusa_cart_id")?.value
+  const cartId = cookies().get('_medusa_cart_id')?.value;
 
   if (!cartId) {
-    return "Missing cart ID"
+    return 'Missing cart ID';
   }
 
   if (!lineId) {
-    return "Missing lineItem ID"
+    return 'Missing lineItem ID';
   }
 
   if (!cartId) {
-    return "Missing cart ID"
+    return 'Missing cart ID';
   }
 
   try {
-    await updateItem({ cartId, lineId, quantity })
-    revalidateTag("cart")
+    await updateItem({ cartId, lineId, quantity });
+    revalidateTag('cart');
   } catch (e: any) {
-    return e.toString()
+    return e.toString();
   }
 }
 
 export async function deleteLineItem(lineId: string) {
-  const cartId = cookies().get("_medusa_cart_id")?.value
+  const cartId = cookies().get('_medusa_cart_id')?.value;
 
   if (!cartId) {
-    return "Missing cart ID"
+    return 'Missing cart ID';
   }
 
   if (!lineId) {
-    return "Missing lineItem ID"
+    return 'Missing lineItem ID';
   }
 
   if (!cartId) {
-    return "Missing cart ID"
+    return 'Missing cart ID';
   }
 
   try {
-    await removeItem({ cartId, lineId })
-    revalidateTag("cart")
+    await removeItem({ cartId, lineId });
+    revalidateTag('cart');
   } catch (e) {
-    return "Error deleting line item"
+    return 'Error deleting line item';
   }
 }
 
@@ -150,32 +157,32 @@ export async function enrichLineItems(
   lineItems: LineItem[],
   regionId: string
 ): Promise<
-  | Omit<LineItem, "beforeInsert" | "beforeUpdate" | "afterUpdateOrLoad">[]
+  | Omit<LineItem, 'beforeInsert' | 'beforeUpdate' | 'afterUpdateOrLoad'>[]
   | undefined
 > {
   // Prepare query parameters
   const queryParams = {
     ids: lineItems.map((lineItem) => lineItem.variant.product_id),
     regionId: regionId,
-  }
+  };
 
   // Fetch products by their IDs
-  const products = await getProductsById(queryParams)
+  const products = await getProductsById(queryParams);
 
   // If there are no line items or products, return an empty array
   if (!lineItems?.length || !products) {
-    return []
+    return [];
   }
 
   // Enrich line items with product and variant information
 
   const enrichedItems = lineItems.map((item) => {
-    const product = products.find((p) => p.id === item.variant.product_id)
-    const variant = product?.variants.find((v) => v.id === item.variant_id)
+    const product = products.find((p) => p.id === item.variant.product_id);
+    const variant = product?.variants.find((v) => v.id === item.variant_id);
 
     // If product or variant is not found, return the original item
     if (!product || !variant) {
-      return item
+      return item;
     }
 
     // If product and variant are found, enrich the item
@@ -183,10 +190,10 @@ export async function enrichLineItems(
       ...item,
       variant: {
         ...variant,
-        product: _.omit(product, "variants"),
+        product: _.omit(product, 'variants'),
       },
-    }
-  }) as LineItem[]
+    };
+  }) as LineItem[];
 
-  return enrichedItems
+  return enrichedItems;
 }

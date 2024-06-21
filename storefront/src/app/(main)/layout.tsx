@@ -13,6 +13,7 @@ import type { Metadata } from 'next';
 import { cache } from 'react';
 import '../../app/globals.css';
 import theme from '../../theme';
+import { CartProvider } from '@/lib/providers/cart/cart-provider';
 
 export const metadata: Metadata = {
   title: 'CHAMDEP VN | Giày dép nam nữ trẻ em',
@@ -62,9 +63,11 @@ export default async function PageLayout({
           <MedusaProvider>
             <RegionProvider regionData={region!}>
               <CustomerProvider initialCustomer={customer}>
-                <Header categories={formatCategories} />
-                <Menu categories={formatCategories} />
-                <div>{children}</div>
+                <CartProvider>
+                  <Header categories={formatCategories} />
+                  <Menu categories={formatCategories} />
+                  <div>{children}</div>
+                </CartProvider>
               </CustomerProvider>
             </RegionProvider>
           </MedusaProvider>

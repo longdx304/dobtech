@@ -6,12 +6,21 @@ export async function middleware(request: NextRequest) {
   const origin = url.origin;
   const pathname = url.pathname;
 
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-url', request.url);
+  requestHeaders.set('x-pathname', pathname);
+  requestHeaders.set('x-origin', origin);
+
   // Check if user is authenticated
   const { device } = userAgent(request);
   const isUserAuthenticated = request.cookies.get('_medusa_jwt');
 
   if (device.type === 'mobile') {
-    return;
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   } else {
     if (isUserAuthenticated && pathname === `/${ERoutes.AUTH}`) {
       return NextResponse.redirect(new URL(`/${ERoutes.USER}`, request.url));
@@ -19,18 +28,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(`/${ERoutes.AUTH}`, request.url));
     }
   }
-
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-url', request.url);
-  requestHeaders.set('x-pathname', pathname);
-  requestHeaders.set('x-origin', origin);
-
-  return NextResponse.next({
-    request: {
-      // Apply new request headers
-      headers: requestHeaders,
-    },
-  });
 }
 
 export const config = {

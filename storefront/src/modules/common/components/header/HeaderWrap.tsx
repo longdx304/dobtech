@@ -10,7 +10,6 @@ import LocalizedClientLink from '../localized-client-link';
 interface Props {}
 
 const HeaderWrap: FC<Props> =  ({}) => {
-
   
   return (
     <Flex
