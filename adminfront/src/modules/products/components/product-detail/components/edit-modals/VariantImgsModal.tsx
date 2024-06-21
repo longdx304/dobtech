@@ -86,7 +86,7 @@ const VariantImgsModal: FC<Props> = ({
 	const valuesDisabled = Object.values(formData).filter((value) => value);
 	const optionsSelect = product?.options?.map((option) => {
 		const uniqueValues = Array.from(
-			new Set(option.values.map((value) => value.value))
+			new Set(option.values.map((value: any) => value.value))
 		);
 		return {
 			title: option.title,
