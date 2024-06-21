@@ -15,7 +15,7 @@ const CartContent = ({
 	console.log('cart', cartState)
 	return (
 		<div className="w-[420px]">
-			{cartState && (
+			{!!cartState.items.length && (
 				<div className="flex items-center justify-center py-4">
 					<Title className="text-xl">Sản phẩm mới thêm</Title>
 				</div>
@@ -111,7 +111,7 @@ export default CartContent;
 
 const EmptyCart = () => {
 	return (
-		<div className="flex pb-12 flex-col gap-y-2 items-center justify-center">
+		<div className="flex pt-8 pb-12 flex-col gap-y-2 items-center justify-center">
 			<Image
 				src={'/images/empty-cart.png'}
 				alt="Empty cart"
