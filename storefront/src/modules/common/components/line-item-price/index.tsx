@@ -29,7 +29,7 @@ const LineItemPrice = ({
               {style === "default" && (
                 <span className="text-md">Original: </span>
               )}
-              <span className="line-through text-md" data-testid="product-original-price">
+              <span className="line-through text-md font-bold" data-testid="product-original-price">
                 {formatAmount({
                   amount: originalPrice,
                   region: region,
@@ -45,7 +45,7 @@ const LineItemPrice = ({
           </>
         )}
         <span
-          className={cn("text-md", {
+          className={cn("text-md font-bold", {
             "text-lg": hasReducedPrice,
           })}
           data-testid="product-price"
