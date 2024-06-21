@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from 'lucide-react';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient } from "@tanstack/react-query"
 
 /* Map of payment provider_id to their title and icon. Add in any payment providers you want to use. */
 export const paymentInfoMap: Record<
@@ -56,6 +56,7 @@ export const noDivisionCurrencies = [
 export const MEDUSA_BACKEND_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000';
 
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -64,4 +65,4 @@ export const queryClient = new QueryClient({
       retry: 1,
     },
   },
-});
+})

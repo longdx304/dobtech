@@ -1,11 +1,12 @@
 import { ProductOption } from '@medusajs/medusa';
 import React from 'react';
+import { Check } from 'lucide-react';
+import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
 import { onlyUnique } from '@/lib/utils/only-unique';
 import { Button } from '@/components/Button';
-import { Check } from 'lucide-react';
-import Image from 'next/image';
+import { useVariantImages } from "@/lib/providers/product/variant-images-provider";
 
 type OptionSelectProps = {
   option: ProductOption;
@@ -29,8 +30,14 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   'data-testid': dataTestId,
   disabled,
 }) => {
+	const { setOptionValue } = useVariantImages();
   const translatedTitle = titleMapping[title] || title;
   const filteredOptions = option.values.map((v) => v.value).filter(onlyUnique);
+
+	const handleClick = (value: string) => {
+		updateOption({ [option.id]: value });
+		setOptionValue(value);
+	}
 
   return (
     <div className='flex flex-col gap-y-3'>
@@ -42,7 +49,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
         {filteredOptions.map((v) => {
           return (
             <Button
-              onClick={() => updateOption({ [option.id]: v })}
+              onClick={() => handleClick(v)}
               key={v}
               className={cn(
                 'w-fit bg-[#fff] border-[#ccc] border h-10 rounded-rounded py-2 px-3 shadow-none text-black relative',

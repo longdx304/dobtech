@@ -5,11 +5,12 @@ import { ReactNode } from 'react';
 interface Props extends CheckboxProps {
 	className?: string;
 	children?: ReactNode;
+	value?: string | number;
 }
 
-export default function Checkbox({ className, children, ...props }: Props) {
+export default function Checkbox({ className, value, children, ...props }: Props) {
 	return (
-		<AntdCheckbox className={cn('', className)} {...props}>
+		<AntdCheckbox value={value} className={cn('', className)} {...props}>
 			{children}
 		</AntdCheckbox>
 	);

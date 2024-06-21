@@ -7,7 +7,7 @@ import SuggestSearch from '@/modules/search/components/suggest-search';
 import { Input, Menu } from 'antd';
 import _ from 'lodash';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 
 const { Search } = Input;
 
@@ -42,7 +42,7 @@ const SearchInput = () => {
   );
 
   const dropdownContent = (
-    <Menu style={{padding: '24px'}}>
+    <Menu style={{ padding: '24px' }}>
       {searchValue ? (
         <SuggestSearch searchValue={searchValue} />
       ) : (

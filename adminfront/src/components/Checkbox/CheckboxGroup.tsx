@@ -7,6 +7,7 @@ interface Props extends CheckboxProps {
 	children?: ReactNode;
 	error?: string;
 	options?: any;
+	value?: string[];
 	onChange?: any;
 }
 
@@ -16,6 +17,7 @@ export default function CheckboxGroup({
 	children,
 	options,
 	onChange,
+	value,
 	...props
 }: Props) {
 	return (
@@ -24,6 +26,7 @@ export default function CheckboxGroup({
 			{...props}
 			options={options}
 			onChange={onChange}
+			value={value}
 		>
 			{children}
 		</AntdCheckbox.Group>

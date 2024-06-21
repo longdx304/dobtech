@@ -16,7 +16,7 @@ describe('Login spec', () => {
 	beforeEach(() => {
 		cy.login('admin@test.com', '123456');
 		cy.wait(1000);
-		cy.visit('/accounts');
+		cy.visit('/admin/accounts');
 		
 	});
 

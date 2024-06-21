@@ -14,6 +14,7 @@ import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
 import { Minus, Plus } from 'lucide-react';
 import OptionSelect from '../option-select';
 import _ from 'lodash';
+import { useCart } from '@/lib/providers/cart/cart-provider';
 
 type ProductActionsProps = {
   product: PricedProduct;
@@ -47,12 +48,14 @@ export default function ProductActions({
   } = useActionProduct({
     product,
   });
+  const { refreshCart } = useCart();
 
   const [isAdding, setIsAdding] = useState(false);
 
   const countryCode = (useParams().countryCode as string) ?? 'vn';
 
   const actionsRef = useRef<HTMLDivElement>(null);
+
 
   // add the selected variant to the cart
   const handleAddToCart = async () => {
@@ -64,6 +67,7 @@ export default function ProductActions({
       quantity: quantity,
       countryCode,
     });
+    refreshCart();
 
     setIsAdding(false);
   };
@@ -125,7 +129,9 @@ export default function ProductActions({
 
         <Button
           onClick={handleAddToCart}
-          disabled={!inStock || !variant || !!disabled || isAdding || !options || !price}
+          disabled={
+            !inStock || !variant || !!disabled || isAdding || !options || !price
+          }
           className='max-w-[200px]'
           isLoading={isAdding}
           data-testid='add-product-button'

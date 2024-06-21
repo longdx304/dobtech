@@ -1,10 +1,8 @@
 'use client';
 import { FC } from 'react';
-import { ArrowLeft } from 'lucide-react';
 import { Row, Col } from 'antd';
 import { Product } from '@medusajs/medusa';
 
-import { Button } from '@/components/Button';
 import ImageThumbnail from './ImageThumbnail';
 import ImageMedia from './ImageMedia';
 

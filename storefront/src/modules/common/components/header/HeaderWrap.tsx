@@ -9,7 +9,8 @@ import LocalizedClientLink from '../localized-client-link';
 
 interface Props {}
 
-const HeaderWrap: FC<Props> = ({}) => {
+const HeaderWrap: FC<Props> =  ({}) => {
+  
   return (
     <Flex
       className='w-full hidden lg:flex'
@@ -28,7 +29,7 @@ const HeaderWrap: FC<Props> = ({}) => {
       </div>
       <Flex gap='small' className='justify-end items-center w-full pr-3 lg:pr-0'>
         {/* Search */}
-        <SearchInput />
+        <SearchInput/>
         
         {/* Cart */}
         <CartButton />

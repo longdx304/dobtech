@@ -21,6 +21,7 @@ const CartDropdown = ({
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
 
   const { countryCode } = useParams();
+  const pathname = usePathname();
 
   const open = () => setCartDropdownOpen(true);
   const close = () => setCartDropdownOpen(false);
@@ -57,8 +58,6 @@ const CartDropdown = ({
     };
   }, [activeTimer]);
 
-  const pathname = usePathname();
-
   // open cart dropdown when modifying the cart items, but only if we're not on the cart page
   useEffect(() => {
     if (itemRef.current !== totalItems && !pathname.includes('/cart')) {
@@ -69,9 +68,11 @@ const CartDropdown = ({
 
   const content = (
     <div className='w-[420px]'>
-      <div className='flex items-center justify-center'>
-        <h3 className='text-xl'>Sản phẩm mới thêm</h3>
-      </div>
+      {cartState && (
+        <div className='flex items-center justify-center'>
+          <h3 className='text-xl'>Sản phẩm mới thêm</h3>
+        </div>
+      )}
       {cartState && cartState.items?.length ? (
         <>
           <div className='overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-8 p-px'>

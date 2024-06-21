@@ -12,6 +12,10 @@ const pwaConfig = {
 	skipWaiting: true,
 	cacheOnFrontEndNav: true,
 	reloadOnOnline: true,
+	fallbacks: {
+		// image: "/images/fallback.jpg",
+		document: "/offline",
+	},
 };
 
 const nextConfig = withStoreConfig({
