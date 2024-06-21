@@ -102,6 +102,7 @@ const DrawPriceProduct: FC<Props> = ({
       className='h-auto [&_.ant-drawer-body]:p-4 [&_.ant-drawer-header-title]:flex-row-reverse [&_.ant-drawer-header-title]:items-start [&_.ant-drawer-header]:py-3 [&_.ant-drawer-header]:pl-3'
       footer={footer}
       title={title}
+			height={'auto'}
     >
       <Row>
         <Col span={24}>

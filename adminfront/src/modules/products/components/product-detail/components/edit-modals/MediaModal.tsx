@@ -3,6 +3,7 @@ import { Form, FormProps, message } from 'antd';
 import { useAdminUpdateProduct } from 'medusa-react';
 import { FC, useEffect } from 'react';
 import _ from 'lodash';
+import { useMedusa } from 'medusa-react';
 
 import { prepareImages, deleteImages } from '@/actions/images';
 import { SubmitModal } from '@/components/Modal';
@@ -27,6 +28,7 @@ const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 	const updateProduct = useAdminUpdateProduct(product?.id);
+	const { client } = useMedusa();
 
 	useEffect(() => {
 		form.setFieldsValue({
@@ -36,11 +38,11 @@ const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 						url: image.url,
 						name: `Hình ảnh ${index + 1}`,
 						selected: false,
-				  }))
+					}))
 				: [],
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [product]);
+	}, [product, state]);
 
 	const checkUrlMatch = (
 		images: FormImage[],
@@ -49,6 +51,38 @@ const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 		const urls = productImages?.map((image) => image.url) || [];
 		const newUrls = images?.map((image) => image.url) || [];
 		return _.isEqual(urls, newUrls);
+	};
+
+	const toDeleteImage = async ({
+		product,
+		newProduct,
+	}: {
+		product: Product;
+		newProduct: Product;
+	}) => {
+		const oldImagesIds = product?.images?.map((image) => image.id) || null;
+		const newImagesIds = newProduct?.images?.map((image) => image.id) || null;
+
+		const toDeleteIds = oldImagesIds.filter((id) => !newImagesIds.includes(id));
+
+		if (product?.metadata?.variant_images && toDeleteIds?.length) {
+			const variantImages = JSON.parse(
+				product?.metadata?.variant_images as string
+			);
+
+			const updateVariantImgs = variantImages?.filter(
+				(variantImg: any) => !toDeleteIds.includes(variantImg.image_id)
+			);
+
+			await client.admin.products
+				.setMetadata(product.id, {
+					key: 'variant_images',
+					value: JSON.stringify(updateVariantImgs),
+				})
+				.catch((err) => {
+					message.error(getErrorMessage(err));
+				});
+		}
 	};
 
 	const onFinish: FormProps<MediaFormProps>['onFinish'] = async (values) => {
@@ -64,14 +98,15 @@ const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 					product?.images?.map((image) => image.url) || null;
 				preppedImages = await prepareImages(values.media, currentImagesUrls);
 			} catch (error) {
-				console.log('err', error);
 				messageApi.error('Đã xảy ra lỗi khi tải hình ảnh lên.');
 				return;
 			}
+
 			const urls = preppedImages.map((img) => img.url);
 			payload.images = urls;
-			updateProduct.mutateAsync(payload, {
-				onSuccess: () => {
+			await updateProduct.mutateAsync(payload, {
+				onSuccess: async ({ product: newProduct }) => {
+					await toDeleteImage({ product, newProduct });
 					messageApi.success('Chỉnh sửa media thành công');
 					handleOk();
 					return;
@@ -105,13 +140,3 @@ const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 };
 
 export default MediaModal;
-
-const getDefaultValues = (imagesProduct: Product['images']) => {
-	return {
-		media:
-			imagesProduct?.map((image) => ({
-				url: image.url,
-				selected: false,
-			})) || [],
-	};
-};

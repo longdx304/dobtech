@@ -6,6 +6,7 @@ import {
 } from "@/actions/products";
 import { getRegion } from "@/actions/region";
 import { ProductProvider } from "@/lib/providers/product/product-provider";
+import { VariantImagesProvider } from "@/lib/providers/product/variant-images-provider";
 import { cn } from "@/lib/utils";
 import MenuProductDetail from "@/modules/products/templates/menu-product-detail";
 import { Region } from "@medusajs/medusa";
@@ -52,8 +53,10 @@ export default async function ProductDetailLayout(props: Props) {
 	return (
 		<div className={cn("w-full box-border")}>
 			<ProductProvider productData={pricedProduct}>
-        <MenuProductDetail />
-        {props.children}
+				<VariantImagesProvider>
+					<MenuProductDetail />
+					{props.children}
+				</VariantImagesProvider>
       </ProductProvider>
 		</div>
 	);
