@@ -11,6 +11,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Bell, LoaderCircle, CircleX, File, FileBox } from 'lucide-react';
 import { notification } from 'antd';
+import * as XLSX from 'xlsx';
 
 import { batchJobDescriptionBuilder } from './utils';
 import { cn, getErrorMessage, bytesConverter } from '@/lib/utils';
@@ -120,13 +121,40 @@ const BatchJobActivityCard = (props: { batchJob: BatchJob }) => {
 			const { download_url } = await createPresignedUrl({
 				file_key: batchJob.result?.file_key,
 			});
-			const link = document.createElement('a');
-			link.href = download_url;
-			link.setAttribute('download', `${batchJob.result?.file_key}`);
-			activityCardRef.current?.appendChild(link);
-			link.click();
+			// Tạo một request để kiểm tra nội dung tệp
+			const response = await fetch(download_url);
+			const blob = await response.blob();
 
-			activityCardRef.current?.removeChild(link);
+			// Đảm bảo mã hóa UTF-8
+			const reader = new FileReader();
+			reader.onload = () => {
+				const csvText = reader.result;
+
+				// Chuyển đổi CSV thành workbook
+				const workbook = XLSX.read(csvText, { type: 'string' });
+
+				// Chuyển đổi workbook thành tệp Blob
+				const wopts = { bookType: 'xlsx', type: 'array' };
+				const xlsxBlob = new Blob([XLSX.write(workbook, wopts)], { type: 'application/octet-stream' });
+
+				// Tạo và kích hoạt link tải xuống cho tệp XLSX
+				const link = document.createElement('a');
+				link.href = URL.createObjectURL(xlsxBlob);
+				link.setAttribute('download', `${batchJob.result?.file_key.replace('.csv', '.xlsx')}`);
+				document.body.appendChild(link); // Append to body instead of a specific element
+				link.click();
+				document.body.removeChild(link); // Remove from body after click
+			};
+			reader.readAsText(blob, 'utf-8');
+
+			// const link = document.createElement('a');
+			// link.href = download_url;
+			// link.setAttribute('download', `${batchJob.result?.file_key}`);
+			// activityCardRef.current?.appendChild(link);
+			// link.click();
+
+			// activityCardRef.current?.removeChild(link);
+
 		} catch (e) {
 			notification.error({
 				description: `Đã xảy ra lỗi trong khi tải xuống tệp ${operation.toLowerCase()}`,

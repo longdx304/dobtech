@@ -33,9 +33,9 @@ const VariantImgsModal: FC<Props> = ({
 	const { client } = useMedusa();
 
 	useEffect(() => {
-		const variantImages = JSON.parse(
-			product?.metadata?.variant_images as string
-		);
+		const variantImages =
+			product?.metadata?.variant_images &&
+			JSON.parse(product?.metadata?.variant_images as string);
 		if (variantImages) {
 			form.setFieldsValue({
 				images: variantImages.reduce(
