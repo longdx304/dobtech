@@ -65,10 +65,11 @@ const CartContent = ({
 												</div>
 											</div>
 										</div>
-										<div className="flex justify-start items-center text-xs">
-											<span
+										<div className="flex justify-start items-center gap-[2px] text-xs">
+											<span>Phân loại hàng:</span>
+											<span className="bg-gray-200 px-[8px] py-[3px] rounded-lg"
 											>
-												Phân loại hàng: {item.variant.options.map(option => option.value).join('/')}
+												{item.variant.options.map(option => option.value).join('/')}
 											</span>
 										</div>
 										<div className="flex justify-between items-center text-xs">

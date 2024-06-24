@@ -74,7 +74,7 @@ export default function ProductActions({
 
   return (
     <>
-      <ProductInfo product={product} region={region} variant={variant} />
+      <ProductInfo product={product} region={region} variant={variant} options={options} />
       <div className='hidden lg:flex flex-col gap-y-2 mt-1' ref={actionsRef}>
         <div>
           {product?.variants?.length && (

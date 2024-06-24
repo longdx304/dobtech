@@ -60,7 +60,7 @@ export default function ImageGallery() {
 	}, [optionValue, variantImg, images])
 
 	return (
-		<Flex className="flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-[730px]">
+		<Flex className="flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-auto">
 			{/* Thumbnails */}
 			<Flex className="flex flex-wrap lg:flex-col justify-center w-full lg:w-fit gap-4">
 				{images?.map((img, index) => (

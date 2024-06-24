@@ -12,9 +12,10 @@ type ProductInfoProps = {
   product: PricedProduct;
   region: Region;
   variant?: PricedVariant;
+	options: Record<string, string>;
 };
 
-const ProductInfo = ({ product, region, variant }: ProductInfoProps) => {
+const ProductInfo = ({ product, region, variant, options }: ProductInfoProps) => {
   if (!product || !region) {
     notFound();
   }
@@ -26,6 +27,7 @@ const ProductInfo = ({ product, region, variant }: ProductInfoProps) => {
         product={product}
         variant={variant as any}
         region={region}
+				options={options}
       />
       <h1 className='text-2xl font-semibold'>{product?.title}</h1>
     </div>

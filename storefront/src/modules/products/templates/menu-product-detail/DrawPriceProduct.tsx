@@ -71,6 +71,8 @@ const DrawPriceProduct: FC<Props> = ({
           product={product}
           variant={variant as any}
           region={region}
+					options={options}
+					isDrawer={true}
         />
         <Text className='text-sm text-gray-400'>{`Kho: ${
           inventoryQuantity || 0
@@ -83,7 +85,7 @@ const DrawPriceProduct: FC<Props> = ({
     <Button
       onClick={handleAddToCart}
       disabled={!inStock || !variant || !!disabled || isAdding}
-      className='w-full h-10 rounded-[4px]'
+      className='w-full h-10 rounded-[4px] mb-2'
       isLoading={isAdding}
       data-testid='add-product-button'
     >

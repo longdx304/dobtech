@@ -21,7 +21,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         <div className='w-full lg:w-fit lg:flex-grow lg:pr-4'>
           <ImageGallery />
         </div>
-        <div className='w-full lg:w-[40%] lg:flex-grow lg:pl-4'>
+        <div className='w-full lg:w-full lg:flex-grow lg:pl-4'>
           <Suspense>
             <ProductActionsWrapper countryCode={countryCode} handle={handle} />
           </Suspense>

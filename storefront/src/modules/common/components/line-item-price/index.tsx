@@ -23,9 +23,9 @@ const LineItemPrice = ({
   return (
     <div className="flex flex-col gap-x-2 text-md items-end">
       <div className="text-left">
-        {hasReducedPrice && (
+        {/* {hasReducedPrice && (
           <>
-            <p>
+            <p className="m-0">
               {style === "default" && (
                 <span className="text-md">Original: </span>
               )}
@@ -43,10 +43,10 @@ const LineItemPrice = ({
               </span>
             )}
           </>
-        )}
+        )} */}
         <span
-          className={cn("text-md font-bold", {
-            "text-lg": hasReducedPrice,
+          className={cn("text-md font-bold text-[#FA6338]", {
+            // "text-lg ": hasReducedPrice,
           })}
           data-testid="product-price"
         >
