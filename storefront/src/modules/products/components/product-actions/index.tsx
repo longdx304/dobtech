@@ -15,10 +15,12 @@ import { Minus, Plus } from 'lucide-react';
 import OptionSelect from '../option-select';
 import _ from 'lodash';
 import { useCart } from '@/lib/providers/cart/cart-provider';
+import { useProduct } from "@/lib/providers/product/product-provider";
 
 type ProductActionsProps = {
-  product: PricedProduct;
-  region: Region;
+  // product: PricedProduct;
+  // region: Region;
+	handleCancel: () => void;
   disabled?: boolean;
 };
 
@@ -30,10 +32,12 @@ export type PriceType = {
 };
 
 export default function ProductActions({
-  product,
-  region,
+  // product,
+  // region,
+	handleCancel = () => {},
   disabled,
 }: ProductActionsProps) {
+	const { region, product } = useProduct();
   const {
     options,
     updateOptions,
@@ -70,6 +74,7 @@ export default function ProductActions({
     refreshCart();
 
     setIsAdding(false);
+		handleCancel();
   };
 
   return (

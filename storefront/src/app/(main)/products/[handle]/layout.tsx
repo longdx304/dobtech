@@ -52,7 +52,7 @@ export default async function ProductDetailLayout(props: Props) {
 
 	return (
 		<div className={cn("w-full box-border")}>
-			<ProductProvider productData={pricedProduct}>
+			<ProductProvider productData={pricedProduct} regionData={region}>
 				<VariantImagesProvider>
 					<MenuProductDetail />
 					{props.children}

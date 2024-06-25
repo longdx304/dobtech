@@ -1,5 +1,5 @@
 'use client';
-
+import { Skeleton } from 'antd';
 import { Region } from '@medusajs/medusa';
 import {
   PricedProduct,
@@ -17,7 +17,18 @@ type ProductInfoProps = {
 
 const ProductInfo = ({ product, region, variant, options }: ProductInfoProps) => {
   if (!product || !region) {
-    notFound();
+    // notFound();
+		return (
+			<div className="flex flex-col gap-2">
+				<Skeleton.Input active />
+				<Skeleton.Input active block />
+				<Skeleton.Input active />
+				<Skeleton.Input active block />
+				<Skeleton.Input active />
+				<Skeleton.Input active block />
+				<Skeleton.Input active />
+			</div>
+		)
   }
 
   return (

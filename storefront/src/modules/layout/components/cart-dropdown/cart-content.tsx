@@ -12,18 +12,18 @@ const CartContent = ({
 }: {
 	cart?: Omit<Cart, 'beforeInsert' | 'afterLoad'> | null;
 }) => {
-	console.log('cart', cartState)
+
 	return (
 		<div className="w-[420px]">
-			{!!cartState?.items.length && (
+			{!!cartState?.items?.length && (
 				<div className="flex items-center justify-center py-4">
 					<Title className="text-xl">Sản phẩm mới thêm</Title>
 				</div>
 			)}
-			{cartState && cartState.items?.length ? (
+			{cartState && cartState?.items?.length ? (
 				<>
 					<div className="overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-8 p-px">
-						{cartState.items
+						{cartState?.items
 							.sort((a, b) => {
 								return a.created_at > b.created_at ? -1 : 1;
 							})

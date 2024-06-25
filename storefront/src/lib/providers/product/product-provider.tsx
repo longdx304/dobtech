@@ -1,40 +1,53 @@
 'use client';
-import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
 import React, {
 	PropsWithChildren,
 	useContext,
 	useEffect,
 	useState,
 } from 'react';
+import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
+import { Region } from '@medusajs/medusa';
 
 type TProductContext = {
   product: PricedProduct | null;
   setProduct: (product: PricedProduct) => void;
+  region: Region | null;
+	setRegion: (region: Region) => void;
 };
 const defaultProductContext: TProductContext = {
   product: null,
   setProduct: () => {},
+  region: null,
+  setRegion: () => {},
 };
 
 const ProductContext = React.createContext(defaultProductContext);
 
 type Props = {
-  productData: PricedProduct;
+  productData?: PricedProduct;
+	regionData?: Region;
 };
 
 export const ProductProvider = ({
   children,
   productData,
+  regionData,
 }: PropsWithChildren & Props) => {
   const [product, setProduct] = useState<PricedProduct | null>(null);
+  const [region, setRegion] = useState<Region | null>(null);
 
   useEffect(() => {
     // Fetch product data
-    setProduct(productData);
-  }, [productData]);
+		if (productData) {
+			setProduct(productData);
+		}
+		if (regionData) {
+			setRegion(regionData)
+		}
+  }, [productData, regionData]);
 
   return (
-    <ProductContext.Provider value={{ product, setProduct }}>
+    <ProductContext.Provider value={{ product, setProduct, region, setRegion }}>
       {children}
     </ProductContext.Provider>
   );

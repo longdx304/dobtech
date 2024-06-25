@@ -1,3 +1,4 @@
+"use server"
 import { medusaClient } from '@/lib/database/config';
 import { StoreGetProductsParams } from '@medusajs/medusa';
 import { cache } from 'react';

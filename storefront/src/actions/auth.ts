@@ -1,3 +1,4 @@
+"use server"
 import { medusaClient } from '@/lib/database/config';
 import medusaError from '@/lib/utils/medusa-error';
 import { StorePostAuthReq } from '@medusajs/medusa';

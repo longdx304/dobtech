@@ -49,5 +49,6 @@ export default async function ProductActionsWrapper({
     return null;
   }
   
-  return <ProductActions product={product} region={region!} />
+  return <ProductActions />
+  // return <ProductActions product={product} region={region!} />
 }

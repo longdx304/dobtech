@@ -1,4 +1,5 @@
 "use client";
+import { cn } from '@/lib/utils';
 import { Flex } from "@/components/Flex";
 import { Image } from "@/components/Image";
 import { useProduct } from "@/lib/providers/product/product-provider";
@@ -11,7 +12,10 @@ import { useVariantImages } from "@/lib/providers/product/variant-images-provide
 import "swiper/css";
 import "swiper/css/pagination";
 
-export default function ImageGallery() {
+type Props = {
+	isImgVertical?: boolean;
+};
+export default function ImageGallery({ isImgVertical = true }: Props) {
 	const { optionValue } = useVariantImages();
 	const { product } = useProduct();
 
@@ -60,9 +64,9 @@ export default function ImageGallery() {
 	}, [optionValue, variantImg, images])
 
 	return (
-		<Flex className="flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-auto">
+		<Flex className={cn("flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-auto", !isImgVertical && "lg:flex-col-reverse")}>
 			{/* Thumbnails */}
-			<Flex className="flex flex-wrap lg:flex-col justify-center w-full lg:w-fit gap-4">
+			<Flex className={cn("flex flex-wrap lg:flex-col justify-center w-full lg:w-fit gap-4", !isImgVertical && "lg:flex-row")}>
 				{images?.map((img, index) => (
 					<Flex
 						key={index}

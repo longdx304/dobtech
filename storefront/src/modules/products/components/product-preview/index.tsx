@@ -32,22 +32,25 @@ const ProductPreview: FC<Props> = async ({ data, region }) => {
   });
 
   return (
-    <LocalizedClientLink
-      href={`products/${data.handle}`}
-      className={cn(
-        'shadow group rounded lg:hover:shadow-lg lg:hover:-translate-y-1.5 transition-all'
-      )}
-    >
-      <Flex vertical>
-        <Thumbnail thumbnail={data?.thumbnail} />
+
+      <Flex vertical className='shadow group rounded lg:hover:shadow-lg transition-all cursor-pointer'>
+				<LocalizedClientLink
+					href={`products/${data.handle}`}
+				>
+					<Thumbnail thumbnail={data?.thumbnail} />
+				</LocalizedClientLink>
         <Flex vertical className='p-2 pb-3 w-full box-border'>
-          <Text className='leading-4 text-[0.875rem] line-clamp-1 w-full text-black font-normal'>
-            {data?.title}
-          </Text>
-          {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
+					<LocalizedClientLink
+						href={`products/${data.handle}`}
+					>
+						<Text className='leading-4 text-[0.875rem] line-clamp-1 w-full text-black font-normal'>
+							{data?.title}
+						</Text>
+					</LocalizedClientLink>
+          {cheapestPrice && <PreviewPrice price={cheapestPrice} productHandle={data.handle} product={pricedProduct} region={region}/>}
         </Flex>
       </Flex>
-    </LocalizedClientLink>
+
   );
 };
 
