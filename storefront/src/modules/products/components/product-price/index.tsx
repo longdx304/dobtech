@@ -19,7 +19,7 @@ export default function ProductPrice({
 	region?: RegionInfo;
 	className?: string;
 	options: Record<string, string>;
-	isDrawer?: boolean,
+	isDrawer?: boolean;
 }) {
 	const { cheapestPrice, variantPrice } = getProductPrice({
 		product,
@@ -48,7 +48,12 @@ export default function ProductPrice({
 
 	return (
 		<div className="bg-white">
-			<div className={cn("flex items-center space-x-2", isDrawer && 'flex-col items-start space-x-0 space-y-1')}>
+			<div
+				className={cn(
+					'flex items-center space-x-2',
+					isDrawer && 'flex-col items-start space-x-0 space-y-1'
+				)}
+			>
 				<span
 					className={cn('text-xl font-bold', {
 						'text-[#FA6338]': selectedPrice.price_type === 'sale',

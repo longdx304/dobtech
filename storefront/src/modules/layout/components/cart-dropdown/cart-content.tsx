@@ -15,7 +15,7 @@ const CartContent = ({
 	console.log('cart', cartState)
 	return (
 		<div className="w-[420px]">
-			{!!cartState.items.length && (
+			{!!cartState?.items.length && (
 				<div className="flex items-center justify-center py-4">
 					<Title className="text-xl">Sản phẩm mới thêm</Title>
 				</div>

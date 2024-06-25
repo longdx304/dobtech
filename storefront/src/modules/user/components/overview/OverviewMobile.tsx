@@ -20,7 +20,7 @@ const OverviewMobile = ({ products, region }: OverviewMobileProps) => {
         <h2 className='w-full h-[50px] flex justify-center items-center bg-[#f6f6f6] mt-0 text-sm'>
           ⬥ Bạn có lẽ cũng thích ⬥
         </h2>
-        <div className='px-4 pb-16'>
+        <div className='px-4 lg:pb-16 pb-4'>
           <ProductList data={products} region={region} />
         </div>
       </div>
