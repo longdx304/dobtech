@@ -27,14 +27,14 @@ const UserInformation = () => {
           ),
           icon: <User />,
         },
-        {
-          key: '2',
-          label: (
-            <a rel='noopener noreferrer' href='/orders'>
-              Đơn hàng của tôi
-            </a>
-          ),
-        },
+        // {
+        //   key: '2',
+        //   label: (
+        //     <a rel='noopener noreferrer' href='/orders'>
+        //       Đơn hàng của tôi
+        //     </a>
+        //   ),
+        // },
         {
           key: '4',
           danger: true,

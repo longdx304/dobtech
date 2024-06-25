@@ -4,7 +4,7 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
-import { Settings } from 'lucide-react';
+import { CircleDollarSign, Gift, Settings, TicketPercent, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import LoginTemplate from '../../templates/login-template';
 
@@ -47,7 +47,7 @@ const ItemGroup = () => {
           <Settings size={24} onClick={() => router.push('/user/setting')} />
         </Flex>
 
-        {/* <Flex align='center' justify='space-between' className='px-4 pt-2 pb-4'>
+        {/* <Flex align='center' justify='space-between' className='px-4 pt-2 pb-4 lg:justify-around'>
           <Flex
             align='center'
             className='flex-col gap-1'
