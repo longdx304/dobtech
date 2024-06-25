@@ -1,29 +1,29 @@
 version: '3.9'
 services:
-    # backend:
-    #     build:
-    #         context: ./backend
-    #         dockerfile: Dockerfile
-    #     image: backend:test
-    #     container_name: medusa-server
-    #     depends_on:
-    #         - postgres
-    #         - redis
-    #     ports:
-    #         - 9000:9000
-    #         - 7001:7001
-    #     volumes:
-    #         - ./backend:/app/medusa
-    #         - backend_node_modules:/app/medusa/node_modules
-    #     environment:
-    #         DATABASE_TYPE: postgres
-    #         DATABASE_URL: postgres://admin:admin@postgres:5432/medusa_db
-    #         REDIS_URL: redis://cache
-    #         NODE_ENV: development
-    #         JWT_SECRET: some_jwt_secret
-    #         COOKIE_SECRET: some_cookie_secret
-    #         MEDUSA_ADMIN_ONBOARDING_TYPE: default
-    #         STORE_CORS: http://storefront:8000,http://localhost:7001
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        image: backend:test
+        container_name: medusa-server
+        depends_on:
+            - postgres
+            - redis
+        ports:
+            - 9000:9000
+            - 7001:7001
+        volumes:
+            - ./backend:/app/medusa
+            - backend_node_modules:/app/medusa/node_modules
+        environment:
+            DATABASE_TYPE: postgres
+            DATABASE_URL: postgres://admin:admin@postgres:5432/medusa_db
+            REDIS_URL: redis://cache
+            NODE_ENV: development
+            JWT_SECRET: some_jwt_secret
+            COOKIE_SECRET: some_cookie_secret
+            MEDUSA_ADMIN_ONBOARDING_TYPE: default
+            STORE_CORS: http://storefront:8000,http://localhost:7001
 
     postgres:
         image: postgres:16-alpine
@@ -45,47 +45,47 @@ services:
         volumes:
             - redis_data:/data
 
-    # adminfront:
-    #     build:
-    #         context: ./adminfront
-    #         dockerfile: Dockerfile
-    #     image: adminfront:test
-    #     container_name: medusa-admin
-    #     depends_on:
-    #         - backend
-    #     ports:
-    #         - '3000:3000'
-    #     volumes:
-    #         - ./adminfront:/app/adminfront
-    #         - adminfront_node_modules:/app/adminfront/node_modules
-    #     environment:
-    #         NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://backend:9000
+    adminfront:
+        build:
+            context: ./adminfront
+            dockerfile: Dockerfile
+        image: adminfront:test
+        container_name: medusa-admin
+        depends_on:
+            - backend
+        ports:
+            - '3000:3000'
+        volumes:
+            - ./adminfront:/app/adminfront
+            - adminfront_node_modules:/app/adminfront/node_modules
+        environment:
+            NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://backend:9000
 
-    # storefront:
-    #     build:
-    #         context: ./storefront
-    #         dockerfile: Dockerfile
-    #     image: storefront:test
-    #     container_name: medusa-storefront
-    #     depends_on:
-    #         - backend
-    #     ports:
-    #         - "8000:8000"
-    #     volumes:
-    #         - ./storefront:/app/storefront
-    #         - storefront_node_modules:/app/storefront/node_modules
-    #     environment:
-    #         NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://backend:9000
-    #         NEXT_PUBLIC_MEDUSA_ADMIN_URL: http://backend:7001
-    #         NEXT_PUBLIC_BASE_URL: http://localhost:8000
-    #         NEXT_PUBLIC_DEFAULT_REGION: us
-    #         NEXT_PUBLIC_SEARCH_ENDPOINT: http://127.0.0.1:7700
-    #         NEXT_PUBLIC_INDEX_NAME: products
-    #         REVALIDATE_SECRET: supersecret
+    storefront:
+        build:
+            context: ./storefront
+            dockerfile: Dockerfile
+        image: storefront:test
+        container_name: medusa-storefront
+        depends_on:
+            - backend
+        ports:
+            - "8000:8000"
+        volumes:
+            - ./storefront:/app/storefront
+            - storefront_node_modules:/app/storefront/node_modules
+        environment:
+            NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://backend:9000
+            NEXT_PUBLIC_MEDUSA_ADMIN_URL: http://backend:7001
+            NEXT_PUBLIC_BASE_URL: http://localhost:8000
+            NEXT_PUBLIC_DEFAULT_REGION: us
+            NEXT_PUBLIC_SEARCH_ENDPOINT: http://127.0.0.1:7700
+            NEXT_PUBLIC_INDEX_NAME: products
+            REVALIDATE_SECRET: supersecret
 
 volumes:
     postgres-db:
     redis_data:
-    # adminfront_node_modules:
-    # storefront_node_modules:
-    # backend_node_modules:
+    adminfront_node_modules:
+    storefront_node_modules:
+    backend_node_modules:
