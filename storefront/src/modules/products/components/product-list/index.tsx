@@ -6,24 +6,27 @@ import { Region } from '@medusajs/medusa';
 import Pagination from './pagination';
 import { VariantImagesProvider } from "@/lib/providers/product/variant-images-provider";
 import { ProductProvider } from "@/lib/providers/product/product-provider";
+import { getProductsList } from '@/actions/products';
+import { getRegion } from '@/actions/region';
 
 interface ProductListProps {
-	data: {
-		products: ProductPreviewType[];
-		count: number;
-	};
-	region?: Region;
-	searchValue?: string | null;
 	page?: number;
 }
 const PAGE_SIZE = 20;
 
-const ProductList: FC<ProductListProps> = ({
-	data,
-	searchValue,
-	region,
+const ProductList: FC<ProductListProps> = async ({
 	page,
 }) => {
+	const region = await getRegion('vn');
+
+  const { response: data } = await getProductsList({
+    pageParam: page,
+    queryParams: {
+      limit: PAGE_SIZE,
+      offset: (page - 1) * PAGE_SIZE,
+    },
+  });
+
   return (
 		<>
 			<ProductProvider productData={undefined} regionData={undefined}>

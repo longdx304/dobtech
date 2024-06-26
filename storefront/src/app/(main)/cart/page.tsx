@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import React, { Suspense } from 'react'
+import React, { Suspense } from 'react';
+import CartSkeleton from './skeleton';
 
 // import CartTemplate from '@/modules/cart/templates';
 const CartTemplate = React.lazy(() => import('@/modules/cart/templates'));
@@ -13,9 +14,11 @@ export default async function Cart() {
 
 	return (
 		<div className="w-full pt-[6rem] lg:pt-[4rem]">
-			<Suspense fallback={<p>Loading feed...</p>}>
+			<Suspense fallback={<CartSkeleton />}>
 				<CartTemplate	/>
 			</Suspense>
 		</div>
 	);
 }
+
+
