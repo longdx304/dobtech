@@ -4,7 +4,7 @@ import { cache } from 'react';
 import medusaError from '@/lib/utils/medusa-error';
 
 export async function createPaymentSessions(cartId: string) {
-  const headers = getMedusaHeaders(["cart"])
+  const headers = await getMedusaHeaders(["cart"])
 
   return medusaClient.carts
     .createPaymentSessions(cartId, headers)
@@ -17,7 +17,7 @@ export async function createPaymentSessions(cartId: string) {
 
 // Shipping actions
 export const listCartShippingMethods = cache(async function (cartId: string) {
-  const headers = getMedusaHeaders(["shipping"])
+  const headers = await getMedusaHeaders(["shipping"])
 
   return medusaClient.shippingOptions
     .listCartOptions(cartId, headers)
@@ -35,7 +35,7 @@ export async function addShippingMethod({
   cartId: string
   shippingMethodId: string
 }) {
-  const headers = getMedusaHeaders(["cart"])
+  const headers = await getMedusaHeaders(["cart"])
 
   return medusaClient.carts
     .addShippingMethod(cartId, { option_id: shippingMethodId }, headers)

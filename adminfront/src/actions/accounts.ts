@@ -40,7 +40,7 @@ export async function getToken(credentials: IAdminAuth) {
  * Get information admin
  */
 export async function getAdmin() {
-	const headers = await getMedusaHeaders(['auth']);
+	const headers = await await getMedusaHeaders(['auth']);
 
 	return medusaClient.admin.auth
 		.getSession(headers)
@@ -77,7 +77,7 @@ export async function listUser(
 	searchParams: Record<string, unknown>
 ): Promise<TResponse<IAdminResponse> | null> {
 	try {
-		const headers = await getMedusaHeaders(['users']);
+		const headers = await await getMedusaHeaders(['users']);
 		const limitData: number = (searchParams?.limit as number) ?? 10;
 
 		const page = searchParams?.page ?? 1;
@@ -101,7 +101,7 @@ export async function listUser(
 }
 
 export async function createUser(payload: IUserRequest) {
-	const headers = await getMedusaHeaders(['users']);
+	const headers = await await getMedusaHeaders(['users']);
 	const { email, fullName, phone, permissions } = payload;
 
 	return medusaClient.admin.users
@@ -128,7 +128,7 @@ export async function createUser(payload: IUserRequest) {
 }
 
 export async function updateUser(userId: string, payload: IUserRequest) {
-	const headers = await getMedusaHeaders(['users']);
+	const headers = await await getMedusaHeaders(['users']);
 	const { fullName, phone, permissions } = payload;
 	return medusaClient.admin.users
 		.update(
@@ -153,7 +153,7 @@ export async function updateUser(userId: string, payload: IUserRequest) {
 }
 
 export async function deleteUser(userId: string) {
-	const headers = await getMedusaHeaders(['users']);
+	const headers = await await getMedusaHeaders(['users']);
 
 	return medusaClient.admin.users
 		.delete(userId, headers)

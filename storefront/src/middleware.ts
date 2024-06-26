@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse, userAgent } from 'next/server';
 import { ERoutes } from './types/routes';
+import { BACKEND_URL } from '@/lib/constants';
+
+async function getUser(accessToken: string | undefined) {
+	if (accessToken) {
+		return fetch(`${BACKEND_URL}/store/auth`, {
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		})
+			.then((data) => data.json())
+			.catch(() => null);
+	}
+	return null;
+}
 
 export async function middleware(request: NextRequest) {
   const url = new URL(request.url);
@@ -13,7 +27,9 @@ export async function middleware(request: NextRequest) {
 
   // Check if user is authenticated
   const { device } = userAgent(request);
-  const isUserAuthenticated = request.cookies.get('_medusa_jwt');
+  const accessToken = request.cookies.get('_medusa_jwt')?.value;
+	const data = await getUser(accessToken);
+	console.log('accessToken', data)
 
   if (device.type === 'mobile') {
     return NextResponse.next({
@@ -22,9 +38,9 @@ export async function middleware(request: NextRequest) {
       },
     });
   } else {
-    if (isUserAuthenticated && pathname === `/${ERoutes.AUTH}`) {
+    if (accessToken && pathname === `/${ERoutes.AUTH}`) {
       return NextResponse.redirect(new URL(`/${ERoutes.USER}`, request.url));
-    } else if (!isUserAuthenticated && pathname === `/${ERoutes.USER}`) {
+    } else if (!accessToken && pathname === `/${ERoutes.USER}`) {
       return NextResponse.redirect(new URL(`/${ERoutes.AUTH}`, request.url));
     }
   }

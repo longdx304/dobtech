@@ -1,7 +1,7 @@
 import axios from "axios"
-import { MEDUSA_BACKEND_URL } from "@/lib/constants/medusa-backend-url"
+import { BACKEND_URL } from "@/lib/constants/medusa-backend-url"
 
-const client = axios.create({ baseURL: MEDUSA_BACKEND_URL })
+const client = axios.create({ baseURL: BACKEND_URL })
 
 export default function medusaRequest(method, path = "", payload = {}) {
   const options = {

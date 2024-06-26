@@ -1,7 +1,7 @@
 'use client';
 import { MedusaProvider as Provider } from 'medusa-react';
 import { PropsWithChildren } from 'react';
-import { MEDUSA_BACKEND_URL, queryClient } from '../constants';
+import { BACKEND_URL, queryClient } from '../constants';
 
 export const MedusaProvider = ({ children }: PropsWithChildren) => {
   return (
@@ -9,7 +9,7 @@ export const MedusaProvider = ({ children }: PropsWithChildren) => {
       queryClientProviderProps={{
         client: queryClient,
       }}
-      baseUrl={MEDUSA_BACKEND_URL}
+      baseUrl={BACKEND_URL}
     >
       {children}
     </Provider>

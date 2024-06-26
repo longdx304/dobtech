@@ -7,7 +7,7 @@ import { getMedusaHeaders } from './common';
 
 export async function listCategories(): Promise<ProductCategory | null> {
 	try {
-		const headers = await getMedusaHeaders(['categories']);
+		const headers = await await getMedusaHeaders(['categories']);
 
 		const { product_categories, count, offset, limit } =
 			await medusaClient.admin.productCategories.list(

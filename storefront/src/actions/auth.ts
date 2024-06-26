@@ -52,7 +52,7 @@ export async function getToken(credentials: StorePostAuthReq) {
 }
 
 export async function authenticate(credentials: StorePostAuthReq) {
-  const headers = getMedusaHeaders(["auth"])
+  const headers = await getMedusaHeaders(["auth"])
 
   return medusaClient.auth
     .authenticate(credentials, headers)

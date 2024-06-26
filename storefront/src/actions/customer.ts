@@ -10,7 +10,7 @@ import medusaError from '@/lib/utils/medusa-error';
 
 // Customer actions
 export async function getCustomer() {
-  const headers = getMedusaHeaders(['customer']);
+  const headers = await getMedusaHeaders(['customer']);
 
   return medusaClient.customers
     .retrieve(headers)
@@ -19,7 +19,7 @@ export async function getCustomer() {
 }
 
 export async function createCustomer(data: StorePostCustomersReq) {
-  const headers = getMedusaHeaders(['customer']);
+  const headers = await getMedusaHeaders(['customer']);
 
   return medusaClient.customers
     .create(data, headers)
@@ -28,7 +28,7 @@ export async function createCustomer(data: StorePostCustomersReq) {
 }
 
 export async function updateCustomer(data: StorePostCustomersCustomerReq) {
-  const headers = getMedusaHeaders(['customer']);
+  const headers = await getMedusaHeaders(['customer']);
 
   return medusaClient.customers
     .update(data, headers)
@@ -39,7 +39,7 @@ export async function updateCustomer(data: StorePostCustomersCustomerReq) {
 export async function addShippingAddress(
   data: StorePostCustomersCustomerAddressesReq
 ) {
-  const headers = getMedusaHeaders(['customer']);
+  const headers = await getMedusaHeaders(['customer']);
 
   return medusaClient.customers.addresses
     .addAddress(data, headers)
@@ -51,7 +51,7 @@ export async function updateShippingAddress(
   addressId: string,
   data: StorePostCustomersCustomerAddressesAddressReq
 ) {
-  const headers = getMedusaHeaders(["customer"])
+  const headers = await getMedusaHeaders(["customer"])
 
   return medusaClient.customers.addresses
     .updateAddress(addressId, data, headers)
@@ -60,7 +60,7 @@ export async function updateShippingAddress(
 }
 
 export async function deleteShippingAddress(addressId: string) {
-  const headers = getMedusaHeaders(['customer']);
+  const headers = await getMedusaHeaders(['customer']);
 
   return medusaClient.customers.addresses
     .deleteAddress(addressId, headers)

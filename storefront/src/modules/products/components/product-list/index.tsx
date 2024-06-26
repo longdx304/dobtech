@@ -15,7 +15,7 @@ interface ProductListProps {
 const PAGE_SIZE = 20;
 
 const ProductList: FC<ProductListProps> = async ({
-	page,
+	page = 1,
 }) => {
 	const region = await getRegion('vn');
 
@@ -26,7 +26,6 @@ const ProductList: FC<ProductListProps> = async ({
       offset: (page - 1) * PAGE_SIZE,
     },
   });
-
   return (
 		<>
 			<ProductProvider productData={undefined} regionData={undefined}>

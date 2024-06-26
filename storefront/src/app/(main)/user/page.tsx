@@ -11,11 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default async function UserPage() {
-  const { response } = await getProductsList({
-    pageParam: 0,
-  } as any);
-
-  const region = await getRegion('vn');
-
-  return <Overview products={response} region={region!} />;
+  return <Overview />;
 }

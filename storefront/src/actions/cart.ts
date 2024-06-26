@@ -6,7 +6,7 @@ import { getMedusaHeaders } from './auth';
 
 // Cart actions
 export async function createCart(data = {}) {
-  const headers = getMedusaHeaders(['cart']);
+  const headers = await getMedusaHeaders(['cart']);
 
   return medusaClient.carts
     .create(data, headers)
@@ -18,7 +18,7 @@ export async function createCart(data = {}) {
 }
 
 export async function updateCart(cartId: string, data: StorePostCartsCartReq) {
-  const headers = getMedusaHeaders(['cart']);
+  const headers = await getMedusaHeaders(['cart']);
 
   return medusaClient.carts
     .update(cartId, data, headers)
@@ -27,7 +27,7 @@ export async function updateCart(cartId: string, data: StorePostCartsCartReq) {
 }
 
 export const getCart = cache(async function (cartId: string) {
-  const headers = getMedusaHeaders(['cart']);
+  const headers = await getMedusaHeaders(['cart']);
 
   return medusaClient.carts
     .retrieve(cartId, headers)
@@ -47,7 +47,7 @@ export async function addItem({
   variantId: string;
   quantity: number;
 }) {
-  const headers = getMedusaHeaders(['cart']);
+  const headers = await getMedusaHeaders(['cart']);
 
   return medusaClient.carts.lineItems
     .create(cartId, { variant_id: variantId, quantity }, headers)
@@ -69,7 +69,7 @@ export async function updateItem({
   lineId: string;
   quantity: number;
 }) {
-  const headers = getMedusaHeaders(['cart']);
+  const headers = await getMedusaHeaders(['cart']);
 
   return medusaClient.carts.lineItems
     .update(cartId, lineId, { quantity }, headers)
@@ -84,7 +84,7 @@ export async function removeItem({
   cartId: string;
   lineId: string;
 }) {
-  const headers = getMedusaHeaders(['cart']);
+  const headers = await getMedusaHeaders(['cart']);
 
   return medusaClient.carts.lineItems
     .delete(cartId, lineId, headers)
@@ -96,7 +96,7 @@ export async function removeItem({
 }
 
 export async function completeCart(cartId: string) {
-  const headers = getMedusaHeaders(['cart']);
+  const headers = await getMedusaHeaders(['cart']);
 
   return medusaClient.carts
     .complete(cartId, headers)
