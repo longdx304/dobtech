@@ -46,7 +46,7 @@ const Item = ({ item, region }: ItemProps) => {
 				<Text data-testid="product-title">{item.title}</Text>
 				<div className="flex items-center gap-2">
 					<span>Phân loại hàng:</span>
-					<span className="bg-gray-200 px-[8px] py-[3px] rounded-lg">
+					<span className="bg-gray-200 px-[12px] py-[2px] rounded-lg">
 						<LineItemOptions
 							variant={item.variant}
 							data-testid="product-variant"

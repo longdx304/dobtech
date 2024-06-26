@@ -32,7 +32,7 @@ const Header: FC<Props> = ({ categories }) => {
       )}
       bordered={false}
     >
-      <Flex vertical className='box-border lg:container'>
+      <Flex vertical className='box-border container'>
         {/* For Desktop */}
         <div className='hidden lg:block'>
           <HeaderWrap />

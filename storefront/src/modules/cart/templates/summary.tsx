@@ -13,7 +13,7 @@ type SummaryProps = {
 
 const Summary = ({ cart, selectedItems }: SummaryProps) => {
 	const selectedCartItems = cart.items.filter((item) =>
-		selectedItems.has(item.id)
+		selectedItems.includes(item.id)
 	);
 
 	const subtotal = selectedCartItems.reduce(
@@ -49,14 +49,14 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 	};
 
 	return (
-		<div className="flex flex-col gap-y-2 bg-white p-4">
+		<div className="flex flex-col gap-y-2 bg-white">
 			<Text className="text-[1.5rem] leading-[2.75rem] font-semibold">Tóm tắt đơn hàng</Text>
 			<CartTotals data={selectedCart} />
 			<LocalizedClientLink
 				href={'checkout?step=' + cart.checkout_step}
 				data-testid="checkout-button"
 			>
-				<Button className="w-full h-10">Thanh toán ngay</Button>
+				<Button className="w-full h-10 font-semibold">{`Thanh toán ngay ${selectedCartItems?.length > 0 ? '(' + selectedCartItems?.length + ')' : ''}`}</Button>
 			</LocalizedClientLink>
 		</div>
 	);

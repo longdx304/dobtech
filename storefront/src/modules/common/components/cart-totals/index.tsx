@@ -31,7 +31,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
 	return (
 		<Flex align="center" justify="end" className="flex justify-items-end">
 			<Text
-				className="text-[1rem] leading-[2.75rem] font-semibold"
+				className="text-[1.35rem] leading-[1.25rem] font-bold"
 				data-testid="cart-total"
 				data-value={total || 0}
 			>

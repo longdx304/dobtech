@@ -1,14 +1,18 @@
+'use client';
 import { LineItem, Region } from '@medusajs/medusa';
 import { Table, Typography } from 'antd';
-import React from 'react';
+import React, { useState } from 'react';
 import Item from '../components/item';
 import Thumbnail from '@/modules/products/components/thumbnail';
+import { Checkbox } from '@/components/Checkbox';
+import type { CheckboxProps } from 'antd';
 
 type ItemsTemplateProps = {
 	items?: Omit<LineItem, 'beforeInsert'>[];
 	region?: Region;
 	selectedItems: Set<string>;
-	onItemSelectionChange: (itemId: string, isSelected: boolean) => void;
+	setSelectedItems: (rowKey: string) => void;
+	onItemSelectionChange: (selectedRowKeys: React.Key[]) => void;
 };
 
 const { Title } = Typography;
@@ -17,22 +21,10 @@ const ItemsTemplate = ({
 	items,
 	region,
 	selectedItems,
+	setSelectedItems,
 	onItemSelectionChange,
 }: ItemsTemplateProps) => {
-	const rowSelection = {
-		onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
-			selectedRowKeys.forEach((key) => {
-				onItemSelectionChange(key as string, true);
-			});
-
-			items?.forEach((item) => {
-				if (!selectedRowKeys.includes(item.id)) {
-					onItemSelectionChange(item.id, false);
-				}
-			});
-		},
-		selectedRowKeys: Array.from(selectedItems),
-	};
+	// const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
 	const columns = [
 		{
@@ -65,17 +57,37 @@ const ItemsTemplate = ({
 					}))
 			: [];
 
+	const checkAll = dataSource?.length === selectedItems?.length;
+
+	const onChange: CheckboxProps['onChange'] = (e) => {
+		const { checked } = e.target;
+		if (checked) {
+			const selectRowKeysAll = dataSource?.map((item) => item.key);
+			setSelectedItems(selectRowKeysAll)
+			return;
+		}
+		setSelectedItems([]);
+	};
+
+	// const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
+	// 	setSelectedRowKeys(selectedRowKeys);
+	// };
+	
 	return (
 		<div>
-			<div className="pb-3 flex items-center">
-				<Title level={2} className="text-[2rem] leading-[2.75rem]">
-					Tất cả mặt hàng
-				</Title>
+			<div className="pb-3 flex items-center px-2">
+				<Checkbox onChange={onChange} checked={checkAll}>
+					<Title level={3} className="leading-[2.75rem] my-0 pl-3">
+						{`Tất cả mặt hàng (${dataSource?.length})`}
+					</Title>
+				</Checkbox>
 			</div>
 			<Table
 				rowSelection={{
 					type: 'checkbox',
-					...rowSelection,
+					selectedRowKeys: selectedItems,
+					onChange: onItemSelectionChange,
+					preserveSelectedRowKeys: true,
 				}}
 				columns={columns}
 				dataSource={dataSource as any}

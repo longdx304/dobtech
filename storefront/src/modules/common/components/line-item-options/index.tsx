@@ -16,7 +16,7 @@ const LineItemOptions = ({
 		<Text
 			data-testid={dataTestid}
 			data-value={dataValue}
-			className="inline-block text-md w-full overflow-hidden text-ellipsis"
+			className="inline-block text-sm w-full overflow-hidden text-ellipsis flex items-center cursor-pointer"
 		>
 			{variant.title}
 		</Text>

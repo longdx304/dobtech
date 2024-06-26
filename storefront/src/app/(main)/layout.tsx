@@ -7,7 +7,6 @@ import { CustomerProvider } from '@/lib/providers/user/user-provider';
 import Header from '@/modules/common/components/header';
 import Menu from '@/modules/common/components/menu';
 import { TTreeCategories } from '@/types/productCategory';
-import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { App, ConfigProvider } from 'antd';
 import type { Metadata } from 'next';
 import { cache } from 'react';
@@ -57,7 +56,6 @@ export default async function PageLayout({
   const customer = await getCustomer();
 
   return (
-    <AntdRegistry>
       <ConfigProvider theme={theme}>
         <App>
           <MedusaProvider>
@@ -73,6 +71,5 @@ export default async function PageLayout({
           </MedusaProvider>
         </App>
       </ConfigProvider>
-    </AntdRegistry>
   );
 }
