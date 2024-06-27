@@ -1,24 +1,16 @@
-import { ProductPreviewType } from '@/types/product';
-import { Region } from '@medusajs/medusa';
 import OverviewDesktop from './OverviewDesktop';
 import OverviewMobile from './OverviewMobile';
 
-type OverviewProps = {
-	products: {
-		products: ProductPreviewType[];
-		count: number;
-	};
-	region: Region;
-};
+type OverviewProps = {};
 
-const Overview = ({ products, region }: OverviewProps) => {
+const Overview = ({}: OverviewProps) => {
 	return (
 		<>
 			<div className="hidden lg:block">
-				<OverviewDesktop products={products} region={region} />
+				<OverviewDesktop />
 			</div>
 			<div className="block lg:hidden">
-				<OverviewMobile products={products} region={region} />
+				<OverviewMobile />
 			</div>
 		</>
 	);

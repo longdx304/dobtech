@@ -48,4 +48,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
 	matcher: ['/((?!api|_next/static|favicon.ico).*)'],
+	runtime: 'experimental-edge',
+	unstable_allowDynamic: ['**/node_modules/lodash*/**/*.js'],
 };
