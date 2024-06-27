@@ -54,17 +54,17 @@ const Item = ({ item, region }: ItemProps) => {
 					</span>
 				</div>
 			</div>
-			<div className="flex gap-4 justify-between">
+			<div className="flex gap-4 justify-between items-end">
 				<div className="flex items-center">
 					<LineItemUnitPrice item={item} region={region} />
 				</div>
 
-				<div className="flex justify-between items-center text-xs gap-4">
+				<div className="flex justify-between items-center text-xs gap-2 h-fit">
 					<CartItemSelect quantity={item.quantity} onChange={changeQuantity} />
 
 					<DeleteButton
 						id={item.id}
-						className="mt-1 bg-transparent"
+						className="bg-transparent"
 						data-testid="cart-item-remove-button"
 					/>
 				</div>

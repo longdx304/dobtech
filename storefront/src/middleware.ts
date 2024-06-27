@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, userAgent } from 'next/server';
 import { ERoutes } from './types/routes';
 import { BACKEND_URL } from '@/lib/constants';
+import _ from 'lodash';
 
 async function getUser(accessToken: string | undefined) {
 	if (accessToken) {
@@ -29,7 +30,6 @@ export async function middleware(request: NextRequest) {
   const { device } = userAgent(request);
   const accessToken = request.cookies.get('_medusa_jwt')?.value;
 	const data = await getUser(accessToken);
-	console.log('accessToken', data)
 
   if (device.type === 'mobile') {
     return NextResponse.next({
@@ -38,9 +38,9 @@ export async function middleware(request: NextRequest) {
       },
     });
   } else {
-    if (accessToken && pathname === `/${ERoutes.AUTH}`) {
+    if (!_.isEmpty(data) && pathname === `/${ERoutes.AUTH}`) {
       return NextResponse.redirect(new URL(`/${ERoutes.USER}`, request.url));
-    } else if (!accessToken && pathname === `/${ERoutes.USER}`) {
+    } else if (_.isEmpty(data) && pathname === `/${ERoutes.USER}`) {
       return NextResponse.redirect(new URL(`/${ERoutes.AUTH}`, request.url));
     }
   }

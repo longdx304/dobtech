@@ -26,7 +26,7 @@ const Overview = ({
 	return (
 		<div className={className} data-testid="cart-container">
 			{cart?.items.length ? (
-				<div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-x-8">
+				<div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-x-8">
 					<Card className="flex flex-col bg-white pb-6 gap-y-6">
 						<ItemsTemplate
 							region={cart?.region}

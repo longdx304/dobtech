@@ -30,7 +30,7 @@ const CartItemSelect: React.FC<CartItemSelectProps> = ({
 
   return (
     <div className="flex items-center gap-2">
-      <span>Số lượng: </span>
+      {/* <span>Số lượng: </span> */}
       <InputNumber
         addonBefore={
           <Button
@@ -38,6 +38,7 @@ const CartItemSelect: React.FC<CartItemSelectProps> = ({
             icon={<Minus size={12} />}
             type="text"
             className="hover:bg-transparent w-[12px]"
+						size="small"
           />
         }
         addonAfter={
@@ -46,12 +47,14 @@ const CartItemSelect: React.FC<CartItemSelectProps> = ({
             icon={<Plus size={12} />}
             type="text"
             className="hover:bg-transparent w-[12px]"
+						size="small"
           />
         }
         controls={false}
         value={quantity}
         className="max-w-[120px] [&_input]:text-center "
         onChange={handleInputChange as any}
+				size="small"
       />
     </div>
   );
