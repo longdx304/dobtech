@@ -18,7 +18,7 @@ export async function listProducts(
 	searchParams: Record<string, unknown>
 ): Promise<TResponse<IProductResponse> | null> {
 	try {
-		const headers = await await getMedusaHeaders(['products']);
+		const headers = await getMedusaHeaders(['products']);
 
 		const limitData: number = (searchParams?.limit as number) ?? 10;
 		const page = searchParams?.page ?? 1;
@@ -43,7 +43,7 @@ export async function listProducts(
 }
 
 export async function createProduct(payload: IProductRequest) {
-	const headers = await await getMedusaHeaders(['products']);
+	const headers = await getMedusaHeaders(['products']);
 
 	const {
 		title,
@@ -104,7 +104,7 @@ export async function updateProduct(
 	options: IProductOptions[],
 	payload: Partial<IProductRequest>
 ) {
-	const headers = await await getMedusaHeaders(['products']);
+	const headers = await getMedusaHeaders(['products']);
 	const { color, quantity, price, inventoryQuantity, categories } = payload;
 
 	// array object of category ids
@@ -205,7 +205,7 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(productId: string) {
-	const headers = await await getMedusaHeaders(['products']);
+	const headers = await getMedusaHeaders(['products']);
 	return medusaClient.admin.products
 		.delete(productId, headers)
 		.then(() => {

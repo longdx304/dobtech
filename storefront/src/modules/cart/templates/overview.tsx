@@ -11,16 +11,16 @@ import { Card } from '@/components/Card';
 const Overview = ({
 	cart,
 	customer,
-  className,
+	className,
 }: {
 	cart: CartWithCheckoutStep | null;
 	customer: Omit<Customer, 'password_hash'> | null;
-  className?: string;
+	className?: string;
 }) => {
 	const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
 	const handleItemSelectionChange = (selectedRowKeys: React.Key[]) => {
-		setSelectedItems(selectedRowKeys);
+		setSelectedItems(selectedRowKeys as string[]);
 	};
 
 	return (
@@ -31,16 +31,16 @@ const Overview = ({
 						<ItemsTemplate
 							region={cart?.region}
 							items={cart?.items}
-							selectedItems={selectedItems}
+							selectedItems={selectedItems as any}
 							onItemSelectionChange={handleItemSelectionChange}
-							setSelectedItems={setSelectedItems}
+							setSelectedItems={setSelectedItems as any}
 						/>
 					</Card>
 					<Card className="h-fit sticky top-16">
 						{cart && cart.region && (
 							<>
 								<div className="bg-white">
-									<Summary cart={cart} selectedItems={selectedItems} />
+									<Summary cart={cart} selectedItems={selectedItems as any} />
 								</div>
 							</>
 						)}

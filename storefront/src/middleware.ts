@@ -17,18 +17,18 @@ async function getUser(accessToken: string | undefined) {
 }
 
 export async function middleware(request: NextRequest) {
-  const url = new URL(request.url);
-  const origin = url.origin;
-  const pathname = url.pathname;
+	const url = new URL(request.url);
+	const origin = url.origin;
+	const pathname = url.pathname;
 
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-url', request.url);
-  requestHeaders.set('x-pathname', pathname);
-  requestHeaders.set('x-origin', origin);
+	const requestHeaders = new Headers(request.headers);
+	requestHeaders.set('x-url', request.url);
+	requestHeaders.set('x-pathname', pathname);
+	requestHeaders.set('x-origin', origin);
 
-  // Check if user is authenticated
-  const { device } = userAgent(request);
-  const accessToken = request.cookies.get('_medusa_jwt')?.value;
+	// Check if user is authenticated
+	const { device } = userAgent(request);
+	const accessToken = request.cookies.get('_medusa_jwt')?.value;
 	const data = await getUser(accessToken);
 
   if (device.type === 'mobile') {
@@ -47,5 +47,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|favicon.ico).*)'],
+	matcher: ['/((?!api|_next/static|favicon.ico).*)'],
 };

@@ -1,8 +1,13 @@
-import { createPaymentSessions, listCartShippingMethods } from '@/actions/checkout';
+import {
+	createPaymentSessions,
+	listCartShippingMethods,
+} from '@/actions/checkout';
 import { getCustomer } from '@/actions/customer';
 import { getCheckoutStep } from '@/lib/utils/get-checkout-step';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { cookies } from 'next/headers';
+import Addresses from '../../components/addresses';
+import { Card } from '@/components/Card';
 
 export default async function CheckoutForm() {
 	const cartId = cookies().get('_medusa_cart_id')?.value;
@@ -36,10 +41,9 @@ export default async function CheckoutForm() {
 
 	return (
 		<div>
-			{/* Addresses
-      Shipping
-      Payment
-			 */}
+			<Card>
+				<Addresses cart={cart} customer={customer} />
+			</Card>
 		</div>
 	);
 }

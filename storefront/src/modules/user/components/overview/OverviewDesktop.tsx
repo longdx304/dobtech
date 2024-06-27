@@ -21,7 +21,7 @@ const OverviewDesktop = ({ products, region }: Props) => {
 					⬥ Bạn có lẽ cũng thích ⬥
 				</h2>
 				<div className="px-4 lg:pb-16 pb-4">
-					<ProductList data={products} region={region} />
+					<ProductList />
 				</div>
 			</div>
 		</>

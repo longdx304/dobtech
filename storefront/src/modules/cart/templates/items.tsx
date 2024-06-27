@@ -10,7 +10,7 @@ import type { CheckboxProps } from 'antd';
 type ItemsTemplateProps = {
 	items?: Omit<LineItem, 'beforeInsert'>[];
 	region?: Region;
-	selectedItems: Set<string>;
+	selectedItems: string[];
 	setSelectedItems: (rowKey: string) => void;
 	onItemSelectionChange: (selectedRowKeys: React.Key[]) => void;
 };
@@ -24,8 +24,6 @@ const ItemsTemplate = ({
 	setSelectedItems,
 	onItemSelectionChange,
 }: ItemsTemplateProps) => {
-	// const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
-
 	const columns = [
 		{
 			title: 'Thumbnail',
@@ -63,16 +61,12 @@ const ItemsTemplate = ({
 		const { checked } = e.target;
 		if (checked) {
 			const selectRowKeysAll = dataSource?.map((item) => item.key);
-			setSelectedItems(selectRowKeysAll)
+			setSelectedItems(selectRowKeysAll as any);
 			return;
 		}
-		setSelectedItems([]);
+		setSelectedItems([] as any);
 	};
 
-	// const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
-	// 	setSelectedRowKeys(selectedRowKeys);
-	// };
-	
 	return (
 		<div>
 			<div className="pb-3 flex items-center px-2">
@@ -85,7 +79,7 @@ const ItemsTemplate = ({
 			<Table
 				rowSelection={{
 					type: 'checkbox',
-					selectedRowKeys: selectedItems,
+					selectedRowKeys: selectedItems as any,
 					onChange: onItemSelectionChange,
 					preserveSelectedRowKeys: true,
 				}}

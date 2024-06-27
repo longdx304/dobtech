@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Modal } from '@/components/Modal';
 import ProductActions from '../../components/product-actions';
 import ImageGallery from '../../components/image-gallery';

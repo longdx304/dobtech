@@ -8,7 +8,7 @@ import { CartWithCheckoutStep } from '@/types/medusa';
 
 type SummaryProps = {
 	cart: CartWithCheckoutStep;
-	selectedItems: Set<string>;
+	selectedItems: string[];
 };
 
 const Summary = ({ cart, selectedItems }: SummaryProps) => {
@@ -48,12 +48,13 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 		items: selectedCartItems,
 	};
 
+
 	return (
 		<div className="flex flex-col gap-y-2 bg-white">
 			<Text className="text-[1.5rem] leading-[2.75rem] font-semibold">Tóm tắt đơn hàng</Text>
 			<CartTotals data={selectedCart} />
 			<LocalizedClientLink
-				href={'checkout?step=' + cart.checkout_step}
+				href={'checkout?step=' + selectedCart.checkout_step}
 				data-testid="checkout-button"
 			>
 				<Button className="w-full h-10 font-semibold">{`Thanh toán ngay ${selectedCartItems?.length > 0 ? '(' + selectedCartItems?.length + ')' : ''}`}</Button>

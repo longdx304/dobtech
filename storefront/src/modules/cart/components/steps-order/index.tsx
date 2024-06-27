@@ -15,10 +15,10 @@ const StepsOrder = ({ className, currentStep = 0 }: Props) => {
 			title: 'Giỏ hàng',
 			icon: <ShoppingBasket size={28} />,
 		},
-		// {
-		// 	title: 'Đặt hàng',
-		// 	icon: <WalletCards />,
-		// },
+		{
+			title: 'Đặt hàng',
+			icon: <WalletCards />,
+		},
 		{
 			title: 'Thanh toán',
 			icon: <WalletCards size={28} />,

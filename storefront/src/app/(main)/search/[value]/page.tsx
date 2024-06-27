@@ -40,9 +40,9 @@ export default async function SearchPage({ params, searchParams }: Params) {
         data-testid='sort-by-container'
       />
       <ProductList
-        data={response}
-        region={region!}
-        searchValue={searchValue}
+        // data={response}
+        // region={region!}
+        // searchValue={searchValue}
         page={page}
       />
     </div>

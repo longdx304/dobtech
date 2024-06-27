@@ -1,8 +1,8 @@
-import { getCategoriesList } from "@/actions/productCategory";
-import { getProductByHandle } from "@/actions/products";
-import ProductTemplate from "@/modules/products/templates";
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { getCategoriesList } from '@/actions/productCategory';
+import { getProductByHandle } from '@/actions/products';
+import ProductTemplate from '@/modules/products/templates';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 type Props = {
 	params: { handle: string | null };
@@ -18,12 +18,14 @@ export async function generateStaticParams() {
 	return staticParams;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+	params,
+}: Props): Promise<Metadata> {
 	const { handle } = params;
 
-	const { product } = await getProductByHandle(decodeURIComponent(handle!) ?? "").then(
-		(product) => product
-	);
+	const { product } = await getProductByHandle(
+		decodeURIComponent(handle!) ?? ''
+	).then((product) => product);
 
 	if (!product) {
 		notFound();
@@ -44,7 +46,7 @@ export default async function ProductPage({ params }: Props) {
 	return (
 		<div className="w-full box-border container pt-[4rem] lg:pt-[8rem]">
 			<ProductTemplate
-				countryCode={"vn"}
+				countryCode={'vn'}
 				handle={decodeURIComponent(params.handle!)}
 			/>
 		</div>

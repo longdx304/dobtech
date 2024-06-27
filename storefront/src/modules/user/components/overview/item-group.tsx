@@ -4,50 +4,56 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
-import { CircleDollarSign, Gift, Settings, TicketPercent, Wallet } from 'lucide-react';
+import {
+	CircleDollarSign,
+	Gift,
+	Settings,
+	TicketPercent,
+	Wallet,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import LoginTemplate from '../../templates/login-template';
 
 const ItemGroup = () => {
-  const { state, onOpen, onClose } = useToggleState(false);
-  const router = useRouter();
-  const { customer } = useCustomer();
+	const { state, onOpen, onClose } = useToggleState(false);
+	const router = useRouter();
+	const { customer } = useCustomer();
 
-  const handleLoginClick = () => {
-    if (!customer) {
-      onOpen();
-    }
-  };
+	const handleLoginClick = () => {
+		if (!customer) {
+			onOpen();
+		}
+	};
 
-  const onCloseDrawer = () => {
-    router.refresh();
-    onClose();
-  };
+	const onCloseDrawer = () => {
+		router.refresh();
+		onClose();
+	};
 
-  return (
-    <>
-      {/* Login / Register */}
-      <Flex
-        className='flex-col space-y-2'
-        style={{ borderBottom: '11px solid #f6f6f6' }}
-      >
-        <Flex
-          align='center'
-          justify='space-between'
-          className='px-4 py-2'
-          onClick={() => {
-            handleLoginClick();
-          }}
-        >
-          <Text className='text-lg font-semibold'>
-            {customer
-              ? `Chào, ${customer.first_name} ${customer.last_name}`
-              : 'Đăng nhập / Đăng ký'}
-          </Text>
-          <Settings size={24} onClick={() => router.push('/user/setting')} />
-        </Flex>
+	return (
+		<>
+			{/* Login / Register */}
+			<Flex
+				className="flex-col space-y-2"
+				style={{ borderBottom: '11px solid #f6f6f6' }}
+			>
+				<Flex
+					align="center"
+					justify="space-between"
+					className="px-4 py-2"
+					onClick={() => {
+						handleLoginClick();
+					}}
+				>
+					<Text className="text-lg font-semibold">
+						{customer
+							? `Chào, ${customer.first_name} ${customer.last_name}`
+							: 'Đăng nhập / Đăng ký'}
+					</Text>
+					<Settings size={24} onClick={() => router.push('/user/setting')} />
+				</Flex>
 
-        {/* <Flex align='center' justify='space-between' className='px-4 pt-2 pb-4 lg:justify-around'>
+				{/* <Flex align='center' justify='space-between' className='px-4 pt-2 pb-4 lg:justify-around'>
           <Flex
             align='center'
             className='flex-col gap-1'
@@ -89,10 +95,10 @@ const ItemGroup = () => {
             <Text className='text-xs'>Quà tặng</Text>
           </Flex>
         </Flex> */}
-      </Flex>
+			</Flex>
 
-      {/* My order */}
-      {/* <Flex
+			{/* My order */}
+			{/* <Flex
         className='flex-col space-y-2 py-4'
         style={{ borderBottom: '11px solid #f6f6f6' }}
       >
@@ -156,8 +162,8 @@ const ItemGroup = () => {
         </Flex>
       </Flex> */}
 
-      {/* Services */}
-      {/* <Flex
+			{/* Services */}
+			{/* <Flex
         className='flex-col space-y-2 py-4'
         style={{ borderBottom: '11px solid #f6f6f6' }}
       >
@@ -208,19 +214,19 @@ const ItemGroup = () => {
         </Flex>
       </Flex> */}
 
-      <Drawer
-        open={state}
-        placement='bottom'
-        onClose={onClose}
-        styles={{
-          header: { borderBottom: 'none' },
-          wrapper: { height: '100%' },
-        }}
-      >
-        <LoginTemplate onCloseDrawer={onCloseDrawer} />
-      </Drawer>
-    </>
-  );
+			<Drawer
+				open={state}
+				placement="bottom"
+				onClose={onClose}
+				styles={{
+					header: { borderBottom: 'none' },
+					wrapper: { height: '100%' },
+				}}
+			>
+				<LoginTemplate onCloseDrawer={onCloseDrawer} />
+			</Drawer>
+		</>
+	);
 };
 
 export default ItemGroup;
