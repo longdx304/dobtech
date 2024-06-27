@@ -1,17 +1,9 @@
 import ProductList from '@/modules/products/components/product-list';
-import { ProductPreviewType } from '@/types/product';
-import { Region } from '@medusajs/medusa';
 import ItemGroup from './item-group';
 
-type OverviewMobileProps = {
-	products: {
-		products: ProductPreviewType[];
-		count: number;
-	};
-	region: Region;
-};
+type OverviewMobileProps = {};
 
-const OverviewMobile = ({ products, region }: OverviewMobileProps) => {
+const OverviewMobile = ({}: OverviewMobileProps) => {
 	return (
 		<>
 			<ItemGroup />
