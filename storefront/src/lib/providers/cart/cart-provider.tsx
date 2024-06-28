@@ -1,7 +1,7 @@
 'use client';
 import { enrichLineItems, retrieveCart } from '@/modules/cart/action';
 import { CartWithCheckoutStep } from '@/types/medusa';
-import { Cart, LineItem } from '@medusajs/medusa';
+import { Address, Cart, LineItem } from '@medusajs/medusa';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 type CartContextType = {
@@ -11,6 +11,8 @@ type CartContextType = {
 	setSelectedCartItems: (items: CartWithCheckoutStep) => void;
 	currentStep: number;
   setCurrentStep: (step: number) => void;
+	selectedAddress: Address | null;
+	setSelectedAddress: (address: Address) => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -22,6 +24,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 	const [selectedCartItems, setSelectedCartItems] =
 		useState<CartWithCheckoutStep>({} as CartWithCheckoutStep);
 	const [currentStep, setCurrentStep] = useState<number>(0);
+	const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
 	const fetchCart = async () => {
 		const cart = await retrieveCart();
@@ -49,6 +52,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 				setSelectedCartItems,
 				currentStep,
         setCurrentStep,
+				selectedAddress,
+				setSelectedAddress,
 			}}
 		>
 			{children}

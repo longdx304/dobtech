@@ -8,7 +8,6 @@ import AddressSelect from '../address-select';
 const ShippingAddress = ({
 	customer,
 	cart,
-
 	countryCode,
 }: {
 	customer: Omit<Customer, 'password_hash'> | null;
@@ -71,15 +70,18 @@ const ShippingAddress = ({
 		});
 	};
 
+	console.log('addressesInRegion', addressesInRegion);
+
 	return (
 		<>
-			{customer && (addressesInRegion?.length || 0) > 0 ? (
-				<Card className="mb-6 flex flex-col gap-y-4 p-5">
+			{/* {customer && (addressesInRegion?.length || 0) > 0 ? (
+				<div className="mb-6 flex flex-col gap-y-4 p-5">
 					<AddressSelect addresses={customer.shipping_addresses} cart={cart} />
-				</Card>
+				</div>
 			) : (
 				<>123</>
-			)}
+			)} */}
+			address select form
 		</>
 	);
 };

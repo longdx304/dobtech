@@ -1,23 +1,22 @@
-import { useCart } from '@/lib/providers/cart/cart-provider';
-import Addresses from '../../components/addresses';
-import ShippingOptions from '@/modules/checkout/components/shipping-options';
-import PaymentOptions from '@/modules/checkout/components/payment-options';
-import { useCustomer } from '@/lib/providers/user/user-provider';
 import { Card } from '@/components/Card';
-import { getRegion } from '@/actions/region';
+import { useCart } from '@/lib/providers/cart/cart-provider';
+import { useRegion } from '@/lib/providers/region-provider';
+import { useCustomer } from '@/lib/providers/user/user-provider';
+import PaymentOptions from '@/modules/checkout/components/payment-options';
+import ShippingOptions from '@/modules/checkout/components/shipping-options';
+import Addresses from '../../components/addresses';
 
-export default async function CheckoutForm() {
+export default function CheckoutForm() {
 	const { cart } = useCart();
 	const { customer } = useCustomer();
-
-	const region = await getRegion('vn');
+	const { region } = useRegion();
 
 	return (
 		<div className="flex flex-col gap-4">
 			<Card>
-				<Addresses cart={cart} customer={customer} />
+				<Addresses cart={cart} customer={customer} region={region!} />
 			</Card>
-			<ShippingOptions region={region} />
+			<ShippingOptions region={region!} />
 			<PaymentOptions />
 		</div>
 	);

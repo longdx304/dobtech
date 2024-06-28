@@ -6,9 +6,10 @@ import { Text } from '@/components/Typography';
 import { formatAmount } from '@/lib/utils/prices';
 import { Region } from '@medusajs/medusa';
 import { useState } from 'react';
+import { RadioChangeEvent } from 'antd';
 
 type Props = {
-	region: string;
+	region: Region;
 };
 
 const ShippingOptions = ({ region }: Props) => {
@@ -31,7 +32,7 @@ const ShippingOptions = ({ region }: Props) => {
   };
 
 	return (
-		<Card isLoading={isLoading}>
+		<Card loading={isLoading}>
 			<Text className="text-xl" strong>
 					Tuỳ chọn giao hàng
 			</Text>
