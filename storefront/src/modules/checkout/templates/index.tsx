@@ -5,8 +5,8 @@ type Props = {};
 
 const CheckoutTemplate = ({}: Props) => {
 	return (
-		<div className="pt-4 container box-border flex flex-col gap-8">
-			<div className="grid grid-cols-1 lg:grid-cols-[1fr_416px] gap-x-40 pt-[2rem]">
+		<div className="box-border flex flex-col gap-8">
+			<div className="grid grid-cols-1 lg:grid-cols-[1fr_416px] gap-x-8">
 				<CheckoutForm />
 				<CheckoutSummary />
 			</div>
