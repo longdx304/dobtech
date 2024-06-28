@@ -44,7 +44,6 @@ const AddressBookDesktop = ({ region }: Props) => {
     setEditingAddress(null);
     onOpen();
   };
-  console.log('region', region)
 
   return (
     <Flex className='flex-col'>

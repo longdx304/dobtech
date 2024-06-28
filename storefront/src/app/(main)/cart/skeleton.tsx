@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 import { Skeleton } from 'antd';
 import { Image } from 'lucide-react';
@@ -41,7 +40,7 @@ const ProductsSkeleton = () => {
 		>
 			<div className="w-full h-auto aspect-[1/1]">
 				<Skeleton.Node active className="w-full h-full">
-					<Image size={40} style={{ color: '#bfbfbf' }} alt="" />
+					<Image size={40} style={{ color: '#bfbfbf' }} />
 				</Skeleton.Node>
 			</div>
 			<Skeleton active paragraph={{ rows: 1 }} className="px-4" />

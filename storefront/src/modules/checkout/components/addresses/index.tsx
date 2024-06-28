@@ -27,47 +27,33 @@ const Addresses = ({
 
 	const countryCode = 'vn';
 
-	const isOpen = searchParams.get('step') === 'address';
-
 	const handleEdit = () => {
-		router.push(pathname + '?step=address');
+		console.log('Edit address');
 	};
-
-	console.log('isOpen', isOpen);
 
 	return (
 		<div className="bg-white">
 			<div className="flex flex-row items-center justify-between mb-6">
 				<Text className="flex flex-row text-lg gap-x-2 items-baseline">
-					Shipping Address
-					{!isOpen && <CheckCircle />}
+					Địa chỉ giao hàng
 				</Text>
-				{!isOpen && cart?.shipping_address && (
+				{cart?.shipping_address && (
 					<Text>
-						<Button
-							onClick={handleEdit}
-							data-testid="edit-address-button"
-						>
+						<Button onClick={handleEdit} data-testid="edit-address-button">
 							Edit
 						</Button>
 					</Text>
 				)}
 			</div>
-			{isOpen && (
-				<Form form={form}>
-					<div className="pb-8">
-						<ShippingAddress
-							customer={customer}
-							countryCode={countryCode}
-							cart={cart}
-						/>
-
-						<SubmitButton className="mt-6" data-testid="submit-address-button">
-							Continue to delivery
-						</SubmitButton>
-					</div>
-				</Form>
-			)}
+			<Form form={form}>
+				<div className="pb-8">
+					<ShippingAddress
+						customer={customer}
+						countryCode={countryCode}
+						cart={cart}
+					/>
+				</div>
+			</Form>
 		</div>
 	);
 };

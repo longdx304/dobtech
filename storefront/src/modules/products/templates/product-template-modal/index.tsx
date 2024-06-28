@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Modal } from '@/components/Modal';
 import ProductActions from '../../components/product-actions';
 import ImageGallery from '../../components/image-gallery';
@@ -14,7 +13,6 @@ const ProductTemplateModal = ({ state, handleOk, handleCancel, productHandle }: 
 	return (
 		<Modal
 			open={state}
-			handleOk={handleCancel}
 			onCancel={handleCancel}
 			footer={null}
 			width={800}

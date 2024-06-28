@@ -1,21 +1,10 @@
-import { getCart } from '@/actions/cart';
 import { Card } from '@/components/Card';
 import { Text } from '@/components/Typography';
+import { useCart } from '@/lib/providers/cart/cart-provider';
 import CartTotals from '@/modules/common/components/cart-totals';
-import { cookies } from 'next/headers';
 
-const CheckoutSummary = async () => {
-	const cartId = cookies().get('_medusa_cart_id')?.value;
-
-	if (!cartId) {
-		return null;
-	}
-
-	const cart = await getCart(cartId).then((cart) => cart);
-
-	if (!cart) {
-		return null;
-	}
+const CheckoutSummary = () => {
+	const { selectedCartItems } = useCart();
 
 	return (
 		<Card className="h-fit sticky top-16">
@@ -24,7 +13,7 @@ const CheckoutSummary = async () => {
 					<Text className="flex flex-row text-lg items-baseline">
 						Tóm tắt đơn hàng
 					</Text>
-					<CartTotals data={cart} />
+					<CartTotals data={selectedCartItems} />
 				</div>
 			</div>
 		</Card>

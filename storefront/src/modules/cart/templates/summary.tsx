@@ -2,9 +2,11 @@
 
 import { Button } from '@/components/Button';
 import { Text } from '@/components/Typography';
+import { useCart } from '@/lib/providers/cart/cart-provider';
 import CartTotals from '@/modules/common/components/cart-totals';
 import LocalizedClientLink from '@/modules/common/components/localized-client-link';
 import { CartWithCheckoutStep } from '@/types/medusa';
+import { message } from 'antd';
 
 type SummaryProps = {
 	cart: CartWithCheckoutStep;
@@ -12,6 +14,8 @@ type SummaryProps = {
 };
 
 const Summary = ({ cart, selectedItems }: SummaryProps) => {
+	const { setSelectedCartItems, setCurrentStep } = useCart();
+
 	const selectedCartItems = cart.items.filter((item) =>
 		selectedItems.includes(item.id)
 	);
@@ -46,19 +50,31 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 		tax_total,
 		total,
 		items: selectedCartItems,
-	};
+	} as CartWithCheckoutStep;
 
+	const handleCheckout = () => {
+		if (selectedCartItems?.length === 0) {
+			message.error('Vui lòng chọn ít nhất một sản phẩm để thanh toán');
+			return;
+		}
+		setSelectedCartItems(selectedCart);
+		setCurrentStep(1);
+	};
 
 	return (
 		<div className="flex flex-col gap-y-2 bg-white">
-			<Text className="text-[1.5rem] leading-[2.75rem] font-semibold">Tóm tắt đơn hàng</Text>
+			<Text className="text-[1.5rem] leading-[2.75rem] font-semibold">
+				Tóm tắt đơn hàng
+			</Text>
 			<CartTotals data={selectedCart} />
-			<LocalizedClientLink
-				href={'checkout?step=' + selectedCart.checkout_step}
-				data-testid="checkout-button"
-			>
-				<Button className="w-full h-10 font-semibold">{`Thanh toán ngay ${selectedCartItems?.length > 0 ? '(' + selectedCartItems?.length + ')' : ''}`}</Button>
-			</LocalizedClientLink>
+			<Button
+				className="w-full h-10 font-semibold"
+				onClick={handleCheckout}
+			>{`Thanh toán ngay ${
+				selectedCartItems?.length > 0
+					? '(' + selectedCartItems?.length + ')'
+					: ''
+			}`}</Button>
 		</div>
 	);
 };
