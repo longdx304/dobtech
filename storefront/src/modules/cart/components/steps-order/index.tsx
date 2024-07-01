@@ -25,9 +25,10 @@ const StepsOrder = ({ className, currentStep = 0 }: Props) => {
 					className="cursor-pointer"
 				>
 					<ShoppingBasket size={28} />
-					<span>Giỏ hàng</span>
+					<span>Đơn hàng của bạn</span>
 				</Flex>
 			),
+			icon: null,
 		},
 		{
 			title: (
@@ -40,24 +41,29 @@ const StepsOrder = ({ className, currentStep = 0 }: Props) => {
 					<span>Thanh toán</span>
 				</Flex>
 			),
+			icon: null,
 		},
 		{
 			title: (
 				<Flex
 					gap={4}
-					onClick={() => setCurrentStep(2)}
 					className="cursor-pointer"
 				>
 					<CircleCheck size={28} />
 					<span>Hoàn tất</span>
 				</Flex>
 			),
+			icon: null,
 		},
 	];
 
 	return (
 		<Card className={cn('', className)}>
-			<Steps current={currentStep} items={ITEMS_STEP} className="" />
+			<Steps
+				current={currentStep}
+				items={ITEMS_STEP}
+				className="[&_.ant-steps-item-icon]:hidden"
+			/>
 		</Card>
 	);
 };

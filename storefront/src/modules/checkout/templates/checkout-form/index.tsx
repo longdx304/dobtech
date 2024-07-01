@@ -4,10 +4,11 @@ import { useRegion } from '@/lib/providers/region-provider';
 import { useCustomer } from '@/lib/providers/user/user-provider';
 import PaymentOptions from '@/modules/checkout/components/payment-options';
 import ShippingOptions from '@/modules/checkout/components/shipping-options';
-import Addresses from '../../components/addresses';
+import ItemsPreview from '@/modules/checkout/components/items-preview';
+import Addresses from '@/modules/checkout/components/addresses';
 
 export default function CheckoutForm() {
-	const { cart } = useCart();
+	const { cart, selectedCartItems } = useCart();
 	const { customer } = useCustomer();
 	const { region } = useRegion();
 
@@ -16,6 +17,7 @@ export default function CheckoutForm() {
 			<Card>
 				<Addresses cart={cart} customer={customer} region={region!} />
 			</Card>
+			<ItemsPreview items={selectedCartItems?.items} region={region!} />
 			<ShippingOptions region={region!} />
 			<PaymentOptions />
 		</div>

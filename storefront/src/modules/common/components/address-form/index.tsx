@@ -27,7 +27,7 @@ export type AddressProps = {
 
 type Props = {
 	region: Region;
-	onClose: (address?: Address) => void;
+	onClose: () => void;
 	editingAddress: Address | null;
 };
 

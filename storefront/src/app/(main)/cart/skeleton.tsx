@@ -24,6 +24,7 @@ const CartSkeleton = () => {
 					<ProductsSkeleton />
 					<ProductsSkeleton />
 					<ProductsSkeleton />
+					<ProductsSkeleton />
 				</div>
 			</div>
 		</div>

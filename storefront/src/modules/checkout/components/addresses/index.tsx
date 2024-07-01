@@ -13,6 +13,7 @@ import { Address, Cart, Customer, Region } from '@medusajs/medusa';
 import { Col, Form, List, Row } from 'antd';
 import { ChevronRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import ShippingAddress from '../shipping-address';
 
 const Addresses = ({
 	cart,
@@ -115,18 +116,17 @@ const Addresses = ({
 					</Flex>
 				</Card>
 			) : (
-				<Empty description="Không có địa chỉ, vui lòng lựa chọn" />
+				customer && <Empty description="Không có địa chỉ, vui lòng lựa chọn" />
 			)}
 
-			{/* <Form form={form}>
-					<div className="pb-8">
-						<ShippingAddress
-							customer={customer}
-							countryCode={countryCode}
-							cart={cart}
-						/>
-					</div>
-				</Form> */}
+			{/* if user buy item without auth */}
+			{!customer && (
+				<ShippingAddress
+					countryCode={countryCode}
+					cart={cart}
+					region={region}
+				/>
+			)}
 
 			{/* Modal address */}
 			<Modal
