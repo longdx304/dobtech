@@ -5,7 +5,7 @@ import { Image } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 
-const CartSkeleton = () => {
+const CheckoutSkeleton = () => {
 	return (
 		<div className="flex flex-col gap-y-12">
 			<div className="pt-4 container box-border grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-x-8">
@@ -32,7 +32,7 @@ const CartSkeleton = () => {
 	);
 };
 
-export default CartSkeleton;
+export default CheckoutSkeleton;
 
 const ProductsSkeleton = () => {
 	return (

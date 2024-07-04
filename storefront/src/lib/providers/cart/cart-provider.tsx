@@ -6,7 +6,13 @@ import {
 } from '@/modules/cart/action';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { Address, Cart, LineItem } from '@medusajs/medusa';
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+	ReactNode,
+	createContext,
+	useContext,
+	useEffect,
+	useState,
+} from 'react';
 
 // Function to compute totals
 const computeTotals = (items: LineItem[]) => {
@@ -34,7 +40,7 @@ type CartContextType = {
 	cart: Cart | null;
 	refreshCart: () => Promise<void>;
 	updateCartItem: (lineId: string, quantity: number) => Promise<void>;
-	selectedCartItems: CartWithCheckoutStep;
+	selectedCartItems: CartWithCheckoutStep | null;
 	setSelectedCartItems: (items: CartWithCheckoutStep) => void;
 	currentStep: number;
 	setCurrentStep: (step: number) => void;
@@ -44,12 +50,14 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
-	children,
-}) => {
+interface Props {
+	children: ReactNode;
+}
+
+export const CartProvider: React.FC<Props> = ({ children }) => {
 	const [cart, setCart] = useState<Cart | null>(null);
 	const [selectedCartItems, setSelectedCartItems] =
-		useState<CartWithCheckoutStep>({} as CartWithCheckoutStep);
+		useState<CartWithCheckoutStep | null>({} as CartWithCheckoutStep);
 	const [currentStep, setCurrentStep] = useState<number>(0);
 	const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
@@ -81,12 +89,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 				)
 			);
 			const totals = computeTotals(selectedItems);
-			setSelectedCartItems((prevSelectedCartItems) => ({
-				...prevSelectedCartItems,
-				items: selectedItems,
-				total: totals.total,
-				subtotal: totals.subtotal,
-			}));
+
+			// compare with cart to get the latest data
+			const selectedCartAddress = cart?.shipping_address;
+
+			setSelectedCartItems(
+				(prevSelectedCartItems) =>
+					({
+						...prevSelectedCartItems,
+						items: selectedItems,
+						total: totals.total,
+						subtotal: totals.subtotal,
+						shipping_address: selectedCartAddress,
+					} as CartWithCheckoutStep)
+			);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [cart]);

@@ -2,16 +2,15 @@ import { Button } from '@/components/Button';
 import { Drawer } from '@/components/Drawer';
 import { Input } from '@/components/Input';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { Region } from '@/types/medusa';
-import { Divider, Form, FormProps, Select, message } from 'antd';
-import { useEffect, useState } from 'react';
 import {
 	addCustomerShippingAddress,
 	updateCustomerShippingAddress,
 } from '@/modules/user/actions';
+import { Region } from '@/types/medusa';
 import { Address } from '@medusajs/medusa';
+import { Divider, Form, FormProps, Select, message } from 'antd';
+import { useEffect, useState } from 'react';
 import SelectedAddress from './SelectedAddress';
-import { useCart } from '@/lib/providers/cart/cart-provider';
 
 export type AddressProps = {
 	firstName: string;

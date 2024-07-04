@@ -6,16 +6,15 @@ import { useRef, useState } from 'react';
 
 import { Button } from '@/components/Button';
 import InputNumber from '@/components/Input/InputNumber';
+import { useCart } from '@/lib/providers/cart/cart-provider';
+import { useProduct } from '@/lib/providers/product/product-provider';
 import { addToCart } from '@/modules/cart/action';
 import ProductInfo from '@/modules/products/components/product-info';
 import useActionProduct from '@/modules/products/hook/useActionProduct';
-import { Region } from '@medusajs/medusa';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
+import _ from 'lodash';
 import { Minus, Plus } from 'lucide-react';
 import OptionSelect from '../option-select';
-import _ from 'lodash';
-import { useCart } from '@/lib/providers/cart/cart-provider';
-import { useProduct } from '@/lib/providers/product/product-provider';
 
 type ProductActionsProps = {
 	// product: PricedProduct;

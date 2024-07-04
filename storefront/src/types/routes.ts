@@ -12,4 +12,5 @@ export enum ERoutes {
   USER_SETTING_PHONE = 'user/setting/phone_change',
   USER_SETTING_PASSWORD = 'user/setting/edit_password',
   USER_ADDRESSBOOK = 'user/addressbook',
+  USER_ORDERS = 'user/orders',
 }

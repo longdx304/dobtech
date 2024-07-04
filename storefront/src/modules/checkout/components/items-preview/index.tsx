@@ -30,13 +30,16 @@ const ItemsPreview = ({ items, region }: Props) => {
 						className="mySwiper"
 						spaceBetween={10}
 						slidesPerView={3}
-            modules={[Navigation]}
+						modules={[Navigation]}
 						navigation={true}
 					>
 						{items.map((item) => (
-							<SwiperSlide key={item.id} className="max-w-[160px] text-[14px]">
+							<SwiperSlide key={item.id} className="max-w-[120px] text-[14px]">
 								<div className="w-full">
-									<Thumbnail thumbnail={item?.thumbnail} size="square" />
+									<Thumbnail
+										thumbnail={item?.thumbnail}
+										className="aspect-square"
+									/>
 									<Item item={item} region={region} type="preview" />
 								</div>
 							</SwiperSlide>

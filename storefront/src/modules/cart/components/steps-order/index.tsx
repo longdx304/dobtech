@@ -1,12 +1,11 @@
 'use client';
-import { ShoppingBasket, WalletCards, CircleCheck } from 'lucide-react';
+import { CircleCheck, ShoppingBasket, WalletCards } from 'lucide-react';
 
-import { Steps } from '@/components/Steps';
 import { Card } from '@/components/Card';
-import { cn } from '@/lib/utils';
-import { useCart } from '@/lib/providers/cart/cart-provider';
 import { Flex } from '@/components/Flex';
-import { useState } from 'react';
+import { Steps } from '@/components/Steps';
+import { useCart } from '@/lib/providers/cart/cart-provider';
+import { cn } from '@/lib/utils';
 
 type Props = {
 	currentStep?: number;
@@ -25,7 +24,7 @@ const StepsOrder = ({ className, currentStep = 0 }: Props) => {
 					className="cursor-pointer"
 				>
 					<ShoppingBasket size={28} />
-					<span>Đơn hàng của bạn</span>
+					<span>Đơn hàng</span>
 				</Flex>
 			),
 			icon: null,
