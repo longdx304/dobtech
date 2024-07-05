@@ -9,6 +9,7 @@ interface Props {
 	strong?: boolean;
 	typeStyle?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 	onMouseEnter?: () => void;
+	onClick?: () => void;
 }
 
 import { BaseType } from 'antd/lib/typography/Base';
@@ -21,6 +22,7 @@ export default function Text({
 	typeStyle,
 	children,
 	onMouseEnter,
+	onClick,
 	...props
 }: Props) {
 	return (
@@ -29,6 +31,7 @@ export default function Text({
 			{...props}
 			type={typeStyle as BaseType}
 			onMouseEnter={onMouseEnter}
+			onClick={onClick}
 		>
 			{strong ? <strong>{children}</strong> : children}
 		</AntdText>

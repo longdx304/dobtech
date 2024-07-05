@@ -1,5 +1,5 @@
 import type { MenuProps } from 'antd';
-import { FolderKanban, LandPlot } from 'lucide-react';
+import { FolderKanban, LandPlot, ListTodo } from 'lucide-react';
 
 import { ERoutes } from '@/types/routes';
 
@@ -34,6 +34,7 @@ const itemOverview = () =>
       [
         getItem('Quản lý tài khoản của tôi', 'overview-2-1', <FolderKanban />),
         getItem('Sổ địa chỉ', 'overview-2-2', <LandPlot />),
+        getItem('Đơn hàng của tôi', 'overview-2-3', <ListTodo />),
       ]
     ),
     getItem(
@@ -51,4 +52,5 @@ export const menuRoutes: Record<string, string> = {
   'overview-1': `/${ERoutes.USER}`,
   'overview-2-1': `/${ERoutes.USER_SETTING_SECURITY}`,
   'overview-2-2': `/${ERoutes.USER_ADDRESSBOOK}`,
+  'overview-2-3': `/${ERoutes.USER_ORDERS}`,
 };

@@ -40,7 +40,7 @@ const Overview = ({
 						{cart && cart.region && (
 							<>
 								<div className="bg-white">
-									<Summary cart={cart} selectedItems={selectedItems as any} />
+									<Summary cart={cart} selectedItems={selectedItems} />
 								</div>
 							</>
 						)}

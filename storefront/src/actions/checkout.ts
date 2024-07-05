@@ -42,3 +42,15 @@ export async function addShippingMethod({
     .then(({ cart }) => cart)
     .catch((err) => medusaError(err))
 }
+
+export async function deleteDiscount(cartId: string, code: string) {
+  const headers = await getMedusaHeaders(["cart"])
+
+  return medusaClient.carts
+    .deleteDiscount(cartId, code, headers)
+    .then(({ cart }) => cart)
+    .catch((err) => {
+      console.log(err)
+      return null
+    })
+}

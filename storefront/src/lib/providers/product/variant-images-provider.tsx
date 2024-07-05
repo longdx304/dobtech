@@ -3,8 +3,7 @@
 import React, {
 	PropsWithChildren,
 	useContext,
-	useEffect,
-	useState,
+	useState
 } from "react";
 
 type VariantImagesContextType = {

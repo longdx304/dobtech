@@ -110,7 +110,7 @@ const CartContent = ({
 
 export default CartContent;
 
-const EmptyCart = () => {
+export const EmptyCart = () => {
 	return (
 		<div className="flex pt-8 pb-12 flex-col gap-y-2 items-center justify-center">
 			<Image
