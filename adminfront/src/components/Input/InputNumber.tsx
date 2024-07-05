@@ -23,7 +23,7 @@ export default function InputNumber({ className, ...props }: Props) {
 		<Flex vertical gap={4} className="w-full">
 			<AntdInputNumber
 				size="large"
-				className={cn('p-[3px] gap-2 w-full', className)}
+				className={cn('gap-2 w-full', className)}
 				formatter={formatter}
 				parser={parser}
 				{...props}

@@ -46,11 +46,10 @@ export const updateSearchQuery = (
  * @param option 
  * @returns format price number
  */
-const formatNumber = (num: number, option?: Intl.NumberFormatOptions) => {
+export const formatNumber = (num: number, option?: Intl.NumberFormatOptions) => {
   return num?.toLocaleString('vi-VN', option);
 };
 
-export default formatNumber;
 
 export const getErrorMessage = (error: any) => {
   let msg = error?.response?.data?.message

@@ -13,7 +13,11 @@ type Props = {
 const ActionAbles: FC<Props> = ({ actions, onMenuClick, id }) => {
 	return (
 		<Dropdown menu={{ items: actions, onClick: onMenuClick, id: id }}>
-			<a onClick={(e) => e.preventDefault()} data-testid="action-ables">
+			<a
+				onClick={(e) => e.stopPropagation()}
+				className="flex items-center"
+				data-testid="action-ables"
+			>
 				<Ellipsis size={20} color="#6B7280" />
 			</a>
 		</Dropdown>

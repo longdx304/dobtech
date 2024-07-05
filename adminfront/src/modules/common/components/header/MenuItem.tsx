@@ -11,6 +11,9 @@ import {
 	LayoutList,
 	CircleDollarSign,
 	UsersRound,
+	Earth,
+	BadgeDollarSign,
+	ShoppingCart
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -36,10 +39,9 @@ function getItem(
 }
 
 // Item dropdown user
-const itemDropdown: MenuProps['items'] = [
+const itemDropdown: any = [
 	{
 		label: 'Đăng xuất',
-		key: 'logout',
 		icon: <LogOut />,
 	},
 ];
@@ -47,25 +49,21 @@ const itemDropdown: MenuProps['items'] = [
 // Item menu overview
 const itemOverview = (role: string, permissions: string[]) =>
 	[
-		role === 'admin' && getItem('Quản lý nhân viên', 'overview-1', <Users />),
-		role === 'admin' && getItem('Danh mục', 'overview-2', <LayoutList />),
-		role === 'admin' && getItem('Định giá', 'pricing', <CircleDollarSign />),
-		role === 'admin' && getItem('Khách hàng', 'customers', <UsersRound />),
-		getItem('Quản lý sản phẩm', 'overview-3', <ClipboardPenLine />),
+		getItem('Đơn hàng', 'orders', <ShoppingCart />),
+		getItem('Quản lý sản phẩm', 'products', <ClipboardPenLine />),
 		getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
-		getItem('Label', 'overview-5', <Settings />, [
-			getItem('Option 6', '6'),
-			getItem('Option 7', '7'),
-			getItem('Option 8', '8'),
-			getItem('Option 9', '9'),
-		]),
 	].filter(() => true);
 
 // Item menu option
-const itemOption: MenuProps['items'] = [
-	getItem('Label', 'option-1', <Settings />),
-	getItem('Label', 'option-2', <Settings />),
-	getItem('Label', 'option-3', <Settings />),
+const itemsAdmin: MenuProps['items'] = [
+	getItem('Quản lý nhân viên', 'accounts', <Users />),
+	getItem('Danh mục', 'product-categories', <LayoutList />),
+	getItem('Định giá', 'pricing', <CircleDollarSign />),
+	getItem('Khách hàng', 'customers', <UsersRound />),
+	getItem('Cài đặt', 'setting', <Settings />, [
+		getItem('Khu vực', 'regions', <Earth />),
+		getItem('Tiền tệ', 'currency', <BadgeDollarSign />),
+	]),
 ];
 
 // Item menu user
@@ -101,13 +99,15 @@ export const menuItems = (
 	const permissions = (user as any)?.permissions?.split(',');
 	return [
 		getItem(
-			'Tổng quan',
+			'Sản phẩm',
 			'overview',
 			null,
 			itemOverview(role, permissions) as MenuItem[],
 			'group'
 		),
-		getItem('Tuỳ chỉnh', 'option', null, itemOption, 'group'),
+		getItem('Kho', 'inventory', null, undefined, 'group'),
+		role === 'admin' &&
+			getItem('Admin', 'admin', null, itemsAdmin as MenuItem[], 'group'),
 		getItem(
 			'',
 			'user',
@@ -119,9 +119,11 @@ export const menuItems = (
 };
 
 export const menuRoutes: Record<string, string> = {
-	'overview-1': ERoutes.ACCOUNTS,
-	'overview-2': ERoutes.PRODUCT_CATEGORIES,
-	'overview-3': ERoutes.PRODUCTS,
+	accounts: ERoutes.ACCOUNTS,
+	'product-categories': ERoutes.PRODUCT_CATEGORIES,
+	products: ERoutes.PRODUCTS,
 	pricing: ERoutes.PRICING,
 	customers: ERoutes.CUSTOMERS,
+	regions: ERoutes.REGIONS,
+	orders: ERoutes.ORDERS,
 };

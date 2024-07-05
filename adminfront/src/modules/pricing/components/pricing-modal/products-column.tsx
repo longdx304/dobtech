@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Flex } from '@/components/Flex';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
-import formatNumber from '@/lib/utils';
+import { formatNumber } from '@/lib/utils';
 
 interface Props {}
 const productsColumns = ({}: Props) => [

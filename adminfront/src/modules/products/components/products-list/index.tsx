@@ -113,21 +113,12 @@ const ProductList = ({}: Props) => {
 			});
 	};
 
-	const handleRow = (id: string) => {
-		return {
-			onClick: () => {
-				router.push(`${ERoutes.PRODUCTS}/${id}`);
-			},
-		};
-	};
-
 	const columns = useMemo(
 		() =>
 			productsColumns({
 				handleDeleteProduct,
 				handleEditProduct,
 				handleChangeStatus,
-				handleRow,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[products]
@@ -164,6 +155,10 @@ const ProductList = ({}: Props) => {
 			},
 		});
 	};
+
+	const handleRowClick = (record) => {
+		router.push(`${ERoutes.PRODUCTS}/${record.id}`)
+  };
 
 	return (
 		<>
@@ -210,6 +205,10 @@ const ProductList = ({}: Props) => {
 				columns={columns as any}
 				dataSource={products ?? []}
 				rowKey="id"
+				onRow={(record) => ({
+					onClick: () => handleRowClick(record),
+					className: 'cursor-pointer',
+				})}
 				pagination={{
 					total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
 					pageSize: PAGE_SIZE,
