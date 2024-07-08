@@ -90,13 +90,13 @@ export default Information;
 const OrderStatus = ({ status }: { status: Order['status'] }) => {
 	switch (status) {
 		case 'completed':
-			return <StatusIndicator variant="success" title="Đã hoàn thành" />;
+			return <StatusIndicator variant="success" title="Đã hoàn thành" className="font-normal" />;
 		case 'pending':
-			return <StatusIndicator variant="default" title="Đang xử lý" />;
+			return <StatusIndicator variant="default" title="Đang xử lý" className="font-normal" />;
 		case 'canceled':
-			return <StatusIndicator variant="danger" title="Đã huỷ" />;
+			return <StatusIndicator variant="danger" title="Đã huỷ" className="font-normal" />;
 		case 'requires_action':
-			return <StatusIndicator variant="danger" title="Yêu cầu xử lý" />;
+			return <StatusIndicator variant="danger" title="Yêu cầu xử lý" className="font-normal" />;
 		default:
 			return null;
 	}

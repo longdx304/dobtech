@@ -3,9 +3,7 @@ import { Flex } from '@/components/Flex';
 import { Text, Title } from '@/components/Typography';
 import { Ban } from 'lucide-react';
 import StatusIndicator from '@/modules/common/components/status-indicator';
-import { Empty, Modal as AntdModal, message } from 'antd';
-import dayjs from 'dayjs';
-import { useAdminCancelOrder, useAdminReservations } from 'medusa-react';
+import { Empty, Modal as AntdModal, message, Divider } from 'antd';
 import { getErrorMessage } from '@/lib/utils';
 import { Button } from '@/components/Button';
 import { useMemo } from 'react';
@@ -27,7 +25,6 @@ type Props = {
 };
 
 const Summary = ({ order, isLoading, inventoryEnabled = false, reservations = [] }: Props) => {
-	console.log('order', order)
 	const reservationItemsMap = useMemo(() => {
     if (!reservations?.length || !inventoryEnabled) {
       return {}
@@ -87,7 +84,6 @@ const Summary = ({ order, isLoading, inventoryEnabled = false, reservations = []
 	};
 
 	const isAllocatable = !["canceled", "archived"].includes(order.status);
-	console.log('order', order)
 
 	return (
 		<Card loading={isLoading} className="px-4">
@@ -107,6 +103,7 @@ const Summary = ({ order, isLoading, inventoryEnabled = false, reservations = []
 						isAllocatable={isAllocatable}
 					/>
 				))}
+				<Divider className="my-2" />
 				<DisplayTotal
           currency={order.currency_code}
           totalAmount={order.subtotal}
@@ -166,9 +163,10 @@ const Summary = ({ order, isLoading, inventoryEnabled = false, reservations = []
           totalTitle={
             hasMovements
               ? "Tổng ban đầu"
-              : "Tổng"
+              : "Tổng cộng"
           }
         />
+				<Divider className="my-2" />
 				<PaymentDetails
           manualRefund={manualRefund}
           swapAmount={swapAmount}

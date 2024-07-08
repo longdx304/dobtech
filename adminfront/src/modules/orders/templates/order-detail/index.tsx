@@ -9,6 +9,7 @@ import Timeline from '@/modules/orders/components/orders/timeline';
 import Summary from '@/modules/orders/components/orders/summary';
 import Payment from '@/modules/orders/components/orders/payment';
 import Fulfillment from '@/modules/orders/components/orders/fulfillment';
+import CustomerInfo from '@/modules/orders/components/orders/customer-info';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 
 interface Props {
@@ -50,6 +51,7 @@ export default function OrderDetail({ id }: Props) {
 				<Summary order={order} isLoading={isLoading} />
 				<Payment order={order} isLoading={isLoading} />
 				<Fulfillment order={order} isLoading={isLoading} />
+				<CustomerInfo order={order} isLoading={isLoading} />
 			</Col>
 			<Col xs={24} sm={10} md={10}>
 				<Timeline orderId={order?.id} isLoading={isLoading} />

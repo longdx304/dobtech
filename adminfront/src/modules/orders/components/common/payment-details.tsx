@@ -8,7 +8,7 @@ export const PaymentDetails = ({
   returnRefund,
   paidTotal,
   refundedTotal,
-}) => {
+}: any) => {
   if (swapAmount + manualRefund + swapRefund + returnRefund === 0) {
     return null
   }
@@ -44,10 +44,10 @@ export const PaymentDetails = ({
         />
       )}
       <DisplayTotal
-        variant={"bold"}
+        variant={"large"}
         currency={currency}
         totalAmount={paidTotal - refundedTotal}
-        totalTitle={"Tổng ròng"}
+        totalTitle={"Khách hàng cần thanh toán"}
       />
     </>
   )

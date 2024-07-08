@@ -7,7 +7,7 @@ type EventActionablesProps = {
 
 const EventActionables: React.FC<EventActionablesProps> = ({ actions }) => {
   return (
-    <Actionables actions={actions} />
+    <ActionAbles actions={actions} />
   )
 }
 

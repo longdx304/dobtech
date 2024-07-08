@@ -13,9 +13,9 @@ import {
 	useAdminOrderEdits,
 } from 'medusa-react';
 import { useMemo } from 'react';
-import useStockLocations from './use-stock-locations';
 import useOrdersExpandParam from '../components/orders/utils/use-admin-expand-parameter';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
+import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
 
 export interface TimelineEvent {
 	id: string;
