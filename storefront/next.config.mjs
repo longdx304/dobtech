@@ -24,6 +24,7 @@ const nextConfig = withStoreConfig({
 			search: false,
 		},
 	},
+	staticPageGenerationTimeout: 1000,
 	reactStrictMode: true,
 	images: {
 		remotePatterns: [
