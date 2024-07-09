@@ -30,7 +30,6 @@ const getPricedProductByHandle = async (handle: string, region: Region) => {
 };
 
 export default async function RelatedProducts({
-	// product,
 	countryCode,
 	handle,
 }: RelatedProductsProps) {
@@ -92,11 +91,6 @@ export default async function RelatedProducts({
 	if (!productPreviews.length) {
 		return null;
 	}
-
-	const response = {
-		products: productPreviews,
-		count: productPreviews.length,
-	};
 
 	return (
 		<div className="product-page-constraint">
