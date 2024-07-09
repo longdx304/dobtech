@@ -33,7 +33,7 @@ export const extractUnitPrice = (
       return 0
     }
 
-    itemPrice = regionPrice.amount
+    itemPrice = regionPrice.amount as number
     includesTax = region.includes_tax
     taxRate = includesTax
       ? (itemPrice * region.tax_rate) / (1 + region.tax_rate)
@@ -59,14 +59,14 @@ export const extractUnitPrice = (
   return 0
 }
 
-export const displayUnitPrice = (item, region) => {
+export const displayUnitPrice = (item: PricedVariant, region: Region) => {
   const currCode = region.currency_code.toUpperCase()
 
   const price = extractUnitPrice(item, region)
   return `${displayAmount(currCode, price)} ${currCode}`
 }
 
-export const extractOptionPrice = (price, region) => {
+export const extractOptionPrice = (price: number, region: Region) => {
   let amount = price
   amount = (amount * (1 + region.tax_rate / 100)) / 100
   return `${amount} ${region.currency_code.toUpperCase()}`
@@ -88,7 +88,10 @@ export function persistedPrice(currency: string, amount: number): number {
   return amount * multiplier
 }
 
-export const stringDisplayPrice = ({ amount, currencyCode }) => {
+export const stringDisplayPrice = ({ amount, currencyCode }: {
+  amount: number
+  currencyCode: string
+}) => {
   if (typeof amount === "undefined" || !currencyCode) {
     return `N/A`
   }

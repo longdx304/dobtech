@@ -19,7 +19,6 @@ const productsColumns = ({
 	handleDeleteProduct,
 	handleEditProduct,
 	handleChangeStatus,
-	handleRow,
 }: Props) => [
 	{
 		title: 'Tên sản phẩm',

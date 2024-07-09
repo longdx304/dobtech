@@ -332,7 +332,7 @@ export const useBuildTimeline = (orderId: string) => {
 				id: event.id,
 				time: event.created_at,
 				type: 'fulfilled',
-				items: event.items.map((item) =>
+				items: event.items.map((item: any) =>
 					getFulfilmentItem(allItems, edits, item)
 				),
 				noNotification: event.no_notification,
@@ -345,7 +345,7 @@ export const useBuildTimeline = (orderId: string) => {
 					id: event.id,
 					time: event.shipped_at,
 					type: 'shipped',
-					items: event.items.map((item) =>
+					items: event.items.map((item: any) =>
 						getFulfilmentItem(allItems, edits, item)
 					),
 					noNotification: event.no_notification,
@@ -359,9 +359,9 @@ export const useBuildTimeline = (orderId: string) => {
 			events.push({
 				id: event.id,
 				items: event.items
-					.map((i) => getReturnItems(allItems, edits, i))
+					.map((i: any) => getReturnItems(allItems, edits, i))
 					// Can be undefined while `edits` is loading
-					.filter((i) => !!i),
+					.filter((i: any) => !!i),
 				status: event.status,
 				currentStatus: event.status,
 				time: event.updated_at,
@@ -377,9 +377,9 @@ export const useBuildTimeline = (orderId: string) => {
 				events.push({
 					id: event.id,
 					items: event.items
-						.map((i) => getReturnItems(allItems, edits, i))
+						.map((i: any) => getReturnItems(allItems, edits, i))
 						// Can be undefined while `edits` is loading
-						.filter((i) => !!i),
+						.filter((i: any) => !!i),
 					status: 'requested',
 					time: event.created_at,
 					type: 'return',
@@ -402,8 +402,8 @@ export const useBuildTimeline = (orderId: string) => {
 				paymentStatus: event.payment_status,
 				returnStatus: event.return_order.status,
 				type: 'exchange',
-				newItems: event.additional_items.map((i) => getSwapItem(i)),
-				returnItems: event.return_order.items.map((i) =>
+				newItems: event.additional_items.map((i: any) => getSwapItem(i)),
+				returnItems: event.return_order.items.map((i: any) =>
 					getReturnItems(allItems, edits, i)
 				),
 				exchangeCartId:
@@ -421,7 +421,7 @@ export const useBuildTimeline = (orderId: string) => {
 					id: event.id,
 					time: event.fulfillments[0].created_at,
 					type: 'fulfilled',
-					items: event.additional_items.map((i) => getSwapItem(i)),
+					items: event.additional_items.map((i: any) => getSwapItem(i)),
 					noNotification: event.no_notification,
 					orderId: order.id,
 					sourceType: 'exchange',
@@ -432,7 +432,7 @@ export const useBuildTimeline = (orderId: string) => {
 						id: event.id,
 						time: event.fulfillments[0].shipped_at,
 						type: 'shipped',
-						items: event.additional_items.map((i) => getSwapItem(i)),
+						items: event.additional_items.map((i: any) => getSwapItem(i)),
 						noNotification: event.no_notification,
 						orderId: order.id,
 						sourceType: 'exchange',
@@ -446,7 +446,7 @@ export const useBuildTimeline = (orderId: string) => {
 				events.push({
 					id: claim.id,
 					type: 'claim',
-					newItems: claim.additional_items.map((i) => ({
+					newItems: claim.additional_items.map((i: any) => ({
 						quantity: i.quantity,
 						title: i.title,
 						thumbnail: i.thumbnail,
@@ -459,7 +459,7 @@ export const useBuildTimeline = (orderId: string) => {
 					refundStatus: claim.payment_status,
 					refundAmount: claim.refund_amount,
 					currencyCode: order.currency_code,
-					claimItems: claim.claim_items.map((i) => getClaimItem(i)),
+					claimItems: claim.claim_items.map((i: any) => getClaimItem(i)),
 					time: claim.canceled_at ? claim.canceled_at : claim.created_at,
 					noNotification: claim.no_notification,
 					claimType: claim.type,
@@ -477,7 +477,7 @@ export const useBuildTimeline = (orderId: string) => {
 						id: claim.id,
 						time: claim.fulfillments[0].created_at,
 						type: 'fulfilled',
-						items: claim.additional_items.map((i) => getSwapItem(i)),
+						items: claim.additional_items.map((i: any) => getSwapItem(i)),
 						noNotification: claim.no_notification,
 						orderId: order.id,
 						sourceType: 'claim',
@@ -488,7 +488,7 @@ export const useBuildTimeline = (orderId: string) => {
 							id: claim.id,
 							time: claim.fulfillments[0].shipped_at,
 							type: 'shipped',
-							items: claim.additional_items.map((i) => getSwapItem(i)),
+							items: claim.additional_items.map((i: any) => getSwapItem(i)),
 							noNotification: claim.no_notification,
 							orderId: order.id,
 							sourceType: 'claim',
@@ -499,7 +499,7 @@ export const useBuildTimeline = (orderId: string) => {
 					events.push({
 						id: `${claim.id}-created`,
 						type: 'claim',
-						newItems: claim.additional_items.map((i) => ({
+						newItems: claim.additional_items.map((i: any) => ({
 							quantity: i.quantity,
 							title: i.title,
 							thumbnail: i.thumbnail,
@@ -511,7 +511,7 @@ export const useBuildTimeline = (orderId: string) => {
 						refundStatus: claim.payment_status,
 						refundAmount: claim.refund_amount,
 						currencyCode: order.currency_code,
-						claimItems: claim.claim_items.map((i) => getClaimItem(i)),
+						claimItems: claim.claim_items.map((i: any) => getClaimItem(i)),
 						time: claim.created_at,
 						noNotification: claim.no_notification,
 						claimType: claim.type,
@@ -550,6 +550,7 @@ export const useBuildTimeline = (orderId: string) => {
 		events[events.length - 1].first = true;
 
 		return events;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		order,
 		edits,
@@ -588,7 +589,8 @@ function findOriginalItemId(edits: any, originalId: any) {
 	edits = edits
 		.filter((e: any) => !!e.confirmed_at) // only confirmed OEs are cloning line items
 		.sort(
-			(a: any, b: any) => new Date(a.confirmed_at) - new Date(b.confirmed_at)
+			// (a: any, b: any) => new Date(a.confirmed_at) - new Date(b.confirmed_at)
+			(a: any, b: any) => new Date(b.confirmed_at).getTime() - new Date(a.confirmed_at).getTime()
 		);
 
 	for (const edit of edits) {

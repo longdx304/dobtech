@@ -9,6 +9,10 @@ import { getErrorMessage } from '@/lib/utils';
 import { useAdminCreateNote, useAdminOrder } from 'medusa-react';
 import useOrdersExpandParam from '../utils/use-admin-expand-parameter';
 import {
+	ItemsFulfilledEvent,
+	ItemsShippedEvent,
+	OrderPlacedEvent,
+	RefundEvent,
 	TimelineEvent,
 	useBuildTimeline,
 	OrderPlacedEvent,

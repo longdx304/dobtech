@@ -156,7 +156,7 @@ const ProductList = ({}: Props) => {
 		});
 	};
 
-	const handleRowClick = (record) => {
+	const handleRowClick = (record: any) => {
 		router.push(`${ERoutes.PRODUCTS}/${record.id}`)
   };
 

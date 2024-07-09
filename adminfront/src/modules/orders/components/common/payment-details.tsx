@@ -8,7 +8,15 @@ export const PaymentDetails = ({
   returnRefund,
   paidTotal,
   refundedTotal,
-}: any) => {
+}: {
+  currency: string
+  swapAmount: number
+  manualRefund: number
+  swapRefund: number
+  returnRefund: number
+  paidTotal: number
+  refundedTotal: number
+}) => {
   if (swapAmount + manualRefund + swapRefund + returnRefund === 0) {
     return null
   }

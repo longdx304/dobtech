@@ -8,7 +8,14 @@ export const DisplayTotal = ({
   variant = "regular",
   subtitle = "",
   totalColor = "text-gray-900",
-}: any) => (
+}: {
+  totalAmount: any
+  totalTitle: any
+  currency: any
+  variant?: any
+  subtitle?: any
+  totalColor?: any
+}) => (
   <div className="mt-4 flex items-center justify-between text-[12px]">
     <div className="flex flex-col">
       <div
@@ -41,7 +48,6 @@ export const DisplayTotalAmount = ({
   <div className="flex">
     <div
       className={clsx(totalColor, {
-        "font-normal mr-3": variant === "regular",
         "font-medium": variant === "bold",
         "font-medium text-[24px]": variant === "large",
       })}
