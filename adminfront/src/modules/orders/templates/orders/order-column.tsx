@@ -4,11 +4,10 @@ import dayjs from 'dayjs';
 import { Truck, Pencil, Trash2 } from 'lucide-react';
 import StatusDot from '@/modules/common/components/status-indicator';
 import { formatNumber } from '@/lib/utils';
-import { format } from 'date-fns';
 
 type Props = {};
 
-const decidePaymentStatus = (status) => {
+const decidePaymentStatus = (status: any) => {
 	switch (status) {
 		case 'captured':
 			return <StatusDot variant="success" title={'Đã thanh toán'} />;
@@ -23,7 +22,7 @@ const decidePaymentStatus = (status) => {
 	}
 };
 
-const decideFulfillmentStt = (status) => {
+const decideFulfillmentStt = (status: any) => {
 	switch (status) {
 		case 'not_fulfilled':
 			return 'Chưa hoàn thành';

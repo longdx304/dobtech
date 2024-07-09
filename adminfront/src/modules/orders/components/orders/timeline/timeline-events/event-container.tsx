@@ -27,7 +27,7 @@ export type EventContainerProps = {
 	midNode?: React.ReactNode;
 	isFirst?: boolean;
 	expandable?: boolean;
-	children: ReactNode;
+	children?: ReactNode;
 	detail?: string | React.ReactNode;
 };
 

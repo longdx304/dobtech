@@ -1,4 +1,5 @@
-import { Option } from "../types/shared"
+/* eslint-disable import/no-anonymous-default-export */
+import { Option } from '@/types/shared';
 
 const providerDescriptors: { [providerKey: string]: Option } = {
   stripe: {

@@ -91,10 +91,10 @@ const RegionModal: FC<Props> = ({ state, handleOk, handleCancel, region }) => {
 		}
 	};
 
-	const parser = (value) => {
+	const parser = (value: any) => {
 		return value.replace(/\$\s?|(,*)/g, '');
 	};
-	const formatter = (value) => {
+	const formatter = (value: any) => {
 		if (value) {
 			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 		}
@@ -188,7 +188,7 @@ const RegionModal: FC<Props> = ({ state, handleOk, handleCancel, region }) => {
 								options={countryOptions}
 								allowClear
 								filterOption={(input, option) =>
-									(option?.label ?? '')
+									(option?.label as string ?? '')
 										.toLowerCase()
 										.includes(input.toLowerCase())
 								}
@@ -215,7 +215,7 @@ const RegionModal: FC<Props> = ({ state, handleOk, handleCancel, region }) => {
 								options={paymentProviderOptions}
 								allowClear
 								filterOption={(input, option) =>
-									(option?.label ?? '')
+									(option?.label as string ?? '')
 										.toLowerCase()
 										.includes(input.toLowerCase())
 								}
@@ -239,7 +239,7 @@ const RegionModal: FC<Props> = ({ state, handleOk, handleCancel, region }) => {
 								options={fulfillmentProviderOptions}
 								allowClear
 								filterOption={(input, option) =>
-									(option?.label ?? '')
+									(option?.label as string ?? '')
 										.toLowerCase()
 										.includes(input.toLowerCase())
 								}

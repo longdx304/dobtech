@@ -14,7 +14,7 @@ const OrderCanceled: React.FC<OrderCanceledProps> = ({ event }) => {
     time: event.time,
     title: "Đã huỷ đơn hàng",
   }
-  return <EventContainer {...args} />
+  return <EventContainer {...args}  />
 }
 
 export default OrderCanceled

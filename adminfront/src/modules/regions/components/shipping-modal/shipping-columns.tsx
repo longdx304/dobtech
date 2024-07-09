@@ -24,7 +24,7 @@ const shippingColumns = ({handleEdit, handleDelete}: Props) => [
 		key: 'amount',
 		className: 'text-xs',
 		render: (_: ShippingOption['amount']) => {
-			return formatNumber(_);
+			return formatNumber(_ || 0);
 		},
 	},
 	{

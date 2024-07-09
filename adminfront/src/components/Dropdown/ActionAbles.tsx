@@ -10,7 +10,7 @@ type Props = {
 	id?: string;
 };
 
-const ActionAbles: FC<Props> = ({ actions, onMenuClick, id }) => {
+export default function ActionAbles({ actions, onMenuClick, id }: Props) {
 	return (
 		<Dropdown menu={{ items: actions, onClick: onMenuClick, id: id }}>
 			<a
@@ -22,6 +22,5 @@ const ActionAbles: FC<Props> = ({ actions, onMenuClick, id }) => {
 			</a>
 		</Dropdown>
 	);
-};
+}
 
-export default ActionAbles;

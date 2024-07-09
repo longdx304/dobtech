@@ -1,4 +1,4 @@
-export const isoAlpha2Countries = {
+export const isoAlpha2Countries: { [key: string]: string }  = {
   AF: "Afghanistan",
   AX: "Aland Islands",
   AL: "Albania",
@@ -246,7 +246,15 @@ export const isoAlpha2Countries = {
   ZW: "Zimbabwe",
 }
 
-export const countries = [
+// Define the type for the countries array
+interface Country {
+  alpha2: string;
+  alpha3: string;
+  name: string;
+  numeric: string;
+}
+
+export const countries: Country[] = [
   { alpha2: "AF", name: "Afghanistan", alpha3: "AFG", numeric: "004" },
   { alpha2: "AL", name: "Albania", alpha3: "ALB", numeric: "008" },
   { alpha2: "DZ", name: "Algeria", alpha3: "DZA", numeric: "012" },
@@ -615,7 +623,7 @@ export const countries = [
   { alpha2: "AX", name: "Åland Islands", alpha3: "ALA", numeric: "248" },
 ]
 
-export function countryLookup(isoCountryCode) {
+export function countryLookup(isoCountryCode: string) {
   if (!isoCountryCode) {
     return
   }
@@ -623,7 +631,7 @@ export function countryLookup(isoCountryCode) {
   const normalizedIsoCountryCode = isoCountryCode.toUpperCase()
 
   if (isoAlpha2Countries[normalizedIsoCountryCode]) {
-    return isoAlpha2Countries[normalizedIsoCountryCode]
+    return isoAlpha2Countries[normalizedIsoCountryCode] 
   } else {
     // try iso alpha 3
     const isoRecord = countries.find(

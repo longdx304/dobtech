@@ -1,5 +1,5 @@
-import React from "react"
 import { ActionAbles } from '@/components/Dropdown';
+import React from "react"
 
 type EventActionablesProps = {
   actions: any
@@ -7,7 +7,7 @@ type EventActionablesProps = {
 
 const EventActionables: React.FC<EventActionablesProps> = ({ actions }) => {
   return (
-    <Actionables actions={actions} />
+    <ActionAbles actions={actions} />
   )
 }
 

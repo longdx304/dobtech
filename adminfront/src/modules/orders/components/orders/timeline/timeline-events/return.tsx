@@ -1,3 +1,6 @@
+// @ts-nocheck
+// ! This file is not type checked
+
 import clsx from "clsx"
 import { useAdminCancelReturn } from "medusa-react"
 import React, { useState } from "react"

@@ -15,6 +15,7 @@ import ShippingModal from '../components/shipping-modal';
 import { Card } from '@/components/Card';
 import { FloatButton } from '@/components/Button';
 import { Modal as AntdModal, message } from 'antd';
+import { getErrorMessage } from '@/lib/utils';
 
 type Props = {};
 
@@ -151,7 +152,7 @@ const RegionList: FC<Props> = ({}) => {
 					onCloseActionRegion();
 					setCurrentRegion(null);
 				}}
-				region={currentRegion}
+				region={currentRegion || undefined}
 			/>
 			<ShippingModal
 				state={stateShipping}
@@ -163,7 +164,7 @@ const RegionList: FC<Props> = ({}) => {
 					onCloseShipping();
 					setRegionId(null);
 				}}
-				regionId={regionId}
+				regionId={regionId || ''}
 			/>
 		</Card>
 	);

@@ -10,6 +10,7 @@ import orderColumns from './order-column';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import { useRouter } from 'next/navigation';
 import { ERoutes } from '@/types/routes';
+import { Region } from '@medusajs/medusa';
 
 type Props = {};
 
@@ -38,7 +39,7 @@ const OrderList: FC<Props> = ({}) => {
 	const [currentRegion, setCurrentRegion] = useState<Region | null>(null);
 	const [regionId, setRegionId] = useState<Region['id'] | null>(null);
 
-	const { orders, isLoading, count } = useAdminOrders(defaultQueryProps, {
+	const { orders, isLoading, count } = useAdminOrders(defaultQueryProps as any, {
     keepPreviousData: true,
   });
 
@@ -60,7 +61,7 @@ const OrderList: FC<Props> = ({}) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [orders]);
 
-	const handleRowClick = (record) => {
+	const handleRowClick = (record: any) => {
 		router.push(`${ERoutes.ORDERS}/${record.id}`)
   };
 

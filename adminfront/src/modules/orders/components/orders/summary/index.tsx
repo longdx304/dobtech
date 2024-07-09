@@ -1,23 +1,16 @@
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
-import { Text, Title } from '@/components/Typography';
-import { Ban } from 'lucide-react';
-import StatusIndicator from '@/modules/common/components/status-indicator';
-import { Empty, Modal as AntdModal, message } from 'antd';
-import dayjs from 'dayjs';
-import { useAdminCancelOrder, useAdminReservations } from 'medusa-react';
-import { getErrorMessage } from '@/lib/utils';
-import { Button } from '@/components/Button';
-import { useMemo } from 'react';
-import { ReservationItemDTO } from "@medusajs/types"
-import {
-  AdminGetVariantsVariantInventoryRes,
-  Order,
-  VariantInventory,
-} from "@medusajs/medusa";
-import OrderLine from './order-line';
+import { Title } from '@/components/Typography';
 import { DisplayTotal, PaymentDetails } from "@/modules/orders/components/common";
+import {
+  Order
+} from "@medusajs/medusa";
+import { ReservationItemDTO } from "@medusajs/types";
+import { Empty } from 'antd';
 import _ from "lodash";
+import { useMemo } from 'react';
+import OrderLine from './order-line';
 
 type Props = {
 	order: Order | undefined;

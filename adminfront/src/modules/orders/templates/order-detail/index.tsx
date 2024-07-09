@@ -47,7 +47,7 @@ export default function OrderDetail({ id }: Props) {
 			</Col>
 			<Col xs={24} sm={14} md={14} className="flex flex-col gap-y-4">
 				<Information order={order} isLoading={isLoading} />
-				<Summary order={order} isLoading={isLoading} />
+				<Summary order={order} isLoading={isLoading} reservations={[]} />
 				<Payment order={order} isLoading={isLoading} />
 				<Fulfillment order={order} isLoading={isLoading} />
 			</Col>

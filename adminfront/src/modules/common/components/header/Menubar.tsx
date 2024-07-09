@@ -64,7 +64,7 @@ const Menubar = ({ user, remove, className, onClose = () => {} }: Props) => {
 			className={className}
 			onClick={handleClickMenu}
 			mode="inline"
-			items={_menuItems}
+			items={_menuItems as any}
 		/>
 	);
 };
