@@ -26,7 +26,7 @@ const ProductPreview: FC<Props> = async ({ data, region }) => {
 		return null;
 	}
 
-	const { cheapestPrice } = getProductPrice({
+	const { cheapestPrice, variantPrice } = getProductPrice({
 		product: pricedProduct,
 		region,
 	});
