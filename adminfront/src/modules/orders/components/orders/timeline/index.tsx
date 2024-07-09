@@ -1,29 +1,24 @@
-import { Order } from '@medusajs/medusa';
 import { Card } from '@/components/Card';
+import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Title } from '@/components/Typography';
-import { ActionAbles } from '@/components/Dropdown';
-import { CircleAlert, RefreshCcw, RotateCcw } from 'lucide-react';
-import { Empty, Modal as AntdModal, message } from 'antd';
-import { getErrorMessage } from '@/lib/utils';
-import { useAdminCreateNote, useAdminOrder } from 'medusa-react';
-import useOrdersExpandParam from '../utils/use-admin-expand-parameter';
 import {
 	ItemsFulfilledEvent,
 	ItemsShippedEvent,
 	OrderPlacedEvent,
 	RefundEvent,
 	TimelineEvent,
-	useBuildTimeline,
-	OrderPlacedEvent,
-	ItemsFulfilledEvent,
-	ItemsShippedEvent,
-	RefundEvent,
+	useBuildTimeline
 } from '@/modules/orders/hooks/use-build-timeline';
-import OrderPlaced from './timeline-events/order-placed';
+import { Order } from '@medusajs/medusa';
+import { Empty } from 'antd';
+import { CircleAlert, RefreshCcw, RotateCcw } from 'lucide-react';
+import { useAdminOrder } from 'medusa-react';
+import useOrdersExpandParam from '../utils/use-admin-expand-parameter';
 import ItemsFulfilled from './timeline-events/items-fulfilled';
 import ItemsShipped from './timeline-events/items-shipped';
 import OrderCanceled from './timeline-events/order-canceled';
+import OrderPlaced from './timeline-events/order-placed';
 import Refund from './timeline-events/refund';
 
 type Props = {
