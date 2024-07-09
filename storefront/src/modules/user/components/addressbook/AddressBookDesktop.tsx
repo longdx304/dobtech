@@ -3,11 +3,11 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
+import AddressForm from '@/modules/common/components/address-form';
 import { Address, Region } from '@medusajs/medusa';
 import { Col, List, Modal, Row } from 'antd';
 import { useState } from 'react';
 import { deleteCustomerShippingAddress } from '../../actions';
-import FormAddress from './FormAddress';
 
 type Props = {
   region: Region;
@@ -121,7 +121,7 @@ const AddressBookDesktop = ({ region }: Props) => {
         onCancel={onClose}
         footer={null}
       >
-        <FormAddress
+        <AddressForm
           region={region}
           onClose={onClose}
           editingAddress={editingAddress}

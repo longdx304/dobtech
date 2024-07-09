@@ -1,16 +1,21 @@
 import { Button } from '@/components/Button';
 import { Drawer } from '@/components/Drawer';
 import { Input } from '@/components/Input';
+import jsonAddress from '@/lib/data/address.json';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import {
-	addCustomerShippingAddress,
-	updateCustomerShippingAddress,
-} from '@/modules/user/actions';
+import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
+import { addCustomerShippingAddress, updateCustomerShippingAddress } from '@/modules/user/actions';
 import { Region } from '@/types/medusa';
 import { Address } from '@medusajs/medusa';
-import { Divider, Form, FormProps, Select, message } from 'antd';
+import { Divider, Form, FormProps, message, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import SelectedAddress from './SelectedAddress';
+
+type Props = {
+	region: Region;
+	onClose: () => void;
+	editingAddress: Address | null;
+};
 
 export type AddressProps = {
 	firstName: string;
@@ -24,14 +29,9 @@ export type AddressProps = {
 	countryCode: string;
 };
 
-type Props = {
-	region: Region;
-	onClose: () => void;
-	editingAddress: Address | null;
-};
-
 const AddressForm = ({ region, onClose, editingAddress }: Props) => {
 	const [form] = Form.useForm();
+	const isDesktop = useIsDesktop();
 
 	const {
 		state: isAddressOpen,
@@ -109,7 +109,7 @@ const AddressForm = ({ region, onClose, editingAddress }: Props) => {
 				onFinish={onFinish}
 				initialValues={{ countryCode: region.countries[0].iso_2 }}
 			>
-				<Form.Item label="Quốc gia" name="countryCode">
+				<Form.Item label="Quốc gia" name="countryCode" className="lg:mb-2">
 					<Select
 						className="[&_.ant-select-selector]:!rounded-none"
 						options={region.countries.map((country) => ({
@@ -122,12 +122,13 @@ const AddressForm = ({ region, onClose, editingAddress }: Props) => {
 					/>
 				</Form.Item>
 
-				<Divider className="my-4" />
+				<Divider className="my-4 lg:mb-3" />
 
 				<Form.Item
 					label="Họ"
 					name="firstName"
 					rules={[{ required: true, message: 'Họ phải chứa 2-40 ký tự' }]}
+					className="lg:mb-3"
 				>
 					<Input placeholder="Họ" className="rounded-none" />
 				</Form.Item>
@@ -136,6 +137,7 @@ const AddressForm = ({ region, onClose, editingAddress }: Props) => {
 					label="Tên"
 					name="lastName"
 					rules={[{ required: true, message: 'Tên phải chứa 2-40 ký tự' }]}
+					className="lg:mb-3"
 				>
 					<Input placeholder="Tên" className="rounded-none" />
 				</Form.Item>
@@ -155,7 +157,7 @@ const AddressForm = ({ region, onClose, editingAddress }: Props) => {
 					<Input placeholder="Số điện thoại" className="rounded-none" />
 				</Form.Item>
 
-				<Divider className="my-4" />
+				<Divider className="my-4 lg:my-2" />
 
 				<Form.Item
 					label="Địa chỉ"
@@ -173,38 +175,106 @@ const AddressForm = ({ region, onClose, editingAddress }: Props) => {
 					label="Tỉnh/Thành phố"
 					name="province"
 					rules={[{ required: true, message: 'Vui lòng chọn tỉnh/thành phố' }]}
+					className="lg:mb-4"
 				>
-					<Input
-						placeholder="Chọn tỉnh/thành phố"
-						className="rounded-none"
-						readOnly
-						value={address.province}
-						onClick={onAddressOpen}
-					/>
+					{isDesktop ? (
+						<Select
+							placeholder="Chọn tỉnh/thành phố"
+							className="rounded-none lg:block hidden [&_.ant-select-selector]:!rounded-none"
+							options={jsonAddress.map((province) => ({
+								label: province.Name,
+								value: province.Name,
+							}))}
+							value={address.province}
+							onChange={(value) => {
+								handleAddressSelect(value, '', '');
+							}}
+							size="large"
+						/>
+					) : (
+						<>
+							<Input
+								placeholder="Chọn tỉnh/thành phố"
+								className="rounded-none lg:hidden block"
+								readOnly
+								value={address.province}
+								onClick={onAddressOpen}
+							/>
+						</>
+					)}
 				</Form.Item>
 
 				<Form.Item
 					label="Quận/Huyện"
 					name="district"
 					rules={[{ required: true, message: 'Vui lòng chọn quận/huyện' }]}
+					className="lg:mb-4"
 				>
-					<Input
-						placeholder="Chọn quận/huyện"
-						className="rounded-none"
-						value={address.district}
-					/>
+					{isDesktop ? (
+						<Select
+							placeholder="Chọn quận/huyện"
+							className="rounded-none hidden lg:block [&_.ant-select-selector]:!rounded-none"
+							options={
+								address.province
+									? jsonAddress
+											.find((prov) => prov.Name === address.province)
+											?.Districts.map((district) => ({
+												label: district.Name,
+												value: district.Name,
+											}))
+									: []
+							}
+							value={address.district}
+							onChange={(value) =>
+								handleAddressSelect(address.province, value, '')
+							}
+							size="large"
+						/>
+					) : (
+						<Input
+							placeholder="Chọn quận/huyện"
+							className="rounded-none block lg:hidden"
+							readOnly
+							value={address.district}
+						/>
+					)}
 				</Form.Item>
 
 				<Form.Item
 					label="Khu vực"
 					name="ward"
 					rules={[{ required: true, message: 'Vui lòng chọn khu vực' }]}
+					className="lg:mb-4"
 				>
-					<Input
-						placeholder="Chọn khu vực"
-						className="rounded-none"
-						value={address.ward}
-					/>
+					{isDesktop ? (
+						<Select
+							placeholder="Chọn khu vực"
+							className="rounded-none hidden lg:block [&_.ant-select-selector]:!rounded-none"
+							options={
+								address.district
+									? jsonAddress
+											.find((prov) => prov.Name === address.province)
+											?.Districts.find((dist) => dist.Name === address.district)
+											?.Wards.map((ward) => ({
+												label: ward.Name,
+												value: ward.Name,
+											}))
+									: []
+							}
+							value={address.ward}
+							onChange={(value) =>
+								handleAddressSelect(address.province, address.district, value)
+							}
+							size="large"
+						/>
+					) : (
+						<Input
+							placeholder="Chọn khu vực"
+							className="rounded-none block lg:hidden"
+							readOnly
+							value={address.ward}
+						/>
+					)}
 				</Form.Item>
 
 				<Form.Item
