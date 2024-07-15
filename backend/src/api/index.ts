@@ -1,8 +1,16 @@
-import { registerOverriddenValidators } from "@medusajs/medusa";
+import { registerOverriddenValidators } from '@medusajs/medusa';
 import {
-	AdminCreateUserRequest,
-	AdminUpdateUserRequest,
-} from "../extend-validator/user";
+  StorePostCartReq,
+  StorePostCartsCartReq,
+} from '../extend-validator/cart';
+import {
+  AdminCreateUserRequest,
+  AdminUpdateUserRequest,
+} from '../extend-validator/user';
+import { registerExtendedValidator } from '../utils/register-exntended-validator';
 
 registerOverriddenValidators(AdminCreateUserRequest);
 registerOverriddenValidators(AdminUpdateUserRequest);
+
+registerExtendedValidator(StorePostCartsCartReq);
+registerExtendedValidator(StorePostCartReq);

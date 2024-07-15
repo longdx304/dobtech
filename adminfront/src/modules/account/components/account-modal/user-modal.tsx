@@ -1,5 +1,5 @@
 'use client';
-import { Form, message, type FormProps , Checkbox} from 'antd';
+import { Form, message, type FormProps } from 'antd';
 import { Mail, Phone, UserRound } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -8,6 +8,7 @@ import { CheckboxGroup } from '@/components/Checkbox';
 import { Input } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
+import { getErrorMessage } from '@/lib/utils';
 import {
 	EPermissions,
 	IAdminResponse,
@@ -16,8 +17,6 @@ import {
 } from '@/types/account';
 import _ from 'lodash';
 import { useAdminCreateUser, useAdminUpdateUser } from 'medusa-react';
-import { User } from '@medusajs/medusa';
-import { getErrorMessage } from '@/lib/utils';
 
 interface Props {
 	state: boolean;
