@@ -7,9 +7,10 @@ import { GiftCard, StorePostCartsCartReq } from '@medusajs/medusa';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { ShippingAddressProps } from './components/shipping-address';
 
 export async function setAddresses(
-	values: any,
+	values: ShippingAddressProps,
 	email?: string,
 	cartId?: string
 ) {

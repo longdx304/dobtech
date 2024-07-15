@@ -1,13 +1,13 @@
 'use client';
 import { Button } from '@/components/Button';
-import React, { useState } from 'react';
-import { deleteCartCheckout, placeOrder } from '../../actions';
 import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { placeOrder } from '../../actions';
 
 const PaymentButton = () => {
 	const [submitting, setSubmitting] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const cartId = useSearchParams().get('cartId') || '';
+	const cartId = useSearchParams().get('cartId') || '';
 
 	const onPaymentCompleted = async () => {
 		await placeOrder(cartId).catch((err) => {
@@ -22,11 +22,6 @@ const PaymentButton = () => {
 		onPaymentCompleted();
 	};
 
-	const handleClick = async () => {
-		deleteCartCheckout(cartId);
-	}
-	
-
 	return (
 		<>
 			<Button
@@ -34,13 +29,9 @@ const PaymentButton = () => {
 				block
 				className="flex items-center justify-center w-full rounded-none text-lg uppercase mt-4 font-bold"
 				onClick={handleCheckout}
-        loading={submitting}
+				loading={submitting}
 			>
 				Đặt hàng
-			</Button>
-
-			<Button onClick={handleClick} className='mt-4'>
-				Test
 			</Button>
 		</>
 	);

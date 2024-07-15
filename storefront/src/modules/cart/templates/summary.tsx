@@ -20,7 +20,7 @@ type SummaryProps = {
 const countryCode = 'vn';
 
 const Summary = ({ cart, selectedItems }: SummaryProps) => {
-	const { refreshCart, allCarts, deleteAndRefreshCart } = useCart();
+	const { refreshCart, allCarts, deleteAndRefreshCart, setCurrentStep } = useCart();
 	const [isAdding, setIsAdding] = useState(false);
 	const router = useRouter();
 	const [isOpenModal, setIsOpenModal] = useState(false);
@@ -94,6 +94,7 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 					)
 				);
 				setCheckoutCart(newCart as Cart);
+				setCurrentStep(1)
 				router.push(`${ERoutes.CHECKOUT}/?cartId=${newCart.id}`);
 			}
 		} catch (e) {
@@ -138,6 +139,7 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 				)
 			);
 			setCheckoutCart(newCart as Cart);
+			setCurrentStep(1)
 			router.push(`${ERoutes.CHECKOUT}/?cartId=${newCart.id}`);
 			setIsOpenModal(false);
 		} catch (e) {

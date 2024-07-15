@@ -1,46 +1,23 @@
-import {
-	createPaymentSessions,
-	listCartShippingMethods,
-} from '@/actions/checkout';
-import { getCheckoutStep } from '@/lib/utils/get-checkout-step';
 import Addresses from '@/modules/checkout/components/addresses';
 import ItemsPreview from '@/modules/checkout/components/items-preview';
 import PaymentOptions from '@/modules/checkout/components/payment-options';
 import ShippingOptions from '@/modules/checkout/components/shipping-options';
-import { CartWithCheckoutStep } from '@/types/medusa';
-import { Customer, Region } from '@medusajs/medusa';
+import { Cart, Customer, Region } from '@medusajs/medusa';
+import { PricedShippingOption } from '@medusajs/medusa/dist/types/pricing';
 
 type Props = {
-	cartId: string;
+	cart: Omit<Cart, 'refunded_total' | 'refundable_amount'>;
 	customer: Omit<Customer, 'password_hash'> | null;
 	region: Region | null;
+	availableShippingMethods: PricedShippingOption[] | null;
 };
 
-export default async function CheckoutForm({
-	cartId,
+export default function CheckoutForm({
+	cart,
 	customer,
 	region,
+	availableShippingMethods,
 }: Props) {
-	// create payment sessions and get cart
-	const cart = (await createPaymentSessions(cartId).then(
-		(cart) => cart
-	)) as CartWithCheckoutStep;
-
-	if (!cart) {
-		return null;
-	}
-
-	cart.checkout_step = cart && getCheckoutStep(cart);
-
-	// get available shipping methods
-	const availableShippingMethods = await listCartShippingMethods(cart.id).then(
-		(methods) => methods?.filter((m) => !m.is_return)
-	);
-
-	if (!availableShippingMethods) {
-		return null;
-	}
-
 	return (
 		<div className="flex flex-col gap-4">
 			<Addresses cart={cart} customer={customer} region={region!} />

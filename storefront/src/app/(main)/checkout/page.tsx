@@ -7,7 +7,8 @@ const CheckoutTemplate = React.lazy(
 );
 
 export const metadata: Metadata = {
-	title: 'Checkout',
+	title: 'CHAMDEP VN | Thanh toán',
+	description: 'Thanh toán mua hàng',
 };
 
 export default async function Checkout({

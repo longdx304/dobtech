@@ -2,19 +2,19 @@
 
 import { authenticate, getToken } from '@/actions/auth';
 import {
-  addShippingAddress,
-  createCustomer,
-  deleteShippingAddress,
-  updateCustomer,
-  updateShippingAddress,
+	addShippingAddress,
+	createCustomer,
+	deleteShippingAddress,
+	updateCustomer,
+	updateShippingAddress,
 } from '@/actions/customer';
 import { AddressProps } from '@/modules/common/components/address-form';
 import {
-  Customer,
-  StorePostCustomersCustomerAddressesAddressReq,
-  StorePostCustomersCustomerAddressesReq,
-  StorePostCustomersCustomerReq,
-  StorePostCustomersReq,
+	Customer,
+	StorePostCustomersCustomerAddressesAddressReq,
+	StorePostCustomersCustomerAddressesReq,
+	StorePostCustomersCustomerReq,
+	StorePostCustomersReq,
 } from '@medusajs/medusa';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';

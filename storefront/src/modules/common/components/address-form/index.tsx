@@ -4,7 +4,10 @@ import { Input } from '@/components/Input';
 import jsonAddress from '@/lib/data/address.json';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
-import { addCustomerShippingAddress, updateCustomerShippingAddress } from '@/modules/user/actions';
+import {
+	addCustomerShippingAddress,
+	updateCustomerShippingAddress,
+} from '@/modules/user/actions';
 import { Region } from '@/types/medusa';
 import { Address } from '@medusajs/medusa';
 import { Divider, Form, FormProps, message, Select } from 'antd';
