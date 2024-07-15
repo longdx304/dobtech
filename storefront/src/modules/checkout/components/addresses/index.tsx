@@ -13,7 +13,8 @@ import { ChevronRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import AddressSelect from '../address-select';
 import ShippingAddress from '../shipping-address';
-import { getCheckoutStep } from '@/lib/utils/get-checkout-step';
+
+const countryCode = 'vn';
 
 const Addresses = ({
 	cart,
@@ -24,7 +25,6 @@ const Addresses = ({
 	customer: Omit<Customer, 'password_hash'> | null;
 	region: Region;
 }) => {
-	const countryCode = 'vn';
 	const { state, onOpen, onClose: onAddressClose } = useToggleState(false);
 	const { selectedAddress, setSelectedAddress } = useCart();
 
@@ -155,7 +155,11 @@ const Addresses = ({
 						/>
 					</div>
 				) : (
-					<AddressSelect region={region} onAddressClose={onAddressClose} />
+					<AddressSelect
+						cart={cart}
+						region={region}
+						onAddressClose={onAddressClose}
+					/>
 				)}
 			</Modal>
 		</Card>

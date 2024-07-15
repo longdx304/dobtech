@@ -5,7 +5,7 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import Item from '@/modules/cart/components/item';
 import Thumbnail from '@/modules/products/components/thumbnail';
-import { LineItem, Region } from '@medusajs/medusa';
+import { Cart, LineItem, Region } from '@medusajs/medusa';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -15,11 +15,13 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 
 type Props = {
-	items?: Omit<LineItem, 'beforeInsert'>[];
+	cart: Omit<Cart, 'refunded_total' | 'refundable_amount'>;
 	region?: Region;
 };
 
-const ItemsPreview = ({ items, region }: Props) => {
+const ItemsPreview = ({ region, cart }: Props) => {
+	const items = cart?.items;
+
 	return (
 		<Card>
 			<Flex className="flex-col">
@@ -40,7 +42,12 @@ const ItemsPreview = ({ items, region }: Props) => {
 										thumbnail={item?.thumbnail}
 										className="aspect-square"
 									/>
-									<Item item={item} region={region} type="preview" />
+									<Item
+										item={item}
+										region={region}
+										type="preview"
+										cartId={cart?.id}
+									/>
 								</div>
 							</SwiperSlide>
 						))}

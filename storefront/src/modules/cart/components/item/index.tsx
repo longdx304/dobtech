@@ -15,9 +15,10 @@ type ItemProps = {
 	item: Omit<LineItem, 'beforeInsert'>;
 	region: Region;
 	type?: 'full' | 'preview';
+	cartId?: string;
 };
 
-const Item = ({ item, region, type = 'full' }: ItemProps) => {
+const Item = ({ item, region, type = 'full', cartId }: ItemProps) => {
 	const [updating, setUpdating] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const { updateCartItem } = useCart();
@@ -26,15 +27,27 @@ const Item = ({ item, region, type = 'full' }: ItemProps) => {
 		setError(null);
 		setUpdating(true);
 
-		const message = await updateCartItem(item.id, quantity)
-			.catch((err: any) => {
-				return err.message;
-			})
-			.finally(() => {
-				setUpdating(false);
-			});
+		if (type === 'preview') {
+			const message = await updateCartItem(item.id, quantity, cartId)
+				.catch((err: any) => {
+					return err.message;
+				})
+				.finally(() => {
+					setUpdating(false);
+				});
 
-		message && setError(message);
+			message && setError(message);
+		} else {
+			const message = await updateCartItem(item.id, quantity)
+				.catch((err: any) => {
+					return err.message;
+				})
+				.finally(() => {
+					setUpdating(false);
+				});
+
+			message && setError(message);
+		}
 	};
 
 	return (

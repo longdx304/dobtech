@@ -1,27 +1,37 @@
 import { medusaClient } from '@/lib/database/config';
 import medusaError from '@/lib/utils/medusa-error';
-import { StorePostCartsCartReq } from '@medusajs/medusa';
+import { StorePostCartReq, StorePostCartsCartReq } from '@medusajs/medusa';
 import { cache } from 'react';
 import { getMedusaHeaders } from './auth';
 
+interface StoreUpdateCartsReq extends StorePostCartsCartReq {
+	metadata?: Record<string, unknown>;
+}
+
+interface StorePostCartsReq extends StorePostCartReq {
+	metadata?: Record<string, unknown>;
+}
+
 // Cart actions
-export async function createCart(data = {}) {
+export async function createCart(payload: StorePostCartsReq) {
 	const headers = await getMedusaHeaders(['cart']);
 
 	return medusaClient.carts
-		.create(data, headers)
-		.then(({ cart }) => cart)
+		.create(payload, headers)
+		.then(({ cart }) => {
+			return cart;
+		})
 		.catch((err) => {
 			console.log(err);
 			return null;
 		});
 }
 
-export async function updateCart(cartId: string, data: StorePostCartsCartReq) {
+export async function updateCart(cartId: string, payload: StoreUpdateCartsReq) {
 	const headers = await getMedusaHeaders(['cart']);
 
 	return medusaClient.carts
-		.update(cartId, data, headers)
+		.update(cartId, payload, headers)
 		.then(({ cart }) => {
 			return cart;
 		})
@@ -102,17 +112,18 @@ export async function completeCart(cartId: string) {
 
 	return medusaClient.carts
 		.complete(cartId, headers)
-		.then((res) => res)
+		.then((res) => {
+			return res;
+		})
 		.catch((err) => medusaError(err));
 }
 
-
 // Order actions
 export const retrieveOrder = cache(async function (id: string) {
-  const headers = await getMedusaHeaders(["order"])
+	const headers = await getMedusaHeaders(['order']);
 
-  return medusaClient.orders
-    .retrieve(id, headers)
-    .then(({ order }) => order)
-    .catch((err) => medusaError(err))
-})
+	return medusaClient.orders
+		.retrieve(id, headers)
+		.then(({ order }) => order)
+		.catch((err) => medusaError(err));
+});

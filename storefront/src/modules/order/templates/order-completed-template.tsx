@@ -9,11 +9,11 @@ import OrderDetails from '../components/order-details';
 import OrderSummary from '../components/order-summary';
 import ShippingDetails from '../components/shipping-details';
 
-type OrderDetailsTemplateProps = {
+type OrderCompletedTemplateProps = {
 	order: Order;
 };
 
-const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
+const OrderCompletedTemplate: React.FC<OrderCompletedTemplateProps> = ({
 	order,
 }) => {
 	return (
@@ -41,4 +41,4 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
 	);
 };
 
-export default OrderDetailsTemplate;
+export default OrderCompletedTemplate;

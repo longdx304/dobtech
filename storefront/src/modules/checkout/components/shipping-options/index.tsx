@@ -1,23 +1,25 @@
+'use client';
 import { Card } from '@/components/Card';
-import { useShippingOptions } from 'medusa-react';
-import { Radio, RadioGroup } from '@/components/Radio';
 import { Flex } from '@/components/Flex';
+import { Radio, RadioGroup } from '@/components/Radio';
 import { Text } from '@/components/Typography';
 import { formatAmount } from '@/lib/utils/prices';
 import { Region } from '@medusajs/medusa';
-import { useState } from 'react';
+import { PricedShippingOption } from '@medusajs/medusa/dist/types/pricing';
 import { RadioChangeEvent } from 'antd';
+import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { setShippingMethod } from '../../actions';
 
 type Props = {
 	region: Region;
+	availableShippingMethods: PricedShippingOption[] | null;
 };
 
-const ShippingOptions = ({ region }: Props) => {
-	const { shipping_options, isLoading } = useShippingOptions({
-		region_id: region.id,
-	});
-
-	const [value, setValue] = useState<string>("");
+const ShippingOptions = ({ region, availableShippingMethods }: Props) => {
+	const [isLoading, setIsLoading] = useState(false);
+	const [value, setValue] = useState<string>('');
+	const cartId = useSearchParams().get('cartId') || '';
 
 	const getAmount = (amount: number | null | undefined) => {
 		return formatAmount({
@@ -27,17 +29,33 @@ const ShippingOptions = ({ region }: Props) => {
 		});
 	};
 
+	const set = async (id: string) => {
+		setIsLoading(true);
+		await setShippingMethod(id, cartId)
+			.then(() => {
+				setIsLoading(false);
+			})
+			.catch((err) => {
+				setIsLoading(false);
+			});
+	};
+
 	const onChange = (e: RadioChangeEvent) => {
-    setValue(e.target.value);
-  };
+		setValue(e.target.value);
+		set(e.target.value);
+	};
 
 	return (
 		<Card loading={isLoading}>
 			<Text className="text-xl" strong>
-					Tuỳ chọn giao hàng
+				Tuỳ chọn giao hàng
 			</Text>
-			<RadioGroup className="w-full flex flex-col justify-start gap-4 pt-4" value={value}	onChange={onChange}>
-				{shipping_options?.map((option) => (
+			<RadioGroup
+				className="w-full flex flex-col justify-start gap-4 pt-4"
+				value={value}
+				onChange={onChange}
+			>
+				{availableShippingMethods?.map((option) => (
 					<Radio
 						key={option.id}
 						value={option.id}

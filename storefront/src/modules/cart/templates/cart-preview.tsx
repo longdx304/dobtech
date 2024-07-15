@@ -1,9 +1,8 @@
 'use client';
 
 import { useCart } from '@/lib/providers/cart/cart-provider';
-import CheckoutTemplate from '@/modules/checkout/templates';
 import { CartWithCheckoutStep } from '@/types/medusa';
-import { Customer } from '@medusajs/medusa';
+import { Cart, Customer } from '@medusajs/medusa';
 import StepsOrder from '../components/steps-order';
 import Overview from './overview';
 
@@ -17,13 +16,13 @@ const CartPreview = ({ cart, customer }: Props) => {
 	return (
 		<>
 			{currentStep > 0 && <StepsOrder currentStep={currentStep} />}
-			{/* {currentStep === 0 ? (
-				<Overview cart={cart} customer={customer} className="pb-12" />
-			) : (
-				<CheckoutTemplate />
-			)} */}
+
 			{currentStep === 0 && (
-				<Overview cart={cart} customer={customer} className="pb-12" />
+				<Overview
+					cart={cart}
+					customer={customer}
+					className="pb-12"
+				/>
 			)}
 		</>
 	);

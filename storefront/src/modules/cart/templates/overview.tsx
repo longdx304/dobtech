@@ -1,12 +1,11 @@
 'use client';
-import React, { useState } from 'react';
-import SignInPrompt from '../components/sign-in-prompt';
-import ItemsTemplate from './items';
-import Summary from './summary';
-import EmptyCartMessage from '../components/empty-cart-message';
+import { Card } from '@/components/Card';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { Customer } from '@medusajs/medusa';
-import { Card } from '@/components/Card';
+import React, { useState } from 'react';
+import EmptyCartMessage from '../components/empty-cart-message';
+import ItemsTemplate from './items';
+import Summary from './summary';
 
 const Overview = ({
 	cart,

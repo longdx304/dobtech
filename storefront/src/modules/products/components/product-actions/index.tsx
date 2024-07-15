@@ -17,8 +17,6 @@ import { Minus, Plus } from 'lucide-react';
 import OptionSelect from '../option-select';
 
 type ProductActionsProps = {
-	// product: PricedProduct;
-	// region: Region;
 	handleCancel?: () => void;
 	disabled?: boolean;
 };
@@ -31,8 +29,6 @@ export type PriceType = {
 };
 
 export default function ProductActions({
-	// product,
-	// region,
 	handleCancel = () => {},
 	disabled,
 }: ProductActionsProps) {
