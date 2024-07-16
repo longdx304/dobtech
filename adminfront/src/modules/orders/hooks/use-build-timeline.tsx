@@ -225,7 +225,6 @@ export const useBuildTimeline = (orderId: string) => {
 			type: 'payment-required',
 			currency_code: order.currency_code,
 		} as PaymentRequiredEvent);
-
 		if (isFeatureEnabled('order_editing')) {
 			for (const edit of edits || []) {
 				events.push({

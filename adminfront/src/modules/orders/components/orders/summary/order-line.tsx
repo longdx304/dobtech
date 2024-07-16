@@ -22,7 +22,7 @@ const OrderLine = ({
 }: OrderLineProps) => {
 	// const { isFeatureEnabled } = useFeatureFlag()
 	return (
-		<div className="hover:bg-gray-50 rounded-md mx-[-5px] mb-1 flex h-[64px] justify-between px-[5px]">
+		<div className="hover:bg-gray-50 rounded-md mx-[-5px] mb-1 flex h-[64px] justify-between px-[5px] cursor-pointer">
 			<div className="flex justify-center items-center space-x-4">
 				<div className="rounded-sm flex h-[48px] w-[36px] overflow-hidden">
 					{item.thumbnail ? (

@@ -86,6 +86,9 @@ const projectConfig = {
 
 const featureFlags = {
   product_categories: true,
+	order_editing: true,
+	sales_channels: true,
+	publishable_api_keys: true,
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */

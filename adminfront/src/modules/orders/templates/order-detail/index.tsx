@@ -10,6 +10,7 @@ import Summary from '@/modules/orders/components/orders/summary';
 import Payment from '@/modules/orders/components/orders/payment';
 import Fulfillment from '@/modules/orders/components/orders/fulfillment';
 import CustomerInfo from '@/modules/orders/components/orders/customer-info';
+import OrderEditModalContainer from '@/modules/orders/components/orders/edit-order-modal';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 
 interface Props {
@@ -43,23 +44,20 @@ export default function OrderDetail({ id }: Props) {
 
 	return (
 		<Row gutter={[16, 16]} className="mb-12">
-			<Col span={24}>
-				<BackToOrders />
-			</Col>
-			<Col xs={24} sm={14} md={14} className="flex flex-col gap-y-4">
-				<Information order={order} isLoading={isLoading} />
-				<Summary order={order} isLoading={isLoading} reservations={[]} />
-				<Payment order={order} isLoading={isLoading} />
-				<Fulfillment order={order} isLoading={isLoading} />
-				<CustomerInfo order={order} isLoading={isLoading} />
-			</Col>
-			<Col xs={24} sm={10} md={10}>
-				<Timeline orderId={order?.id} isLoading={isLoading} />
-			</Col>
-			{/* <Col xs={24}>
-			</Col>
-			<Col xs={24}>
-			</Col> */}
+				<Col span={24}>
+					<BackToOrders />
+				</Col>
+				<Col xs={24} sm={14} md={14} className="flex flex-col gap-y-4">
+					<Information order={order} isLoading={isLoading} />
+					<Summary order={order} isLoading={isLoading} reservations={[]} />
+					<Payment order={order} isLoading={isLoading} />
+					<Fulfillment order={order} isLoading={isLoading} />
+					<CustomerInfo order={order} isLoading={isLoading} />
+				</Col>
+				<Col xs={24} sm={10} md={10}>
+					<Timeline orderId={order?.id} isLoading={isLoading} />
+				</Col>
+				{order && <OrderEditModalContainer order={order} />}
 		</Row>
 	);
 }

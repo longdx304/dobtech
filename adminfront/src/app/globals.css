@@ -38,3 +38,8 @@ body {
 	color: #6B7280 !important;
 	font-size: 12px;
 }
+
+/* Antd Input number */
+.ant-input-number .ant-input-number-handler-wrap {
+	opacity: 1 !important;
+}

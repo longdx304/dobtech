@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
@@ -8,7 +9,11 @@ import {
 	OrderPlacedEvent,
 	RefundEvent,
 	TimelineEvent,
-	useBuildTimeline
+	useBuildTimeline,
+	PaymentRequiredEvent,
+	RefundRequiredEvent,
+	OrderEditEvent,
+	OrderEditRequestedEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
 import { Order } from '@medusajs/medusa';
 import { Empty } from 'antd';
@@ -20,6 +25,14 @@ import ItemsShipped from './timeline-events/items-shipped';
 import OrderCanceled from './timeline-events/order-canceled';
 import OrderPlaced from './timeline-events/order-placed';
 import Refund from './timeline-events/refund';
+import PaymentRequired from './timeline-events/order-edit/payment-required';
+import RefundRequired from './timeline-events/order-edit/refund-required';
+import EditCreated from './timeline-events/order-edit/created';
+import EditConfirmed from './timeline-events/order-edit/confirmed';
+import EditCanceled from './timeline-events/order-edit/canceled';
+import EditDeclined from './timeline-events/order-edit/declined';
+import EditRequested from './timeline-events/order-edit/requested';
+import ReturnMenu from './timeline-events/modal/returns';
 
 type Props = {
 	orderId: Order['id'] | undefined;
@@ -29,6 +42,7 @@ type Props = {
 const Timeline = ({ orderId, isLoading }: Props) => {
 	const { orderRelations } = useOrdersExpandParam();
 	const { events, refetch } = useBuildTimeline(orderId!);
+	const [showRequestReturn, setShowRequestReturn] = useState(false)
 	// const createNote = useAdminCreateNote();
 	const { order, isLoading: isOrderLoading } = useAdminOrder(orderId!, {
 		expand: orderRelations,
@@ -39,7 +53,7 @@ const Timeline = ({ orderId, isLoading }: Props) => {
 			label: <span className="w-full">{'Yêu cầu trả hàng'}</span>,
 			key: 'require_return',
 			icon: <RotateCcw />,
-			// onClick: handleCancelOrder,
+			onClick: () => setShowRequestReturn(true),
 		},
 		{
 			label: <span className="w-full">{'Đăng ký trao đổi'}</span>,
@@ -63,8 +77,6 @@ const Timeline = ({ orderId, isLoading }: Props) => {
 		);
 	};
 
-	console.log('events', events)
-
 	return (
 		<Card loading={isLoading || isOrderLoading} className="px-4">
 			<div>
@@ -74,12 +86,19 @@ const Timeline = ({ orderId, isLoading }: Props) => {
 						<ActionAbles actions={actions} />
 					</div>
 				</Flex>
-				<div className="flex flex-col">
+				<div className="flex flex-col text-xs">
 					{events?.map((event, i) => {
 						return <div key={i}>{switchOnType(event, refetch)}</div>;
 					})}
 				</div>
 			</div>
+			{showRequestReturn && order && (
+        <ReturnMenu
+          order={order}
+					state={showRequestReturn}
+          onClose={() => setShowRequestReturn(false)}
+        />
+      )}
 		</Card>
 	);
 };
@@ -114,20 +133,20 @@ function switchOnType(event: TimelineEvent, refetch: () => void) {
 		//   return <Notification event={event as NotificationEvent} />
 		case "refund":
 		  return <Refund event={event as RefundEvent} />
-		// case "edit-created":
-		//   return <EditCreated event={event as OrderEditEvent} />
-		// case "edit-canceled":
-		//   return <EditCanceled event={event as OrderEditEvent} />
-		// case "edit-declined":
-		//   return <EditDeclined event={event as OrderEditEvent} />
-		// case "edit-confirmed":
-		//   return <EditConfirmed event={event as OrderEditEvent} />
-		// case "edit-requested":
-		//   return <EditRequested event={event as OrderEditRequestedEvent} />
-		// case "refund-required":
-		//   return <RefundRequired event={event as RefundRequiredEvent} />
-		// case "payment-required":
-		//   return <PaymentRequired event={event as PaymentRequiredEvent} />
+		case "edit-created":
+		  return <EditCreated event={event as OrderEditEvent} />
+		case "edit-canceled":
+		  return <EditCanceled event={event as OrderEditEvent} />
+		case "edit-declined":
+		  return <EditDeclined event={event as OrderEditEvent} />
+		case "edit-confirmed":
+		  return <EditConfirmed event={event as OrderEditEvent} />
+		case "edit-requested":
+		  return <EditRequested event={event as OrderEditRequestedEvent} />
+		case "refund-required":
+		  return <RefundRequired event={event as RefundRequiredEvent} />
+		case "payment-required":
+		  return <PaymentRequired event={event as PaymentRequiredEvent} />
 		default:
 			return null;
 	}

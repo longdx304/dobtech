@@ -3,9 +3,11 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Text, Title } from '@/components/Typography';
 import StatusIndicator from '@/modules/common/components/status-indicator';
-import { Empty, Modal as AntdModal, message } from 'antd';
+import { Empty, Modal as AntdModal, message, Divider } from 'antd';
 import dayjs from 'dayjs';
-import { useAdminCancelOrder } from 'medusa-react';
+import { useAdminCancelOrder, useAdminCancelClaimFulfillment,
+  useAdminCancelFulfillment,
+  useAdminCancelSwapFulfillment, } from 'medusa-react';
 import { getErrorMessage } from '@/lib/utils';
 import { Store, Package, CircleX } from 'lucide-react';
 import { useState } from 'react';
@@ -14,6 +16,9 @@ import { TrackingLink } from "@/modules/orders/components/common";
 import { BadgeButton, Button } from '@/components/Button';
 import { ActionAbles } from '@/components/Dropdown';
 import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import CreateFulfillmentModal from './create-fulfillment-modal';
+import MarkShippedModal from './mark-shipped-modal';
 
 type Props = {
 	order: Order | undefined;
@@ -77,9 +82,8 @@ const gatherAllFulfillments = (order: Order) => {
 }
 
 const Fulfillment = ({ order, isLoading }: Props) => {
-	const [fullfilmentToShip, setFullfilmentToShip] = useState(null)
-	const handleCancelOrder = () => {
-	};
+	const [fulfillmentToShip, setFulfillmentToShip] = useState(null);
+	const { state, onOpen, onClose } = useToggleState(false);
 
 	if (!order) {
 		return (
@@ -93,17 +97,21 @@ const Fulfillment = ({ order, isLoading }: Props) => {
     (item: LineItem) => item.quantity > (item.fulfilled_quantity ?? 0)
   )
 
-	const allFulfillments = gatherAllFulfillments(order)
+	const allFulfillments = gatherAllFulfillments(order);
+
+	const handleOkFulfillment = () => {
+		onClose();
+	};
 
 	return (
 		<Card loading={isLoading} className="px-4">
 			<div>
 				<Flex align="center" justify="space-between" className="pb-2">
-					<Title level={4}>{`Thực hiện đơn hàng`}</Title>
+					<Title level={4}>{`Fulfillment`}</Title>
 					<div className="flex justify-end items-center gap-4">
 						<FulfillmentStatus status={order!.fulfillment_status} />
 						{order.status !== 'canceled' && anyItemsToFulfil && (
-							<Button type="default">{'Tạo thực hiện'}</Button>
+							<Button type="default" onClick={onOpen}>{'Xác nhận đóng gói'}</Button>
 						)}
 					</div>
 				</Flex>
@@ -119,17 +127,32 @@ const Fulfillment = ({ order, isLoading }: Props) => {
 						</span>
 					</div>
 				))}
-				<div className="inter-small-regular mt-6 ">
+				<Divider className="mt-4 mb-2" />
+				<div className="">
 					{allFulfillments.map((fulfillmentObj: any, i: number) => (
 						<FormattedFulfillment
 							key={i}
 							order={order}
 							fulfillmentObj={fulfillmentObj}
-							setFullfilmentToShip={setFullfilmentToShip}
+							setFulfillmentToShip={setFulfillmentToShip}
 						/>
 					))}
 				</div>
 			</div>
+			<CreateFulfillmentModal
+				state={state}
+				orderToFulfill={order as any}
+				handleCancel={() => onClose()}
+				orderId={order.id}
+				handleOk={handleOkFulfillment}
+			/>
+			{fulfillmentToShip && 
+			<MarkShippedModal 
+				handleCancel={() => setFulfillmentToShip(null)}
+				state={!!fulfillmentToShip}
+				fulfillment={fulfillmentToShip}
+				orderId={order.id}
+			/>}
 		</Card>
 	);
 };
@@ -200,11 +223,14 @@ const FulfillmentStatus = ({ status }: { status: Order['fulfillment_status'] }) 
 };
 
 const FormattedFulfillment = ({
-	setFullfilmentToShip,
+	setFulfillmentToShip,
   order,
   fulfillmentObj,
 }: any) => {
-	const { getLocationNameById } = useStockLocations()
+	const cancelFulfillment = useAdminCancelFulfillment(order.id);
+  const cancelSwapFulfillment = useAdminCancelSwapFulfillment(order.id);
+  const cancelClaimFulfillment = useAdminCancelClaimFulfillment(order.id);
+	const { getLocationNameById } = useStockLocations();
 	const { fulfillment } = fulfillmentObj;
   const hasLinks = !!fulfillment.tracking_links?.length;
 
@@ -225,9 +251,50 @@ const FormattedFulfillment = ({
     }
   }
 
+	const handleCancelFulfillment = async () => {
+    const { resourceId, resourceType } = getData()
+
+    const shouldCancel = AntdModal.confirm({
+			title: 'Huỷ fulfillment',
+			content: 'Bạn có chắc chắn muốn hủy thực hiện không?',
+			onOk: async () => {
+				switch (resourceType) {
+				case "swap":
+					return cancelSwapFulfillment.mutate(
+						{ swap_id: resourceId, fulfillment_id: fulfillment.id },
+						{
+							onSuccess: () =>
+								message.success("Hủy trao đổi thành công"),
+							onError: (err) =>
+								message.error(getErrorMessage(err)),
+						}
+					)
+				case "claim":
+					return cancelClaimFulfillment.mutate(
+						{ claim_id: resourceId, fulfillment_id: fulfillment.id },
+						{
+							onSuccess: () =>
+								message.success("Hủy đơn thành công"),
+							onError: (err) =>
+								message.error(getErrorMessage(err)),
+						}
+					)
+				default:
+					return cancelFulfillment.mutate(fulfillment.id, {
+						onSuccess: () =>
+							message.success("Hủy thực hiện thành công"),
+						onError: (err) =>
+							message.error(getErrorMessage(err)),
+					})
+				}
+			},
+		})
+    
+  }
+
 	return (
 		<div className="flex w-full justify-between">
-      <div className="flex flex-col space-y-1 py-4">
+      <div className="flex flex-col py-2">
         <div className="text-gray-900 text-xs">
           {fulfillment.canceled_at
             ? 'Thực hiện đã bị hủy'
@@ -236,7 +303,7 @@ const FormattedFulfillment = ({
         <div className="text-gray-500 flex text-xs items-center">
           {!fulfillment.shipped_at
             ? 'Chưa gửi'
-            : 'Theo dõi'}
+            : 'Theo dõi đơn'}
           {hasLinks &&
             fulfillment.tracking_links.map((tl: any, j: any) => (
               <TrackingLink key={j} trackingLink={tl} />
@@ -264,13 +331,14 @@ const FormattedFulfillment = ({
                 label: "Đánh dấu đã gửi",
                 icon: <Package size={20} />,
 								key: 'item-1',
-                // onClick: () => setFullfilmentToShip(fulfillment),
+                onClick: () => setFulfillmentToShip(fulfillment),
               },
               {
                 label: "Hủy thực hiện",
                 icon: <CircleX size={20} />,
 								key: 'item-2',
-                // onClick: () => handleCancelFulfillment(),
+								danger: true,
+                onClick: () => handleCancelFulfillment(),
               },
             ]}
           />

@@ -9,8 +9,13 @@ import dayjs from 'dayjs';
 import { useAdminCapturePayment } from 'medusa-react';
 import { getErrorMessage } from '@/lib/utils';
 import { Button } from '@/components/Button';
-import { DisplayTotal, PaymentDetails } from "@/modules/orders/components/common";
+import {
+	DisplayTotal,
+	PaymentDetails,
+} from '@/modules/orders/components/common';
 import { formatAmountWithSymbol } from '@/utils/prices';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import RefundModal from './refund-modal';
 
 type Props = {
 	order: Order | undefined;
@@ -18,6 +23,10 @@ type Props = {
 };
 
 const Payment = ({ order, isLoading }: Props) => {
+	const capturePayment = useAdminCapturePayment(order?.id! || '');
+
+	const { state, onOpen, onClose } = useToggleState(false);
+
 	if (!order) {
 		return (
 			<Card loading={isLoading}>
@@ -26,21 +35,26 @@ const Payment = ({ order, isLoading }: Props) => {
 		);
 	}
 
-	const orderId = order?.id;
-	// eslint-disable-next-line react-hooks/rules-of-hooks
-	const capturePayment = useAdminCapturePayment(orderId!);
 	let labelBtn = 'Thu tiền';
+
+	let action = () => {
+		AntdModal.confirm({
+			title: 'Xác nhận thu tiền',
+			content: 'Bạn có chắc chắn đã thu tiền từ khách hàng?',
+			onOk: async () => {
+				await capturePayment.mutateAsync(void {}, {
+					onSuccess: () => message.success('Đã thu tiền thành công'),
+					onError: (err) => message.error(getErrorMessage(err)),
+				});
+			},
+		});
+	};
 
 	const isSystemPayment = order?.payments?.some(
 		(p) => p.provider_id === 'system'
 	);
 
 	const { payment_status } = order!;
-
-	console.log('order', order);
-	console.log('isSystemPayment', isSystemPayment);
-
-	const handleCancelOrder = () => {};
 
 	let shouldShowNotice = false;
 	// If payment is a system payment, we want to show a notice
@@ -56,12 +70,12 @@ const Payment = ({ order, isLoading }: Props) => {
 		case payment_status === 'captured' ||
 			payment_status === 'partially_refunded': {
 			labelBtn = 'Hoàn tiền';
-			// action = () => showRefundMenu()
+			action = () => onOpen();
 			break;
 		}
 
 		case shouldShowNotice: {
-			// action = () => message.info('Đơn hàng này đang chờ thanh toán tự động');
+			action = () => message.info('Đơn hàng này đang chờ thanh toán tự động');
 			break;
 		}
 
@@ -71,6 +85,11 @@ const Payment = ({ order, isLoading }: Props) => {
 		default:
 			break;
 	}
+
+	const handleOkRefund = () => {
+		onClose();
+	};
+
 	return (
 		<Card loading={isLoading} className="px-4">
 			<div>
@@ -79,12 +98,14 @@ const Payment = ({ order, isLoading }: Props) => {
 					<div className="flex justify-end items-center gap-4">
 						<PaymentStatus status={order!.payment_status} />
 						{order.payment_status !== 'canceled' && (
-							<Button type="default">{labelBtn}</Button>
+							<Button type="default" onClick={action}>
+								{labelBtn}
+							</Button>
 						)}
 					</div>
 				</Flex>
 			</div>
-			<div className='pt-6'>
+			<div className="pt-6">
 				{order?.payments?.map((payment) => (
 					<div key={payment.id} className="flex flex-col">
 						<DisplayTotal
@@ -92,7 +113,7 @@ const Payment = ({ order, isLoading }: Props) => {
 							totalAmount={payment.amount}
 							totalTitle={payment.id}
 							subtitle={`${dayjs(payment.created_at).format(
-								"hh:mm DD MMM YYYY"
+								'hh:mm DD MMM YYYY'
 							)}`}
 						/>
 						{!!payment.amount_refunded && (
@@ -102,7 +123,7 @@ const Payment = ({ order, isLoading }: Props) => {
 										<CornerDownRight size={20} />
 									</div>
 									<div className="font-normal text-gray-900">
-										{"Đã hoàn tiền"}
+										{'Đã hoàn tiền'}
 									</div>
 								</div>
 								<div className="flex items-center">
@@ -122,7 +143,7 @@ const Payment = ({ order, isLoading }: Props) => {
 						<Divider className="my-2" />
 						<div className="flex justify-between text-xs">
 							<div className="font-semibold text-grey-90">
-								{"Tổng số tiền đã thanh toán"}
+								{'Tổng số tiền đã thanh toán'}
 							</div>
 							<div className="flex">
 								<div className="font-semibold text-gray-900 mr-3">
@@ -139,6 +160,12 @@ const Payment = ({ order, isLoading }: Props) => {
 					</div>
 				))}
 			</div>
+			<RefundModal
+				state={state}
+				handleOk={handleOkRefund}
+				handleCancel={onClose}
+				order={order}
+			/>
 		</Card>
 	);
 };

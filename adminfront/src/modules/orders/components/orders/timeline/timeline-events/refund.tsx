@@ -1,7 +1,7 @@
 import React from "react"
 import { RefundEvent } from "@/modules/orders/hooks/use-build-timeline";
 import { formatAmountWithSymbol } from "@/utils/prices"
-import { TicketSlash } from "lucide-react";
+import { WalletMinimal } from "lucide-react";
 import EventContainer from "./event-container"
 
 type RefundEventProps = {
@@ -10,7 +10,7 @@ type RefundEventProps = {
 
 const Refund: React.FC<RefundEventProps> = ({ event }) => {
   const args = {
-    icon: <TicketSlash size={20} />,
+    icon: <WalletMinimal size={20} />,
     title: "Hoàn tiền",
     time: event.time,
     midNode: (

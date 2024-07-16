@@ -1,3 +1,4 @@
+'use client';
 import { useAdminStockLocations } from "medusa-react"
 import { useEffect } from "react"
 import { useFeatureFlag } from "@/lib/providers/feature-flag-provider"

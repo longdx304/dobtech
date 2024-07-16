@@ -7,7 +7,7 @@ export const DisplayTotal = ({
   currency,
   variant = "regular",
   subtitle = "",
-  totalColor = "text-gray-900",
+  totalColor = "text-gray-900 mr-3",
 }: {
   totalAmount: any
   totalTitle: any
@@ -40,7 +40,7 @@ export const DisplayTotal = ({
 )
 
 export const DisplayTotalAmount = ({
-  totalColor = "text-gray-900",
+  totalColor = "text-gray-900 mr-3",
   variant = "regular",
   totalAmount,
   currency,
