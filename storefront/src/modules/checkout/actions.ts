@@ -1,14 +1,19 @@
 'use server';
 
 import { completeCart, updateCart } from '@/actions/cart';
-import { deleteDiscount } from '@/actions/checkout';
+import { addShippingMethod, deleteDiscount } from '@/actions/checkout';
+import { BACKEND_URL } from '@/lib/constants';
 import { GiftCard, StorePostCartsCartReq } from '@medusajs/medusa';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { ShippingAddressProps } from './components/shipping-address';
 
-export async function setAddresses(values: any, email?: string) {
-	const cartId = cookies().get('_medusa_cart_id')?.value;
-
+export async function setAddresses(
+	values: ShippingAddressProps,
+	email?: string,
+	cartId?: string
+) {
 	if (!cartId) return { message: 'Không tìm thấy sản phẩm' };
 
 	const data = {
@@ -26,13 +31,25 @@ export async function setAddresses(values: any, email?: string) {
 		email: email ? email : 'anonymous@gmail.com',
 	} as StorePostCartsCartReq;
 
-	console.log('data', data);
-
 	try {
 		await updateCart(cartId, data);
 		revalidateTag('cart');
 	} catch (error: any) {
 		return error.toString();
+	}
+}
+
+export async function setShippingMethod(
+	shippingMethodId: string,
+	cartId?: string
+) {
+	if (!cartId) throw new Error('Không tìm thấy sản phẩm');
+
+	try {
+		await addShippingMethod({ cartId, shippingMethodId });
+		revalidateTag('cart');
+	} catch (error: any) {
+		throw error;
 	}
 }
 
@@ -111,24 +128,72 @@ export async function submitDiscountForm(values: any) {
 	}
 }
 
-export async function placeOrder() {
-  const cartId = cookies().get("_medusa_cart_id")?.value
+export async function placeOrder(cartId?: string) {
+	if (!cartId) throw new Error('Không tìm thấy sản phẩm');
 
-  if (!cartId) throw new Error("No cartId cookie found")
+	let cart;
 
-  let cart
+	try {
+		cart = await completeCart(cartId);
+		revalidateTag('cart');
+	} catch (error: any) {
+		throw error;
+	}
 
+	if (cart?.type === 'order') {
+		redirect(`/order/confirmed/${cart?.data.id}`);
+	}
+
+	return cart;
+}
+
+export async function listAllCart() {
   try {
-    cart = await completeCart(cartId)
-		console.log('cart', cart)
-    revalidateTag("cart")
+    const response = await fetch(`${BACKEND_URL}/store/cart`, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch carts');
+    }
+
+		const data = await response.json();
+		return data.carts;
   } catch (error: any) {
-    throw error
+    throw error;
   }
+}
 
-  // if (cart?.type === "order") {
-  //   cookies().set("_medusa_cart_id", "", { maxAge: -1 })
-  // }
 
-  return cart
+export async function deleteCartCheckout(cartId?: string) {
+	if (!cartId) throw new Error('Không tìm thấy sản phẩm');
+
+	try {
+		await fetch(`${BACKEND_URL}/store/cart?cartId=${cartId}`, {
+			method: 'DELETE',
+		});
+	} catch (error: any) {
+		throw error;
+	}
+}
+
+export async function updateCartMetadata(
+	cartId?: string,
+	key?: string,
+	value?: string | number
+) {
+	if (!cartId) throw new Error('Không tìm thấy sản phẩm');
+
+	try {
+		await fetch(
+			`${BACKEND_URL}/store/cart/metadata?cartId=${cartId}&key=${key}&value=${value}`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}
+		);
+	} catch (error: any) {
+		throw error;
+	}
 }

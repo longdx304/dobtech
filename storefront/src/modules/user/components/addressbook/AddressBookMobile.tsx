@@ -4,6 +4,7 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
+import AddressForm from '@/modules/common/components/address-form';
 import { Region } from '@/types/medusa';
 import { Address } from '@medusajs/medusa';
 import { Modal } from 'antd';
@@ -12,7 +13,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { deleteCustomerShippingAddress } from '../../actions';
-import FormAddress from './FormAddress';
 
 type Props = {
   region: Region;
@@ -141,7 +141,7 @@ const AddressBookMobile = ({ region }: Props) => {
         onClose={onClose}
         className='[&_.ant-drawer-title]:flex [&_.ant-drawer-title]:justify-center [&_.ant-drawer-title]:items-center'
       >
-        <FormAddress
+        <AddressForm
           region={region}
           onClose={onClose}
           editingAddress={editingAddress}

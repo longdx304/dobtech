@@ -4,10 +4,10 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Text } from '@/components/Typography';
 import { useCart } from '@/lib/providers/cart/cart-provider';
+import { setAddresses } from '@/modules/checkout/actions';
 import { Cart, Region } from '@medusajs/medusa';
 import { Divider, Form, FormProps, Select, message } from 'antd';
 import { useState } from 'react';
-import { setAddresses } from '@/modules/checkout/actions';
 
 export type ShippingAddressProps = {
 	firstName: string;
@@ -31,14 +31,26 @@ const ShippingAddress = ({
 	region: Region;
 }) => {
 	const [form] = Form.useForm();
-	const [isEditing, setIsEditing] = useState(false);
+	const [isEditing, setIsEditing] = useState(true);
 	const { refreshCart } = useCart();
 
 	const onFinish: FormProps<ShippingAddressProps>['onFinish'] = async (
 		values
 	) => {
+		const shippingAddress = {
+			firstName: values.firstName,
+			lastName: values.lastName,
+			phone: values.phone,
+			ward: values.ward,
+			address: values.address,
+			district: values.district,
+			province: values.province,
+			postalCode: values.postalCode,
+			countryCode: values.countryCode,
+		};
+
 		try {
-			await setAddresses(values);
+			await setAddresses(shippingAddress, cart?.email, cart?.id);
 			message.success('Địa chỉ giao hàng đã được cập nhật');
 			refreshCart();
 			setIsEditing(false);
@@ -62,9 +74,12 @@ const ShippingAddress = ({
 		});
 	};
 
+	console.log('cart shipping address', cart);
+	console.log('isEditing', isEditing);
+
 	return (
 		<>
-			{cart?.id && (!cart?.shipping_address || isEditing) && (
+			{cart?.id && isEditing && (
 				<Form
 					form={form}
 					onFinish={onFinish}
@@ -178,7 +193,7 @@ const ShippingAddress = ({
 				</Form>
 			)}
 
-			{cart?.id && cart?.shipping_address && !isEditing && (
+			{!isEditing && (
 				<Card className="shadow-none">
 					<Flex className="flex-col" gap={4}>
 						<Flex gap={10} align="baseline">
@@ -194,8 +209,8 @@ const ShippingAddress = ({
 							{cart?.shipping_address?.address_2}
 						</Text>
 						<Text className="text-[12px]">
-							{cart?.shipping_address?.address_1},{' '}
-							{cart?.shipping_address?.city}, {cart?.shipping_address?.province}{' '}
+							{cart?.shipping_address?.address_1},{cart?.shipping_address?.city}
+							, {cart?.shipping_address?.province},
 							{cart?.shipping_address?.postal_code}
 						</Text>
 						<Flex gap={8} className="absolute bottom-2 right-5">

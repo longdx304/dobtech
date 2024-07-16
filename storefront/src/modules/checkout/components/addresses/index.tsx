@@ -1,7 +1,6 @@
 'use client';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { Empty } from '@/components/Empty';
 import { Flex } from '@/components/Flex';
 import { Modal } from '@/components/Modal';
 import { Text } from '@/components/Typography';
@@ -13,7 +12,8 @@ import { ChevronRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import AddressSelect from '../address-select';
 import ShippingAddress from '../shipping-address';
-import { getCheckoutStep } from '@/lib/utils/get-checkout-step';
+
+const countryCode = 'vn';
 
 const Addresses = ({
 	cart,
@@ -24,7 +24,6 @@ const Addresses = ({
 	customer: Omit<Customer, 'password_hash'> | null;
 	region: Region;
 }) => {
-	const countryCode = 'vn';
 	const { state, onOpen, onClose: onAddressClose } = useToggleState(false);
 	const { selectedAddress, setSelectedAddress } = useCart();
 
@@ -92,7 +91,7 @@ const Addresses = ({
 					</Flex>
 				)}
 			</Flex>
-			{addressesInRegion && displayAddress ? (
+			{customer && addressesInRegion && displayAddress ? (
 				<Card className="shadow-none">
 					<Flex className="flex-col" gap={4}>
 						<Flex gap={10} align="baseline">
@@ -104,8 +103,8 @@ const Addresses = ({
 							</Text>
 						</Flex>
 						<Text className="text-[12px]">{displayAddress?.address_2}</Text>
-						<Text className="text-[12px]">
-							{displayAddress?.address_1}, {displayAddress?.city},{' '}
+						<Text className="text-[12px] w-[300px]">
+							{displayAddress?.address_1}, {displayAddress?.city},
 							{displayAddress?.province} {displayAddress?.postal_code}
 						</Text>
 						<Flex gap={8} className="absolute bottom-2 right-5">
@@ -120,11 +119,6 @@ const Addresses = ({
 					</Flex>
 				</Card>
 			) : (
-				customer && <Empty description="Không có địa chỉ, vui lòng lựa chọn" />
-			)}
-
-			{/* if user buy item without auth */}
-			{!customer && (
 				<ShippingAddress
 					countryCode={countryCode}
 					cart={cart}
@@ -155,7 +149,11 @@ const Addresses = ({
 						/>
 					</div>
 				) : (
-					<AddressSelect region={region} onAddressClose={onAddressClose} />
+					<AddressSelect
+						cart={cart}
+						region={region}
+						onAddressClose={onAddressClose}
+					/>
 				)}
 			</Modal>
 		</Card>

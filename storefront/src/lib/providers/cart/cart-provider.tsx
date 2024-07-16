@@ -4,6 +4,7 @@ import {
 	retrieveCart,
 	updateLineItem,
 } from '@/modules/cart/action';
+import { deleteCartCheckout, listAllCart } from '@/modules/checkout/actions';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { Address, Cart, LineItem } from '@medusajs/medusa';
 import {
@@ -38,14 +39,20 @@ const computeTotals = (items: LineItem[]) => {
 
 type CartContextType = {
 	cart: Cart | null;
+	allCarts: Cart[];
 	refreshCart: () => Promise<void>;
-	updateCartItem: (lineId: string, quantity: number) => Promise<void>;
+	updateCartItem: (
+		lineId: string,
+		quantity: number,
+		checkoutCartId?: string
+	) => Promise<void>;
 	selectedCartItems: CartWithCheckoutStep | null;
 	setSelectedCartItems: (items: CartWithCheckoutStep) => void;
 	currentStep: number;
 	setCurrentStep: (step: number) => void;
 	selectedAddress: Address | null;
 	setSelectedAddress: (address: Address) => void;
+	deleteAndRefreshCart: (cartId: string) => Promise<void>;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -56,6 +63,7 @@ interface Props {
 
 export const CartProvider: React.FC<Props> = ({ children }) => {
 	const [cart, setCart] = useState<Cart | null>(null);
+	const [allCarts, setAllCarts] = useState<Cart[]>([]);
 	const [selectedCartItems, setSelectedCartItems] =
 		useState<CartWithCheckoutStep | null>({} as CartWithCheckoutStep);
 	const [currentStep, setCurrentStep] = useState<number>(0);
@@ -70,16 +78,54 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 		setCart(cart as Cart);
 	};
 
-	const refreshCart = async () => {
+	const fetchAllCarts = async () => {
+		try {
+			const allCarts = await listAllCart();
+			setAllCarts(allCarts);
+		} catch (e) {
+			console.error('Error fetching all carts:', e);
+		}
+	};
+
+	/**
+	 * Deletes a cart and refreshes the list of all carts.
+	 *
+	 * @param {string} cartId - The ID of the cart to be deleted.
+	 * @return {Promise<void>} A promise that resolves when the cart is successfully deleted and the list of carts is refreshed.
+	 * @throws {Error} If there is an error deleting the cart.
+	 */
+	const deleteAndRefreshCart = async (cartId: string) => {
+		try {
+			await deleteCartCheckout(cartId);
+			await fetchAllCarts();
+		} catch (error) {
+			console.error('Error deleting cart:', error);
+			throw error;
+		}
+	};
+
+	/**
+	 * Updates a cart item with the specified line ID, quantity, and optional checkout cart ID.
+	 *
+	 * @param {string} lineId - The ID of the line item to update.
+	 * @param {number} quantity - The new quantity for the line item.
+	 * @param {string} [checkoutCartId] - The optional checkout cart ID.
+	 * @return {Promise<void>} A promise that resolves when the cart item is successfully updated and the cart is fetched.
+	 */
+	const updateCartItem = async (
+		lineId: string,
+		quantity: number,
+		checkoutCartId?: string
+	) => {
+		await updateLineItem({ lineId, quantity, checkoutCartId });
 		await fetchCart();
 	};
 
-	const updateCartItem = async (lineId: string, quantity: number) => {
-		await updateLineItem({ lineId, quantity });
-		await fetchCart();
-	};
-
-	// update selected items when cart changes
+	/**
+	 * Updates the selected cart items based on the current cart.
+	 * Filters the selected items based on IDs and computes the totals.
+	 * Updates the selected cart items state with the latest data.
+	 */
 	useEffect(() => {
 		if (cart) {
 			// Filter selected items based on IDs
@@ -107,14 +153,25 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [cart]);
 
+	/**
+	 * Refreshes the cart by fetching the updated cart and all carts.
+	 *
+	 * @return {Promise<void>} A promise that resolves when the cart is successfully refreshed with the updated data.
+	 */
+	const refreshCart = async () => {
+		await Promise.all([fetchCart(), fetchAllCarts()]);
+	};
+
 	useEffect(() => {
 		fetchCart();
+		fetchAllCarts();
 	}, []);
 
 	return (
 		<CartContext.Provider
 			value={{
 				cart,
+				allCarts,
 				refreshCart,
 				updateCartItem,
 				selectedCartItems,
@@ -123,6 +180,7 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 				setCurrentStep,
 				selectedAddress,
 				setSelectedAddress,
+				deleteAndRefreshCart,
 			}}
 		>
 			{children}

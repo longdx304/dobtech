@@ -6,7 +6,7 @@ import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCart } from '@/lib/providers/cart/cart-provider';
 import { useCustomer } from '@/lib/providers/user/user-provider';
 import AddressForm from '@/modules/common/components/address-form';
-import { Address, Region } from '@medusajs/medusa';
+import { Address, Cart, Region } from '@medusajs/medusa';
 import { Col, List, Row, message } from 'antd';
 import { useState } from 'react';
 import { setAddresses } from '../../actions';
@@ -14,9 +14,11 @@ import { setAddresses } from '../../actions';
 const AddressSelect = ({
 	region,
 	onAddressClose,
+	cart,
 }: {
 	region: Region;
 	onAddressClose: () => void;
+	cart: Omit<Cart, 'refunded_total' | 'refundable_amount'> | null;
 }) => {
 	const { state, onOpen, onClose } = useToggleState(false);
 	const { customer } = useCustomer();
@@ -46,8 +48,9 @@ const AddressSelect = ({
 			postalCode: values.postal_code,
 			countryCode: values.country_code,
 		};
+
 		try {
-			await setAddresses(shippingAddress, email);
+			await setAddresses(shippingAddress, email, cart?.id);
 			message.success('Địa chỉ giao hàng đã được cập nhật');
 			refreshCart();
 		} catch {

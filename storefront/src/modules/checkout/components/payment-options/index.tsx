@@ -1,3 +1,4 @@
+'use client';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Radio, RadioGroup } from '@/components/Radio';

@@ -88,6 +88,7 @@ export async function createUser(payload: IUserRequest) {
 	const headers = await getMedusaHeaders(['users']);
 	const { email, fullName, phone, permissions } = payload;
 
+	console.log('payload', payload)
 	return medusaClient.admin.users
 		.create(
 			{
