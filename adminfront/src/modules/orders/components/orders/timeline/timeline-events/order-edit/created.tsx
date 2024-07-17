@@ -46,17 +46,22 @@ const getInfo = (edit: OrderEdit): { type: string; user_id: string } => {
 const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 	const {
 		isModalVisible,
+		showModal,
 		hideModal,
 		orderEdits,
 		activeOrderEditId,
-		setActiveOrderEdit,
+		setActiveOrderEditId,
 	} = useOrderEdit();
 
 	const orderEdit = event.edit;
 
 	const { type, user_id } = getInfo(orderEdit);
 
-	const name = `${type === 'created' ? 'Đã tạo chỉnh sửa đơn hàng' : 'Yêu cầu chỉnh sửa đơn hàng'}`;
+	const name = `${
+		type === 'created'
+			? 'Đã tạo chỉnh sửa đơn hàng'
+			: 'Yêu cầu chỉnh sửa đơn hàng'
+	}`;
 
 	const { user } = useAdminUser(user_id);
 
@@ -102,7 +107,7 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 	};
 
 	const onContinueEdit = () => {
-		setActiveOrderEdit(orderEdit.id);
+		setActiveOrderEditId(orderEdit.id);
 		showModal();
 	};
 
@@ -149,7 +154,12 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 									okText="Xác nhận"
 									cancelText="Huy"
 								>
-									<Button danger className="w-full font-medium" size="small" type="default">
+									<Button
+										danger
+										className="w-full font-medium"
+										size="small"
+										type="default"
+									>
 										Xoá
 									</Button>
 								</Popconfirm>
@@ -172,7 +182,12 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 									okText="Xác nhận"
 									cancelText="Huy"
 								>
-									<Button danger className="w-full font-medium" size="small" type="default">
+									<Button
+										danger
+										className="w-full font-medium"
+										size="small"
+										type="default"
+									>
 										Huỷ
 									</Button>
 								</Popconfirm>
@@ -185,7 +200,7 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 	);
 };
 
-const OrderEditChanges = ({ orderEdit }) => {
+const OrderEditChanges = ({ orderEdit }: any) => {
 	if (!orderEdit) {
 		return <></>;
 	}
@@ -199,7 +214,7 @@ const OrderEditChanges = ({ orderEdit }) => {
 	);
 
 	const removed = orderEdit.changes.filter(
-		(oec) =>
+		(oec: any) =>
 			oec.type === OrderEditItemChangeType.ITEM_REMOVE ||
 			(oec.type === OrderEditItemChangeType.ITEM_UPDATE &&
 				oec.line_item &&
@@ -212,7 +227,7 @@ const OrderEditChanges = ({ orderEdit }) => {
 			{added.length > 0 && (
 				<div className="flex flex-col gap-y-2">
 					<span className="font-normal text-gray-500">Đã thêm:</span>
-					{added.map((change) => (
+					{added.map((change: any) => (
 						<OrderEditChangeItem change={change} key={change.id} />
 					))}
 				</div>
@@ -220,7 +235,7 @@ const OrderEditChanges = ({ orderEdit }) => {
 			{removed.length > 0 && (
 				<div>
 					<span className="font-normal text-gray-500">Đã xoá:</span>
-					{removed.map((change) => (
+					{removed.map((change: any) => (
 						<OrderEditChangeItem change={change} key={change.id} />
 					))}
 				</div>
@@ -256,7 +271,8 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 			<div>
 				<div className="rounded-md flex h-[40px] w-[30px] overflow-hidden">
 					{lineItem?.thumbnail ? (
-						<img src={lineItem.thumbnail} className="object-cover" />
+						// eslint-disable-next-line @next/next/no-img-element
+						<img src={lineItem.thumbnail} className="object-cover" alt="" />
 					) : (
 						<PlaceholderImage />
 					)}
@@ -270,9 +286,9 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 					)}
 				</span>
 				<span className="font-normal text-gray-500 flex">
-					{`${lineItem.variant.title}${
-								lineItem.variant.sku ? ` (${lineItem.variant.sku})` : ''
-							}`}
+					{`${lineItem?.variant.title}${
+						lineItem?.variant.sku ? ` (${lineItem.variant.sku})` : ''
+					}`}
 				</span>
 			</div>
 		</div>

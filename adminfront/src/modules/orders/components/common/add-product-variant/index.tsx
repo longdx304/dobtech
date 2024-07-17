@@ -22,6 +22,7 @@ type AddProductVariantProps = {
 	isReplace?: boolean;
 	isLoading?: boolean;
 	// onSubmit: (variants: ProductVariant[]) => void;
+	onSubmit: (variants: string[]) => void;
 	title: string;
 };
 
@@ -56,7 +57,7 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 	};
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
-		setSelectedVariants(selectedRowKeys);
+		setSelectedVariants(selectedRowKeys as string[]);
 	};
 
 	const handleChangeDebounce = _.debounce(

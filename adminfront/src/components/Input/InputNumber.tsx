@@ -5,19 +5,24 @@ import { cn } from '@/lib/utils';
 
 interface Props extends InputNumberProps {
 	className?: string;
+	allowClear?: boolean;
 }
 
-export default function InputNumber({ className, ...props }: Props) {
+export default function InputNumber({
+	className,
+	allowClear = false,
+	...props
+}: Props) {
 	const formatter = (value: any) => {
-    if (value) {
-      return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    }
-    return value;
-  };
+		if (value) {
+			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+		}
+		return value;
+	};
 
-  const parser = (value: any) => {
-    return value.replace(/\$\s?|(,*)/g, '');
-  };
+	const parser = (value: any) => {
+		return value.replace(/\$\s?|(,*)/g, '');
+	};
 
 	return (
 		<Flex vertical gap={4} className="w-full">

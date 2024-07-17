@@ -59,9 +59,7 @@ const OrderLine = ({
 							tax: [],
 						})}
 					</div>
-					<div className="font-normal text-gray-500">
-						x {item.quantity}
-					</div>
+					<div className="font-normal text-gray-500">x {item.quantity}</div>
 					{/* {isFeatureEnabled("inventoryService") && isAllocatable && (
             <ReservationIndicator reservations={reservations} lineItem={item} />
           )} */}

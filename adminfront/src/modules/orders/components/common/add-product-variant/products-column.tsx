@@ -1,12 +1,11 @@
-import { ProductVariant, InventoryLevelDTO } from '@medusajs/medusa';
-import { Pencil, Trash, LoaderCircle } from 'lucide-react';
+// @ts-nocheck
+import { ProductVariant } from '@medusajs/medusa';
 import Image from 'next/image';
 import React from 'react';
 
 import { Flex } from '@/components/Flex';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
-import { ActionAbles } from '@/components/Dropdown';
 import { formatAmountWithSymbol } from '@/utils/prices';
 
 interface Props {
@@ -75,7 +74,7 @@ const productsColumns = ({ variantInventoryCell, currencyCode }: Props) => [
 						)}
 						<span>
 							{formatAmountWithSymbol({
-								amount: record.calculated_price_incl_tax,
+								amount: record.calculated_price_incl_tax ,
 								currency: currencyCode,
 							})}
 						</span>

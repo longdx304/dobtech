@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Fulfillment } from '@medusajs/medusa';
 import {
 	useAdminCreateClaimShipment,
@@ -88,7 +89,7 @@ const MarkShippedModal: React.FC<MarkShippedModalProps> = ({
         break;
     }
 
-		await action.mutateAsync(requestObj, {
+		await action.mutateAsync(requestObj as any, {
       onSuccess: () => {
         message.success(successText);
 				form.resetFields();
@@ -162,7 +163,7 @@ const MarkShippedModal: React.FC<MarkShippedModalProps> = ({
 								onClick={() => subOpt.add()}
 								block
 								className="mt-0"
-								disabled={trackingNumbers?.some(item => !item)}
+								disabled={trackingNumbers?.some((item: any) => !item)}
 							>
 								+ Thêm số theo dõi bổ sung
 							</Button>

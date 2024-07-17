@@ -1,27 +1,21 @@
-import { message } from 'antd';
 import { Flex } from '@/components/Flex';
 import { Modal } from '@/components/Modal';
-import { Title, Text } from '@/components/Typography';
-import { Select } from '@/components/Select';
-import {
-	useAdminCreateFulfillment,
-	useAdminFulfillClaim,
-	useAdminFulfillSwap,
-	useAdminStockLocations,
-} from 'medusa-react';
-import { useMemo, useState } from 'react';
-import { currencies } from '@/types/currencies';
-import { Option } from '@/types/shared';
+import { Text, Title } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
 import {
 	AdminPostOrdersOrderClaimsClaimFulfillmentsReq,
 	AdminPostOrdersOrderFulfillmentsReq,
 	AdminPostOrdersOrderSwapsSwapFulfillmentsReq,
-	ClaimOrder,
-	Order,
-	Swap,
 	LineItem,
+	Order,
 } from '@medusajs/medusa';
+import { message } from 'antd';
+import {
+	useAdminCreateFulfillment,
+	useAdminFulfillClaim,
+	useAdminFulfillSwap,
+} from 'medusa-react';
+import { useState } from 'react';
 import FulfillmentItems from './fulfillment-items';
 
 interface Props {
@@ -35,11 +29,6 @@ interface Props {
 export const getFulfillAbleQuantity = (item: LineItem): number => {
 	return item.quantity - (item.fulfilled_quantity || 0);
 };
-
-type actionType =
-	| typeof createOrderFulfillment
-	| typeof createSwapFulfillment
-	| typeof createClaimFulfillment;
 
 const CreateFulfillmentModal = ({
 	state,
@@ -61,13 +50,18 @@ const CreateFulfillmentModal = ({
 	);
 
 	const items =
-		'items' in orderToFulfill
+		'items' in orderToFulfill 
 			? orderToFulfill.items
-			: orderToFulfill.additional_items;
+			: (orderToFulfill as any).additional_items;
 
 	const createOrderFulfillment = useAdminCreateFulfillment(orderId);
 	const createSwapFulfillment = useAdminFulfillSwap(orderId);
 	const createClaimFulfillment = useAdminFulfillClaim(orderId);
+
+	type actionType =
+		| typeof createOrderFulfillment
+		| typeof createSwapFulfillment
+		| typeof createClaimFulfillment;
 
 	const isSubmitting =
 		createOrderFulfillment.isLoading ||
@@ -117,13 +111,13 @@ const CreateFulfillmentModal = ({
 				break;
 		}
 
-		await action.mutateAsync(requestObj, {
+		await action.mutateAsync(requestObj as any, {
 			onSuccess: () => {
 				message.success(successText);
 				handleOk();
 				// handleCancel();
 			},
-			onError: (err) => message.error(getErrorMessage(err)),
+			onError: (err: any) => message.error(getErrorMessage(err)),
 		});
 	};
 

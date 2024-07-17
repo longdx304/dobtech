@@ -1,67 +1,69 @@
-import { Form, message } from 'antd';
+import { Input, InputNumber, TextArea } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
-import { Title } from '@/components/Typography';
 import { Select } from '@/components/Select';
-import { InputNumber, TextArea, Input } from '@/components/Input';
-import { Order } from "@medusajs/medusa";
-import { useAdminRefundPayment } from "medusa-react";
-import { useMemo, useState } from "react";
-import { currencies } from "@/types/currencies"
-import { Option } from '@/types/shared';
+import { Title } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
+import { currencies } from '@/types/currencies';
+import { Order } from '@medusajs/medusa';
+import { Form, message } from 'antd';
+import { useAdminRefundPayment } from 'medusa-react';
+import { useMemo } from 'react';
 
 interface Props {
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
 	order: Order;
-};
+}
 
 type RefundMenuFormData = {
 	// currency
-  amount: number
-  reason: string;
-  note?: string
-}
+	amount: number;
+	reason: string;
+	note?: string;
+};
 
 const getCurrencyInfo = (currencyCode?: string) => {
-  if (!currencyCode) {
-    return undefined
-  }
-  const currencyInfo = currencies[currencyCode.toUpperCase()]
-  return currencyInfo;
-}
+	if (!currencyCode) {
+		return undefined;
+	}
+	const currencyInfo = currencies[currencyCode.toUpperCase()];
+	return currencyInfo;
+};
 
 const RefundModal = ({ state, handleOk, handleCancel, order }: Props) => {
 	const [form] = Form.useForm();
-	const { mutateAsync, isLoading } = useAdminRefundPayment(order.id)
+	const { mutateAsync, isLoading } = useAdminRefundPayment(order.id);
 
-  const refundable = useMemo(() => {
-    return order.paid_total - order.refunded_total
-  }, [order]);
+	const refundable = useMemo(() => {
+		return order.paid_total - order.refunded_total;
+	}, [order]);
 
 	const onFinish = async (values: RefundMenuFormData) => {
-		await mutateAsync({
-			amount: values.amount,
-			reason: values.reason,
-			no_notification: true,
-			note: values?.note || '',
-		}, {
-			onSuccess: () => {
-				message.success('Đã hoàn tiền đơn hàng thành công');
-				handleOk();
-				form.resetFields();
+		await mutateAsync(
+			{
+				amount: values.amount,
+				reason: values.reason,
+				no_notification: true,
+				note: values?.note || '',
 			},
-			onError: (error: any) => {
-				message.error(getErrorMessage(error))
-			},
-		});
+			{
+				onSuccess: () => {
+					message.success('Đã hoàn tiền đơn hàng thành công');
+					handleOk();
+					form.resetFields();
+				},
+				onError: (error: any) => {
+					message.error(getErrorMessage(error));
+				},
+			}
+		);
 	};
 
-	const parser = (value) => {
+	const parser = (value: any) => {
 		return value.replace(/\$\s?|(,*)/g, '');
 	};
-	const formatter = (value) => {
+	const formatter = (value: any) => {
 		if (value) {
 			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 		}
@@ -71,7 +73,7 @@ const RefundModal = ({ state, handleOk, handleCancel, order }: Props) => {
 	const handleCancelModal = () => {
 		form.resetFields();
 		handleCancel();
-	}
+	};
 
 	return (
 		<SubmitModal
@@ -92,7 +94,11 @@ const RefundModal = ({ state, handleOk, handleCancel, order }: Props) => {
 						label="Tiền tệ"
 						className="w-[100px]"
 					>
-						<Input defaultValue={order.currency_code.toUpperCase()} className="w-[100px]" disabled />
+						<Input
+							defaultValue={order.currency_code.toUpperCase()}
+							className="w-[100px]"
+							disabled
+						/>
 					</Form.Item>
 					<Form.Item
 						labelCol={{ span: 24 }}
@@ -120,13 +126,22 @@ const RefundModal = ({ state, handleOk, handleCancel, order }: Props) => {
 							max={refundable}
 							min={1}
 							allowClear
-							prefix={<span className='text-gray-500'>{getCurrencyInfo(order.currency_code).symbol_native}</span>}
+							prefix={
+								<span className="text-gray-500">
+									{getCurrencyInfo(order?.currency_code)?.symbol_native}  
+								</span>
+							}
 							formatter={formatter}
 							parser={parser}
 						/>
 					</Form.Item>
 				</div>
-				<Form.Item labelCol={{ span: 24 }} name="reason" label="Lý do" initialValue={"discount"} >
+				<Form.Item
+					labelCol={{ span: 24 }}
+					name="reason"
+					label="Lý do"
+					initialValue={'discount'}
+				>
 					<Select
 						options={[
 							{ value: 'discount', label: 'Giảm giá' },
@@ -135,7 +150,7 @@ const RefundModal = ({ state, handleOk, handleCancel, order }: Props) => {
 					/>
 				</Form.Item>
 				<Form.Item labelCol={{ span: 24 }} name="note" label="Ghi chú">
-					<TextArea	placeholder="Giảm giá cho khách hàng thân thiết" />
+					<TextArea placeholder="Giảm giá cho khách hàng thân thiết" />
 				</Form.Item>
 			</Form>
 		</SubmitModal>

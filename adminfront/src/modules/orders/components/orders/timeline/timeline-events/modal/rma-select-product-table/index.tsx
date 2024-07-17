@@ -33,7 +33,7 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 	);
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
-		setSelectedVariants(selectedRowKeys);
+		setSelectedVariants(selectedRowKeys as string[]);
 	};
   // const handleQuantity = (change, item) => {
   //   if (

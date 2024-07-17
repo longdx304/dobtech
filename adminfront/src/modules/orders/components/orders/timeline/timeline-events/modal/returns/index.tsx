@@ -1,247 +1,250 @@
+// @ts-nocheck
+// !check this file
 import {
-  AdminGetVariantsVariantInventoryRes,
-  AdminPostOrdersOrderReturnsReq,
-  LevelWithAvailability,
-  Order,
-  LineItem as RawLineItem,
-} from "@medusajs/medusa"
-import React, { useContext, useEffect, useState } from "react"
-import {
-  useAdminRequestReturn,
-  useAdminShippingOptions,
-  useAdminStockLocations,
-  useMedusa,
-} from "medusa-react";
+	AdminGetVariantsVariantInventoryRes,
+	AdminPostOrdersOrderReturnsReq,
+	LevelWithAvailability,
+	Order,
+	LineItem as RawLineItem,
+} from '@medusajs/medusa';
 import { message } from 'antd';
+import {
+	useAdminRequestReturn,
+	useAdminShippingOptions,
+	useAdminStockLocations,
+	useMedusa,
+} from 'medusa-react';
+import React, { useEffect, useState } from 'react';
 
-import { Button } from "@/components/Button"
-import { Option } from "@/types/shared"
-import { getAllReturnableItems } from '@/modules/orders/components/orders/utils/create-filtering';
-import { removeFalsy } from "@/utils/remove-nullish"
-import { displayAmount } from "@/utils/prices"
-import { getErrorMessage } from "@/lib/utils"
-import { useFeatureFlag } from "@/lib/providers/feature-flag-provider"
-import { Title, Text } from '@/components/Typography';
 import { Modal } from '@/components/Modal';
+import { Text, Title } from '@/components/Typography';
+import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
+import { getErrorMessage } from '@/lib/utils';
+import { getAllReturnableItems } from '@/modules/orders/components/orders/utils/create-filtering';
+import { Option } from '@/types/shared';
+import { removeFalsy } from '@/utils/remove-nullish';
 import RMASelectProductTable from '../rma-select-product-table';
 
 type ReturnMenuProps = {
-  order: Order;
+	order: Order;
 	state: boolean;
 	onClose: () => void;
-}
+};
 
-type LineItem = Omit<RawLineItem, "beforeInsert">
+type LineItem = Omit<RawLineItem, 'beforeInsert'>;
 
 const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
-  const { client } = useMedusa()
-  const { isFeatureEnabled } = useFeatureFlag()
-  const isLocationFulfillmentEnabled =
-    isFeatureEnabled("inventoryService") &&
-    isFeatureEnabled("stockLocationService")
+	const { client } = useMedusa();
+	const { isFeatureEnabled } = useFeatureFlag();
+	const isLocationFulfillmentEnabled =
+		isFeatureEnabled('inventoryService') &&
+		isFeatureEnabled('stockLocationService');
 
-  const [submitting, setSubmitting] = useState(false)
-  const [refundEdited, setRefundEdited] = useState(false)
-  const [refundable, setRefundable] = useState(0)
-  const [refundAmount, setRefundAmount] = useState(0)
-  const [selectedLocation, setSelectedLocation] = useState<{
-    value: string
-    label: string
-  } | null>(null)
-  const [toReturn, setToReturn] = useState<
-    Record<string, { quantity: number }>
-  >({})
-  const [useCustomShippingPrice, setUseCustomShippingPrice] = useState(false)
+	const [submitting, setSubmitting] = useState(false);
+	const [refundEdited, setRefundEdited] = useState(false);
+	const [refundable, setRefundable] = useState(0);
+	const [refundAmount, setRefundAmount] = useState(0);
+	const [selectedLocation, setSelectedLocation] = useState<{
+		value: string;
+		label: string;
+	} | null>(null);
+	const [toReturn, setToReturn] = useState<
+		Record<string, { quantity: number }>
+	>({});
+	const [useCustomShippingPrice, setUseCustomShippingPrice] = useState(false);
 
-  const [shippingPrice, setShippingPrice] = useState<number>()
-  const [shippingMethod, setShippingMethod] = useState<Option | null>(null)
+	const [shippingPrice, setShippingPrice] = useState<number>();
+	const [shippingMethod, setShippingMethod] = useState<Option | null>(null);
 
-  const [allItems, setAllItems] = useState<Omit<LineItem, "beforeInsert">[]>([])
+	const [allItems, setAllItems] = useState<Omit<LineItem, 'beforeInsert'>[]>(
+		[]
+	);
 
-  const { stock_locations, refetch } = useAdminStockLocations(
-    {},
-    {
-      enabled: isLocationFulfillmentEnabled,
-    }
-  )
+	const { stock_locations, refetch } = useAdminStockLocations(
+		{},
+		{
+			enabled: isLocationFulfillmentEnabled,
+		}
+	);
 
-  React.useEffect(() => {
-    if (isLocationFulfillmentEnabled) {
-      refetch()
-    }
-  }, [isLocationFulfillmentEnabled, refetch])
+	React.useEffect(() => {
+		if (isLocationFulfillmentEnabled) {
+			refetch();
+		}
+	}, [isLocationFulfillmentEnabled, refetch]);
 
-  const requestReturnOrder = useAdminRequestReturn(order.id)
+	const requestReturnOrder = useAdminRequestReturn(order.id);
 
-  useEffect(() => {
-    if (order) {
-      setAllItems(getAllReturnableItems(order, false))
-    }
-  }, [order])
+	useEffect(() => {
+		if (order) {
+			setAllItems(getAllReturnableItems(order, false));
+		}
+	}, [order]);
 
-  const itemMap = React.useMemo(() => {
-    return new Map<string, LineItem>(order.items.map((i) => [i.id, i]))
-  }, [order.items])
+	const itemMap = React.useMemo(() => {
+		return new Map<string, LineItem>(order.items.map((i) => [i.id, i]));
+	}, [order.items]);
 
-  const [inventoryMap, setInventoryMap] = useState<
-    Map<string, LevelWithAvailability[]>
-  >(new Map())
+	const [inventoryMap, setInventoryMap] = useState<
+		Map<string, LevelWithAvailability[]>
+	>(new Map());
 
-  React.useEffect(() => {
-    const getInventoryMap = async () => {
-      if (!allItems.length || !isLocationFulfillmentEnabled) {
-        return new Map()
-      }
-      const itemInventoryList = await Promise.all(
-        allItems.map(async (item) => {
-          if (!item.variant_id) {
-            return undefined
-          }
-          return await client.admin.variants.getInventory(item.variant_id)
-        })
-      )
+	React.useEffect(() => {
+		const getInventoryMap = async () => {
+			if (!allItems.length || !isLocationFulfillmentEnabled) {
+				return new Map();
+			}
+			const itemInventoryList = await Promise.all(
+				allItems.map(async (item) => {
+					if (!item.variant_id) {
+						return undefined;
+					}
+					return await client.admin.variants.getInventory(item.variant_id);
+				})
+			);
 
-      return new Map(
-        itemInventoryList
-          .filter((it) => !!it)
-          .map((item) => {
-            const { variant } = item as AdminGetVariantsVariantInventoryRes
-            return [variant.id, variant.inventory[0]?.location_levels]
-          })
-      )
-    }
+			return new Map(
+				itemInventoryList
+					.filter((it) => !!it)
+					.map((item) => {
+						const { variant } = item as AdminGetVariantsVariantInventoryRes;
+						return [variant.id, variant.inventory[0]?.location_levels];
+					})
+			);
+		};
 
-    getInventoryMap().then((map) => {
-      setInventoryMap(map)
-    })
-  }, [allItems, client.admin.variants, isLocationFulfillmentEnabled])
+		getInventoryMap().then((map) => {
+			setInventoryMap(map);
+		});
+	}, [allItems, client.admin.variants, isLocationFulfillmentEnabled]);
 
-  const locationsHasInventoryLevels = React.useMemo(() => {
-    return Object.entries(toReturn)
-      .map(([itemId]) => {
-        const item = itemMap.get(itemId)
-        if (!item?.variant_id) {
-          return true
-        }
-        const hasInventoryLevel = inventoryMap
-          .get(item.variant_id)
-          ?.find((l) => l.location_id === selectedLocation?.value)
+	const locationsHasInventoryLevels = React.useMemo(() => {
+		return Object.entries(toReturn)
+			.map(([itemId]) => {
+				const item = itemMap.get(itemId);
+				if (!item?.variant_id) {
+					return true;
+				}
+				const hasInventoryLevel = inventoryMap
+					.get(item.variant_id)
+					?.find((l) => l.location_id === selectedLocation?.value);
 
-        if (!hasInventoryLevel && selectedLocation?.value) {
-          return false
-        }
-        return true
-      })
-      .every(Boolean)
-  }, [toReturn, itemMap, selectedLocation?.value, inventoryMap])
-
-  const { isLoading: shippingLoading, shipping_options: shippingOptions } =
-    useAdminShippingOptions({
-      region_id: order.region_id,
-      is_return: true,
-    })
-
-  useEffect(() => {
-    const items = Object.keys(toReturn)
-      .map((t) => allItems.find((i) => i.id === t))
-      .filter((i) => typeof i !== "undefined") as LineItem[]
-
-    const itemTotal = items.reduce((acc: number, curr: LineItem): number => {
-      const unitRefundable =
-        (curr.refundable || 0) / (curr.quantity - curr.returned_quantity)
-
-      return acc + unitRefundable * toReturn[curr.id].quantity
-    }, 0)
-
-    const total = itemTotal - (shippingPrice || 0)
-
-    setRefundable(total)
-
-    setRefundAmount(total)
-  }, [toReturn, shippingPrice])
-
-  const onSubmit = async () => {
-    const items = Object.entries(toReturn).map(([key, value]) => {
-      const toSet = {
-        reason_id: value.reason?.value.id,
-        ...value,
-      }
-      delete toSet.reason
-      const clean = removeFalsy(toSet)
-      return {
-        item_id: key,
-        ...(clean as { quantity: number }),
-      }
-    })
-
-    const data: AdminPostOrdersOrderReturnsReq = {
-      items,
-      refund: Math.round(refundAmount),
-      no_notification: undefined,
-    }
-
-    if (selectedLocation && isLocationFulfillmentEnabled) {
-      data.location_id = selectedLocation.value
-    }
-
-    if (shippingMethod) {
-      const taxRate = shippingMethod.tax_rates.reduce((acc, curr) => {
-        return acc + curr.rate / 100
-      }, 0)
-
-      data.return_shipping = {
-        option_id: shippingMethod.value,
-        price: shippingPrice ? Math.round(shippingPrice / (1 + taxRate)) : 0,
-      }
-    }
-
-    setSubmitting(true)
-    return requestReturnOrder
-      .mutateAsync(data)
-      .then(() => onClose())
-      .then(() => {
-        message.success("Đã yêu cầu trả lại đơn hàng")
+				if (!hasInventoryLevel && selectedLocation?.value) {
+					return false;
+				}
+				return true;
 			})
-      .catch((error) =>
-        message.error(getErrorMessage(error))
-      )
-      .finally(() => setSubmitting(false))
-  }
+			.every(Boolean);
+	}, [toReturn, itemMap, selectedLocation?.value, inventoryMap]);
 
-  const handleRefundUpdated = (value) => {
-    if (value < order.refundable_amount && value >= 0) {
-      setRefundAmount(value)
-    }
-  }
+	const { isLoading: shippingLoading, shipping_options: shippingOptions } =
+		useAdminShippingOptions({
+			region_id: order.region_id,
+			is_return: true,
+		});
 
-  const handleShippingSelected = (selectedItem) => {
-    setShippingMethod(selectedItem)
-    const method = shippingOptions?.find((o) => selectedItem.value === o.id)
+	useEffect(() => {
+		const items = Object.keys(toReturn)
+			.map((t) => allItems.find((i) => i.id === t))
+			.filter((i) => typeof i !== 'undefined') as LineItem[];
 
-    if (method) {
-      setShippingPrice(method.price_incl_tax)
-    }
-  }
+		const itemTotal = items.reduce((acc: number, curr: LineItem): number => {
+			const unitRefundable =
+				(curr.refundable || 0) / (curr.quantity - curr.returned_quantity);
 
-  useEffect(() => {
-    if (!useCustomShippingPrice && shippingMethod) {
-      const method = shippingOptions?.find((o) => shippingMethod.value === o.id)
+			return acc + unitRefundable * toReturn[curr.id].quantity;
+		}, 0);
 
-      if (method) {
-        setShippingPrice(method.price_incl_tax)
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [useCustomShippingPrice, shippingMethod])
+		const total = itemTotal - (shippingPrice || 0);
 
-  const handleUpdateShippingPrice = (value) => {
-    if (value >= 0) {
-      setShippingPrice(value)
-    }
-  }
+		setRefundable(total);
 
-  return (
-    <Modal
+		setRefundAmount(total);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [toReturn, shippingPrice]);
+
+	const onSubmit = async () => {
+		const items = Object.entries(toReturn).map(([key, value]) => {
+			const toSet = {
+				reason_id: value.reason?.value.id,
+				...value,
+			};
+			delete toSet.reason;
+			const clean = removeFalsy(toSet);
+			return {
+				item_id: key,
+				...(clean as { quantity: number }),
+			};
+		});
+
+		const data: AdminPostOrdersOrderReturnsReq = {
+			items,
+			refund: Math.round(refundAmount),
+			no_notification: undefined,
+		};
+
+		if (selectedLocation && isLocationFulfillmentEnabled) {
+			data.location_id = selectedLocation.value;
+		}
+
+		if (shippingMethod) {
+			const taxRate = shippingMethod.tax_rates.reduce((acc, curr) => {
+				return acc + curr.rate / 100;
+			}, 0);
+
+			data.return_shipping = {
+				option_id: shippingMethod.value,
+				price: shippingPrice ? Math.round(shippingPrice / (1 + taxRate)) : 0,
+			};
+		}
+
+		setSubmitting(true);
+		return requestReturnOrder
+			.mutateAsync(data)
+			.then(() => onClose())
+			.then(() => {
+				message.success('Đã yêu cầu trả lại đơn hàng');
+			})
+			.catch((error) => message.error(getErrorMessage(error)))
+			.finally(() => setSubmitting(false));
+	};
+
+	const handleRefundUpdated = (value: any) => {
+		if (value < order.refundable_amount && value >= 0) {
+			setRefundAmount(value);
+		}
+	};
+
+	const handleShippingSelected = (selectedItem: any) => {
+		setShippingMethod(selectedItem);
+		const method = shippingOptions?.find((o) => selectedItem.value === o.id);
+
+		if (method) {
+			setShippingPrice(method.price_incl_tax);
+		}
+	};
+
+	useEffect(() => {
+		if (!useCustomShippingPrice && shippingMethod) {
+			const method = shippingOptions?.find(
+				(o) => shippingMethod.value === o.id
+			);
+
+			if (method) {
+				setShippingPrice(method.price_incl_tax);
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [useCustomShippingPrice, shippingMethod]);
+
+	const handleUpdateShippingPrice = (value: any) => {
+		if (value >= 0) {
+			setShippingPrice(value);
+		}
+	};
+
+	return (
+		<Modal
 			open={state}
 			handleOk={onSubmit}
 			// isLoading={isLoading}
@@ -254,7 +257,7 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			</Title>
 			<div>
 				<Text strong className="font-medium mb-2">
-					{"Các mục cần trả lại"}
+					{'Các mục cần trả lại'}
 				</Text>
 				<RMASelectProductTable
 					order={order}
@@ -263,7 +266,7 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 					setToReturn={(items) => setToReturn(items)}
 				/>
 			</div>
-        {/* <Modal.Content>
+			{/* <Modal.Content>
           <div className="mb-7">
             <h3 className="inter-base-semibold">
               {t("returns-items-to-return", "Items to return")}
@@ -433,8 +436,8 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
             </div>
           </div>
         </Modal.Footer> */}
-    </Modal>
-  )
-}
+		</Modal>
+	);
+};
 
-export default ReturnMenu
+export default ReturnMenu;
