@@ -1,11 +1,10 @@
-import React, { useMemo, useCallback, useEffect } from 'react';
-import { LineItem } from '@medusajs/medusa';
-import { getFulfillAbleQuantity } from './create-fulfillment-modal';
-import Image from 'next/image';
-import { formatAmountWithSymbol } from '@/utils/prices';
-import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import { InputNumber } from '@/components/Input';
+import PlaceholderImage from '@/modules/common/components/placeholder-image';
+import { LineItem } from '@medusajs/medusa';
 import { useAdminVariantsInventory } from 'medusa-react';
+import Image from 'next/image';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { getFulfillAbleQuantity } from './create-fulfillment-modal';
 
 const FulfillmentItems = ({
 	items,
@@ -135,7 +134,9 @@ const FulfillmentLine = ({
 			handleQuantityUpdate(
 				Math.min(
 					getFulfillAbleQuantity(item),
-					...[hasInventoryItem ? availableQuantity : Number.MAX_VALUE]
+					...([
+						hasInventoryItem ? (availableQuantity as number) : Number.MAX_VALUE,
+					] as number[])
 				),
 				item.id
 			);

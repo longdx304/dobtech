@@ -1,11 +1,11 @@
 'use client';
-import { LineItem, Region } from '@medusajs/medusa';
-import { Table, Typography } from 'antd';
-import React, { useState } from 'react';
-import Item from '../components/item';
-import Thumbnail from '@/modules/products/components/thumbnail';
 import { Checkbox } from '@/components/Checkbox';
+import Thumbnail from '@/modules/products/components/thumbnail';
+import { LineItem, Region } from '@medusajs/medusa';
 import type { CheckboxProps } from 'antd';
+import { Table, Typography } from 'antd';
+import React from 'react';
+import Item from '../components/item';
 
 type ItemsTemplateProps = {
 	items?: Omit<LineItem, 'beforeInsert'>[];

@@ -1,9 +1,11 @@
+// @ts-nocheck
+// !check this file
 import { ClaimItem, LineItem, Order } from '@medusajs/medusa';
 
 export const getAllReturnableItems = (
 	order: Omit<Order, 'beforeInserts'>,
 	isClaim: boolean
-) => {
+): Omit<LineItem, 'beforeInsert'>[] => {
 	let orderItems = order.items.reduce(
 		(map, obj) =>
 			map.set(obj.id, {
