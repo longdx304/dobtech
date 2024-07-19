@@ -8,62 +8,69 @@ import { User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const UserInformation = () => {
-  const { customer } = useCustomer();
-  const router = useRouter();
+	const { customer } = useCustomer();
+	const router = useRouter();
 
-  const handleLogout = async () => {
-    await signOut();
-    router.push(ERoutes.DASHBOARD);
-  };
+	const handleLogout = async () => {
+		await signOut();
+		router.push(ERoutes.DASHBOARD);
+	};
 
-  const items: MenuProps['items'] = customer
-    ? [
-        {
-          key: '1',
-          label: (
-            <a href={`/${ERoutes.USER}`}>
-              {customer.first_name} {customer.last_name}
-            </a>
-          ),
-          icon: <User />,
-        },
-        // {
-        //   key: '2',
-        //   label: (
-        //     <a rel='noopener noreferrer' href='/orders'>
-        //       Đơn hàng của tôi
-        //     </a>
-        //   ),
-        // },
-        {
-          key: '4',
-          danger: true,
-          label: <span onClick={handleLogout}>Đăng xuất</span>,
-        },
-      ]
-    : [
-        {
-          key: '1',
-          label: (
-            <a rel='noopener noreferrer' href='/user/auth'>
-              Đăng nhập / đăng kí
-            </a>
-          ),
-          icon: <User />,
-        },
-      ];
+	const handleClickMenu: MenuProps['onClick'] = (e) => {
+		const { key } = e;
+		if (key === 'logout') {
+			handleLogout();
+			return;
+		}
+	};
 
-  const menu = { items };
+	const items: MenuProps['items'] = customer
+		? [
+				{
+					key: 'dropdown-1',
+					label: (
+						<a href={`/${ERoutes.USER}`}>
+							{customer.first_name} {customer.last_name}
+						</a>
+					),
+					icon: <User />,
+				},
+				{
+					key: 'dropdown-2',
+					label: <a href={`/${ERoutes.USER_ORDERS}`}>Đơn hàng của tôi</a>,
+				},
+				{
+					type: 'divider',
+				},
+				{
+					key: 'logout',
+					danger: true,
+					label: <span onClick={handleLogout}>Đăng xuất</span>,
+				},
+		  ]
+		: [
+				{
+					key: 'dropdown-1',
+					label: (
+						<a rel="noopener noreferrer" href="/user/auth">
+							Đăng nhập / đăng kí
+						</a>
+					),
+					icon: <User />,
+				},
+		  ];
 
-  return (
-    <Dropdown menu={menu}>
-      <Button
-        icon={<User className='stroke-2' color='#767676' />}
-        shape='circle'
-        type='text'
-      />
-    </Dropdown>
-  );
+	const menu = { items, onClick: handleClickMenu };
+
+	return (
+		<Dropdown menu={menu}>
+			<Button
+				icon={<User className="stroke-2" color="#767676" />}
+				shape="circle"
+				type="text"
+			/>
+		</Dropdown>
+	);
 };
 
 export default UserInformation;

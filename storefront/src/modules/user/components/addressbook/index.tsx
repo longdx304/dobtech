@@ -1,25 +1,24 @@
 'use client';
 
-import React from 'react';
-import AddressBookDesktop from './AddressBookDesktop';
-import AddressBookMobile from './AddressBookMobile';
+import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
 import { Region } from '@medusajs/medusa';
+import dynamic from 'next/dynamic';
 
 type AddressBookProps = {
-  region: Region;
+	region: Region;
 };
 
+const AddressBookDesktop = dynamic(() => import('./AddressBookDesktop'));
+const AddressBookMobile = dynamic(() => import('./AddressBookMobile'));
+
 const AddressBook = ({ region }: AddressBookProps) => {
-  return (
-    <>
-      <div className='hidden lg:block'>
-        <AddressBookDesktop region={region} />
-      </div>
-      <div className='block lg:hidden'>
-        <AddressBookMobile region={region} />
-      </div>
-    </>
-  );
+	const isDesktop = useIsDesktop();
+
+	return isDesktop ? (
+		<AddressBookDesktop region={region} />
+	) : (
+		<AddressBookMobile region={region} />
+	);
 };
 
 export default AddressBook;
