@@ -40,10 +40,11 @@ const productsColumns = ({ currencyCode }: Props) => [
 	},
 	{
 		title: 'Số lượng',
-		key: 'quantity',
-		dataIndex: 'quantity',
+		key: 'return_quantity',
+		dataIndex: 'return_quantity',
 		className: 'text-xs',
-		render: (_: LineItem['quantity'], record: Omit<LineItem, "beforeInsert">) => {
+		editable: true,
+		render: (_: number, record: Omit<LineItem, "beforeInsert">) => {
 			return _;
 		},
 	},

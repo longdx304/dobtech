@@ -14,6 +14,7 @@ import {
 	RefundRequiredEvent,
 	OrderEditEvent,
 	OrderEditRequestedEvent,
+	ReturnEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
 import { Order } from '@medusajs/medusa';
 import { Empty } from 'antd';
@@ -25,6 +26,7 @@ import ItemsShipped from './timeline-events/items-shipped';
 import OrderCanceled from './timeline-events/order-canceled';
 import OrderPlaced from './timeline-events/order-placed';
 import Refund from './timeline-events/refund';
+import Return from './timeline-events/return';
 import PaymentRequired from './timeline-events/order-edit/payment-required';
 import RefundRequired from './timeline-events/order-edit/refund-required';
 import EditCreated from './timeline-events/order-edit/created';
@@ -117,8 +119,8 @@ function switchOnType(event: TimelineEvent, refetch: () => void) {
 		  return <ItemsShipped event={event as ItemsShippedEvent} />
 		case "canceled":
 		  return <OrderCanceled event={event as TimelineEvent} />
-		// case "return":
-		//   return <Return event={event as ReturnEvent} refetch={refetch} />
+		case "return":
+		  return <Return event={event as ReturnEvent} refetch={refetch} />
 		// case "exchange":
 		//   return (
 		//     <Exchange

@@ -13,8 +13,10 @@ import {
   useMedusa,
 } from "medusa-react";
 import { message } from 'antd';
+import { LoaderCircle, SquareArrowOutUpRight } from 'lucide-react';
 
 import { Button } from "@/components/Button"
+import { Select } from "@/components/Select"
 import { Option } from "@/types/shared"
 import { getAllReturnableItems } from '@/modules/orders/components/orders/utils/create-filtering';
 import { removeFalsy } from "@/utils/remove-nullish"
@@ -185,9 +187,10 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
     }
 
     if (shippingMethod) {
-      const taxRate = shippingMethod.tax_rates.reduce((acc, curr) => {
-        return acc + curr.rate / 100
-      }, 0)
+      // const taxRate = shippingMethod.tax_rates.reduce((acc, curr) => {
+      //   return acc + curr.rate / 100
+      // }, 0)
+			const taxRate = 0;
 
       data.return_shipping = {
         option_id: shippingMethod.value,
@@ -214,13 +217,13 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
     }
   }
 
-  const handleShippingSelected = (selectedItem) => {
-    setShippingMethod(selectedItem)
-    const method = shippingOptions?.find((o) => selectedItem.value === o.id)
+  const handleShippingSelected = (selectedItem: string, selectOption: Option) => {
+    setShippingMethod(selectOption)
+    // const method = shippingOptions?.find((o) => selectedItem.value === o.id)
 
-    if (method) {
-      setShippingPrice(method.price_incl_tax)
-    }
+    // if (method) {
+    //   setShippingPrice(method.price_incl_tax)
+    // }
   }
 
   useEffect(() => {
@@ -244,8 +247,8 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
     <Modal
 			open={state}
 			handleOk={onSubmit}
-			// isLoading={isLoading}
-			// disabled={isLoading}
+			isLoading={submitting}
+			disabled={submitting}
 			handleCancel={onClose}
 			width={800}
 		>
@@ -263,176 +266,80 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 					setToReturn={(items) => setToReturn(items)}
 				/>
 			</div>
-        {/* <Modal.Content>
-          <div className="mb-7">
-            <h3 className="inter-base-semibold">
-              {t("returns-items-to-return", "Items to return")}
-            </h3>
-            <RMASelectProductTable
-              order={order}
-              allItems={allItems}
-              toReturn={toReturn}
-              setToReturn={(items) => setToReturn(items)}
-            />
-          </div>
-
-          {isLocationFulfillmentEnabled && (
-            <div className="mb-8">
-              <h3 className="inter-base-semibold ">Location</h3>
-              <p className="inter-base-regular text-grey-50">
-                {t(
-                  "returns-choose-which-location-you-want-to-return-the-items-to",
-                  "Choose which location you want to return the items to."
-                )}
-              </p>
-              <Select
-                className="mt-2"
-                placeholder={t(
-                  "returns-select-location-to-return-to",
-                  "Select Location to Return to"
-                )}
-                value={selectedLocation}
-                isMulti={false}
-                onChange={setSelectedLocation}
-                options={
-                  stock_locations?.map((sl: StockLocationDTO) => ({
-                    label: sl.name,
-                    value: sl.id,
-                  })) || []
-                }
-              />
-              {!locationsHasInventoryLevels && (
-                <div className="bg-orange-10 border-orange-20 rounded-rounded text-yellow-60 gap-x-base mt-4 flex border p-4">
-                  <div className="text-orange-40">
-                    <WarningCircleIcon size={20} fillType="solid" />
-                  </div>
-                  <div>
-                    {t(
-                      "returns-selected-location-has-no-inventory-levels",
-                      "The selected location does not have inventory levels for the selected items. The return can be requested but can't be received until an inventory level is created for the selected location."
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          <div>
-            <h3 className="inter-base-semibold ">
-              {t("returns-shipping", "Shipping")}
-            </h3>
-            <p className="inter-base-regular text-grey-50">
-              {t(
-                "returns-choose-retur,-shipping-method",
-                "Choose which shipping method you want to use for this return."
-              )}
-            </p>
-            {shippingLoading ? (
-              <div className="flex justify-center">
-                <Spinner size="medium" variant="secondary" />
-              </div>
-            ) : (
-              <Select
-                className="mt-2"
-                placeholder="Add a shipping method"
-                value={shippingMethod}
-                onChange={handleShippingSelected}
-                options={
-                  shippingOptions?.map((o) => ({
-                    label: o.name,
-                    value: o.id,
-                    tax_rates: o.tax_rates,
-                  })) || []
-                }
-              />
-            )}
-            {shippingMethod && (
-              <RMAShippingPrice
-                inclTax
-                useCustomShippingPrice={useCustomShippingPrice}
-                shippingPrice={shippingPrice}
-                currencyCode={order.currency_code}
-                updateShippingPrice={handleUpdateShippingPrice}
-                setUseCustomShippingPrice={setUseCustomShippingPrice}
-              />
-            )}
-          </div>
-
-          {refundable >= 0 && (
-            <div className="mt-10">
-              {!useCustomShippingPrice && shippingMethod && (
-                <div className="inter-small-regular mb-4 flex justify-between">
-                  <span>{t("returns-shipping", "Shipping")}</span>
-                  <div>
-                    {displayAmount(order.currency_code, shippingPrice || 0)}{" "}
-                    <span className="text-grey-40 ml-3">
-                      {order.currency_code.toUpperCase()}
-                    </span>
-                  </div>
-                </div>
-              )}
-              <div className="inter-base-semibold flex w-full justify-between">
-                <span>{t("returns-total-refund", "Total Refund")}</span>
-                <div className="flex items-center">
-                  {!refundEdited && (
-                    <>
-                      <span
-                        className="text-grey-40 mr-2 cursor-pointer"
-                        onClick={() => setRefundEdited(true)}
-                      >
-                        <EditIcon size={20} />{" "}
-                      </span>
-                      {`${displayAmount(
-                        order.currency_code,
-                        refundAmount
-                      )} ${order.currency_code.toUpperCase()}`}
-                    </>
-                  )}
-                </div>
-              </div>
-              {refundEdited && (
-                <CurrencyInput.Root
-                  className="mt-2"
-                  size="small"
-                  currentCurrency={order.currency_code}
-                  readOnly
-                >
-                  <CurrencyInput.Amount
-                    label={t("returns-amount", "Amount")}
-                    amount={refundAmount}
-                    onChange={handleRefundUpdated}
-                  />
-                </CurrencyInput.Root>
-              )}
-            </div>
-          )}
-        </Modal.Content>
-        <Modal.Footer>
-          <div className="flex w-full justify-between">
-            <div className="gap-x-xsmall flex">
-              <Button
-                onClick={() => onDismiss()}
-                className="w-[112px]"
-                type="submit"
-                size="small"
-                variant="ghost"
-              >
-                {t("returns-back", "Back")}
-              </Button>
-              <Button
-                onClick={onSubmit}
-                loading={submitting}
-                className="w-[112px]"
-                type="submit"
-                size="small"
-                variant="primary"
-                disabled={Object.keys(toReturn).length === 0}
-              >
-                {t("returns-submit", "Submit")}
-              </Button>
-            </div>
-          </div>
-        </Modal.Footer> */}
+			<div className="mt-4 flex flex-col">
+				<Text strong className="font-medium">
+					{"Vận chuyển"}
+				</Text>
+				<Text className="mb-2">
+					{"Chọn phương thức vận chuyển bạn muốn sử dụng cho trả lại này."}
+				</Text>
+				{shippingLoading ? (
+					<div className="flex justify-center">
+						<LoaderCircle size={20} className="animate-spin" />
+					</div>
+				) : (
+					<Select
+						className="mt-2"
+						placeholder="Add a shipping method"
+						value={shippingMethod?.value}
+						onChange={handleShippingSelected}
+						options={
+							shippingOptions?.map((o) => ({
+								label: o.name,
+								value: o.id,
+							})) || []
+						}
+					/>
+				)}
+			</div>
+			{refundable >= 0 && (
+				<div className="mt-10">
+					{!useCustomShippingPrice && shippingMethod && (
+						<div className="font-normal mb-4 flex justify-between">
+							<span>{"Vận chuyển"}</span>
+							<div>
+								{displayAmount(order.currency_code, shippingPrice || 0)}{" "}
+								<span className="text-gray-400 ml-3">
+									{order.currency_code.toUpperCase()}
+								</span>
+							</div>
+						</div>
+					)}
+					<div className="font-medium flex w-full justify-between items-center">
+						<span>{"Tổng tiền hoàn trả"}</span>
+						<div className="flex items-center">
+							{!refundEdited && (
+								<div className="flex items-center">
+									<span
+										className="text-gray-400 mr-2 cursor-pointer flex items-center"
+										onClick={() => setRefundEdited(true)}
+									>
+										<SquareArrowOutUpRight size={16} />
+									</span>
+									{`${displayAmount(
+										order.currency_code,
+										refundAmount
+									)} ${order.currency_code.toUpperCase()}`}
+								</div>
+							)}
+						</div>
+					</div>
+					{/* {refundEdited && (
+						<CurrencyInput.Root
+							className="mt-2"
+							size="small"
+							currentCurrency={order.currency_code}
+							readOnly
+						>
+							<CurrencyInput.Amount
+								label={t("returns-amount", "Amount")}
+								amount={refundAmount}
+								onChange={handleRefundUpdated}
+							/>
+						</CurrencyInput.Root>
+					)} */}
+				</div>
+			)}
     </Modal>
   )
 }
