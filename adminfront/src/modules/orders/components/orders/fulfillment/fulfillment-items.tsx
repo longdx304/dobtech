@@ -1,24 +1,23 @@
-import React, { useMemo, useCallback, useEffect } from 'react';
-import { LineItem } from '@medusajs/medusa';
-import { getFulfillAbleQuantity } from './create-fulfillment-modal';
-import Image from 'next/image';
-import { formatAmountWithSymbol } from '@/utils/prices';
-import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import { InputNumber } from '@/components/Input';
+import PlaceholderImage from '@/modules/common/components/placeholder-image';
+import { LineItem } from '@medusajs/medusa';
 import { useAdminVariantsInventory } from 'medusa-react';
+import Image from 'next/image';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { getFulfillAbleQuantity } from './create-fulfillment-modal';
 
 const FulfillmentItems = ({
 	items,
 	quantities,
 	setQuantities,
-	ite,
 	setErrors,
 }: {
 	items: LineItem[];
 	quantities: Record<string, number>;
 	setQuantities: (quantities: Record<string, number>) => void;
 	locationId?: string;
-	setErrors: (errors: React.SetStateAction<{}>) => void;
+	// setErrors: (errors: React.SetStateAction<{}>) => void;
+	setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }) => {
 	const handleQuantityUpdate = useCallback(
 		(value: number, id: string) => {
@@ -65,7 +64,8 @@ const FulfillmentLine = ({
 	item: LineItem;
 	quantities: Record<string, number>;
 	handleQuantityUpdate: (value: number, id: string) => void;
-	setErrors: (errors: Record<string, string>) => void;
+	// setErrors: (errors: Record<string, string>) => void;
+	setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }) => {
 	const isLocationFulfillmentEnabled = false;
 	const { variant, isLoading, refetch } = useAdminVariantsInventory(
@@ -116,7 +116,7 @@ const FulfillmentLine = ({
 			(!availableQuantity || quantities[item.id] <= availableQuantity));
 
 	useEffect(() => {
-		setErrors((errors) => {
+		setErrors((errors: Record<string, string>) => {
 			if (validQuantity) {
 				delete errors[item.id];
 				return errors;
@@ -134,7 +134,9 @@ const FulfillmentLine = ({
 			handleQuantityUpdate(
 				Math.min(
 					getFulfillAbleQuantity(item),
-					...[hasInventoryItem ? availableQuantity : Number.MAX_VALUE]
+					...([
+						hasInventoryItem ? (availableQuantity as number) : Number.MAX_VALUE,
+					] as number[])
 				),
 				item.id
 			);
@@ -180,11 +182,11 @@ const FulfillmentLine = ({
 				<InputNumber
 					className="w-[90px]"
 					max={Math.min(
-            getFulfillAbleQuantity(item),
-            ...[hasInventoryItem ? availableQuantity || 0 : Number.MAX_VALUE]
-          )}
+						getFulfillAbleQuantity(item),
+						...[hasInventoryItem ? availableQuantity || 0 : Number.MAX_VALUE]
+					)}
 					min={0}
-					allowClear
+					allowClear={true}
 					defaultValue={getFulfillAbleQuantity(item)}
 					addonAfter={
 						<span className="flex text-gray-500 text-xs">
@@ -192,11 +194,9 @@ const FulfillmentLine = ({
 							<span className="pl-1">{getFulfillAbleQuantity(item)}</span>
 						</span>
 					}
-					size="default"
+					size="middle"
 					value={quantities[item.id]}
-					onChange={(value) =>
-            handleQuantityUpdate(value, item.id)
-          }
+					onChange={(value: any) => handleQuantityUpdate(value, item.id)}
 				/>
 			</div>
 		</div>

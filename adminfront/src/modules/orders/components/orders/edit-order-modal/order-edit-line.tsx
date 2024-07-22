@@ -77,7 +77,7 @@ const OrderEditLine = ({
 
     try {
       await addLineItem({
-        variant_id: item.variant_id,
+        variant_id: item.variant_id as string,
         quantity: item.quantity,
       })
     } catch (e) {
@@ -229,7 +229,7 @@ const OrderEditLine = ({
 							</span>
 						</div>
 					</div>
-					<ActionAbles actions={actions} />
+					<ActionAbles actions={actions as any} />
 				</div>
 			</div>
 			<AddProductVariant

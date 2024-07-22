@@ -16,6 +16,7 @@ type OrderEditContextType = {
 	hideModal: () => void;
 	isModalVisible: boolean;
 	activeOrderEditId?: string | undefined;
+	setActiveOrderEditId: (id: string | undefined) => void;
 	orderEdits?: OrderEdit[];
 };
 
@@ -24,6 +25,7 @@ const defaultOrderEditContext: OrderEditContextType = {
 	hideModal: () => {},
 	isModalVisible: false,
 	activeOrderEditId: undefined,
+	setActiveOrderEditId: () => {},
 	orderEdits: undefined,
 };
 
@@ -68,6 +70,7 @@ export const OrderEditProvider = ({
 				hideModal,
 				isModalVisible,
 				activeOrderEditId,
+				setActiveOrderEditId,
 				orderEdits: order_edits,
 			}}
 		>

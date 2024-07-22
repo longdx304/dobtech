@@ -1,12 +1,9 @@
-import { LineItem, InventoryLevelDTO } from '@medusajs/medusa';
-import { Pencil, Trash, LoaderCircle } from 'lucide-react';
+import { LineItem } from '@medusajs/medusa';
 import Image from 'next/image';
-import React from 'react';
 
 import { Flex } from '@/components/Flex';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
-import { ActionAbles } from '@/components/Dropdown';
 import { formatAmountWithSymbol } from '@/utils/prices';
 
 interface Props {
@@ -20,7 +17,7 @@ const productsColumns = ({ currencyCode }: Props) => [
 		// width: 150,
 		className: 'text-xs',
 		fixed: 'left',
-		render: (_: LineItem['title'], record: Omit<LineItem, "beforeInsert">) => (
+		render: (_: LineItem['title'], record: Omit<LineItem, 'beforeInsert'>) => (
 			<Flex className="flex items-center gap-3">
 				<Image
 					src={record?.thumbnail ?? '/images/product-img.png'}
@@ -53,7 +50,10 @@ const productsColumns = ({ currencyCode }: Props) => [
 		key: 'refundable',
 		dataIndex: 'refundable',
 		className: 'text-xs',
-		render: (_: LineItem['refundable'], record: Omit<LineItem, "beforeInsert">) => {
+		render: (
+			_: LineItem['refundable'],
+			record: Omit<LineItem, 'beforeInsert'>
+		) => {
 			return (
 				<div className="flex items-center">
 					<span className="pr-1">

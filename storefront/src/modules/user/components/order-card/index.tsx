@@ -1,4 +1,6 @@
 import { Button } from '@/components/Button';
+import { Flex } from '@/components/Flex';
+import { Text } from '@/components/Typography';
 import { formatAmount } from '@/lib/utils/prices';
 import LocalizedClientLink from '@/modules/common/components/localized-client-link';
 import Thumbnail from '@/modules/products/components/thumbnail';
@@ -21,62 +23,66 @@ const OrderCard = ({ order }: OrderCardProps) => {
 	}, [order]);
 
 	return (
-		<div className="bg-white flex flex-col" data-testid="order-card">
-			<div className="uppercase text-large-semi mb-1">
-				#<span data-testid="order-display-id">{order.display_id}</span>
-			</div>
-			<div className="flex items-center divide-x divide-gray-200 text-small-regular text-ui-fg-base">
-				<span className="pr-2" data-testid="order-created-at">
+		<Flex className="bg-white flex-col" data-testid="order-card">
+			<Flex
+				align="center"
+				className="flex divide-x divide-solid divide-y-0 divide-gray-200"
+			>
+				<Text className="pr-2" data-testid="order-created-at">
 					{new Date(order.created_at).toDateString()}
-				</span>
-				<span className="px-2" data-testid="order-amount">
+				</Text>
+				<Text className="px-2" data-testid="order-amount">
 					{formatAmount({
 						amount: order.total,
 						region: order.region,
 						includeTaxes: false,
 					})}
-				</span>
-				<span className="pl-2">{`${numberOfLines} ${
+				</Text>
+				<Text className="pl-2">{`${numberOfLines} ${
 					numberOfLines > 1 ? 'items' : 'item'
-				}`}</span>
-			</div>
-			<div className="grid grid-cols-2 small:grid-cols-4 gap-4 my-4">
+				}`}</Text>
+			</Flex>
+			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 my-4">
 				{order.items.slice(0, 3).map((i) => {
 					return (
-						<div
+						<Flex
 							key={i.id}
-							className="flex flex-col gap-y-2"
+							className="flex-col gap-y-2"
 							data-testid="order-item"
 						>
 							<Thumbnail thumbnail={i.thumbnail} size="full" />
-							<div className="flex items-center text-small-regular text-ui-fg-base">
-								<span
-									className="text-ui-fg-base font-semibold"
-									data-testid="item-title"
-								>
+							<Flex align="center">
+								<Text className="font-semibold" data-testid="item-title">
 									{i.title}
-								</span>
-								<span className="ml-2">x</span>
-								<span data-testid="item-quantity">{i.quantity}</span>
-							</div>
-						</div>
+								</Text>
+								<Text className="ml-2">x</Text>
+								<Text data-testid="item-quantity">{i.quantity}</Text>
+							</Flex>
+						</Flex>
 					);
 				})}
 				{numberOfProducts > 4 && (
-					<div className="w-full h-full flex flex-col items-center justify-center">
-						<span className="text-small-regular text-ui-fg-base">
-							+ {numberOfLines - 4}
-						</span>
-						<span className="text-small-regular text-ui-fg-base">more</span>
-					</div>
+					<Flex
+						align="center"
+						justify="center"
+						className="w-full h-full flex flex-col"
+					>
+						<Text>+ {numberOfLines - 4}</Text>
+						<Text>more</Text>
+					</Flex>
 				)}
 			</div>
-			<div className="flex justify-end">
+			<Flex className="justify-end">
 				<LocalizedClientLink href={`user/orders/details/${order.id}`}>
-					<Button data-testid="order-details-link">See details</Button>
+					<Button
+						data-testid="order-details-link"
+						className="h-[32px] px-1 py-2 text-[12px] lg:h-[40px] lg:px-3 lg:py-4 lg:text-[16px]"
+					>
+						Xem chi tiết
+					</Button>
 				</LocalizedClientLink>
-			</div>
-		</div>
+			</Flex>
+		</Flex>
 	);
 };
 

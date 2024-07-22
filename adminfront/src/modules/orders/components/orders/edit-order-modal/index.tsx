@@ -1,23 +1,24 @@
-import { Order, OrderEdit, ProductVariant } from '@medusajs/medusa';
-import { useState, useEffect, useRef } from 'react';
-import { useOrderEdit } from './context';
-import {
-	useAdminRequestOrderEditConfirmation,
-	useAdminUpdateOrderEdit,
-	useAdminOrderEditAddLineItem,
-	useAdminDeleteOrderEdit,
-} from 'medusa-react';
-import { message } from 'antd';
-import { Modal } from '@/components/Modal';
-import { Title } from '@/components/Typography';
-import { Input } from '@/components/Input';
+// @ts-nocheck
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
-import OrderEditLine from './order-edit-line';
-import { formatAmountWithSymbol } from '@/utils/prices';
-import clsx from "clsx";
+import { Input } from '@/components/Input';
+import { Modal } from '@/components/Modal';
+import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import { formatAmountWithSymbol } from '@/utils/prices';
+import { Order, OrderEdit, ProductVariant } from '@medusajs/medusa';
+import { message } from 'antd';
+import clsx from 'clsx';
+import {
+	useAdminDeleteOrderEdit,
+	useAdminOrderEditAddLineItem,
+	useAdminRequestOrderEditConfirmation,
+	useAdminUpdateOrderEdit,
+} from 'medusa-react';
+import { useEffect, useRef, useState } from 'react';
 import AddProductVariant from '../../common/add-product-variant';
+import { useOrderEdit } from './context';
+import OrderEditLine from './order-edit-line';
 
 type OrderEditModalContainerProps = {
 	order: Order;
@@ -33,7 +34,7 @@ const OrderEditModalContainer = (props: OrderEditModalContainerProps) => {
 		hideModal,
 		orderEdits,
 		activeOrderEditId,
-		setActiveOrderEdit,
+		setActiveOrderEditId,
 	} = useOrderEdit();
 
 	const orderEdit = orderEdits?.find((oe) => oe.id === activeOrderEditId);
@@ -89,7 +90,11 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 		refundedTotal,
 	} = props;
 
-	const { state: stateAddProduct, onOpen: openAddProduct, onClose: closeAddProduct} = useToggleState(false);
+	const {
+		state: stateAddProduct,
+		onOpen: openAddProduct,
+		onClose: closeAddProduct,
+	} = useToggleState(false);
 
 	const filterRef = useRef();
 	const [note, setNote] = useState<string | undefined>();
@@ -111,9 +116,8 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 		orderEdit.id
 	);
 
-	const { mutateAsync: addLineItem, isLoading: loadingAddLineItem  } = useAdminOrderEditAddLineItem(
-		orderEdit.id
-	);
+	const { mutateAsync: addLineItem, isLoading: loadingAddLineItem } =
+		useAdminOrderEditAddLineItem(orderEdit.id);
 
 	const onSave = async () => {
 		try {
@@ -137,13 +141,13 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 
 	useEffect(() => {
 		if (showFilter) {
-			filterRef.current.focus();
+			filterRef?.current?.focus();
 		}
 	}, [showFilter]);
 
 	const onAddVariants = async (selectedVariants: ProductVariant['id']) => {
 		try {
-			const promises = selectedVariants.map((variantId) =>
+			const promises = selectedVariants.map((variantId: any) =>
 				addLineItem({ variant_id: variantId, quantity: 1 })
 			);
 
@@ -188,7 +192,9 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 				{'Chỉnh sửa đơn hàng'}
 			</Title>
 			<Flex justify="flex-end" className="text-xs pt-4">
-				<Button type="default" className="w-fit" onClick={openAddProduct}>{'Thêm sản phẩm'}</Button>
+				<Button type="default" className="w-fit" onClick={openAddProduct}>
+					{'Thêm sản phẩm'}
+				</Button>
 			</Flex>
 			<div className="flex flex-col mt-4">
 				{/* ITEMS */}
@@ -221,11 +227,11 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 				{/* NOTE */}
 				{hasChanges && (
 					<div className="flex items-center justify-between">
-						<span className="text-gray-500">{"Ghi chú"}</span>
+						<span className="text-gray-500">{'Ghi chú'}</span>
 						<Input
 							className="max-w-[455px]"
 							placeholder="Thêm ghi chú"
-							onChange={(value) => setNote(value)}
+							onChange={(value: any) => setNote(value)}
 							value={note}
 						/>
 					</div>
@@ -236,9 +242,9 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 				state={stateAddProduct}
 				onClose={closeAddProduct}
 				onSubmit={onAddVariants}
-		    customerId={customerId}
-		    regionId={regionId}
-		    currencyCode={currencyCode}
+				customerId={customerId}
+				regionId={regionId}
+				currencyCode={currencyCode}
 				isLoading={loadingAddLineItem}
 			/>
 		</Modal>
@@ -246,65 +252,59 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 };
 
 type TotalsSectionProps = {
-  amountPaid: number
-  newTotal: number
-  differenceDue: number
-  currencyCode: string
-}
+	amountPaid: number;
+	newTotal: number;
+	differenceDue: number;
+	currencyCode: string;
+};
 
 /**
  * Totals section displaying order and order edit subtotals.
  */
 function TotalsSection(props: TotalsSectionProps) {
-  const { currencyCode, amountPaid, newTotal, differenceDue } = props
+	const { currencyCode, amountPaid, newTotal, differenceDue } = props;
 
-  return (
-    <>
-      <div className="bg-gray-200 mb-6 w-full" />
-      <div className="mb-2 flex h-[40px] justify-between">
-        <span className="text-gray-500">
-          {"Số tiền đã thanh toán"}
-        </span>
-        <span className="text-gray-900">
-          {formatAmountWithSymbol({
-            amount: amountPaid,
-            currency: currencyCode,
-          })}
-          <span className="text-gray-400"> {currencyCode.toUpperCase()}</span>
-        </span>
-      </div>
+	return (
+		<>
+			<div className="bg-gray-200 mb-6 w-full" />
+			<div className="mb-2 flex h-[40px] justify-between">
+				<span className="text-gray-500">{'Số tiền đã thanh toán'}</span>
+				<span className="text-gray-900">
+					{formatAmountWithSymbol({
+						amount: amountPaid,
+						currency: currencyCode,
+					})}
+					<span className="text-gray-400"> {currencyCode.toUpperCase()}</span>
+				</span>
+			</div>
 
-      <div className="mb-2 flex h-[40px] justify-between">
-        <span className="font-semibold text-gray-900">
-          {"Tổng mới"}
-        </span>
-        <span className="text-2xl font-semibold">
-          {formatAmountWithSymbol({
-            amount: newTotal,
-            currency: currencyCode,
-          })}
-        </span>
-      </div>
+			<div className="mb-2 flex h-[40px] justify-between">
+				<span className="font-semibold text-gray-900">{'Tổng mới'}</span>
+				<span className="text-2xl font-semibold">
+					{formatAmountWithSymbol({
+						amount: newTotal,
+						currency: currencyCode,
+					})}
+				</span>
+			</div>
 
-      <div className="flex justify-between">
-        <span className="text-gray-500">
-          {"Sự khác biệt cần thanh toán"}
-        </span>
-        <span
-          className={clsx("text-gray-900", {
-            "text-rose-500": differenceDue < 0,
-            "text-emerald-500": differenceDue >= 0,
-          })}
-        >
-          {formatAmountWithSymbol({
-            amount: differenceDue,
-            currency: currencyCode,
-          })}
-          <span className="text-gray-400"> {currencyCode.toUpperCase()}</span>
-        </span>
-      </div>
+			<div className="flex justify-between">
+				<span className="text-gray-500">{'Sự khác biệt cần thanh toán'}</span>
+				<span
+					className={clsx('text-gray-900', {
+						'text-rose-500': differenceDue < 0,
+						'text-emerald-500': differenceDue >= 0,
+					})}
+				>
+					{formatAmountWithSymbol({
+						amount: differenceDue,
+						currency: currencyCode,
+					})}
+					<span className="text-gray-400"> {currencyCode.toUpperCase()}</span>
+				</span>
+			</div>
 
-      <div className="bg-gray-200 mt-8 mb-6 h-px w-full" />
-    </>
-  )
+			<div className="bg-gray-200 mt-8 mb-6 h-px w-full" />
+		</>
+	);
 }

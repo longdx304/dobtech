@@ -23,7 +23,7 @@ const LineItemPrice = ({
     <div className="flex flex-col gap-x-2 text-md items-end">
       <div className="text-left">
         <span
-          className={cn("text-md font-bold", {
+          className={cn("text-md font-bold text-[16px]", {
             "text-[#FA6338]": hasReducedPrice,
             "text-black": !hasReducedPrice,
           })}
