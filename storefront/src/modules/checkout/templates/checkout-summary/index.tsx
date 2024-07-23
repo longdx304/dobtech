@@ -33,7 +33,7 @@ const CheckoutSummary = ({ cart }: Props) => {
 					</div>
 				</div>
 			</Card>
-			<PaymentButton />
+			<PaymentButton data={cart!} />
 		</Flex>
 	);
 };

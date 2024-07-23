@@ -4,10 +4,10 @@ import { LineItem, Order } from '@medusajs/medusa';
 import { Metadata } from 'next';
 
 import { notFound } from 'next/navigation';
-import React, { Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 import OrderSkeleton from './skeleton';
 
-const OrderCompletedTemplate = React.lazy(
+const OrderCompletedTemplate = lazy(
 	() => import('@/modules/order/templates/order-completed-template')
 );
 

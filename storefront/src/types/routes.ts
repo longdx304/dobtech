@@ -3,6 +3,7 @@ export enum ERoutes {
   CATEGORY = 'category',
   AUTH = 'user/auth',
   CHECKOUT = 'checkout',
+  CART = 'cart',
 
   // user
 	USER = 'user',
