@@ -11,7 +11,7 @@ import CartPreview from './cart-preview';
 type Props = {};
 
 const fetchCart = async () => {
-	const cartId = cookies().get('_medusa_cart_id')?.value;
+	const cartId = cookies().get('_chamdep_cart_id')?.value;
 
 	if (!cartId) {
 		return null;
