@@ -214,7 +214,7 @@ export async function deleteCustomerShippingAddress(addressId: string) {
 }
 
 export async function signOut() {
-	cookies().set('_medusa_jwt', '', {
+	cookies().set('_chamdep_jwt', '', {
 		maxAge: -1,
 	});
 	revalidateTag('auth');

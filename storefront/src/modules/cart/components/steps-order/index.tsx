@@ -6,6 +6,8 @@ import { Flex } from '@/components/Flex';
 import { Steps } from '@/components/Steps';
 import { useCart } from '@/lib/providers/cart/cart-provider';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { ERoutes } from '@/types/routes';
 
 type Props = {
 	currentStep?: number;
@@ -14,13 +16,17 @@ type Props = {
 
 const StepsOrder = ({ className, currentStep = 0 }: Props) => {
 	const { currentStep: step, setCurrentStep } = useCart();
+	const router = useRouter();
 
 	const ITEMS_STEP = [
 		{
 			title: (
 				<Flex
 					gap={4}
-					onClick={() => setCurrentStep(0)}
+					onClick={() => {
+						setCurrentStep(0);
+						router.push(`/${ERoutes.CART}`);
+					}}
 					className="cursor-pointer"
 				>
 					<ShoppingBasket size={28} />
@@ -44,10 +50,7 @@ const StepsOrder = ({ className, currentStep = 0 }: Props) => {
 		},
 		{
 			title: (
-				<Flex
-					gap={4}
-					className="cursor-pointer"
-				>
+				<Flex gap={4} className="cursor-pointer">
 					<CircleCheck size={28} />
 					<span>Hoàn tất</span>
 				</Flex>

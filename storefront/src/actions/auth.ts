@@ -17,7 +17,7 @@ export const getMedusaHeaders = (tags: string[] = []) => {
     },
   } as Record<string, any>;
 
-  const token = cookies().get('_medusa_jwt')?.value;
+  const token = cookies().get('_chamdep_jwt')?.value;
 
   if (token) {
     headers.authorization = `Bearer ${token}`;
@@ -38,7 +38,7 @@ export async function getToken(credentials: StorePostAuthReq) {
     })
     .then(({ access_token }) => {
       access_token &&
-        cookies().set("_medusa_jwt", access_token, {
+        cookies().set("_chamdep_jwt", access_token, {
           maxAge: 60 * 60 * 24 * 7,
           httpOnly: true,
           sameSite: "strict",

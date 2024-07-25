@@ -12,7 +12,7 @@ const SkeletonRelatedProducts = () => {
         </div>
       </div>
 
-      <div className='grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 sm:grid-cols-2 w-full gap-x-6 gap-y-6'>
+      <div className='grid xl:grid-cols-6 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 sm:grid-cols-2 w-full gap-x-6 gap-y-6'>
         {repeat(3).map((index: any) => (
           <SkeletonProductPreview key={index} />
         ))}

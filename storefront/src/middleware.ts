@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
 
 	// Check if user is authenticated
 	const { device } = userAgent(request);
-	const accessToken = request.cookies.get('_medusa_jwt')?.value;
+	const accessToken = request.cookies.get('_chamdep_jwt')?.value;
 	const data = await getUser(accessToken);
 
   if (device.type === 'mobile') {

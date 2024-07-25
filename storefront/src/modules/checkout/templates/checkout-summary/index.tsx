@@ -2,15 +2,19 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import DiscountCode from '@/modules/checkout/components/discount-code';
-import CartTotals from '@/modules/common/components/cart-totals';
+import CartTotals, { CartType } from '@/modules/common/components/cart-totals';
 import { Cart } from '@medusajs/medusa';
 import PaymentButton from '../../components/payment-button';
+import { useEffect } from 'react';
 
 type Props = {
 	cart: Omit<Cart, 'refunded_total' | 'refundable_amount'>;
 };
 
 const CheckoutSummary = ({ cart }: Props) => {
+	useEffect(() => {
+    console.log('Cart updated in CheckoutSummary:', cart);
+  }, [cart]);
 	return (
 		<Flex className="flex-col">
 			<Card className="">
@@ -19,7 +23,7 @@ const CheckoutSummary = ({ cart }: Props) => {
 						<Text className="flex flex-row text-lg items-baseline font-semibold">
 							Tóm tắt đơn hàng
 						</Text>
-						<CartTotals data={cart!} />
+						<CartTotals data={cart!} type={CartType.CHECKOUT} />
 					</div>
 				</div>
 			</Card>
@@ -33,7 +37,7 @@ const CheckoutSummary = ({ cart }: Props) => {
 					</div>
 				</div>
 			</Card>
-			<PaymentButton />
+			<PaymentButton data={cart!} />
 		</Flex>
 	);
 };

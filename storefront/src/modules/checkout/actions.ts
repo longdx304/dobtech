@@ -3,9 +3,8 @@
 import { completeCart, updateCart } from '@/actions/cart';
 import { addShippingMethod, deleteDiscount } from '@/actions/checkout';
 import { BACKEND_URL } from '@/lib/constants';
-import { GiftCard, StorePostCartsCartReq } from '@medusajs/medusa';
+import { Cart, GiftCard, StorePostCartsCartReq } from '@medusajs/medusa';
 import { revalidateTag } from 'next/cache';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ShippingAddressProps } from './components/shipping-address';
 
@@ -53,9 +52,7 @@ export async function setShippingMethod(
 	}
 }
 
-export async function applyDiscount(code: string) {
-	const cartId = cookies().get('_medusa_cart_id')?.value;
-
+export async function applyDiscount(code: string, cartId: string) {
 	if (!cartId) return 'No cartId cookie found';
 
 	try {
@@ -67,9 +64,7 @@ export async function applyDiscount(code: string) {
 	}
 }
 
-export async function applyGiftCard(code: string) {
-	const cartId = cookies().get('_medusa_cart_id')?.value;
-
+export async function applyGiftCard(code: string, cartId: string) {
 	if (!cartId) return 'No cartId cookie found';
 
 	try {
@@ -81,9 +76,7 @@ export async function applyGiftCard(code: string) {
 	}
 }
 
-export async function removeDiscount(code: string) {
-	const cartId = cookies().get('_medusa_cart_id')?.value;
-
+export async function removeDiscount(code: string, cartId: string) {
 	if (!cartId) return 'No cartId cookie found';
 
 	try {
@@ -96,10 +89,9 @@ export async function removeDiscount(code: string) {
 
 export async function removeGiftCard(
 	codeToRemove: string,
-	giftCards: GiftCard[]
+	giftCards: GiftCard[],
+	cartId: string
 ) {
-	const cartId = cookies().get('_medusa_cart_id')?.value;
-
 	if (!cartId) return 'No cartId cookie found';
 
 	try {
@@ -115,12 +107,12 @@ export async function removeGiftCard(
 	}
 }
 
-export async function submitDiscountForm(values: any) {
+export async function submitDiscountForm(values: any, cartId: string) {
 	const code = values.code;
 
 	try {
-		await applyDiscount(code).catch(async (err) => {
-			await applyGiftCard(code);
+		await applyDiscount(code, cartId).catch(async (err) => {
+			await applyGiftCard(code, cartId);
 		});
 		return null;
 	} catch (error: any) {
@@ -147,22 +139,21 @@ export async function placeOrder(cartId?: string) {
 	return cart;
 }
 
-export async function listAllCart() {
-  try {
-    const response = await fetch(`${BACKEND_URL}/store/cart`, {
-      method: 'GET',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch carts');
-    }
+export async function listAllCart(): Promise<Cart[]> {
+	try {
+		const response = await fetch(`${BACKEND_URL}/store/cart`, {
+			method: 'GET',
+		});
+		if (!response.ok) {
+			throw new Error('Failed to fetch carts');
+		}
 
 		const data = await response.json();
 		return data.carts;
-  } catch (error: any) {
-    throw error;
-  }
+	} catch (error: any) {
+		throw error;
+	}
 }
-
 
 export async function deleteCartCheckout(cartId?: string) {
 	if (!cartId) throw new Error('Không tìm thấy sản phẩm');

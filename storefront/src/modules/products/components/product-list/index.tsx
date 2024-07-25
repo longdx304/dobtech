@@ -24,13 +24,14 @@ const ProductList: FC<ProductListProps> = async ({
       offset: (page - 1) * PAGE_SIZE,
     },
   });
+
   return (
 		<>
 			<ProductProvider productData={undefined} regionData={undefined}>
 				<VariantImagesProvider>
 					<div className="flex flex-col items-center gap-4 pb-16">
 						{data.products?.length > 0 && (
-							<div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 sm:grid-cols-2 w-full gap-x-3 gap-y-3 lg:gap-x-4 lg:gap-y-4">
+							<div className="grid xl:grid-cols-6 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 sm:grid-cols-2 w-full gap-x-3 gap-y-3 lg:gap-x-4 lg:gap-y-4">
 								{data.products?.map((product, index) => (
 									<ProductPreview key={index} data={product} region={region!} />
 								))}

@@ -10,6 +10,7 @@ import { RadioChangeEvent } from 'antd';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { setShippingMethod } from '../../actions';
+import { Loader } from 'lucide-react';
 
 type Props = {
 	region: Region;
@@ -46,7 +47,7 @@ const ShippingOptions = ({ region, availableShippingMethods }: Props) => {
 	};
 
 	return (
-		<Card loading={isLoading}>
+		<Card>
 			<Text className="text-xl" strong>
 				Tuỳ chọn giao hàng
 			</Text>
@@ -72,9 +73,13 @@ const ShippingOptions = ({ region, availableShippingMethods }: Props) => {
 									</Text>
 								)}
 							</Flex>
-							<Text className="text-xs" strong>
-								{getAmount(option.amount)}
-							</Text>
+							{isLoading ? (
+								<Loader className="animate-spin" size={12} />
+							) : (
+								<Text className="text-xs" strong>
+									{getAmount(option.amount)}
+								</Text>
+							)}
 						</Flex>
 					</Radio>
 				))}

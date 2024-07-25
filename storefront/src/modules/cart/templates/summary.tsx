@@ -20,7 +20,8 @@ type SummaryProps = {
 const countryCode = 'vn';
 
 const Summary = ({ cart, selectedItems }: SummaryProps) => {
-	const { refreshCart, allCarts, deleteAndRefreshCart, setCurrentStep } = useCart();
+	const { refreshCart, allCarts, deleteAndRefreshCart, setCurrentStep } =
+		useCart();
 	const [isAdding, setIsAdding] = useState(false);
 	const router = useRouter();
 	const [isOpenModal, setIsOpenModal] = useState(false);
@@ -63,7 +64,8 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 
 	useEffect(() => {
 		const cart = allCarts.find(
-			(cart) => cart?.metadata?.cart_type === 'checkout'
+			(cart) =>
+				cart?.metadata?.cart_type === 'checkout' && cart?.payment_id === null
 		);
 		setCheckoutCart(cart);
 	}, [allCarts]);
@@ -78,7 +80,6 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 		try {
 			if (checkoutCart) {
 				setIsOpenModal(true);
-				refreshCart();
 			} else {
 				const newCart = await createCheckoutCart(countryCode);
 				if (!newCart) {
@@ -94,7 +95,7 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 					)
 				);
 				setCheckoutCart(newCart as Cart);
-				setCurrentStep(1)
+				setCurrentStep(1);
 				router.push(`${ERoutes.CHECKOUT}/?cartId=${newCart.id}`);
 			}
 		} catch (e) {
@@ -124,6 +125,7 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 			if (checkoutCart) {
 				await deleteAndRefreshCart(checkoutCart?.id!);
 				setCheckoutCart(undefined);
+				refreshCart();
 			}
 			const newCart = await createCheckoutCart(countryCode);
 			if (!newCart) {
@@ -139,16 +141,22 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 				)
 			);
 			setCheckoutCart(newCart as Cart);
-			setCurrentStep(1)
+			setCurrentStep(1);
 			router.push(`${ERoutes.CHECKOUT}/?cartId=${newCart.id}`);
-			setIsOpenModal(false);
 		} catch (e) {
 			console.error('Error in handleModalOk:', e);
 			message.error('An error occurred while processing your request');
+		} finally {
+			setIsOpenModal(false);
 		}
 	};
 
 	const handleCancel = () => {
+		setIsOpenModal(false);
+	};
+
+	const handleCheckCart = () => {
+		setCurrentStep(1);
 		setIsOpenModal(false);
 		router.push(`${ERoutes.CHECKOUT}/?cartId=${checkoutCart?.id}`);
 	};
@@ -177,6 +185,24 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 				onCancel={handleCancel}
 				okText="Tiếp tục thanh toán đơn hàng mới"
 				cancelText="Kiểm tra giỏ hàng"
+				footer={[
+					<Button
+						key="check"
+						size="middle"
+						type="default"
+						onClick={handleCheckCart}
+					>
+						Kiểm tra giỏ hàng
+					</Button>,
+					<Button
+						key="submit"
+						size="middle"
+						type="primary"
+						onClick={handleModalOk}
+					>
+						Tiếp tục thanh toán đơn hàng mới
+					</Button>,
+				]}
 			/>
 		</>
 	);

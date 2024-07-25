@@ -24,7 +24,7 @@ import { updateCartMetadata } from '../checkout/actions';
  * const cart = await getOrSetCart()
  */
 export async function getOrSetCart(countryCode: string) {
-	const cartId = cookies().get('_medusa_cart_id')?.value;
+	const cartId = cookies().get('_chamdep_cart_id')?.value;
 	let cart;
 
 	if (cartId) {
@@ -42,7 +42,7 @@ export async function getOrSetCart(countryCode: string) {
 	if (!cart) {
 		cart = await createCart({ region_id }).then((res) => res);
 		cart &&
-			cookies().set('_medusa_cart_id', cart.id, {
+			cookies().set('_chamdep_cart_id', cart.id, {
 				maxAge: 60 * 60 * 24 * 7,
 				httpOnly: true,
 				sameSite: 'strict',
@@ -60,7 +60,7 @@ export async function getOrSetCart(countryCode: string) {
 }
 
 export async function retrieveCart() {
-	const cartId = cookies().get('_medusa_cart_id')?.value;
+	const cartId = cookies().get('_chamdep_cart_id')?.value;
 
 	if (!cartId) {
 		return null;
@@ -114,7 +114,7 @@ export async function updateLineItem({
 	quantity: number;
 	checkoutCartId?: string;
 }) {
-	const cartId = checkoutCartId || cookies().get('_medusa_cart_id')?.value;
+	const cartId = checkoutCartId || cookies().get('_chamdep_cart_id')?.value;
 
 	if (!cartId) {
 		return 'Missing cart ID';
@@ -137,7 +137,7 @@ export async function updateLineItem({
 }
 
 export async function deleteLineItem(lineId: string) {
-	const cartId = cookies().get('_medusa_cart_id')?.value;
+	const cartId = cookies().get('_chamdep_cart_id')?.value;
 
 	if (!cartId) {
 		return 'Missing cart ID';
