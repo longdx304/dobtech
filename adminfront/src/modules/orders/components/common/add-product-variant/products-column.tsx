@@ -62,7 +62,7 @@ const productsColumns = ({ variantInventoryCell, currencyCode }: Props) => [
 
 			const showOriginal =_ !== "default"
 			return (
-				<div className="flex items-center justify-end gap-2">
+				<div className="flex items-center justify-start gap-2">
 					<div className="flex flex-col items-end">
 						{showOriginal && (
 							<span className="text-gray-400 line-through">

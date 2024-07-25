@@ -15,6 +15,7 @@ import {
 	OrderEditEvent,
 	OrderEditRequestedEvent,
 	ReturnEvent,
+	ExchangeEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
 import { Order } from '@medusajs/medusa';
 import { Empty } from 'antd';
@@ -27,6 +28,7 @@ import OrderCanceled from './timeline-events/order-canceled';
 import OrderPlaced from './timeline-events/order-placed';
 import Refund from './timeline-events/refund';
 import Return from './timeline-events/return';
+import Exchange from './timeline-events/exchange';
 import PaymentRequired from './timeline-events/order-edit/payment-required';
 import RefundRequired from './timeline-events/order-edit/refund-required';
 import EditCreated from './timeline-events/order-edit/created';
@@ -35,6 +37,7 @@ import EditCanceled from './timeline-events/order-edit/canceled';
 import EditDeclined from './timeline-events/order-edit/declined';
 import EditRequested from './timeline-events/order-edit/requested';
 import ReturnMenu from './timeline-events/modal/returns';
+import SwapModal from './timeline-events/modal/swap';
 
 type Props = {
 	orderId: Order['id'] | undefined;
@@ -44,7 +47,8 @@ type Props = {
 const Timeline = ({ orderId, isLoading }: Props) => {
 	const { orderRelations } = useOrdersExpandParam();
 	const { events, refetch } = useBuildTimeline(orderId!);
-	const [showRequestReturn, setShowRequestReturn] = useState(false)
+	const [showRequestReturn, setShowRequestReturn] = useState<boolean>(false)
+	const [showCreateSwap, setShowCreateSwap] = useState<boolean>(false)
 	// const createNote = useAdminCreateNote();
 	const { order, isLoading: isOrderLoading } = useAdminOrder(orderId!, {
 		expand: orderRelations,
@@ -61,7 +65,7 @@ const Timeline = ({ orderId, isLoading }: Props) => {
 			label: <span className="w-full">{'Đăng ký trao đổi'}</span>,
 			key: 'exchange',
 			icon: <RefreshCcw />,
-			// onClick: handleCancelOrder,
+			onClick: () => setShowCreateSwap(true),
 		},
 		{
 			label: <span className="w-full">{'Đăng ký đòi hỏi'}</span>,
@@ -101,6 +105,13 @@ const Timeline = ({ orderId, isLoading }: Props) => {
           onClose={() => setShowRequestReturn(false)}
         />
       )}
+			{showCreateSwap && order && (
+        <SwapModal
+          order={order}
+					state={showCreateSwap}
+          onClose={() => setShowCreateSwap(false)}
+        />
+      )}
 		</Card>
 	);
 };
@@ -121,14 +132,14 @@ function switchOnType(event: TimelineEvent, refetch: () => void) {
 		  return <OrderCanceled event={event as TimelineEvent} />
 		case "return":
 		  return <Return event={event as ReturnEvent} refetch={refetch} />
-		// case "exchange":
-		//   return (
-		//     <Exchange
-		//       key={event.id}
-		//       event={event as ExchangeEvent}
-		//       refetch={refetch}
-		//     />
-		//   )
+		case "exchange":
+		  return (
+		    <Exchange
+		      key={event.id}
+		      event={event as ExchangeEvent}
+		      refetch={refetch}
+		    />
+		  )
 		// case "claim":
 		//   return <Claim event={event as ClaimEvent} />
 		// case "notification":

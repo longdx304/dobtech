@@ -37,6 +37,7 @@ const CreateFulfillmentModal = ({
 	orderToFulfill,
 	orderId,
 }: Props) => {
+	console.log('orderToFulfill', orderToFulfill);
 	const [errors, setErrors] = useState({});
 	const [quantities, setQuantities] = useState<Record<string, number>>(
 		'items' in orderToFulfill
@@ -110,7 +111,8 @@ const CreateFulfillmentModal = ({
 					}));
 				break;
 		}
-
+		console.log('type', type)
+		console.log('requestObj', requestObj)
 		await action.mutateAsync(requestObj as any, {
 			onSuccess: () => {
 				message.success(successText);

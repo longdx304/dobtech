@@ -10,11 +10,10 @@ import {
 import { message } from 'antd';
 import { LoaderCircle, SquareArrowOutUpRight } from 'lucide-react';
 
-import { Select } from "@/components/Select"
+import { Select } from "@/components/Select";
 import { Option } from "@/types/shared"
-import { displayAmount } from "@/utils/prices"
-import { getErrorMessage } from "@/lib/utils"
-import { Title, Text } from '@/components/Typography';
+import { displayAmount } from "@/utils/prices";
+import { getErrorMessage } from "@/lib/utils";
 import {
 	useAdminRequestReturn,
 	useAdminShippingOptions,
@@ -228,15 +227,6 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 		}
 	};
 
-	const handleShippingSelected = (selectedItem: any) => {
-		setShippingMethod(selectedItem);
-		const method = shippingOptions?.find((o) => selectedItem.value === o.id);
-
-		if (method) {
-			setShippingPrice(method.price_incl_tax);
-		}
-	};
-
 	useEffect(() => {
 		if (!useCustomShippingPrice && shippingMethod) {
 			const method = shippingOptions?.find(
@@ -268,7 +258,7 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			<Title level={4} className="text-center mb-2">
 				{'Yêu cầu trả lại'}
 			</Title>
-			<div>
+			<div className="flex flex-col gap-2">
 				<Text strong className="font-medium mb-2">
 					{'Các mục cần trả lại'}
 				</Text>
@@ -293,7 +283,7 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 				) : (
 					<Select
 						className="mt-2"
-						placeholder="Add a shipping method"
+						placeholder="Chọn phương thức vận chuyển"
 						value={shippingMethod?.value}
 						onChange={handleShippingSelected}
 						options={
@@ -325,7 +315,7 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 								<div className="flex items-center">
 									<span
 										className="text-gray-400 mr-2 cursor-pointer flex items-center"
-										onClick={() => setRefundEdited(true)}
+										// onClick={() => setRefundEdited(true)}
 									>
 										<SquareArrowOutUpRight size={16} />
 									</span>

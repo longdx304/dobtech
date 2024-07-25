@@ -1,16 +1,18 @@
 import clsx from "clsx"
 import { useAdminCancelReturn } from "medusa-react"
-import React, { useState } from "react"
+import React from "react"
 // import { ReceiveReturnMenu } from "../../../domain/orders/details/receive-return"
 import { ReturnEvent } from "@/modules/orders/hooks/use-build-timeline";
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { Button } from "@/components/Button"
 import { CircleAlert, Ban, PackageCheck, Trash2 } from 'lucide-react';
+import { message, Modal } from 'antd';
 
 import DeletePrompt from "../../organisms/delete-prompt"
 import EventActionables from "./event-actionables"
 import EventContainer from "./event-container"
 import EventItemContainer from "./event-item-container"
+import ReceiveReturnModal from './modal/receive-return';
 
 type ReturnRequestedProps = {
   event: ReturnEvent
@@ -18,27 +20,50 @@ type ReturnRequestedProps = {
 }
 
 const Return: React.FC<ReturnRequestedProps> = ({ event, refetch }) => {
-  const [showCancel, setShowCancel] = useState(false)
   const cancelReturn = useAdminCancelReturn(event.id)
 
-  const {
-    state: showReceiveReturnMenu,
-    close: closeReceiveReturnMenu,
-    open: openReceiveReturnMenu,
-  } = useToggleState()
+  const { state, onClose, onOpen } = useToggleState(false);
 
   const handleCancel = () => {
-    cancelReturn.mutate(undefined, {
-      onSuccess: () => {
-        refetch()
-      },
-    })
+		Modal.confirm({
+			title: 'Bạn có muốn huỷ yêu cầu trả hàng ?',
+			content:
+				'Yêu cầu trả hàng sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn thực hiện chứ?',
+			icon: (
+				<CircleAlert
+					style={{ width: 32, height: 24 }}
+					className="mr-2"
+					color="#E7B008"
+				/>
+			),
+			okType: 'danger',
+			okText: 'Đồng ý',
+			cancelText: 'Huỷ',
+			async onOk() {
+				cancelReturn.mutateAsync(event.id, {
+					onSuccess: () => {
+						refetch();
+						message.success('Huỷ trả hàng thành công!');
+						return;
+					},
+					onError: (error: any) => {
+						message.error(getErrorMessage(error));
+						return;
+					},
+				});
+			},
+		});
+    // cancelReturn.mutate(undefined, {
+    //   onSuccess: () => {
+    //     refetch()
+    //   },
+    // })
   }
 
   const eventContainerArgs = buildReturn(
     event,
     handleCancel,
-    openReceiveReturnMenu
+    onOpen
   )
 
   if (event.raw?.claim_order_id) {
@@ -48,23 +73,12 @@ const Return: React.FC<ReturnRequestedProps> = ({ event, refetch }) => {
   return (
     <>
       <EventContainer {...eventContainerArgs} />
-      {/* {showCancel && (
-        <DeletePrompt
-          handleClose={() => setShowCancel(false)}
-          onDelete={async () => handleCancel()}
-          heading="Cancel return"
-          confirmText="Yes, cancel"
-          successText="Canceled return"
-          text="Are you sure you want to cancel this return?"
-        />
-      )} */}
-      {/* {showReceiveReturnMenu && (
-        <ReceiveReturnMenu
-          onClose={closeReceiveReturnMenu}
-          order={event.order}
-          returnRequest={event.raw}
-        />
-      )} */}
+			{state && <ReceiveReturnModal
+				onClose={onClose}
+				order={event.order}
+				returnRequest={event.raw}
+				state={state}
+			/>}
     </>
   )
 }
@@ -78,7 +92,6 @@ function buildReturn(
   let icon: React.ReactNode
   let button: React.ReactNode
   const actions: any[] = [];
-	console.log('event', event)
 
   switch (event.status) {
     case "requested":
@@ -111,7 +124,7 @@ function buildReturn(
       icon = <Ban size={20} className="text-gray-500" />
       break
     case "requires_action":
-      title = "Yêu cầu trả lại cần hành động"
+      title = "Yêu cầu trả lại cần thực hiện"
       icon = <CircleAlert size={20} className="text-rose-500" />
       break
     default:

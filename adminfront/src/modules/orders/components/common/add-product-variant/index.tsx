@@ -9,9 +9,10 @@ import { Tooltip } from '@/components/Tooltip';
 import { Input } from '@/components/Input';
 import productsColumns from './products-column';
 import { Search, LoaderCircle } from 'lucide-react';
-import { useAdminVariants, useAdminVariantsInventory } from "medusa-react";
+import { useAdminVariants, useAdminVariantsInventory } from 'medusa-react';
 import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
 import _ from 'lodash';
+import { useEffect } from 'react';
 
 type AddProductVariantProps = {
 	state: boolean;
@@ -22,42 +23,52 @@ type AddProductVariantProps = {
 	isReplace?: boolean;
 	isLoading?: boolean;
 	// onSubmit: (variants: ProductVariant[]) => void;
-	onSubmit: (variants: string[]) => void;
+	onSubmit: (variantIds: string[], variants?: ProductVariant[] ) => void;
 	title: string;
+	selectedItems?: string[];
 };
 
 const PAGE_SIZE = 10;
 
 const AddProductVariant = (props: AddProductVariantProps) => {
-	const { isReplace, regionId, currencyCode, customerId } =
-    props;
-	const [selectedVariants, setSelectedVariants] = useState<string[]>(
-		[]
-	);
+	const { isReplace, regionId, currencyCode, customerId } = props;
+	const [selectedVariantIds, setSelectedVariantIds] = useState<string[]>([]);
+	const [selectedVariants, setSelectedVariants] = useState<ProductVariant[]>([]);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
 
 	const { isLoading, count, variants } = useAdminVariants({
-    q: searchValue,
-    limit: PAGE_SIZE,
-    offset: (currentPage - 1) * PAGE_SIZE,
-    region_id: regionId,
-    customer_id: customerId,
-  })
+		q: searchValue,
+		limit: PAGE_SIZE,
+		offset: (currentPage - 1) * PAGE_SIZE,
+		region_id: regionId,
+		customer_id: customerId,
+	});
+
+	useEffect(() => {
+		if (props.selectedItems) {
+			setSelectedVariantIds(props.selectedItems);
+		} else {
+			setSelectedVariantIds([])
+			setSelectedVariants([])
+		}
+	}, [props.selectedItems]);
 
 	const onSubmit = async () => {
 		// wait until onSubmit is done to reduce list jumping
-		await props.onSubmit(selectedVariants);
-		setSelectedVariants([]);
+		await props.onSubmit(selectedVariantIds, selectedVariants);
+		// setSelectedVariantIds([]);
 		props.onClose();
 	};
 
 	const onBack = () => {
+		setSelectedVariantIds([]);
 		setSelectedVariants([]);
 	};
 
-	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
-		setSelectedVariants(selectedRowKeys as string[]);
+	const handleRowSelectionChange = (selectedRowKeys: React.Key[], selectedRows: ProductVariant[]) => {
+		setSelectedVariantIds(selectedRowKeys as string[]);
+		setSelectedVariants(selectedRows as ProductVariant[]);
 	};
 
 	const handleChangeDebounce = _.debounce(
@@ -70,8 +81,8 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 
 	const variantInventoryCell = (record: ProductVariant) => {
 		// const { getLocationNameById } = useStockLocations();
-			// const { variant, isLoading } = useAdminVariantsInventory(record.id);
-			// console.log('variant', variant)
+		// const { variant, isLoading } = useAdminVariantsInventory(record.id);
+		// console.log('variant', variant)
 
 		// 	if (isLoading) {
 		// 		return <LoaderCircle className="animate-spin" />
@@ -88,31 +99,31 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 		// 		0
 		// 	)
 
-			// const LocationTooltip = (
-			// 	<>
-			// 		{inventory[0].location_levels.map(
-			// 			(location_level: InventoryLevelDTO) => (
-			// 				<div key={location_level.id} className="font-normal">
-			// 					<span className="font-semibold">
-			// 						{location_level.stocked_quantity}
-			// 					</span>
-			// 						{`Tại ${location: getLocationNameById(location_level.location_id)}`}
-			// 				</div>
-			// 			)
-			// 		)}
-			// 	</>
-			// );
+		// const LocationTooltip = (
+		// 	<>
+		// 		{inventory[0].location_levels.map(
+		// 			(location_level: InventoryLevelDTO) => (
+		// 				<div key={location_level.id} className="font-normal">
+		// 					<span className="font-semibold">
+		// 						{location_level.stocked_quantity}
+		// 					</span>
+		// 						{`Tại ${location: getLocationNameById(location_level.location_id)}`}
+		// 				</div>
+		// 			)
+		// 		)}
+		// 	</>
+		// );
 
-			return (
-				<></>
-				// <Tooltip title={'LocationTooltip'}>
-				// 	<div className="">
-				// 		{total} in {inventory[0].location_levels.length}{" "}
-				// 		{_.pluralize("location", inventory[0].location_levels.length)}
-				// 	</div>
-				// </Tooltip>
-			)
-	}
+		return (
+			<></>
+			// <Tooltip title={'LocationTooltip'}>
+			// 	<div className="">
+			// 		{total} in {inventory[0].location_levels.length}{" "}
+			// 		{_.pluralize("location", inventory[0].location_levels.length)}
+			// 	</div>
+			// </Tooltip>
+		);
+	};
 
 	const columns = productsColumns({ variantInventoryCell, currencyCode });
 
@@ -148,7 +159,7 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 			<Table
 				rowSelection={{
 					type: isReplace ? 'radio' : 'checkbox',
-					selectedRowKeys: selectedVariants,
+					selectedRowKeys: selectedVariantIds,
 					onChange: handleRowSelectionChange,
 					preserveSelectedRowKeys: true,
 					// getCheckboxProps: (record) => ({

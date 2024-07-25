@@ -6,6 +6,7 @@ import { Button } from '@/components/Button';
 import { Table } from '@/components/Table';
 import productsColumns from './products-column';
 import { EditableRow, EditableCell } from './products-component';
+import { isLineItemCanceled } from '@/utils/is-line-item';
 
 type RMASelectProductTableProps = {
 	order: Omit<Order, 'beforeInsert'>;
@@ -33,12 +34,20 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 
 	useEffect(() => {
 		setDataSource(
-			allItems.map((item) => ({
-				...item,
-				return_quantity: item.quantity - item.returned_quantity,
-			}))
+			allItems.map((item) => {
+				if (
+					item.returned_quantity === item.quantity ||
+					isLineItemCanceled(item, order)
+				) {
+					return;
+				}
+				return {
+					...item,
+					return_quantity: item.quantity - item.returned_quantity,
+				};
+			}).filter((item) => item)
 		);
-	}, [allItems]);
+	}, [allItems, order]);
 
 	const handleReturnToggle = (
 		record: Omit<LineItem, 'beforeInsert'>,
@@ -54,12 +63,15 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 			};
 		} else {
 			delete newReturns[record.id];
-			setDataSource(
-				allItems.map((item) => ({
-					...item,
-					return_quantity: item.quantity - item.returned_quantity,
-				}))
+			const newVariants = [...(dataSource as any)];
+			const indexVariant = newVariants.findIndex(
+				(variant) => record.id === variant.id
 			);
+			newVariants.splice(indexVariant, 1, {
+				...record,
+				return_quantity: record.quantity - record.returned_quantity,
+			});
+			setDataSource(newVariants as any);
 		}
 
 		setToReturn(newReturns);
@@ -92,45 +104,14 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 		const indexVariant = newVariants.findIndex(
 			(variant) => item.id === variant.id
 		);
-		// const itemVariant = newVariants[indexVariant];
 		newVariants.splice(indexVariant, 1, {
 			...item,
 			return_quantity: item.return_quantity + change,
 		});
 		setDataSource(newVariants as any);
-		console.log('newReturns', newVariants[item.id]);
 
 		setToReturn(newReturns);
 	};
-
-	// const setReturnReason = (reason, note, files, id) => {
-	//   let newReturns = {}
-	//   if (imagesOnReturns && files?.length) {
-	//     handleAddImages(files).then((res) => {
-	//       newReturns = {
-	//         ...toReturn,
-	//         [id]: {
-	//           ...toReturn[id],
-	//           reason: reason,
-	//           note: note,
-	//           images: [...(toReturn[id].images || []), ...res],
-	//         },
-	//       }
-	//       setToReturn(newReturns)
-	//     })
-	//   } else {
-	//     newReturns = {
-	//       ...toReturn,
-	//       [id]: {
-	//         ...toReturn[id],
-	//         reason: reason,
-	//         note: note,
-	//       },
-	//     }
-
-	//     setToReturn(newReturns)
-	//   }
-	// }
 
 	const components = {
 		body: {
@@ -168,9 +149,6 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 				onChange: handleRowSelectionChange,
 				preserveSelectedRowKeys: true,
 				onSelect: handleReturnToggle,
-				// getCheckboxProps: (record) => ({
-				// 	disabled: productIds?.includes(record.id),
-				// }),
 			}}
 			// loading={isLoading}
 			columns={columns as any}

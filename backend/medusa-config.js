@@ -43,6 +43,9 @@ const plugins = [
       upload_dir: 'uploads',
     },
   },
+	{
+    resolve: 'medusa-plugin-variant-images',
+  },
   {
     resolve: `medusa-file-s3`,
     options: {
