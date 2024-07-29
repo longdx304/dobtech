@@ -23,7 +23,7 @@ export async function getToken(credentials: IAdminAuth) {
 		.then(({ access_token }) => {
 			console.log('access_token', access_token);
 			access_token &&
-				cookies().set('_medusa_jwt', access_token, {
+				cookies().set('_admin_chamdep_jwt', access_token, {
 					maxAge: 60 * 60 * 24 * 7,
 					httpOnly: true,
 					sameSite: 'strict',
@@ -52,7 +52,7 @@ export async function getAdmin() {
  * User Logout
  */
 export async function signOut() {
-	cookies().set('_medusa_jwt', '', {
+	cookies().set('_admin_chamdep_jwt', '', {
 		maxAge: -1,
 	});
 }

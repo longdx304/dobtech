@@ -1,21 +1,21 @@
 'use client';
+import { FloatButton } from '@/components/Button';
+import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
-import { Title } from '@/components/Typography';
-import { Search, Plus } from 'lucide-react';
-import { ChangeEvent, FC, useMemo, useState } from 'react';
-import _ from 'lodash';
-import useToggleState from '@/lib/hooks/use-toggle-state';
 import { Table } from '@/components/Table';
-import { useAdminRegions, useMedusa } from 'medusa-react';
-import regionColumns from './region-column';
+import { Title } from '@/components/Typography';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import { getErrorMessage } from '@/lib/utils';
 import { Region } from '@medusajs/medusa';
+import { Modal as AntdModal, message } from 'antd';
+import _ from 'lodash';
+import { Plus, Search } from 'lucide-react';
+import { useAdminRegions, useMedusa } from 'medusa-react';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
 import RegionModal from '../components/region-modal';
 import ShippingModal from '../components/shipping-modal';
-import { Card } from '@/components/Card';
-import { FloatButton } from '@/components/Button';
-import { Modal as AntdModal, message } from 'antd';
-import { getErrorMessage } from '@/lib/utils';
+import regionColumns from './region-column';
 
 type Props = {};
 
@@ -63,6 +63,7 @@ const RegionList: FC<Props> = ({}) => {
 	};
 
 	const handleEditRegion = (record: Region) => {
+		console.log('record edit', record);
 		setCurrentRegion(record);
 		onOpenActionRegion();
 	};
@@ -99,7 +100,7 @@ const RegionList: FC<Props> = ({}) => {
 		return regionColumns({
 			handleEditRegion,
 			handleShippingOption,
-			handleReturnShippingOption,
+			// handleReturnShippingOption,
 			handleDeleteRegion,
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
