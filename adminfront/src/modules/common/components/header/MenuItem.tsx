@@ -1,25 +1,25 @@
 import type { MenuProps } from 'antd';
 import { Flex } from 'antd';
 import {
+	BadgeDollarSign,
 	CalendarRange,
+	CircleDollarSign,
 	ClipboardPenLine,
+	Earth,
 	Ellipsis,
+	LayoutList,
 	LogOut,
 	Settings,
+	ShoppingCart,
 	User as UserIcon,
 	Users,
-	LayoutList,
-	CircleDollarSign,
 	UsersRound,
-	Earth,
-	BadgeDollarSign,
-	ShoppingCart
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
 import { IAdminResponse } from '@/types/account';
-import { User } from '@medusajs/medusa';
 import { ERoutes } from '@/types/routes';
+import { User } from '@medusajs/medusa';
 
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(

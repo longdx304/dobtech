@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
 		const isPublicRoute = publicRoutes.includes(pathname);
 
 		// Decrypt the session from the cookie
-		const accessToken = request.cookies.get('_medusa_jwt')?.value;
+		const accessToken = request.cookies.get('_admin_chamdep_jwt')?.value;
 		// Get current user information
 		const data = await getUser(accessToken);
 

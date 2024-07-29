@@ -1,11 +1,10 @@
 import { ActionAbles } from '@/components/Dropdown';
 import { Region } from '@medusajs/medusa';
-import dayjs from 'dayjs';
-import { Truck, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, Truck } from 'lucide-react';
 
 type Props = {
 	handleShippingOption: (record: Region) => void;
-	handleReturnShippingOption: (record: Region) => void;
+	// handleReturnShippingOption: (record: Region) => void;
 	handleEditRegion: (record: Region) => void;
 	handleDeleteRegion: (recordId: Region['id']) => void;
 };
@@ -13,7 +12,7 @@ type Props = {
 const regionColumns = ({
 	handleEditRegion,
 	handleShippingOption,
-	handleReturnShippingOption,
+	// handleReturnShippingOption,
 	handleDeleteRegion,
 }: Props) => [
 	{
@@ -67,13 +66,13 @@ const regionColumns = ({
 						handleShippingOption(record);
 					},
 				},
-				{
-					label: 'Tuỳ chọn giao hàng trả lại',
-					icon: <Truck size={20} />,
-					onClick: () => {
-						handleReturnShippingOption(record);
-					},
-				},
+				// {
+				// 	label: 'Tuỳ chọn giao hàng trả lại',
+				// 	icon: <Truck size={20} />,
+				// 	onClick: () => {
+				// 		handleReturnShippingOption(record);
+				// 	},
+				// },
 				{
 					label: 'Xoá',
 					icon: <Trash2 size={20} />,

@@ -1,16 +1,15 @@
-import { ShippingOption } from '@medusajs/medusa';
-import dayjs from 'dayjs';
-import { formatNumber } from '@/lib/utils';
-import { Tag } from '@/components/Tag';
 import { ActionAbles } from '@/components/Dropdown';
+import { Tag } from '@/components/Tag';
+import { formatNumber } from '@/lib/utils';
+import { ShippingOption } from '@medusajs/medusa';
 import { Pencil, Trash2 } from 'lucide-react';
 
 type Props = {
 	handleEdit: (record: ShippingOption) => void;
-	handleDelete: (recordId: ShippingOption['id']) => void
+	handleDelete: (recordId: ShippingOption['id']) => void;
 };
 
-const shippingColumns = ({handleEdit, handleDelete}: Props) => [
+const shippingColumns = ({ handleEdit, handleDelete }: Props) => [
 	{
 		title: 'Tên',
 		dataIndex: 'name',
