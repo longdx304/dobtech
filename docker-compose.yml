@@ -59,7 +59,7 @@ services:
             - ./adminfront:/app/adminfront
             - adminfront_node_modules:/app/adminfront/node_modules
         environment:
-            NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://backend:9000
+            NEXT_PUBLIC_BACKEND_URL: http://backend:9000
 
     storefront:
         build:
@@ -75,7 +75,7 @@ services:
             - ./storefront:/app/storefront
             - storefront_node_modules:/app/storefront/node_modules
         environment:
-            NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://backend:9000
+            NEXT_PUBLIC_BACKEND_URL: http://backend:9000
             NEXT_PUBLIC_MEDUSA_ADMIN_URL: http://backend:7001
             NEXT_PUBLIC_BASE_URL: http://localhost:8000
             NEXT_PUBLIC_DEFAULT_REGION: us

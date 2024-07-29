@@ -43,16 +43,9 @@ const plugins = [
       upload_dir: 'uploads',
     },
   },
-  // {
-  //   resolve: '@medusajs/admin',
-  //   /** @type {import('@medusajs/admin').PluginOptions} */
-  //   options: {
-  //     autoRebuild: true,
-  //     develop: {
-  //       open: process.env.OPEN_BROWSER !== 'false',
-  //     },
-  //   },
-  // },
+	{
+    resolve: 'medusa-plugin-variant-images',
+  },
   {
     resolve: `medusa-file-s3`,
     options: {
@@ -64,7 +57,6 @@ const plugins = [
       cache_control: process.env.S3_CACHE_CONTROL,
       // optional
       download_file_duration: process.env.S3_DOWNLOAD_FILE_DURATION,
-      // prefix: process.env.S3_PREFIX,
     },
   },
 ];
@@ -97,6 +89,9 @@ const projectConfig = {
 
 const featureFlags = {
   product_categories: true,
+	order_editing: true,
+	sales_channels: true,
+	publishable_api_keys: true,
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */

@@ -46,11 +46,10 @@ export const updateSearchQuery = (
  * @param option 
  * @returns format price number
  */
-const formatNumber = (num: number, option?: Intl.NumberFormatOptions) => {
+export const formatNumber = (num: number, option?: Intl.NumberFormatOptions) => {
   return num?.toLocaleString('vi-VN', option);
 };
 
-export default formatNumber;
 
 export const getErrorMessage = (error: any) => {
   let msg = error?.response?.data?.message
@@ -61,4 +60,23 @@ export const getErrorMessage = (error: any) => {
     msg = "Đã xảy ra lỗi khi thực hiện thao tác. Vui lòng thử lại sau."
   }
   return msg
+}
+
+const units: [string, number][] = [
+  ["B", 1],
+  ["Kb", 1000],
+  ["Mb", 1000000],
+  ["Gb", 1000000000],
+]
+
+export function bytesConverter(size: number): string | undefined {
+  let result: string | undefined = undefined
+
+  for (const [unit, divider] of units) {
+    if (size >= divider) {
+      result = `${(size / divider).toFixed(2)} ${unit}`
+    }
+  }
+
+  return result
 }

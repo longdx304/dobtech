@@ -1,4 +1,4 @@
-describe('Login spec', () => {
+describe('Categories spec', () => {
 	const nameCategory = 'Test Create Product Category';
 	const nameCategoryUpdate = 'Test Update Product Category';
 	const nameSubCategory = 'Test Create Sub Product Category';
@@ -8,7 +8,7 @@ describe('Login spec', () => {
 	beforeEach(() => {
 		cy.login('admin@test.com', '123456');
 		cy.wait(1000);
-		cy.visit('/product-categories');
+		cy.visit('/admin/product-categories');
 		cy.wait(1000);
 	});
 

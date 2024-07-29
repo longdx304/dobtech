@@ -71,6 +71,8 @@ const DrawPriceProduct: FC<Props> = ({
           product={product}
           variant={variant as any}
           region={region}
+					options={options}
+					isDrawer={true}
         />
         <Text className='text-sm text-gray-400'>{`Kho: ${
           inventoryQuantity || 0
@@ -83,7 +85,7 @@ const DrawPriceProduct: FC<Props> = ({
     <Button
       onClick={handleAddToCart}
       disabled={!inStock || !variant || !!disabled || isAdding}
-      className='w-full h-10 rounded-[4px]'
+      className='w-full h-10 rounded-[4px] mb-2'
       isLoading={isAdding}
       data-testid='add-product-button'
     >
@@ -102,6 +104,7 @@ const DrawPriceProduct: FC<Props> = ({
       className='h-auto [&_.ant-drawer-body]:p-4 [&_.ant-drawer-header-title]:flex-row-reverse [&_.ant-drawer-header-title]:items-start [&_.ant-drawer-header]:py-3 [&_.ant-drawer-header]:pl-3'
       footer={footer}
       title={title}
+			height={'auto'}
     >
       <Row>
         <Col span={24}>

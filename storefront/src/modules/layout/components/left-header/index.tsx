@@ -1,8 +1,8 @@
 'use client';
-import React, { useState } from 'react';
 import { Button } from '@/components/Button';
-import { Mail, ChevronLeft, AlignJustify } from 'lucide-react';
+import { AlignJustify, ChevronLeft } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 
 import { Flex } from '@/components/Flex';
 import DrawCategory from '@/modules/common/components/menu/DrawCategory';

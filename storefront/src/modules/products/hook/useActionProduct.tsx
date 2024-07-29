@@ -119,6 +119,7 @@ const useActionProduct = ({ product }: Props) => {
       setQuantity(quantity - 1);
     }
   };
+  
   const handleInputChange = (value: number) => {
     setQuantity(value);
   };

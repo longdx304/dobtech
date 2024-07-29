@@ -12,6 +12,10 @@ const pwaConfig = {
 	skipWaiting: true,
 	cacheOnFrontEndNav: true,
 	reloadOnOnline: true,
+	fallbacks: {
+		// image: "/images/fallback.jpg",
+		document: "/offline",
+	},
 };
 
 const nextConfig = withStoreConfig({
@@ -20,6 +24,7 @@ const nextConfig = withStoreConfig({
 			search: false,
 		},
 	},
+	staticPageGenerationTimeout: 1000,
 	reactStrictMode: true,
 	images: {
 		remotePatterns: [

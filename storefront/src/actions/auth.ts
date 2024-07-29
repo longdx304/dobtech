@@ -1,3 +1,7 @@
+"use server"
+import { medusaClient } from '@/lib/database/config';
+import medusaError from '@/lib/utils/medusa-error';
+import { StorePostAuthReq } from '@medusajs/medusa';
 import { cookies } from 'next/headers';
 
 /**
@@ -13,7 +17,7 @@ export const getMedusaHeaders = (tags: string[] = []) => {
     },
   } as Record<string, any>;
 
-  const token = cookies().get('_medusa_jwt')?.value;
+  const token = cookies().get('_chamdep_jwt')?.value;
 
   if (token) {
     headers.authorization = `Bearer ${token}`;
@@ -23,3 +27,35 @@ export const getMedusaHeaders = (tags: string[] = []) => {
 
   return headers;
 };
+
+// Authentication actions
+export async function getToken(credentials: StorePostAuthReq) {
+  return medusaClient.auth
+    .getToken(credentials, {
+      next: {
+        tags: ["auth"],
+      },
+    })
+    .then(({ access_token }) => {
+      access_token &&
+        cookies().set("_chamdep_jwt", access_token, {
+          maxAge: 60 * 60 * 24 * 7,
+          httpOnly: true,
+          sameSite: "strict",
+          secure: process.env.NODE_ENV === "production",
+        })
+      return access_token
+    })
+    .catch((err) => {
+      throw new Error("Lỗi: Email hoặc mật khẩu không đúng")
+    })
+}
+
+export async function authenticate(credentials: StorePostAuthReq) {
+  const headers = await getMedusaHeaders(["auth"])
+
+  return medusaClient.auth
+    .authenticate(credentials, headers)
+    .then(({ customer }) => customer)
+    .catch((err) => medusaError(err))
+}

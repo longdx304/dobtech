@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ERoutes, routesConfig } from '@/types/routes';
 import { ERole } from './types/account';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 // const BACKEND_URL = 'http://13.213.42.237:9000';
 
 async function getUser(accessToken: string | undefined) {
@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
 		const isPublicRoute = publicRoutes.includes(pathname);
 
 		// Decrypt the session from the cookie
-		const accessToken = request.cookies.get('_medusa_jwt')?.value;
+		const accessToken = request.cookies.get('_admin_chamdep_jwt')?.value;
 		// Get current user information
 		const data = await getUser(accessToken);
 

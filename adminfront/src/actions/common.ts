@@ -14,7 +14,7 @@ export const getMedusaHeaders = (tags: string[] = []) => {
 		},
 	} as Record<string, any>;
 
-	const token = cookies().get('_medusa_jwt')?.value;
+	const token = cookies().get('_admin_chamdep_jwt')?.value;
 
 	if (token) {
 		headers.authorization = `Bearer ${token}`;

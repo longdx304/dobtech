@@ -1,3 +1,4 @@
+"use server"
 import { medusaClient } from '@/lib/database/config';
 import { StoreGetProductsParams } from '@medusajs/medusa';
 import { cache } from 'react';
@@ -66,7 +67,7 @@ export const getProductsList = cache(async function ({
 export const getProductByHandle = cache(async function (
   handle: string
 ): Promise<{ product: PricedProduct }> {
-  const headers = getMedusaHeaders(['products']);
+  const headers = await getMedusaHeaders(['products']);
 
   const product = await medusaClient.products
     .list({ handle }, headers)
@@ -85,7 +86,7 @@ export const getProductsById = cache(async function ({
   ids: string[];
   regionId: string;
 }) {
-  const headers = getMedusaHeaders(['products']);
+  const headers = await getMedusaHeaders(['products']);
 
   return medusaClient.products
     .list({ id: ids, region_id: regionId }, headers)
@@ -103,7 +104,7 @@ export const retrievePricedProductById = cache(async function ({
   id: string;
   regionId: string;
 }) {
-  const headers = getMedusaHeaders(['products']);
+  const headers = await getMedusaHeaders(['products']);
 
   return medusaClient.products
     .retrieve(`${id}?region_id=${regionId}`, headers)

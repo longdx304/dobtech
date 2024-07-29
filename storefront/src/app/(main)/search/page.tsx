@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 export default async function SearchPage({}) {
   return (
     <div className='w-full box-border'>
+      {/* Mobile */}
       <SearchModal />
     </div>
   );

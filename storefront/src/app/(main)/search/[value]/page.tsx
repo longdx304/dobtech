@@ -1,8 +1,10 @@
 import { Metadata } from 'next';
 
 import { getProductsList } from '@/actions/products';
+import { getRegion } from '@/actions/region';
 import ProductList from '@/modules/products/components/product-list';
 import RefinementList from '@/modules/store/components/refinement-list';
+import { SortOptions } from '@/modules/store/components/refinement-list/sort-products';
 
 export const metadata: Metadata = {
   title: 'CHAMDEP VN | Tìm kiếm',
@@ -11,29 +13,38 @@ export const metadata: Metadata = {
 
 type Params = {
   params: { value: string };
-  searchParams: Record<string, unknown>;
+  searchParams: { page?: string };
 };
 
+const PAGE_SIZE = 20;
 export default async function SearchPage({ params, searchParams }: Params) {
   const searchValue = decodeURIComponent(params?.value || '');
+  const page = searchParams.page ? parseInt(searchParams.page) : 1;
+  const region = await getRegion('vn');
 
   const queryParams = {
     q: searchValue,
-    limit: 6,
-    offset: 0,
+    limit: PAGE_SIZE,
+    offset: (page - 1) * PAGE_SIZE,
   };
+
   const { response } = await getProductsList({
-    pageParam: 0,
+    pageParam: page,
     queryParams,
-  } as any);
+  });
 
   return (
     <div className='w-full box-border container pt-[4rem] lg:pt-[6rem]'>
       <RefinementList
-        sortBy={searchValue as any}
+        sortBy={searchValue as SortOptions}
         data-testid='sort-by-container'
       />
-      <ProductList data={response} searchValue={searchValue} />
+      <ProductList
+        // data={response}
+        // region={region!}
+        // searchValue={searchValue}
+        page={page}
+      />
     </div>
   );
 }
