@@ -1,18 +1,24 @@
-import { ClaimItem, LineItem, Order, Return } from '@medusajs/medusa';
 import {
-	ItemsToSendFormType,
-	ReceiveReturnFormType,
-	CreateClaimFormType,
-	ShippingFormType,
 	AddressPayload,
 	ClaimTypeFormType,
-	SendNotificationFormType,
+	CreateClaimFormType,
 	ItemsToReceiveFormType,
 	ItemsToReturnFormType,
+	ItemsToSendFormType,
+	ReceiveReturnFormType,
+	SendNotificationFormType,
+	ShippingFormType,
 } from '@/types/order';
 import { Subset } from '@/types/shared';
 import { isoAlpha2Countries } from '@/utils/countries';
+import { ClaimItem, LineItem, Order, Return } from '@medusajs/medusa';
 
+/**
+ * Returns the default shipping address values for an order.
+ *
+ * @param {Order} order - The order object.
+ * @return {Subset<AddressPayload>} - The default shipping address values.
+ */
 const getDefaultShippingAddressValues = (
 	order: Order
 ): Subset<AddressPayload> => {
@@ -35,13 +41,20 @@ const getDefaultShippingAddressValues = (
 		(k) => k
 	) as (keyof AddressPayload)[];
 
-	return keys.reduce((acc: any, key: any) => {
+	/**
+	 * Returns the default shipping address values for an order.
+	 * If the country code exists in the shipping address, it also includes the country display name.
+	 *
+	 * @param {Order} order - The order object.
+	 * @return {Subset<AddressPayload>} - The default shipping address values.
+	 */
+	return keys.reduce<Partial<AddressPayload>>((acc, key) => {
 		if (key === 'country_code') {
 			const countryDisplayName = order.shipping_address.country_code
 				? isoAlpha2Countries[order.shipping_address.country_code.toUpperCase()]
 				: '';
 			acc[key] = {
-				value: order.shipping_address[key],
+				value: order?.shipping_address?.[key] ?? '',
 				label: countryDisplayName,
 			};
 		} else {
@@ -51,6 +64,15 @@ const getDefaultShippingAddressValues = (
 	}, {});
 };
 
+/**
+ * Returns all returnable items from an order or a claim.
+ * If the order has claims with return orders that are not canceled,
+ * the claimed items are subtracted from the order items.
+ *
+ * @param {Omit<Order, 'beforeInserts'>} order - The order or claim.
+ * @param {boolean} isClaim - Whether the order is a claim.
+ * @return {Omit<LineItem, 'beforeInsert'>[]} - The returnable items.
+ */
 export const getAllReturnableItems = (
 	order: Omit<Order, 'beforeInserts'>,
 	isClaim: boolean
@@ -84,7 +106,10 @@ export const getAllReturnableItems = (
 							it.shipped_quantity ||
 							it.shipped_quantity === it.fulfilled_quantity
 					)
-					.reduce((map: any, obj: any) => map.set(obj.id, { ...obj }), orderItems);
+					.reduce(
+						(map: any, obj: any) => map.set(obj.id, { ...obj }),
+						orderItems
+					);
 			}
 		}
 	}
@@ -140,6 +165,12 @@ const getDefaultShippingValues = (): Subset<ShippingFormType> => {
 	};
 };
 
+/**
+ * Returns an object containing items that can be returned for a given order.
+ *
+ * @param {Order} order - The order object from which to extract returnable items.
+ * @return {ItemsToReturnFormType} An object containing an array of items that can be returned.
+ */
 const getReturnableItemsValues = (order: Order) => {
 	const returnItems: ItemsToReturnFormType = {
 		items: [],
@@ -173,6 +204,13 @@ const getReturnableItemsValues = (order: Order) => {
 	return returnItems;
 };
 
+/**
+ * Returns an object containing items that can be received for a given order and return request.
+ *
+ * @param {Order} order - The order object from which to extract returnable items.
+ * @param {Return} returnRequest - The return request object containing items to be received.
+ * @return {Subset<ItemsToReceiveFormType>} An object containing an array of items that can be received.
+ */
 const getReceiveableItemsValues = (
 	order: Order,
 	returnRequest: Return
@@ -217,28 +255,6 @@ const getReceiveableItemsValues = (
 	return returnItems;
 };
 
-// export const getDefaultSwapValues = (
-//   order: Order
-// ): Subset<CreateSwapFormType> => {
-//   return {
-//     return_items: getReturnableItemsValues(order, false),
-//     additional_items: getDefaultAdditionalItemsValues(),
-//     notification: getDefaultSendNotificationValues(),
-//     return_shipping: getDefaultShippingValues(),
-//   }
-// }
-
-// export const getDefaultRequestReturnValues = (
-//   order: Order
-// ): Subset<RequestReturnFormType> => {
-//   return {
-//     return_items: getReturnableItemsValues(order, false),
-//     notification: getDefaultSendNotificationValues(),
-//     receive: getDefaultReceiveVaues(),
-//     return_shipping: getDefaultShippingValues(),
-//   }
-// }
-
 export const getDefaultReceiveReturnValues = (
 	order: Order,
 	returnRequest: Return
@@ -248,6 +264,12 @@ export const getDefaultReceiveReturnValues = (
 	};
 };
 
+/**
+ * Returns the default values for a claim form based on the provided order.
+ *
+ * @param {Order} order - The order object.
+ * @return {Subset<CreateClaimFormType>} - The default values for the claim form.
+ */
 export const getDefaultClaimValues = (
 	order: Order
 ): Subset<CreateClaimFormType> => {
