@@ -43,7 +43,7 @@ const plugins = [
       upload_dir: 'uploads',
     },
   },
-	{
+  {
     resolve: 'medusa-plugin-variant-images',
   },
   {
@@ -62,18 +62,19 @@ const plugins = [
 ];
 
 const modules = {
-  /*eventBus: {
-    resolve: "@medusajs/event-bus-redis",
+  eventBus: {
+    resolve: '@medusajs/event-bus-redis',
     options: {
-      redisUrl: REDIS_URL
-    }
+      redisUrl: REDIS_URL,
+    },
   },
   cacheService: {
-    resolve: "@medusajs/cache-redis",
+    resolve: '@medusajs/cache-redis',
     options: {
-      redisUrl: REDIS_URL
-    }
-  },*/
+      redisUrl: REDIS_URL,
+      ttl: 0,
+    },
+  },
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule["projectConfig"]} */
@@ -83,15 +84,14 @@ const projectConfig = {
   store_cors: STORE_CORS,
   database_url: DATABASE_URL,
   admin_cors: ADMIN_CORS,
-  // Uncomment the following lines to enable REDIS
   redis_url: REDIS_URL,
 };
 
 const featureFlags = {
   product_categories: true,
-	order_editing: true,
-	sales_channels: true,
-	publishable_api_keys: true,
+  order_editing: true,
+  sales_channels: true,
+  publishable_api_keys: true,
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */

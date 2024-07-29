@@ -1,11 +1,6 @@
-import { LineItem, Order } from '@medusajs/medusa';
-import clsx from 'clsx';
-import React, { Fragment, useState, useEffect } from 'react';
-import { formatAmountWithSymbol } from '@/utils/prices';
-import { Button } from '@/components/Button';
 import { Table } from '@/components/Table';
+import React from 'react';
 import productsColumns from './products-column';
-import { EditableRow, EditableCell } from './products-component';
 
 type RMAReturnProductsTableProps = {
 	isAdditionalItems?: boolean;

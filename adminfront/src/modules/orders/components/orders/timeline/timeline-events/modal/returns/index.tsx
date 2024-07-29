@@ -9,9 +9,9 @@ import { message } from 'antd';
 import { LoaderCircle, SquareArrowOutUpRight } from 'lucide-react';
 
 import { Select } from '@/components/Select';
+import { getErrorMessage } from '@/lib/utils';
 import { Option } from '@/types/shared';
 import { displayAmount } from '@/utils/prices';
-import { getErrorMessage } from '@/lib/utils';
 import {
 	useAdminRequestReturn,
 	useAdminShippingOptions,

@@ -35,7 +35,7 @@ const getDefaultShippingAddressValues = (
 		(k) => k
 	) as (keyof AddressPayload)[];
 
-	return keys.reduce((acc, key) => {
+	return keys.reduce((acc: any, key: any) => {
 		if (key === 'country_code') {
 			const countryDisplayName = order.shipping_address.country_code
 				? isoAlpha2Countries[order.shipping_address.country_code.toUpperCase()]
@@ -80,11 +80,11 @@ export const getAllReturnableItems = (
 			if (claim.additional_items && claim.additional_items.length) {
 				orderItems = claim.additional_items
 					.filter(
-						(it) =>
+						(it: any) =>
 							it.shipped_quantity ||
 							it.shipped_quantity === it.fulfilled_quantity
 					)
-					.reduce((map, obj) => map.set(obj.id, { ...obj }), orderItems);
+					.reduce((map: any, obj: any) => map.set(obj.id, { ...obj }), orderItems);
 			}
 		}
 	}
@@ -93,7 +93,7 @@ export const getAllReturnableItems = (
 		if (order.swaps && order.swaps.length) {
 			for (const swap of order.swaps) {
 				orderItems = swap.additional_items.reduce(
-					(map, obj) =>
+					(map: any, obj: any) =>
 						map.set(obj.id, {
 							...obj,
 						}),

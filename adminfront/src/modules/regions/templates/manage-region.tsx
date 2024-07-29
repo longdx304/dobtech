@@ -63,7 +63,6 @@ const RegionList: FC<Props> = ({}) => {
 	};
 
 	const handleEditRegion = (record: Region) => {
-		console.log('record edit', record);
 		setCurrentRegion(record);
 		onOpenActionRegion();
 	};
@@ -113,7 +112,6 @@ const RegionList: FC<Props> = ({}) => {
 			</Flex>
 			<Flex align="center" justify="flex-end" className="pb-4">
 				<Input
-					// size="small"
 					placeholder="Tìm kiếm khu vực..."
 					name="search"
 					prefix={<Search size={16} />}
