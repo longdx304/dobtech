@@ -1,5 +1,7 @@
-import { LineItem } from '@medusajs/medusa';
+// @ts-nocheck
+import { ProductVariant } from '@medusajs/medusa';
 import Image from 'next/image';
+import React from 'react';
 
 import { Flex } from '@/components/Flex';
 import Tooltip from '@/components/Tooltip/Tooltip';
@@ -12,12 +14,12 @@ interface Props {
 const productsColumns = ({ currencyCode }: Props) => [
 	{
 		title: 'Chi tiết sản phẩm',
-		key: 'title',
-		dataIndex: 'title',
-		// width: 150,
+		key: 'product_title',
+		dataIndex: 'product_title',
+		width: 200,
 		className: 'text-xs',
 		fixed: 'left',
-		render: (_: LineItem['title'], record: any) => (
+		render: (_: any, record: any) => (
 			<div>
 				<Flex className="flex items-center gap-3">
 					<Image
@@ -28,10 +30,12 @@ const productsColumns = ({ currencyCode }: Props) => [
 						className="rounded-md cursor-pointer"
 					/>
 					<Flex vertical className="">
-						<Tooltip title={_}>
-							<Text className="text-xs line-clamp-2">{_}</Text>
+						<Tooltip title={record.product_title}>
+							<Text className="text-xs line-clamp-2">
+								{record.product_title}
+							</Text>
 						</Tooltip>
-						<span className="text-gray-500">{record.description}</span>
+						<span className="text-gray-500">{`(${record.variant_title})`}</span>
 					</Flex>
 				</Flex>
 				{(record?.reason || record?.note) && (
@@ -47,23 +51,26 @@ const productsColumns = ({ currencyCode }: Props) => [
 	},
 	{
 		title: 'Số lượng',
-		key: 'return_quantity',
-		dataIndex: 'return_quantity',
+		key: 'quantity',
+		dataIndex: 'quantity',
 		className: 'text-xs',
 		editable: true,
-		render: (_: number, record: Omit<LineItem, 'beforeInsert'>) => {
+		render: (_: number, record: any) => {
 			return _;
 		},
 	},
 	{
-		title: 'Số tiền hoàn trả',
+		title: 'Có thể hoàn tiền',
 		key: 'refundable',
 		dataIndex: 'refundable',
 		className: 'text-xs',
-		render: (
-			_: LineItem['refundable'],
-			record: Omit<LineItem, 'beforeInsert'>
-		) => {
+		// width: 250,
+		render: (_: number, record: any) => {
+			if (!_) {
+				return '-';
+			}
+
+			const showOriginal = _ !== 'default';
 			return (
 				<div className="flex items-center">
 					<span className="pr-1">

@@ -5,6 +5,7 @@ import { BellOff, ChevronDown, ChevronUp } from 'lucide-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/vi';
+import { Button } from '@/components/Button';
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
@@ -67,9 +68,9 @@ const EventContainer: React.FC<EventContainerProps> = ({
 					)}
 					{topNode}
 					{expandable && (
-						<button onClick={toggleExpand}>
+						<Button type="text" onClick={toggleExpand}>
 							{isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-						</button>
+						</Button>
 					)}
 				</div>
 			</div>

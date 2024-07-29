@@ -20,7 +20,7 @@ interface EditableCellProps {
 	title: ReactNode;
 	editable: boolean;
 	children: ReactNode;
-	dataIndex: keyof Omit<LineItem, 'beforeInsert'>;
+	dataIndex: any;
 	record: any;
 	handleQuantity: (
 		change: number,
@@ -35,8 +35,8 @@ export const EditableCell = ({
 	children,
 	dataIndex,
 	record,
-	handleReason = () => {},
 	handleQuantity,
+	handleReason = () => {},
 	...restProps
 }: EditableCellProps) => {
 	const [showReturnReason, setShowReturnReason] = useState<boolean>(false);
@@ -52,7 +52,7 @@ export const EditableCell = ({
 					>
 						<Minus size={16} />
 					</span>
-					<span>{(record[dataIndex] as any) || ''}</span>
+					<span>{record[dataIndex] || ''}</span>
 					<span
 						onClick={() => handleQuantity(1, record)}
 						className={clsx(
@@ -77,6 +77,7 @@ export const EditableCell = ({
 							handleReason(reason, record.id)
 						}
 						initValue={{ reason: record?.reason, note: record?.note }}
+						isClaim={true}
 					/>
 				)}
 			</div>

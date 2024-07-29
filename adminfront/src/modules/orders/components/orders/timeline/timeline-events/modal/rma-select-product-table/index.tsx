@@ -1,8 +1,5 @@
 import { LineItem, Order } from '@medusajs/medusa';
-import clsx from 'clsx';
-import React, { Fragment, useState, useEffect } from 'react';
-import { formatAmountWithSymbol } from '@/utils/prices';
-import { Button } from '@/components/Button';
+import React, { useState, useEffect } from 'react';
 import { Table } from '@/components/Table';
 import productsColumns from './products-column';
 import { EditableRow, EditableCell } from './products-component';
@@ -34,18 +31,20 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 
 	useEffect(() => {
 		setDataSource(
-			allItems.map((item) => {
-				if (
-					item.returned_quantity === item.quantity ||
-					isLineItemCanceled(item, order)
-				) {
-					return;
-				}
-				return {
-					...item,
-					return_quantity: item.quantity - item.returned_quantity,
-				};
-			}).filter((item) => item)
+			allItems
+				.map((item) => {
+					if (
+						item.returned_quantity === item.quantity ||
+						isLineItemCanceled(item, order)
+					) {
+						return;
+					}
+					return {
+						...item,
+						return_quantity: item.quantity - (item.returned_quantity || 0),
+					};
+				})
+				.filter((item) => item) as any
 		);
 	}, [allItems, order]);
 
@@ -59,7 +58,7 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 				images: null,
 				reason: null,
 				note: '',
-				quantity: record.quantity - record.returned_quantity,
+				quantity: record.quantity - (record.returned_quantity || 0),
 			};
 		} else {
 			delete newReturns[record.id];
@@ -69,7 +68,9 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 			);
 			newVariants.splice(indexVariant, 1, {
 				...record,
-				return_quantity: record.quantity - record.returned_quantity,
+				reason: null,
+				note: '',
+				return_quantity: record.quantity - (record.returned_quantity || 0),
 			});
 			setDataSource(newVariants as any);
 		}
@@ -81,12 +82,10 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 		setSelectedVariants(selectedRowKeys as string[]);
 	};
 
-	const handleQuantity = (
-		change: number,
-		item: Omit<LineItem, 'beforeInsert'>
-	) => {
+	const handleQuantity = (change: number, item: any) => {
 		if (
-			(item.quantity - item.returned_quantity === toReturn[item.id]?.quantity &&
+			(item.quantity - (item.returned_quantity || 0) ===
+				toReturn[item.id]?.quantity &&
 				change > 0) ||
 			(toReturn[item.id]?.quantity === 1 && change < 0)
 		) {
@@ -113,6 +112,29 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 		setToReturn(newReturns);
 	};
 
+	const handleReason = (reason: any, itemId: string) => {
+		const newReturns = {
+			...toReturn,
+			[itemId]: {
+				...toReturn[itemId],
+				reason: reason?.reason?.value || null,
+				note: reason?.note || '',
+			},
+		};
+		const newVariants = [...(dataSource as any)];
+		const indexVariant = newVariants.findIndex(
+			(variant) => itemId === variant.id
+		);
+		newVariants.splice(indexVariant, 1, {
+			...newVariants[indexVariant],
+			reason: reason?.reason || null,
+			note: reason?.note || '',
+		});
+
+		setDataSource(newVariants as any);
+		setToReturn(newReturns);
+	};
+
 	const components = {
 		body: {
 			row: EditableRow,
@@ -133,7 +155,7 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 					dataIndex: col.dataIndex,
 					title: col.title,
 					handleQuantity,
-					// handleSave: handleSave,
+					handleReason,
 				}),
 			};
 		}

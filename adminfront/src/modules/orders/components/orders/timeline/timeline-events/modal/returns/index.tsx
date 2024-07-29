@@ -1,5 +1,3 @@
-// @ts-nocheck
-// !check this file
 import {
 	AdminGetVariantsVariantInventoryRes,
 	AdminPostOrdersOrderReturnsReq,
@@ -10,10 +8,10 @@ import {
 import { message } from 'antd';
 import { LoaderCircle, SquareArrowOutUpRight } from 'lucide-react';
 
-import { Select } from "@/components/Select";
-import { Option } from "@/types/shared"
-import { displayAmount } from "@/utils/prices";
-import { getErrorMessage } from "@/lib/utils";
+import { Select } from '@/components/Select';
+import { Option } from '@/types/shared';
+import { displayAmount } from '@/utils/prices';
+import { getErrorMessage } from '@/lib/utils';
 import {
 	useAdminRequestReturn,
 	useAdminShippingOptions,
@@ -147,20 +145,23 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			is_return: true,
 		});
 
-  const handleShippingSelected = (selectedItem: string, selectOption: Option) => {
-    setShippingMethod(selectOption)
-    // const method = shippingOptions?.find((o) => selectedItem.value === o.id)
+	const handleShippingSelected = (
+		selectedItem: string,
+		selectOption: Option
+	) => {
+		setShippingMethod(selectOption);
+		// const method = shippingOptions?.find((o) => selectedItem.value === o.id)
 
-    // if (method) {
-    //   setShippingPrice(method.price_incl_tax)
-    // }
-  }
+		// if (method) {
+		//   setShippingPrice(method.price_incl_tax)
+		// }
+	};
 	useEffect(() => {
 		const items = Object.keys(toReturn)
 			.map((t) => allItems.find((i) => i.id === t))
 			.filter((i) => typeof i !== 'undefined') as LineItem[];
 
-		const itemTotal = items.reduce((acc: number, curr: LineItem): number => {
+		const itemTotal = items.reduce((acc: number, curr: any): number => {
 			const unitRefundable =
 				(curr.refundable || 0) / (curr.quantity - curr.returned_quantity);
 
@@ -176,9 +177,9 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 	}, [toReturn, shippingPrice]);
 
 	const onSubmit = async () => {
-		const items = Object.entries(toReturn).map(([key, value]) => {
+		const items = Object.entries(toReturn).map(([key, value]: any) => {
 			const toSet = {
-				reason_id: value.reason?.value.id,
+				reason_id: value?.reason || null,
 				...value,
 			};
 			delete toSet.reason;
@@ -200,13 +201,13 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 		}
 
 		if (shippingMethod) {
-			const taxRate = shippingMethod.tax_rates.reduce((acc, curr) => {
-				return acc + curr.rate / 100;
-			}, 0);
+			// const taxRate = shippingMethod.tax_rates.reduce((acc, curr) => {
+			// 	return acc + curr.rate / 100;
+			// }, 0);
 
 			data.return_shipping = {
 				option_id: shippingMethod.value,
-				price: shippingPrice ? Math.round(shippingPrice / (1 + taxRate)) : 0,
+				price: shippingPrice ? Math.round(shippingPrice / 1) : 0,
 			};
 		}
 
@@ -234,7 +235,8 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			);
 
 			if (method) {
-				setShippingPrice(method.price_incl_tax);
+				setShippingPrice(0);
+				// setShippingPrice(method.price_incl_tax);
 			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -271,10 +273,10 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			</div>
 			<div className="mt-4 flex flex-col">
 				<Text strong className="font-medium">
-					{"Vận chuyển"}
+					{'Vận chuyển'}
 				</Text>
 				<Text className="mb-2">
-					{"Chọn phương thức vận chuyển bạn muốn sử dụng cho trả lại này."}
+					{'Chọn phương thức vận chuyển bạn muốn sử dụng cho trả lại này.'}
 				</Text>
 				{shippingLoading ? (
 					<div className="flex justify-center">
@@ -285,7 +287,7 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 						className="mt-2"
 						placeholder="Chọn phương thức vận chuyển"
 						value={shippingMethod?.value}
-						onChange={handleShippingSelected}
+						onChange={handleShippingSelected as any}
 						options={
 							shippingOptions?.map((o) => ({
 								label: o.name,
@@ -299,9 +301,9 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 				<div className="mt-10">
 					{!useCustomShippingPrice && shippingMethod && (
 						<div className="font-normal mb-4 flex justify-between">
-							<span>{"Vận chuyển"}</span>
+							<span>{'Vận chuyển'}</span>
 							<div>
-								{displayAmount(order.currency_code, shippingPrice || 0)}{" "}
+								{displayAmount(order.currency_code, shippingPrice || 0)}{' '}
 								<span className="text-gray-400 ml-3">
 									{order.currency_code.toUpperCase()}
 								</span>
@@ -309,7 +311,7 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 						</div>
 					)}
 					<div className="font-medium flex w-full justify-between items-center">
-						<span>{"Tổng tiền hoàn trả"}</span>
+						<span>{'Tổng tiền hoàn trả'}</span>
 						<div className="flex items-center">
 							{!refundEdited && (
 								<div className="flex items-center">
@@ -343,8 +345,8 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 					)} */}
 				</div>
 			)}
-    </Modal>
-  )
-}
+		</Modal>
+	);
+};
 
 export default ReturnMenu;

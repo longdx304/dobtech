@@ -1,9 +1,6 @@
-import { LineItem } from '@medusajs/medusa';
 import Image from 'next/image';
 import { Trash2 } from 'lucide-react';
-import {
-  ProductVariant
-} from '@medusajs/medusa';
+import { ProductVariant } from '@medusajs/medusa';
 
 import { Flex } from '@/components/Flex';
 import { Button } from '@/components/Button';
@@ -15,30 +12,39 @@ import { Plus, Minus } from 'lucide-react';
 
 interface Props {
 	order: any;
-	handleRemoveItem: (itemId: string) => void;
 	handleToAddQuantity: (value: number, itemId: string) => void;
+	handleRemoveItem: (itemId: string) => void;
 }
 
-type SelectProduct = Omit<ProductVariant & { quantity: number }, "beforeInsert">
+type SelectProduct = Omit<
+	ProductVariant & { quantity: number },
+	'beforeInsert'
+>;
 
-const extractPrice = (prices, order) => {
-  let price = prices.find((ma) => ma?.region_id === order?.region_id)
+const extractPrice = (prices: any, order: any) => {
+	let price = prices.find((ma: any) => ma?.region_id === order?.region_id);
 
-  if (!price) {
-    price = prices.find((ma) => ma?.currency_code === order?.currency_code)
-  }
+	if (!price) {
+		price = prices.find(
+			(ma: any) => ma?.currency_code === order?.currency_code
+		);
+	}
 
-  if (price) {
-    return formatAmountWithSymbol({
-      currency: order.currency_code,
-      amount: price.amount * (1 + order.tax_rate / 100),
-    })
-  }
+	if (price) {
+		return formatAmountWithSymbol({
+			currency: order.currency_code,
+			amount: price.amount * (1 + order.tax_rate / 100),
+		});
+	}
 
-  return 0;
-}
+	return 0;
+};
 
-const productsColumns = ({ order, handleRemoveItem, handleToAddQuantity }: Props) => [
+const productsColumns = ({
+	order,
+	handleRemoveItem,
+	handleToAddQuantity,
+}: Props) => [
 	{
 		title: 'Chi tiết sản phẩm',
 		key: 'product',
@@ -83,7 +89,9 @@ const productsColumns = ({ order, handleRemoveItem, handleToAddQuantity }: Props
 					<span>{_ || 0}</span>
 					<span
 						onClick={() => handleToAddQuantity(1, record.id)}
-						className={clsx("hover:bg-gray-200 ml-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md")}
+						className={clsx(
+							'hover:bg-gray-200 ml-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md'
+						)}
 					>
 						<Plus size={16} />
 					</span>
@@ -96,9 +104,7 @@ const productsColumns = ({ order, handleRemoveItem, handleToAddQuantity }: Props
 		key: 'prices',
 		dataIndex: 'prices',
 		className: 'text-xs',
-		render: (
-			_: SelectProduct['prices']
-		) => {
+		render: (_: SelectProduct['prices']) => {
 			return extractPrice(_, order);
 		},
 	},
@@ -110,7 +116,7 @@ const productsColumns = ({ order, handleRemoveItem, handleToAddQuantity }: Props
 			return (
 				<Flex>
 					<Button
-						onClick={() => handleRemoveItem(_)}
+						onClick={() => handleRemoveItem(_ as string)}
 						type="text"
 						shape="circle"
 						icon={<Trash2 size={20} color="#d3d3d3" />}

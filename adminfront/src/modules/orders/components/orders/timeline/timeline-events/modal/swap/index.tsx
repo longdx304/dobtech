@@ -1,11 +1,8 @@
-// @ts-nocheck
-// !check this file
 import {
 	AdminPostOrdersOrderSwapsReq,
 	Order,
 	ProductVariant,
 	ReturnReason,
-	StockLocationDTO,
 } from '@medusajs/medusa';
 import { message } from 'antd';
 import { LoaderCircle, SquareArrowOutUpRight } from 'lucide-react';
@@ -130,7 +127,8 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 
 				return (
 					acc +
-					((next.refundable || 0) / (next.quantity - next.returned_quantity)) *
+					((next.refundable || 0) /
+						(next.quantity - (next.returned_quantity as any))) *
 						toReturn[next.id].quantity
 				);
 			}, 0) - (shippingPrice || 0)
@@ -203,7 +201,7 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 	useEffect(() => {
 		if (!useCustomShippingPrice && shippingMethod && shippingOptions) {
 			const method = shippingOptions.find((o) => shippingMethod.value === o.id);
-			setShippingPrice(method?.amount);
+			setShippingPrice(method?.amount as any);
 		}
 	}, [useCustomShippingPrice, shippingMethod]);
 
@@ -230,15 +228,14 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			message.error('Phương thức vận chuyển chưa được lựa chọn.');
 			return;
 		}
-		const items = Object.entries(toReturn).map(([key, value]) => {
+		const items = Object.entries(toReturn).map(([key, value]: any) => {
 			return {
 				item_id: key,
 				note: value.note ?? undefined,
 				quantity: value.quantity,
-				reason_id: value.reason?.value.id ?? undefined,
+				reason_id: value.reason ?? undefined,
 			};
 		});
-
 		const data: AdminPostOrdersOrderSwapsReq = {
 			return_items: items,
 			additional_items: itemsToAdd.map((i) => ({
@@ -247,20 +244,15 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			})),
 			no_notification: false,
 		};
-
 		// if (isLocationFulfillmentEnabled && selectedLocation) {
 		//   data.return_location_id = selectedLocation.value
 		// }
-
 		if (shippingMethod) {
 			data.return_shipping = {
 				option_id: shippingMethod.value,
 				price: Math.round(shippingPrice || 0),
 			};
 		}
-
-		console.log('payload create swap', data)
-
 		return mutateAsync(data, {
 			onSuccess: () => {
 				refetch();
@@ -286,7 +278,7 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 				{'Đăng ký trao đổi'}
 			</Title>
 			<div className="flex flex-col gap-2">
-				<Text strong className="font-medium mb-2">
+				<Text strong className="font-medium">
 					{'Các sản phẩm trả lại'}
 				</Text>
 				<RMASelectProductTable
@@ -312,7 +304,7 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 						className="mt-2"
 						placeholder="Chọn phương thức vận chuyển"
 						value={shippingMethod?.value}
-						onChange={handleShippingSelected}
+						onChange={handleShippingSelected as any}
 						options={
 							shippingOptions?.map((o) => ({
 								label: o.name,
@@ -334,14 +326,14 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 						title="Thêm biến thể sản phẩm"
 						state={stateAddProduct}
 						onClose={closeAddProduct}
-						onSubmit={onAddVariants}
-						customerId={order.customerId}
-						regionId={order.regionId}
+						onSubmit={onAddVariants as any}
+						customerId={order.customer_id}
+						regionId={order.region_id}
 						currencyCode={order.currency_code}
 					/>
 				)}
 			</div>
-			<>
+			{itemsToAdd?.length ? (
 				<RMAReturnProductsTable
 					isAdditionalItems
 					order={order}
@@ -349,9 +341,9 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 					handleRemoveItem={handleRemoveItem}
 					handleToAddQuantity={handleToAddQuantity}
 				/>
-			</>
+			) : null}
 			<div className="text-xs text-gray-900 font-normal mt-8 flex items-center justify-between">
-				<span>{"Tổng trả hàng"}</span>
+				<span>{'Tổng trả hàng'}</span>
 				<span>
 					{formatAmountWithSymbol({
 						currency: order.currency_code,
@@ -360,7 +352,7 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 				</span>
 			</div>
 			<div className="text-xs text-gray-900 font-normal mt-2 flex items-center justify-between">
-				<span>{"Tổng thêm"}</span>
+				<span>{'Tổng thêm'}</span>
 				<span>
 					{formatAmountWithSymbol({
 						currency: order.currency_code,
@@ -371,7 +363,7 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 				</span>
 			</div>
 			<div className="font-semibold mt-4 flex items-center justify-between">
-				<span>{"Ước tính khác biệt"}</span>
+				<span>{'Ước tính khác biệt'}</span>
 				<span className="font-semibold">
 					{formatAmountWithSymbol({
 						currency: order.currency_code,

@@ -1,19 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-	AdminGetVariantsVariantInventoryRes,
 	AdminPostReturnsReturnReceiveReq,
-	InventoryLevelDTO,
-	LineItem,
 	Order,
 	Return,
-	StockLocationDTO,
 } from '@medusajs/medusa';
-import {
-	useAdminOrder,
-	useAdminReceiveReturn,
-	useMedusa,
-	useAdminStockLocations,
-} from 'medusa-react';
+import { useAdminOrder, useAdminReceiveReturn, useMedusa } from 'medusa-react';
 import { message, Divider } from 'antd';
 import Image from 'next/image';
 import { SquareArrowOutUpRight } from 'lucide-react';
@@ -27,7 +18,7 @@ import { Text, Title } from '@/components/Typography';
 import useOrdersExpandParam from '@/modules/orders/components/orders/utils/use-admin-expand-parameter';
 import { Table } from '@/components/Table';
 import productsColumns from './products-column';
-import { getDefaultReceiveReturnValues } from './get-default-values';
+import { getDefaultReceiveReturnValues } from '@/modules/orders/components/orders/utils/get-default-values';
 import { EditableRow, EditableCell } from './products-component';
 import { ReceiveReturnItem } from '@/types/order';
 
@@ -96,19 +87,32 @@ export const ReceiveReturnModal = ({
 		return isRefundedClaim || Boolean(returnRequest.swap_id);
 	}, [isRefundedClaim, returnRequest.swap_id]);
 
-	// useEffect(() => {
-	//   reset(getDefaultReceiveReturnValues(order, returnRequest))
-	// }, [order, returnRequest, reset])
-
 	const onSubmit = async () => {
+		let refund: number | undefined = undefined;
+
+		/**
+		 * If the return was not refunded as part of a refund claim, or was not created as a
+		 * result of a swap, we allow the user to specify a refund amount.
+		 */
+		if (refundAmount !== undefined && !isSwapOrRefundedClaim) {
+			refund = refundAmount;
+		}
+
+		/**
+		 * If the return was refunded as part of a refund claim, we set the refund amount to 0.
+		 * This is a workaround to ensure that the refund is not issued twice.
+		 */
+		if (isRefundedClaim) {
+			refund = 0;
+		}
+
 		const toCreate: AdminPostReturnsReturnReceiveReq = {
 			items: dataSource.map((receive: ReceiveReturnItem) => ({
 				item_id: receive.item_id,
 				quantity: receive.quantity,
 			})),
-			refund: refundAmount,
+			refund,
 		};
-		console.log('toCreate', toCreate)
 		await mutateAsync(toCreate, {
 			onSuccess: () => {
 				message.success(
@@ -128,14 +132,16 @@ export const ReceiveReturnModal = ({
 	};
 
 	useEffect(() => {
-		const itemsReceived = dataSource.filter((item: any) => selectedVariants.includes(item.item_id));
-		const itemTotal = itemsReceived.reduce((acc:number, curr: any) => {
+		const itemsReceived = dataSource.filter((item: any) =>
+			selectedVariants.includes(item.item_id)
+		);
+		const itemTotal = itemsReceived.reduce((acc: number, curr: any) => {
 			const priceRefundable = curr.quantity * curr.price;
 
 			return acc + priceRefundable;
 		}, 0);
-		setRefundAmount(itemTotal)
-	}, [dataSource, selectedVariants])
+		setRefundAmount(itemTotal);
+	}, [dataSource, selectedVariants]);
 
 	const handleCancel = () => {
 		onClose();
@@ -244,31 +250,35 @@ export const ReceiveReturnModal = ({
 					{'Đang nhận hàng'}
 				</Text>
 				<div className="flex flex-col gap-y-2 px-4">
-					{dataSource?.filter((item: any) => selectedVariants?.includes(item.item_id)).map((item: any) => (
-						<SummaryLineItem
-						key={item.item_id}
-						item={item}
-						currencyCode={order.currency_code}
-						/>
-					))}
+					{dataSource
+						?.filter((item: any) => selectedVariants?.includes(item.item_id))
+						.map((item: any) => (
+							<SummaryLineItem
+								key={item.item_id}
+								item={item}
+								currencyCode={order.currency_code}
+							/>
+						))}
 				</div>
 			</div>
 			<Divider className="my-2" />
 			<div className="font-medium flex w-full justify-between items-center">
-				<Text strong className="font-medium">{"Tổng tiền hoàn trả"}</Text>
+				<Text strong className="font-medium">
+					{'Tổng tiền hoàn trả'}
+				</Text>
 				<div className="flex items-center">
-						<div className="flex items-center">
-							<span
-								className="text-gray-400 mr-2 cursor-pointer flex items-center"
-								// onClick={() => setRefundEdited(true)}
-							>
-								<SquareArrowOutUpRight size={16} />
-							</span>
-							{`${displayAmount(
-								order.currency_code,
-								refundAmount
-							)} ${order.currency_code.toUpperCase()}`}
-						</div>
+					<div className="flex items-center">
+						<span
+							className="text-gray-400 mr-2 cursor-pointer flex items-center"
+							// onClick={() => setRefundEdited(true)}
+						>
+							<SquareArrowOutUpRight size={16} />
+						</span>
+						{`${displayAmount(
+							order.currency_code,
+							refundAmount
+						)} ${order.currency_code.toUpperCase()}`}
+					</div>
 				</div>
 			</div>
 		</Modal>

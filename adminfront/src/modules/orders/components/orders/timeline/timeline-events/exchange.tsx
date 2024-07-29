@@ -16,14 +16,24 @@ import { ExchangeEvent } from '@/modules/orders/hooks/use-build-timeline';
 import Medusa from '@/services/api';
 import { getErrorMessage } from '@/lib/utils';
 // import CopyToClipboard from "../../atoms/copy-to-clipboard"
-import { FulfillmentStatus, PaymentStatus, ReturnStatus } from "./order-status"
-import EventContainer, { EventIconColor } from "./event-container"
-import EventItemContainer from "./event-item-container"
-import { CircleAlert, Ban, CircleDollarSign, Truck, RefreshCw, CircleX } from 'lucide-react';
+import { FulfillmentStatus, PaymentStatus, ReturnStatus } from './order-status';
+import EventContainer, { EventIconColor } from './event-container';
+import EventItemContainer from './event-item-container';
+import {
+	CircleAlert,
+	Ban,
+	CircleDollarSign,
+	Truck,
+	RefreshCw,
+	CircleX,
+} from 'lucide-react';
 import { TooltipIcon } from '@/components/Tooltip';
-import EventActionables from "./event-actionables"
+import EventActionables from './event-actionables';
 import { Button } from '@/components/Button';
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
 
+dayjs.locale('vi');
 type ExchangeProps = {
 	event: ExchangeEvent;
 	refetch: () => void;
@@ -57,8 +67,16 @@ const ExchangeStatus: React.FC<ExchangeStatusProps> = ({ event }) => {
 };
 
 const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
-	const { state: stateReceiveReturn, onClose: closeReceiveReturn, onOpen: openReceiveReturn } = useToggleState(false);
-	const { state: stateCreateFulfillment, onClose: closeCreateFulfillment, onOpen: openCreateFulfillment } = useToggleState(false);
+	const {
+		state: stateReceiveReturn,
+		onClose: closeReceiveReturn,
+		onOpen: openReceiveReturn,
+	} = useToggleState(false);
+	const {
+		state: stateCreateFulfillment,
+		onClose: closeCreateFulfillment,
+		onOpen: openCreateFulfillment,
+	} = useToggleState(false);
 	const cancelExchange = useAdminCancelSwap(event.orderId);
 	const cancelReturn = useAdminCancelReturn(event.returnId);
 	const [differenceCardId, setDifferenceCardId] = useState<string | undefined>(
@@ -227,11 +245,7 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 
 	const args = {
 		title: event.canceledAt ? 'Trao đổi đã bị huỷ' : 'Yêu cầu trao đổi',
-		icon: event.canceledAt ? (
-			<CircleX size={20} />
-		) : (
-			<RefreshCw size={20} />
-		),
+		icon: event.canceledAt ? <CircleX size={20} /> : <RefreshCw size={20} />,
 		expandable: !!event.canceledAt,
 		iconColor: event.canceledAt
 			? EventIconColor.DEFAULT
@@ -243,9 +257,9 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 			<div className="gap-y-2 flex flex-col" key={event.id}>
 				{event.canceledAt && (
 					<div>
-						<span className="inter-small-semibold mr-2">Requested on:</span>
-						<span className="text-grey-50">
-							{new Date(event.time).toUTCString()}
+						<span className="font-medium mr-2">Yêu cầu huỷ:</span>
+						<span className="text-gray-500">
+							{dayjs(event.time).format('DD MMM YYYY HH:mm:ss')}
 						</span>
 					</div>
 				)}
@@ -253,7 +267,7 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 				{!event.canceledAt && paymentLink}
 				{returnItems}
 				{newItems}
-				<div className="gap-x-4 flex items-center">
+				<div className="gap-x-2 flex items-center">
 					{event.returnStatus === 'requested' && (
 						<Button
 							type="default"
@@ -269,7 +283,7 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 							onClick={openCreateFulfillment}
 							className="font-medium w-full"
 						>
-							Thực hiện trao đổi
+							Đóng gói
 						</Button>
 					)}
 				</div>
@@ -290,7 +304,7 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 			{stateCreateFulfillment && (
 				<CreateFulfillmentModal
 					state={stateCreateFulfillment}
-					orderToFulfill={event.raw}
+					orderToFulfill={event.raw as any}
 					handleCancel={closeCreateFulfillment}
 					orderId={event.orderId}
 					handleOk={closeCreateFulfillment}
@@ -347,7 +361,7 @@ function getReturnItems(event: ExchangeEvent) {
 			<div>
 				{event.returnItems
 					.filter((i) => !!i)
-					.map((i: ReturnItem) => (
+					.map((i: any) => (
 						<EventItemContainer
 							key={i.id}
 							item={{ ...i, quantity: i.requestedQuantity }}
@@ -358,7 +372,7 @@ function getReturnItems(event: ExchangeEvent) {
 	);
 }
 
-function getActions(event: ExchangeEvent, actions: ActionType[]) {
+function getActions(event: ExchangeEvent, actions: any) {
 	if (actions.length === 0) {
 		return null;
 	}
