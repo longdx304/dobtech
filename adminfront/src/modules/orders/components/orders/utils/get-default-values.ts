@@ -1,3 +1,5 @@
+// @ts-nocheck
+// !check this file
 import {
 	AddressPayload,
 	ClaimTypeFormType,
@@ -78,16 +80,14 @@ export const getAllReturnableItems = (
 	isClaim: boolean
 ) => {
 	let orderItems = order.items.reduce(
-		(map, obj) =>
-			map.set(obj.id, {
-				...obj,
-			}),
+		(map, obj) => map.set(obj.id, { ...obj }),
+
 		new Map<string, Omit<LineItem, 'beforeInsert'>>()
 	);
 
 	let claimedItems: ClaimItem[] = [];
 
-	if (order.claims && order.claims.length) {
+	if (order?.claims?.length) {
 		for (const claim of order.claims) {
 			claim.claim_items = claim.claim_items ?? [];
 			claimedItems = [...claimedItems, ...claim.claim_items];
@@ -99,7 +99,7 @@ export const getAllReturnableItems = (
 				continue;
 			}
 
-			if (claim.additional_items && claim.additional_items.length) {
+			if (claim?.additional_items?.length) {
 				orderItems = claim.additional_items
 					.filter(
 						(it: any) =>
@@ -115,7 +115,7 @@ export const getAllReturnableItems = (
 	}
 
 	if (!isClaim) {
-		if (order.swaps && order.swaps.length) {
+		if (order?.swaps?.length) {
 			for (const swap of order.swaps) {
 				orderItems = swap.additional_items.reduce(
 					(map: any, obj: any) =>

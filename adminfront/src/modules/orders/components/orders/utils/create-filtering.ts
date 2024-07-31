@@ -25,7 +25,7 @@ export const getAllReturnableItems = (
 	let claimedItems: ClaimItem[] = [];
 
 	// Process claims
-	if (order.claims && order.claims.length) {
+	if (order?.claims?.length) {
 		for (const claim of order.claims) {
 			// Skip claims with canceled return orders
 			if (claim.return_order?.status !== 'canceled') {
@@ -42,7 +42,7 @@ export const getAllReturnableItems = (
 			}
 
 			// Add additional items to the order items map
-			if (claim.additional_items && claim.additional_items.length) {
+			if (claim?.additional_items?.length) {
 				orderItems = claim.additional_items
 					.filter(
 						(it: any) =>
@@ -59,7 +59,7 @@ export const getAllReturnableItems = (
 
 	// Process swaps for non-claim orders
 	if (!isClaim) {
-		if (order.swaps && order.swaps.length) {
+		if (order?.swaps?.length) {
 			for (const swap of order.swaps) {
 				// Skip swaps with not fulfilled fulfillment status
 				if (swap.fulfillment_status === 'not_fulfilled') {
