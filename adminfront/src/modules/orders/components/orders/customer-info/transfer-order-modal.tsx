@@ -178,11 +178,13 @@ const TransferOrdersModal: FC<TransferOrdersModalProps> = ({
 										first_name:
 											order.customer.first_name ||
 											order.billing_address?.first_name ||
-											order.shipping_address?.first_name,
+											order.shipping_address?.first_name || 
+											undefined,
 										last_name:
 											order.customer.last_name ||
 											order.billing_address?.last_name ||
-											order.shipping_address?.last_name,
+											order.shipping_address?.last_name || 
+											undefined,
 									}),
 								] as any
 							}
