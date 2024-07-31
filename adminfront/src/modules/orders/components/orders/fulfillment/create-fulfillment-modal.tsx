@@ -27,7 +27,7 @@ interface Props {
 }
 
 export const getFulfillAbleQuantity = (item: LineItem): number => {
-	return item.quantity - (item.fulfilled_quantity || 0);
+	return item.quantity - (item.fulfilled_quantity ?? 0);
 };
 
 const CreateFulfillmentModal = ({
@@ -37,11 +37,10 @@ const CreateFulfillmentModal = ({
 	orderToFulfill,
 	orderId,
 }: Props) => {
-	console.log('orderToFulfill', orderToFulfill);
 	const [errors, setErrors] = useState({});
 	const [quantities, setQuantities] = useState<Record<string, number>>(
 		'items' in orderToFulfill
-			? (orderToFulfill as Order).items.reduce((acc, next) => {
+			? orderToFulfill.items.reduce((acc, next) => {
 					return {
 						...acc,
 						[next.id]: getFulfillAbleQuantity(next),
@@ -51,7 +50,7 @@ const CreateFulfillmentModal = ({
 	);
 
 	const items =
-		'items' in orderToFulfill 
+		'items' in orderToFulfill
 			? orderToFulfill.items
 			: (orderToFulfill as any).additional_items;
 
@@ -111,13 +110,12 @@ const CreateFulfillmentModal = ({
 					}));
 				break;
 		}
-		console.log('type', type)
-		console.log('requestObj', requestObj)
+		console.log('type', type);
+		console.log('requestObj', requestObj);
 		await action.mutateAsync(requestObj as any, {
 			onSuccess: () => {
 				message.success(successText);
 				handleOk();
-				// handleCancel();
 			},
 			onError: (err: any) => message.error(getErrorMessage(err)),
 		});
@@ -145,7 +143,6 @@ const CreateFulfillmentModal = ({
 				items={items}
 				quantities={quantities}
 				setQuantities={setQuantities}
-				// locationId={locationSelectValue.value}
 				setErrors={setErrors}
 			/>
 		</Modal>

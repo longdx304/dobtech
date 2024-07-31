@@ -1,9 +1,9 @@
 'use client';
-import { Modal as AntdModal, ModalProps, Form } from 'antd';
+import { Modal as AntdModal, ModalProps } from 'antd';
 
+import { Button } from '@/components/Button';
 import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';
-import { Button } from '@/components/Button';
 
 interface Props extends ModalProps {
 	className?: string;
@@ -49,7 +49,6 @@ export default function SubmitModal({
 	return (
 		<AntdModal
 			className={cn('', className)}
-			// afterClose={() => form.resetFields()}
 			onCancel={handleCancel}
 			footer={renderFooter()}
 			{...props}
