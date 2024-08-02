@@ -44,9 +44,6 @@ const plugins = [
     },
   },
   {
-    resolve: 'medusa-plugin-variant-images',
-  },
-  {
     resolve: `medusa-file-s3`,
     options: {
       s3_url: process.env.S3_URL,

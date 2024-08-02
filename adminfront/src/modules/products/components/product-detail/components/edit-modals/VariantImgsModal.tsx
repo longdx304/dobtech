@@ -3,7 +3,6 @@ import { SubmitModal } from '@/components/Modal';
 import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
-import { MediaFormType } from '@/types/products';
 import { Product } from '@medusajs/medusa';
 import { Form, FormProps, message } from 'antd';
 import { useMedusa } from 'medusa-react';
@@ -40,7 +39,7 @@ const VariantImgsModal: FC<Props> = ({
 			form.setFieldsValue({
 				images: variantImages.reduce(
 					(acc: Record<string, string>, curr: any) => {
-						acc[curr.image_id] = curr.variant_value;
+						acc[curr.image_url] = curr.variant_value;
 						return acc;
 					},
 					{}
@@ -53,7 +52,7 @@ const VariantImgsModal: FC<Props> = ({
 	const createPayload = (values: Record<string, unknown>) => {
 		const images = Object.entries(values)
 			.map(([key, value]) => ({
-				image_id: key,
+				image_url: key,
 				variant_value: value,
 			}))
 			.filter((image) => image.variant_value);
@@ -129,7 +128,7 @@ const VariantImgsModal: FC<Props> = ({
 							width={64}
 							height={64}
 						/>
-						<Form.Item name={['images', img.id]}>
+						<Form.Item name={['images', img.url]}>
 							<Select
 								placeholder="Chọn biến thể"
 								className="w-[150px]"

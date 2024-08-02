@@ -1,21 +1,23 @@
-"use client";
+'use client';
 import { cn } from '@/lib/utils';
-import { Flex } from "@/components/Flex";
-import { Image } from "@/components/Image";
-import { useProduct } from "@/lib/providers/product/product-provider";
-import { useMemo, useRef, useState, useEffect } from "react";
-import SwiperCore from "swiper";
-import { Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { useVariantImages } from "@/lib/providers/product/variant-images-provider";
+import { Flex } from '@/components/Flex';
+import { Image } from '@/components/Image';
+import { useProduct } from '@/lib/providers/product/product-provider';
+import { useMemo, useRef, useState, useEffect } from 'react';
+import SwiperCore from 'swiper';
+import { Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { useVariantImages } from '@/lib/providers/product/variant-images-provider';
 
-import "swiper/css";
-import "swiper/css/pagination";
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 type Props = {
 	isImgVertical?: boolean;
 };
-export default function ImageGallery({ isImgVertical = true }: Props) {
+export default function ImageGallery({
+	isImgVertical = true,
+}: Readonly<Props>) {
 	const { optionValue } = useVariantImages();
 	const { product } = useProduct();
 
@@ -24,7 +26,7 @@ export default function ImageGallery({ isImgVertical = true }: Props) {
 
 		if (!Array.isArray(product.images) || product.images.length === 0) {
 			if (!product.thumbnail) {
-				return ["/images/product-img.png"];
+				return ['/images/product-img.png'];
 			}
 			return [product.thumbnail];
 		}
@@ -32,9 +34,9 @@ export default function ImageGallery({ isImgVertical = true }: Props) {
 		return product.images;
 	}, [product]);
 
-	const variantImg = product?.metadata?.variant_images ? JSON.parse(
-		(product?.metadata?.variant_images as string)
-	) : null;
+	const variantImg = product?.metadata?.variant_images
+		? JSON.parse(product?.metadata?.variant_images as string)
+		: null;
 
 	const [selectedImage, setSelectedImage] = useState<number>(0);
 	const mainSwiperRef = useRef<SwiperCore>();
@@ -52,8 +54,10 @@ export default function ImageGallery({ isImgVertical = true }: Props) {
 
 	useEffect(() => {
 		if (images && variantImg && optionValue) {
-			const imageId = variantImg.find((item: Record<string, string>) => item.variant_value === optionValue)?.image_id;
-			const index = images.findIndex((img: any) => img.id === imageId);
+			const imageId = variantImg.find(
+				(item: Record<string, string>) => item.variant_value === optionValue
+			)?.image_url;
+			const index = images.findIndex((img: any) => img.url === imageId);
 			if (index !== -1) {
 				setSelectedImage(index);
 				if (mainSwiperRef.current) {
@@ -61,23 +65,33 @@ export default function ImageGallery({ isImgVertical = true }: Props) {
 				}
 			}
 		}
-	}, [optionValue, variantImg, images])
+	}, [optionValue, variantImg, images]);
 
 	return (
-		<Flex className={cn("flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-auto", !isImgVertical && "lg:flex-col-reverse")}>
+		<Flex
+			className={cn(
+				'flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-auto',
+				!isImgVertical && 'lg:flex-col-reverse'
+			)}
+		>
 			{/* Thumbnails */}
-			<Flex className={cn("flex flex-wrap lg:flex-col justify-center w-full lg:w-fit gap-4", !isImgVertical && "lg:flex-row")}>
+			<Flex
+				className={cn(
+					'flex flex-wrap lg:flex-col justify-center w-full lg:w-fit gap-4',
+					!isImgVertical && 'lg:flex-row'
+				)}
+			>
 				{images?.map((img, index) => (
 					<Flex
-						key={index}
+						key={typeof img === 'string' ? index : img.url}
 						onClick={() => handleThumbnailClick(index)}
 						className={`cursor-pointer w-16 h-16 lg:w-20 lg:h-20 rounded-sm overflow-hidden border border-gray-200 ${
-							selectedImage === index ? "border-primary" : ""
+							selectedImage === index ? 'border-primary' : ''
 						}`}
 						onMouseEnter={() => handleThumbnailClick(index)}
 					>
 						<Image
-							src={typeof img === "string" ? img : img.url}
+							src={typeof img === 'string' ? img : img.url}
 							className="object-cover"
 							alt={`Thumbnail ${index + 1}`}
 							width="inherit"
@@ -101,11 +115,11 @@ export default function ImageGallery({ isImgVertical = true }: Props) {
 				>
 					{images?.map((img, index) => (
 						<SwiperSlide
-							key={index}
-							data-hash={typeof img === "string" ? null : img.id}
+							key={typeof img === 'string' ? index : img.url}
+							data-hash={typeof img === 'string' ? null : img.id}
 						>
 							<Image
-								src={typeof img === "string" ? img : img.url}
+								src={typeof img === 'string' ? img : img.url}
 								className="rounded-sm object-contain"
 								alt={`Image ${index + 1}`}
 								width="inherit"

@@ -97,7 +97,7 @@ const useActionProduct = ({ product }: Props) => {
     }
     const total =
       variants?.reduce(
-        (acc, variant) => acc + (variant?.inventory_quantity || 0),
+        (acc, variant) => acc + (variant?.inventory_quantity ?? 0),
         0
       ) || 0;
     return total;

@@ -35,7 +35,6 @@ const PaymentButton = ({ data }: Props) => {
 
 	const lineItemIds = findLineItemId(intersection as string[]);
 
-
 	const onPaymentCompleted = async () => {
 		await placeOrder(cartId).catch((err) => {
 			setErrorMessage(err.toString());
@@ -76,12 +75,6 @@ const PaymentButton = ({ data }: Props) => {
 			>
 				Đặt hàng
 			</Button>
-
-			{/* <Button
-				onClick={() => handleDeleteLineItem(lineItemIds as string[])}
-			>
-				123
-			</Button> */}
 		</>
 	);
 };
