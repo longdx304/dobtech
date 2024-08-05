@@ -17,7 +17,7 @@ import {
 	useAdminUploadProtectedFile,
 } from 'medusa-react';
 import { FC, ReactNode, useEffect, useState } from 'react';
-
+import * as XLSX from 'xlsx';
 import { Flex } from '@/components/Flex';
 import { Modal } from '@/components/Modal';
 import { Text, Title } from '@/components/Typography';
@@ -104,16 +104,41 @@ const ImportModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 	 */
 	const processUpload = async (file: File) => {
 		try {
-			const res = await adminUploadFile(file as any);
-			const _fileKey = res.uploads[0].key;
-			setFileKey(_fileKey as any);
-			const batchJob = await createBatchJob({
-				dry_run: true,
-				context: { fileKey: _fileKey },
-				type: 'product-import',
-			});
-			resetInterval();
-			setBatchJobId(batchJob.batch_job.id as any);
+			// Read the XLSX file
+			const reader = new FileReader();
+			reader.onload = async (e) => {
+				const data = new Uint8Array(e.target?.result as ArrayBuffer);
+				const workbook = XLSX.read(data, { type: 'array' });
+
+				// Assume we want to process the first sheet
+				const firstSheetName = workbook.SheetNames[0];
+				const worksheet = workbook.Sheets[firstSheetName];
+
+				// Convert the worksheet to CSV
+				const csv = XLSX.utils.sheet_to_csv(worksheet);
+
+				// Create a new File object with the CSV data
+				const csvFile = new File([csv], file.name.replace('.xlsx', '.csv'), {
+					type: 'text/csv',
+				});
+
+				// Upload the CSV file
+				const res = await adminUploadFile(csvFile as any);
+				const _fileKey = res.uploads[0].key;
+				setFileKey(_fileKey as any);
+
+				// Create batch job
+				const batchJob = await createBatchJob({
+					dry_run: true,
+					context: { fileKey: _fileKey },
+					type: 'product-import',
+				});
+
+				resetInterval();
+				setBatchJobId(batchJob.batch_job.id as any);
+			};
+
+			reader.readAsArrayBuffer(file);
 		} catch (e) {
 			message.error('Nhập file thất bại.');
 
@@ -289,6 +314,7 @@ const DropArea: FC<DropAreaProps> = ({ onUpload }) => {
 
 	return (
 		<div
+			role="file-upload"
 			onDragEnter={() => setIsDragOver(true)}
 			onDragLeave={() => setIsDragOver(false)}
 			onDragOver={onDragOver}
@@ -310,7 +336,7 @@ const DropArea: FC<DropAreaProps> = ({ onUpload }) => {
 						id="upload-form-file"
 						className="hidden"
 						// multiple
-						accept="text/csv"
+						// accept="text/csv"
 						onChange={handleFileSelect}
 					/>
 				</a>

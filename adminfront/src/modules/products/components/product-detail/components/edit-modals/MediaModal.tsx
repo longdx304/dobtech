@@ -1,17 +1,15 @@
 import { Product } from '@medusajs/medusa';
 import { Form, FormProps, message } from 'antd';
-import { useAdminUpdateProduct } from 'medusa-react';
-import { FC, useEffect } from 'react';
 import _ from 'lodash';
-import { useMedusa } from 'medusa-react';
-
-import { prepareImages, deleteImages } from '@/actions/images';
+import { useAdminUpdateProduct, useMedusa } from 'medusa-react';
+import { FC, useEffect } from 'react';
+import { prepareImages } from '@/actions/images';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
+import { getErrorMessage } from '@/lib/utils';
 import MediaForm from '@/modules/products/components/products-modal/components/MediaForm';
 import { FormImage } from '@/types/common';
 import { MediaFormType } from '@/types/products';
-import { getErrorMessage } from '@/lib/utils';
 
 type Props = {
 	product: Product;

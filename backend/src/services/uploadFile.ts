@@ -36,6 +36,7 @@ class UploadFileService {
       });
       await s3Client.send(deleteObjectsCommand);
     } catch (error) {
+      console.error("Error deleting file:", error);
       throw error;
     }
   }
