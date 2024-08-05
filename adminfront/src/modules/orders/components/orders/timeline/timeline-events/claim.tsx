@@ -177,7 +177,7 @@ const Claim: React.FC<ClaimProps> = ({ event, refetch }) => {
 	const actions: any = [];
 
 	if (
-		event.claim.return_order &&
+		event.claim?.return_order &&
 		event.claim.return_order?.status === 'requested'
 	) {
 		actions.push({

@@ -23,7 +23,7 @@ type AddProductVariantProps = {
 	isReplace?: boolean;
 	isLoading?: boolean;
 	// onSubmit: (variants: ProductVariant[]) => void;
-	onSubmit: (variantIds: string[], variants?: ProductVariant[] ) => void;
+	onSubmit: (variantIds: string[], variants?: ProductVariant[]) => void;
 	title: string;
 	selectedItems?: string[];
 };
@@ -33,7 +33,9 @@ const PAGE_SIZE = 10;
 const AddProductVariant = (props: AddProductVariantProps) => {
 	const { isReplace, regionId, currencyCode, customerId } = props;
 	const [selectedVariantIds, setSelectedVariantIds] = useState<string[]>([]);
-	const [selectedVariants, setSelectedVariants] = useState<ProductVariant[]>([]);
+	const [selectedVariants, setSelectedVariants] = useState<ProductVariant[]>(
+		[]
+	);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -49,8 +51,8 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 		if (props.selectedItems) {
 			setSelectedVariantIds(props.selectedItems);
 		} else {
-			setSelectedVariantIds([])
-			setSelectedVariants([])
+			setSelectedVariantIds([]);
+			setSelectedVariants([]);
 		}
 	}, [props.selectedItems]);
 
@@ -66,7 +68,10 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 		setSelectedVariants([]);
 	};
 
-	const handleRowSelectionChange = (selectedRowKeys: React.Key[], selectedRows: ProductVariant[]) => {
+	const handleRowSelectionChange = (
+		selectedRowKeys: React.Key[],
+		selectedRows: ProductVariant[]
+	) => {
 		setSelectedVariantIds(selectedRowKeys as string[]);
 		setSelectedVariants(selectedRows as ProductVariant[]);
 	};
@@ -131,6 +136,12 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 		setCurrentPage(page);
 	};
 
+	const handleDisable = (record: any) => {
+		if (record?.inventory_quantity || record?.original_price_incl_tax) {
+			return false;
+		}
+		return true;
+	};
 	return (
 		<Modal
 			open={props.state}
@@ -162,9 +173,9 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 					selectedRowKeys: selectedVariantIds,
 					onChange: handleRowSelectionChange,
 					preserveSelectedRowKeys: true,
-					// getCheckboxProps: (record) => ({
-					// 	disabled: productIds?.includes(record.id),
-					// }),
+					getCheckboxProps: (record: ProductVariant) => ({
+						disabled: handleDisable(record),
+					}),
 				}}
 				loading={isLoading}
 				columns={columns as any}

@@ -418,7 +418,7 @@ export const useBuildTimeline = (orderId: string) => {
 			) {
 				events.push({
 					id: event.id,
-					time: event.fulfillments[0].created_at,
+					time: event.fulfillments[0]?.created_at,
 					type: 'fulfilled',
 					items: event.additional_items.map((i: any) => getSwapItem(i)),
 					noNotification: event.no_notification,
@@ -426,7 +426,7 @@ export const useBuildTimeline = (orderId: string) => {
 					sourceType: 'exchange',
 				} as ItemsFulfilledEvent);
 
-				if (event.fulfillments[0].shipped_at) {
+				if (event.fulfillments[0]?.shipped_at) {
 					events.push({
 						id: event.id,
 						time: event.fulfillments[0].shipped_at,
@@ -589,7 +589,8 @@ function findOriginalItemId(edits: any, originalId: any) {
 		.filter((e: any) => !!e.confirmed_at) // only confirmed OEs are cloning line items
 		.sort(
 			// (a: any, b: any) => new Date(a.confirmed_at) - new Date(b.confirmed_at)
-			(a: any, b: any) => new Date(b.confirmed_at).getTime() - new Date(a.confirmed_at).getTime()
+			(a: any, b: any) =>
+				new Date(b.confirmed_at).getTime() - new Date(a.confirmed_at).getTime()
 		);
 
 	for (const edit of edits) {

@@ -4,16 +4,19 @@ import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
 import { currencies } from '@/types/currencies';
+import { normalizeAmount, persistedPrice } from '@/utils/prices';
 import { Order } from '@medusajs/medusa';
 import { Form, message } from 'antd';
 import { useAdminRefundPayment } from 'medusa-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 interface Props {
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
 	order: Order;
+	initialAmount?: number;
+	initialReason?: string;
 }
 
 type RefundMenuFormData = {
@@ -31,7 +34,14 @@ const getCurrencyInfo = (currencyCode?: string) => {
 	return currencyInfo;
 };
 
-const RefundModal = ({ state, handleOk, handleCancel, order }: Props) => {
+const RefundModal = ({
+	state,
+	handleOk,
+	handleCancel,
+	order,
+	initialAmount = 100,
+	initialReason = 'discount',
+}: Props) => {
 	const [form] = Form.useForm();
 	const { mutateAsync, isLoading } = useAdminRefundPayment(order.id);
 
@@ -39,10 +49,20 @@ const RefundModal = ({ state, handleOk, handleCancel, order }: Props) => {
 		return order.paid_total - order.refunded_total;
 	}, [order]);
 
+	useEffect(() => {
+		if (initialAmount || initialReason) {
+			form.setFieldsValue({
+				amount: normalizeAmount(order.currency_code, initialAmount),
+				reason: initialReason || 'discount',
+			});
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [initialAmount, initialReason]);
+
 	const onFinish = async (values: RefundMenuFormData) => {
 		await mutateAsync(
 			{
-				amount: values.amount,
+				amount: persistedPrice(order.currency_code, values.amount),
 				reason: values.reason,
 				no_notification: true,
 				note: values?.note || '',
@@ -123,12 +143,16 @@ const RefundModal = ({ state, handleOk, handleCancel, order }: Props) => {
 						]}
 					>
 						<InputNumber
-							max={refundable}
-							min={1}
+							max={+normalizeAmount(order.currency_code, refundable)}
+							min={
+								initialAmount
+									? +normalizeAmount(order.currency_code, initialAmount)
+									: 1
+							}
 							allowClear
 							prefix={
 								<span className="text-gray-500">
-									{getCurrencyInfo(order?.currency_code)?.symbol_native}  
+									{getCurrencyInfo(order?.currency_code)?.symbol_native}
 								</span>
 							}
 							formatter={formatter}
@@ -140,7 +164,7 @@ const RefundModal = ({ state, handleOk, handleCancel, order }: Props) => {
 					labelCol={{ span: 24 }}
 					name="reason"
 					label="Lý do"
-					initialValue={'discount'}
+					initialValue={initialReason}
 				>
 					<Select
 						options={[

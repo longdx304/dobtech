@@ -38,19 +38,6 @@ type ReturnMenuProps = {
 	onClose: () => void;
 };
 
-type ReturnRecord = Record<
-	string,
-	{
-		images: string[];
-		note: string;
-		quantity: number;
-		reason: {
-			label: string;
-			value: ReturnReason;
-		} | null;
-	}
->;
-
 type SelectProduct = Omit<
 	ProductVariant & { quantity: number },
 	'beforeInsert'
@@ -65,10 +52,6 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 		isFeatureEnabled('stockLocationService');
 
 	const [itemsToAdd, setItemsToAdd] = useState<SelectProduct[]>([]);
-	const [selectedLocation, setSelectedLocation] = useState<{
-		value: string;
-		label: string;
-	} | null>(null);
 	const [toReturn, setToReturn] = useState<
 		Record<string, { quantity: number }>
 	>({});
@@ -225,7 +208,7 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			return;
 		}
 		if (!shippingMethod) {
-			message.error('Phương thức vận chuyển chưa được lựa chọn.');
+			message.error('Vui lòng chọn phương thức vận chuyển.');
 			return;
 		}
 		const items = Object.entries(toReturn).map(([key, value]: any) => {
@@ -247,12 +230,10 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 		// if (isLocationFulfillmentEnabled && selectedLocation) {
 		//   data.return_location_id = selectedLocation.value
 		// }
-		if (shippingMethod) {
-			data.return_shipping = {
-				option_id: shippingMethod.value,
-				price: Math.round(shippingPrice || 0),
-			};
-		}
+		data.return_shipping = {
+			option_id: shippingMethod.value,
+			price: Math.round(shippingPrice || 0),
+		};
 		return mutateAsync(data, {
 			onSuccess: () => {
 				refetch();
@@ -334,13 +315,15 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 				)}
 			</div>
 			{itemsToAdd?.length ? (
-				<RMAReturnProductsTable
-					isAdditionalItems
-					order={order}
-					itemsToAdd={itemsToAdd}
-					handleRemoveItem={handleRemoveItem}
-					handleToAddQuantity={handleToAddQuantity}
-				/>
+				<>
+					<RMAReturnProductsTable
+						isAdditionalItems
+						order={order}
+						itemsToAdd={itemsToAdd}
+						handleRemoveItem={handleRemoveItem}
+						handleToAddQuantity={handleToAddQuantity}
+					/>
+				</>
 			) : null}
 			<div className="text-xs text-gray-900 font-normal mt-8 flex items-center justify-between">
 				<span>{'Tổng trả hàng'}</span>

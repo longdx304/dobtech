@@ -23,6 +23,14 @@ type RefundStatusProps = {
 
 const PaymentStatus: React.FC<PaymentStatusProps> = ({ paymentStatus }) => {
 	switch (paymentStatus) {
+		case 'difference_refunded':
+			return (
+				<StatusIndicator
+					title="Thanh toán"
+					variant="success"
+					className="font-normal"
+				/>
+			);
 		case 'captured':
 			return (
 				<StatusIndicator

@@ -1,4 +1,3 @@
-import { ReturnItem } from '@medusajs/medusa';
 import {
 	useAdminCancelReturn,
 	useAdminCancelSwap,
@@ -26,12 +25,14 @@ import {
 	Truck,
 	RefreshCw,
 	CircleX,
+	CreditCard,
 } from 'lucide-react';
 import { TooltipIcon } from '@/components/Tooltip';
 import EventActionables from './event-actionables';
 import { Button } from '@/components/Button';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
+import SwapCheckoutModal from './modal/swap-checkout';
 
 dayjs.locale('vi');
 type ExchangeProps = {
@@ -77,6 +78,11 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 		onClose: closeCreateFulfillment,
 		onOpen: openCreateFulfillment,
 	} = useToggleState(false);
+	const {
+		state: stateSwapCheckout,
+		onClose: closeSwapCheckout,
+		onOpen: openSwapCheckout,
+	} = useToggleState(false);
 	const cancelExchange = useAdminCancelSwap(event.orderId);
 	const cancelReturn = useAdminCancelReturn(event.returnId);
 	const [differenceCardId, setDifferenceCardId] = useState<string | undefined>(
@@ -86,7 +92,6 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 		string | undefined
 	>(undefined);
 	const [payable, setPayable] = useState<boolean>(true);
-
 	const { store } = useAdminStore();
 	const { orderRelations } = useOrdersExpandParam();
 	const { order } = useAdminOrder(event.orderId, {
@@ -213,6 +218,17 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 
 	const actions: any = [];
 
+	const handleSwapCheckout = async () => {
+		openSwapCheckout();
+	};
+
+	if (event.paymentStatus === 'not_paid') {
+		actions.push({
+			label: 'Tạo phiên thanh toán',
+			icon: <CreditCard size={20} />,
+			onClick: handleSwapCheckout,
+		});
+	}
 	if (event.paymentStatus === 'awaiting') {
 		actions.push({
 			label: 'Thanh toán',
@@ -308,6 +324,14 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 					handleCancel={closeCreateFulfillment}
 					orderId={event.orderId}
 					handleOk={closeCreateFulfillment}
+				/>
+			)}
+			{stateSwapCheckout && order && (
+				<SwapCheckoutModal
+					state={stateSwapCheckout}
+					order={order}
+					onClose={closeSwapCheckout}
+					cartId={event.raw.cart_id}
 				/>
 			)}
 		</>

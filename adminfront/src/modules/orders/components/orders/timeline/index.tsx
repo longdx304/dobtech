@@ -88,7 +88,10 @@ const Timeline = ({ orderId, isLoading }: Props) => {
 	}
 
 	return (
-		<Card loading={isLoading || isOrderLoading} className="px-4">
+		<Card
+			loading={isLoading || isOrderLoading}
+			className="px-4 max-h-[calc(100vh-80px)] overflow-y-auto sticky top-[20px]"
+		>
 			<div>
 				<Flex align="center" justify="space-between" className="pb-4">
 					<Title level={4}>{`Dòng thời gian`}</Title>
