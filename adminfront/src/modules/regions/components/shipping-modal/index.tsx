@@ -89,7 +89,6 @@ const ShippingModal: FC<Props> = ({
 	};
 
 	const handleEditReturnShipping = (record: ShippingOption) => {
-		// setCurrentShipping(record);
 		setCurrentReturnShipping(record);
 		onOpenActionReturnShipping();
 	};
@@ -132,8 +131,6 @@ const ShippingModal: FC<Props> = ({
 		[returnShippingOptions]
 	);
 
-	console.log('shippingOptions', shippingOptions);
-	console.log('returnShippingOptions', returnShippingOptions);
 	return (
 		<>
 			{/* Main Modal Shipping */}

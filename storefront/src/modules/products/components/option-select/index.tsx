@@ -1,12 +1,11 @@
 import { ProductOption } from '@medusajs/medusa';
-import React from 'react';
-import { Check } from 'lucide-react';
 import Image from 'next/image';
+import React from 'react';
 
-import { cn } from '@/lib/utils';
-import { onlyUnique } from '@/lib/utils/only-unique';
 import { Button } from '@/components/Button';
 import { useVariantImages } from "@/lib/providers/product/variant-images-provider";
+import { cn } from '@/lib/utils';
+import { onlyUnique } from '@/lib/utils/only-unique';
 
 type OptionSelectProps = {
   option: ProductOption;

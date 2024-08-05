@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { message } from 'antd';
+import { Item, LineItem } from '@medusajs/medusa';
 import { clsx } from 'clsx';
-import { Plus, Minus } from 'lucide-react';
+import { Minus, Plus } from 'lucide-react';
+import { ReactNode } from 'react';
 
-export const EditableRow = ({ index, ...props }) => {
+export const EditableRow = ({ index, ...props }: { index: number }) => {
   // const [form] = Form.useForm();
   return (
     // <Form form={form} component={false}>
@@ -41,14 +41,14 @@ export const EditableCell = ({
     childNode = (
       <div className="text-gray-500 flex w-full justify-start text-right">
         <span
-          onClick={() => handleQuantity(-1, record)}
+          onClick={() => handleQuantity(-1, record as any)}
           className="hover:bg-gray-200 mr-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md"
         >
           <Minus size={16} />
         </span>
         <span>{record[dataIndex] || ""}</span>
         <span
-          onClick={() => handleQuantity(1, record)}
+          onClick={() => handleQuantity(1, record as any)}
           className={clsx("hover:bg-gray-200 ml-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md")}
         >
           <Plus size={16} />

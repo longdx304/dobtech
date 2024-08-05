@@ -18,9 +18,7 @@ export async function generateStaticParams() {
 	return staticParams;
 }
 
-export async function generateMetadata({
-	params,
-}: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { handle } = params;
 
 	const { product } = await getProductByHandle(
@@ -42,7 +40,7 @@ export async function generateMetadata({
 	};
 }
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params }: Readonly<Props>) {
 	return (
 		<div className="w-full box-border container pt-[4rem] lg:pt-[8rem]">
 			<ProductTemplate

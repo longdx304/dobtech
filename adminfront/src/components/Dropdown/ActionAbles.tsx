@@ -1,6 +1,5 @@
 import type { MenuProps } from 'antd';
 import { Ellipsis } from 'lucide-react';
-import { FC } from 'react';
 
 import { Dropdown } from '@/components/Dropdown';
 
@@ -23,4 +22,3 @@ export default function ActionAbles({ actions, onMenuClick, id }: Props) {
 		</Dropdown>
 	);
 }
-

@@ -3,38 +3,37 @@ import {
 	Order,
 	ProductVariant,
 } from '@medusajs/medusa';
-import { message, Divider } from 'antd';
+import { Divider, message } from 'antd';
 import { LoaderCircle } from 'lucide-react';
 
 import { Select } from '@/components/Select';
-import { Option } from '@/types/shared';
 import { getErrorMessage } from '@/lib/utils';
+import { Option, Subset } from '@/types/shared';
 import {
 	useAdminCreateClaim,
-	useAdminShippingOptions,
 	useAdminOrder,
+	useAdminShippingOptions,
 	useAdminStockLocations,
 } from 'medusa-react';
-import React, { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
-import { Text, Title } from '@/components/Typography';
-import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
-import { getDefaultClaimValues } from '@/modules/orders/components/orders/utils/get-default-values';
-import AddProductVariant from '@/modules/orders/components/common/add-product-variant';
-import useToggleState from '@/lib/hooks/use-toggle-state';
-import RMAReturnProductsTable from '../rma-return-product-table';
-import _ from 'lodash';
-import { formatAmountWithSymbol } from '@/utils/prices';
-import { CreateClaimFormType } from '@/types/order';
-import { Subset } from '@/types/shared';
-import { EditableRow, EditableCell } from './products-component';
-import { Table } from '@/components/Table';
-import productsColumns from './products-column';
-import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import { Radio, RadioGroup } from '@/components/Radio';
+import { Table } from '@/components/Table';
+import { Text, Title } from '@/components/Typography';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
+import PlaceholderImage from '@/modules/common/components/placeholder-image';
+import AddProductVariant from '@/modules/orders/components/common/add-product-variant';
+import { getDefaultClaimValues } from '@/modules/orders/components/orders/utils/get-default-values';
+import { CreateClaimFormType } from '@/types/order';
+import { formatAmountWithSymbol } from '@/utils/prices';
+import _ from 'lodash';
+import RMAReturnProductsTable from '../rma-return-product-table';
+import productsColumns from './products-column';
+import { EditableCell, EditableRow } from './products-component';
 
 type ClaimProps = {
 	order: Order;
@@ -59,7 +58,7 @@ const extractPrice = (prices: any, order: any, quantity?: number) => {
 	if (price) {
 		return formatAmountWithSymbol({
 			currency: order.currency_code,
-			amount: price.amount * (1 + order.tax_rate / 100) * (quantity || 1),
+			amount: price.amount * (1 + order.tax_rate / 100) * (quantity ?? 1),
 		});
 	}
 
@@ -92,9 +91,6 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 	const [dataSource, setDataSource] = useState<any | null>(null);
 	const [defaultClaim, setDefaultClaim] =
 		useState<Subset<CreateClaimFormType> | null>(null);
-	// const [refundAmount, setRefundAmount] = useState<number>(0);
-
-	console.log('defaultClaim', defaultClaim);
 
 	const {
 		stock_locations,
@@ -145,6 +141,7 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 				);
 			}, 0) - (shippingPrice || 0)
 		);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toReturn, shippingPrice]);
 
 	const additionalTotal = useMemo(() => {
@@ -166,6 +163,7 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 			const lineTotal = amount * next.quantity;
 			return acc + lineTotal;
 		}, 0);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [itemsToAdd]);
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
@@ -243,6 +241,7 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 			const method = shippingOptions.find((o) => shippingMethod.value === o.id);
 			setShippingPrice(method?.amount as number);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [useCustomShippingPrice, shippingMethod]);
 
 	const onAddVariants = (
@@ -299,23 +298,23 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 					? itemsToAdd.map((i) => ({
 							variant_id: i.id,
 							quantity: i.quantity,
-						}))
+					  }))
 					: undefined,
 			no_notification: false,
 			shipping_address:
 				type === 'replace'
 					? {
 							address_1: defaultClaim?.shipping_address?.address_1,
-							address_2: defaultClaim?.shipping_address?.address_2 || undefined,
+							address_2: defaultClaim?.shipping_address?.address_2 ?? undefined,
 							city: defaultClaim?.shipping_address?.city,
 							country_code: defaultClaim?.shipping_address?.country_code?.value,
-							company: defaultClaim?.shipping_address?.company || undefined,
+							company: defaultClaim?.shipping_address?.company ?? undefined,
 							first_name: defaultClaim?.shipping_address?.first_name,
 							last_name: defaultClaim?.shipping_address?.last_name,
-							phone: defaultClaim?.shipping_address?.phone || undefined,
+							phone: defaultClaim?.shipping_address?.phone ?? undefined,
 							postal_code: defaultClaim?.shipping_address?.postal_code,
-							province: defaultClaim?.shipping_address?.province || undefined,
-						}
+							province: defaultClaim?.shipping_address?.province ?? undefined,
+					  }
 					: undefined,
 			return_location_id: undefined,
 			shipping_methods:
@@ -325,7 +324,7 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 								option_id: shippingMethodReplace.value,
 								price: 0,
 							},
-						]
+					  ]
 					: undefined,
 		};
 		console.log('payload', data);
@@ -481,17 +480,15 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 				</RadioGroup>
 			</div>
 			{defaultClaim?.claim_type?.type === 'replace' && (
-				<>
-					<ItemsToSend
-						order={order}
-						itemsToAdd={itemsToAdd}
-						setItemsToAdd={setItemsToAdd}
-						onAddVariants={onAddVariants}
-						defaultClaim={defaultClaim}
-						shippingMethodReplace={shippingMethodReplace}
-						handleShippingSelectedReplace={handleShippingSelectedReplace}
-					/>
-				</>
+				<ItemsToSend
+					order={order}
+					itemsToAdd={itemsToAdd}
+					setItemsToAdd={setItemsToAdd}
+					onAddVariants={onAddVariants}
+					defaultClaim={defaultClaim}
+					shippingMethodReplace={shippingMethodReplace}
+					handleShippingSelectedReplace={handleShippingSelectedReplace}
+				/>
 			)}
 			<Divider className="my-6" />
 			<div className="">
@@ -569,7 +566,9 @@ const SummaryLineItem = ({
 							src={isReplace ? item?.product?.thumbnail : item.thumbnail}
 							height={48}
 							width={36}
-							alt={`Image summary ${isReplace ? item?.product.title : item.product_title}`}
+							alt={`Image summary ${
+								isReplace ? item?.product.title : item.product_title
+							}`}
 							className="object-cover"
 						/>
 					) : (
@@ -594,7 +593,7 @@ const SummaryLineItem = ({
 									amount: item.total / item.original_quantity,
 									currency: currencyCode,
 									tax: [],
-								})}
+							  })}
 					</div>
 					<div className="font-normal text-gray-500">x {item.quantity}</div>
 					<div className="font-normal text-gray-900 min-w-[55px] text-right">
@@ -605,7 +604,7 @@ const SummaryLineItem = ({
 										(item.total / item.original_quantity) * item.quantity ?? 0,
 									currency: currencyCode,
 									tax: [],
-								})}
+							  })}
 					</div>
 				</div>
 				<div className="font-normal text-gray-500 text-[12px]">

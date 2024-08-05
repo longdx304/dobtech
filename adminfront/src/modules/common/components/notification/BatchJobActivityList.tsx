@@ -1,6 +1,8 @@
 // @ts-nocheck
 'use client';
 import { BatchJob } from '@medusajs/medusa/dist';
+import { notification } from 'antd';
+import { Bell, CircleX, FileBox, LoaderCircle } from 'lucide-react';
 import {
 	useAdminBatchJob,
 	useAdminCancelBatchJob,
@@ -9,16 +11,14 @@ import {
 	useAdminStore,
 } from 'medusa-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Bell, LoaderCircle, CircleX, File, FileBox } from 'lucide-react';
-import { notification } from 'antd';
 import * as XLSX from 'xlsx';
 
-import { batchJobDescriptionBuilder } from './utils';
-import { cn, getErrorMessage, bytesConverter } from '@/lib/utils';
-import getRelativeTime from '@/utils/get-relative-time';
 import { Button } from '@/components/Button';
+import { bytesConverter, cn, getErrorMessage } from '@/lib/utils';
 import ActivityCard from '@/modules/common/components/activity-card';
-import BatchJobFileCard from '@/modules/common/components//batch-job-file-card';
+import BatchJobFileCard from '@/modules/common/components/batch-job-file-card';
+import getRelativeTime from '@/utils/get-relative-time';
+import { batchJobDescriptionBuilder } from './utils';
 
 /**
  * Retrieve a batch job and refresh the data depending on the last batch job status
@@ -135,27 +135,24 @@ const BatchJobActivityCard = (props: { batchJob: BatchJob }) => {
 
 				// Chuyển đổi workbook thành tệp Blob
 				const wopts = { bookType: 'xlsx', type: 'array' };
-				const xlsxBlob = new Blob([XLSX.write(workbook, wopts)], { type: 'application/octet-stream' });
+				const xlsxBlob = new Blob([XLSX.write(workbook, wopts)], {
+					type: 'application/octet-stream',
+				});
 
 				// Tạo và kích hoạt link tải xuống cho tệp XLSX
 				const link = document.createElement('a');
 				link.href = URL.createObjectURL(xlsxBlob);
-				link.setAttribute('download', `${batchJob.result?.file_key.replace('.csv', '.xlsx')}`);
+				link.setAttribute(
+					'download',
+					`${batchJob.result?.file_key.replace('.csv', '.xlsx')}`
+				);
 				document.body.appendChild(link); // Append to body instead of a specific element
 				link.click();
 				document.body.removeChild(link); // Remove from body after click
 			};
 			reader.readAsText(blob, 'utf-8');
-
-			// const link = document.createElement('a');
-			// link.href = download_url;
-			// link.setAttribute('download', `${batchJob.result?.file_key}`);
-			// activityCardRef.current?.appendChild(link);
-			// link.click();
-
-			// activityCardRef.current?.removeChild(link);
-
 		} catch (e) {
+			console.log('Download error', e);
 			notification.error({
 				description: `Đã xảy ra lỗi trong khi tải xuống tệp ${operation.toLowerCase()}`,
 			});
@@ -180,23 +177,23 @@ const BatchJobActivityCard = (props: { batchJob: BatchJob }) => {
 	const getBatchJobFileCard = () => {
 		const twentyfourHoursInMs = 24 * 60 * 60 * 1000;
 
-		const icon =
-			batchJob.status !== 'completed' && batchJob.status !== 'canceled' ? (
-				batchJob.status === 'failed' ? (
-					<CircleX size={18} color="rgb(220 38 38)" />
-				) : (
-					<LoaderCircle size={20} className="animate-spin" />
-				)
-			) : (
-				<FileBox
-					size={20}
-					color={
-						Math.abs(relativeTimeElapsed.raw) > twentyfourHoursInMs
-							? '#767676'
-							: 'rgb(110 231 183)'
-					}
-				/>
-			);
+		let icon;
+
+		if (batchJob.status !== 'completed' && batchJob.status !== 'canceled') {
+			if (batchJob.status === 'failed') {
+				icon = <CircleX size={18} color="rgb(220 38 38)" />;
+			} else {
+				icon = <LoaderCircle size={20} className="animate-spin" />;
+			}
+		} else {
+			let iconColor;
+			if (Math.abs(relativeTimeElapsed.raw) > twentyfourHoursInMs) {
+				iconColor = '#767676';
+			} else {
+				iconColor = 'rgb(110 231 183)';
+			}
+			icon = <FileBox size={20} color={iconColor} />;
+		}
 
 		const fileSize = batchJob.result?.file_key
 			? bytesConverter(batchJob.result?.file_size ?? 0)
@@ -227,7 +224,7 @@ const BatchJobActivityCard = (props: { batchJob: BatchJob }) => {
 			variant: string,
 			text: string,
 			className?: string,
-			danger?: boolean,
+			danger?: boolean
 		) => {
 			return (
 				<Button
@@ -249,7 +246,8 @@ const BatchJobActivityCard = (props: { batchJob: BatchJob }) => {
 							{buildButton(onDownloadFile, 'text', 'Tải xuống', 'ml-2')}
 						</div>
 					)}
-					{canCancel && buildButton(() => cancelBatchJob(), 'default', 'Huỷ', '', true)}
+					{canCancel &&
+						buildButton(() => cancelBatchJob(), 'default', 'Huỷ', '', true)}
 				</div>
 			)
 		);

@@ -1,3 +1,4 @@
+import { message, Modal } from 'antd';
 import {
 	useAdminCancelReturn,
 	useAdminCancelSwap,
@@ -5,34 +6,30 @@ import {
 	useAdminStore,
 } from 'medusa-react';
 import React, { useEffect, useState } from 'react';
-import { message, Modal } from 'antd';
 
+import { Button } from '@/components/Button';
+import { TooltipIcon } from '@/components/Tooltip';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import { getErrorMessage } from '@/lib/utils';
 import CreateFulfillmentModal from '@/modules/orders/components/orders/fulfillment/create-fulfillment-modal';
-import ReceiveReturnModal from './modal/receive-return';
 import useOrdersExpandParam from '@/modules/orders/components/orders/utils/use-admin-expand-parameter';
 import { ExchangeEvent } from '@/modules/orders/hooks/use-build-timeline';
 import Medusa from '@/services/api';
-import { getErrorMessage } from '@/lib/utils';
-// import CopyToClipboard from "../../atoms/copy-to-clipboard"
-import { FulfillmentStatus, PaymentStatus, ReturnStatus } from './order-status';
-import EventContainer, { EventIconColor } from './event-container';
-import EventItemContainer from './event-item-container';
-import {
-	CircleAlert,
-	Ban,
-	CircleDollarSign,
-	Truck,
-	RefreshCw,
-	CircleX,
-	CreditCard,
-} from 'lucide-react';
-import { TooltipIcon } from '@/components/Tooltip';
-import EventActionables from './event-actionables';
-import { Button } from '@/components/Button';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
-import SwapCheckoutModal from './modal/swap-checkout';
+import {
+	Ban,
+	CircleAlert,
+	CircleDollarSign,
+	CircleX,
+	RefreshCw,
+	Truck,
+} from 'lucide-react';
+import EventActionables from './event-actionables';
+import EventContainer, { EventIconColor } from './event-container';
+import EventItemContainer from './event-item-container';
+import ReceiveReturnModal from './modal/receive-return';
+import { FulfillmentStatus, PaymentStatus, ReturnStatus } from './order-status';
 
 dayjs.locale('vi');
 type ExchangeProps = {
@@ -159,11 +156,9 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 					onSuccess: () => {
 						refetch();
 						message.success('Huỷ trao đổi thành công!');
-						return;
 					},
 					onError: (error: any) => {
 						message.error(getErrorMessage(error));
-						return;
 					},
 				});
 			},
@@ -190,11 +185,9 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 					onSuccess: () => {
 						refetch();
 						message.success('Huỷ trả hàng thành công!');
-						return;
 					},
 					onError: (error: any) => {
 						message.error(getErrorMessage(error));
-						return;
 					},
 				});
 			},
@@ -368,12 +361,6 @@ function getPaymentLink(
 				)}
 				<span>Link thanh toán:</span>
 			</div>
-			{/* {differenceCardId && (
-				<CopyToClipboard
-					value={differenceCardId}
-					displayValue={exchangeCartId}
-				/>
-			)} */}
 		</div>
 	) : null;
 }

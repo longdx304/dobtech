@@ -11,6 +11,7 @@ import {
 	LogOut,
 	Settings,
 	ShoppingCart,
+	Undo2,
 	User as UserIcon,
 	Users,
 	UsersRound,
@@ -63,6 +64,7 @@ const itemsAdmin: MenuProps['items'] = [
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
 		getItem('Tiền tệ', 'currency', <BadgeDollarSign />),
+		getItem('Lý do trả hàng', 'return-reasons', <Undo2 />),
 	]),
 ];
 
@@ -126,4 +128,5 @@ export const menuRoutes: Record<string, string> = {
 	customers: ERoutes.CUSTOMERS,
 	regions: ERoutes.REGIONS,
 	orders: ERoutes.ORDERS,
+	'return-reasons': ERoutes.RETURN_REASONS,
 };

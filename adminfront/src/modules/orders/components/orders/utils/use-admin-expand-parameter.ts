@@ -27,6 +27,11 @@ const orderRelations = [
 	'returnable_items',
 ];
 
+/**
+ * Returns an object containing the expanded order relations based on the current feature flags.
+ *
+ * @return {{ orderRelations: string }} An object with the property `orderRelations` containing a comma-separated string of the expanded order relations.
+ */
 const useOrdersExpandParam = () => {
 	const { isFeatureEnabled } = useFeatureFlag();
 	const editsEnabled = isFeatureEnabled('order_editing');

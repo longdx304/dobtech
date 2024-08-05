@@ -27,7 +27,7 @@ interface Props {
 }
 
 export const getFulfillAbleQuantity = (item: LineItem): number => {
-	return item.quantity - (item.fulfilled_quantity || 0);
+	return item.quantity - (item.fulfilled_quantity ?? 0);
 };
 
 const CreateFulfillmentModal = ({
@@ -40,7 +40,7 @@ const CreateFulfillmentModal = ({
 	const [errors, setErrors] = useState({});
 	const [quantities, setQuantities] = useState<Record<string, number>>(
 		'items' in orderToFulfill
-			? (orderToFulfill as Order).items.reduce((acc, next) => {
+			? orderToFulfill.items.reduce((acc, next) => {
 					return {
 						...acc,
 						[next.id]: getFulfillAbleQuantity(next),
@@ -110,12 +110,10 @@ const CreateFulfillmentModal = ({
 					}));
 				break;
 		}
-
 		await action.mutateAsync(requestObj as any, {
 			onSuccess: () => {
 				message.success(successText);
 				handleOk();
-				// handleCancel();
 			},
 			onError: (err: any) => message.error(getErrorMessage(err)),
 		});
@@ -143,7 +141,6 @@ const CreateFulfillmentModal = ({
 				items={items}
 				quantities={quantities}
 				setQuantities={setQuantities}
-				// locationId={locationSelectValue.value}
 				setErrors={setErrors}
 			/>
 		</Modal>

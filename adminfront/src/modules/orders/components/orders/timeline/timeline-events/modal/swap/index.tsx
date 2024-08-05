@@ -116,6 +116,7 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 				);
 			}, 0) - (shippingPrice || 0)
 		);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toReturn, shippingPrice]);
 
 	const additionalTotal = useMemo(() => {
@@ -137,6 +138,7 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			const lineTotal = amount * next.quantity;
 			return acc + lineTotal;
 		}, 0);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [itemsToAdd]);
 
 	const handleToAddQuantity = (value: number, itemId: string) => {
@@ -186,6 +188,7 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			const method = shippingOptions.find((o) => shippingMethod.value === o.id);
 			setShippingPrice(method?.amount as any);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [useCustomShippingPrice, shippingMethod]);
 
 	const onAddVariants = (

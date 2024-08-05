@@ -1,5 +1,5 @@
-import { Dropdown as AndtDropdown, DropDownProps } from 'antd';
 import { cn } from '@/lib/utils';
+import { Dropdown as AndtDropdown, DropDownProps } from 'antd';
 
 export type Props = Partial<DropDownProps> & {
 	className?: string;

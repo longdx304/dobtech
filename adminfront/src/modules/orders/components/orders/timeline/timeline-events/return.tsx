@@ -1,14 +1,12 @@
+import { Button } from '@/components/Button';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import { ReturnEvent } from '@/modules/orders/hooks/use-build-timeline';
+import { message, Modal } from 'antd';
 import clsx from 'clsx';
+import { Ban, CircleAlert, PackageCheck, Trash2 } from 'lucide-react';
 import { useAdminCancelReturn } from 'medusa-react';
 import React from 'react';
-// import { ReceiveReturnMenu } from "../../../domain/orders/details/receive-return"
-import { ReturnEvent } from '@/modules/orders/hooks/use-build-timeline';
-import useToggleState from '@/lib/hooks/use-toggle-state';
-import { Button } from '@/components/Button';
-import { CircleAlert, Ban, PackageCheck, Trash2 } from 'lucide-react';
-import { message, Modal } from 'antd';
 
-import DeletePrompt from '../../organisms/delete-prompt';
 import EventActionables from './event-actionables';
 import EventContainer from './event-container';
 import EventItemContainer from './event-item-container';
@@ -41,7 +39,7 @@ const Return: React.FC<ReturnRequestedProps> = ({ event, refetch }) => {
 			okText: 'Đồng ý',
 			cancelText: 'Huỷ',
 			async onOk() {
-				cancelReturn.mutateAsync(event.id, {
+				cancelReturn.mutateAsync(event.id as any, {
 					onSuccess: () => {
 						refetch();
 						message.success('Huỷ trả hàng thành công!');
@@ -143,17 +141,17 @@ function buildReturn(
 							return <EventItemContainer key={index} item={i} />;
 						}),
 						React.createElement(React.Fragment, { key: 'button' }, button),
-					]
+				  ]
 				: event.status === 'received'
-					? [
-							event.items.map((i, index) => (
-								<EventItemContainer
-									key={index}
-									item={{ ...i, quantity: i.receivedQuantity ?? i.quantity }}
-								/>
-							)),
-						]
-					: null,
+				? [
+						event.items.map((i, index) => (
+							<EventItemContainer
+								key={index}
+								item={{ ...i, quantity: i.receivedQuantity ?? i.quantity }}
+							/>
+						)),
+				  ]
+				: null,
 	};
 }
 
