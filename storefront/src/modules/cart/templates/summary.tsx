@@ -25,6 +25,7 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 	const [isAdding, setIsAdding] = useState(false);
 	const router = useRouter();
 	const [isOpenModal, setIsOpenModal] = useState(false);
+	const [isProcessing, setIsProcessing] = useState(false);
 	const [checkoutCart, setCheckoutCart] = useState<Cart | undefined>(undefined);
 
 	const selectedCartItems = cart.items.filter((item) =>
@@ -121,13 +122,15 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 	 * @throws {Error} If the new checkout cart cannot be created.
 	 */
 	const handleModalOk = async () => {
+		setIsProcessing(true);
 		try {
 			if (checkoutCart) {
 				await deleteAndRefreshCart(checkoutCart?.id!);
 				setCheckoutCart(undefined);
-				refreshCart();
+				await refreshCart();
 			}
 			const newCart = await createCheckoutCart(countryCode);
+
 			if (!newCart) {
 				throw new Error('Failed to create checkout cart');
 			}
@@ -147,6 +150,7 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 			console.error('Error in handleModalOk:', e);
 			message.error('An error occurred while processing your request');
 		} finally {
+			setIsProcessing(false);
 			setIsOpenModal(false);
 		}
 	};
@@ -162,7 +166,7 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 	};
 
 	return (
-		<>
+		<div>
 			<div className="flex flex-col gap-y-2 bg-white">
 				<Text className="text-[1.5rem] leading-[2.75rem] font-semibold">
 					Tóm tắt đơn hàng
@@ -172,11 +176,13 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 					className="w-full h-10 font-semibold"
 					onClick={handleSelectedItemCheckout}
 					isLoading={isAdding}
-				>{`Thanh toán ngay ${
-					selectedCartItems?.length > 0
-						? '(' + selectedCartItems?.length + ')'
-						: ''
-				}`}</Button>
+				>
+					{`Thanh toán ngay ${
+						selectedCartItems?.length > 0
+							? '(' + selectedCartItems?.length + ')'
+							: ''
+					}`}
+				</Button>
 			</div>
 			<Modal
 				title="Xác nhận"
@@ -191,6 +197,7 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 						size="middle"
 						type="default"
 						onClick={handleCheckCart}
+						disabled={isProcessing}
 					>
 						Kiểm tra giỏ hàng
 					</Button>,
@@ -199,12 +206,14 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 						size="middle"
 						type="primary"
 						onClick={handleModalOk}
+						loading={isProcessing}
+						disabled={isProcessing}
 					>
 						Tiếp tục thanh toán đơn hàng mới
 					</Button>,
 				]}
 			/>
-		</>
+		</div>
 	);
 };
 

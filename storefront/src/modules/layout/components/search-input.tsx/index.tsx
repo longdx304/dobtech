@@ -32,7 +32,6 @@ const SearchInput = () => {
 	};
 
 	const handleBlur = () => {
-		console.log('handleBlur');
 		if (timeoutRef.current) {
 			clearTimeout(timeoutRef.current);
 		}
@@ -77,7 +76,7 @@ const SearchInput = () => {
 			dropdownRender={() => dropdownContent}
 			trigger={['click']}
 			open={isDropdownOpen}
-			placement="bottomCenter"
+			placement="bottom"
 			onOpenChange={handleDropdownClick}
 		>
 			<Search

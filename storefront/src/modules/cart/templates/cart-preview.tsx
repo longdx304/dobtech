@@ -12,7 +12,7 @@ type Props = {
 	customer: Omit<Customer, 'password_hash'> | null;
 };
 const CartPreview = ({ cart, customer }: Props) => {
-	const { currentStep, refreshCart, setCurrentStep, allCarts } = useCart();
+	const { currentStep, refreshCart, setCurrentStep } = useCart();
 
 	useEffect(() => {
 		setCurrentStep(0);

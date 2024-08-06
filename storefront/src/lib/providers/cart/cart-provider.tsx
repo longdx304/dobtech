@@ -87,7 +87,7 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 			return allCarts;
 		} catch (e) {
 			console.error('Error fetching all carts:', e);
-			return []
+			return [];
 		}
 	};
 
@@ -162,18 +162,14 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 	 *
 	 * @return {Promise<void>} A promise that resolves when the cart is successfully refreshed with the updated data.
 	 */
-	// const refreshCart = async () => {
-	// 	await Promise.all([fetchCart(), fetchAllCarts()]);
-	// };
-
 	const refreshCart = async () => {
-    const [updatedCart, updatedAllCarts] = await Promise.all([
-      fetchCart(),
-      fetchAllCarts(),
-    ]);
-    setCart(updatedCart);
-    setAllCarts(updatedAllCarts);
-  };
+		const [updatedCart, updatedAllCarts] = await Promise.all([
+			fetchCart(),
+			fetchAllCarts(),
+		]);
+		setCart(updatedCart);
+		setAllCarts(updatedAllCarts);
+	};
 
 	useEffect(() => {
 		// fetchCart();
@@ -181,8 +177,6 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 		refreshCart();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
-	console.log('main cart', cart)
 
 	return (
 		<CartContext.Provider

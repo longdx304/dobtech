@@ -35,8 +35,7 @@ const ProductBanner = () => {
                 src={`/images/banner/${index + 1}.jpg`}
                 alt='banner'
                 fill
-                objectFit='cover'
-                className='w-full h-full'
+                className='w-full h-full object-cover'
               />
             </div>
           </SwiperSlide>

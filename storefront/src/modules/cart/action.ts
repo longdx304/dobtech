@@ -15,6 +15,7 @@ import _ from 'lodash';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { updateCartMetadata } from '../checkout/actions';
+import { getCustomer, updateCustomer } from '@/actions/customer';
 
 /**
  * Retrieves the cart based on the cartId cookie
@@ -99,6 +100,15 @@ export async function addToCart({
 	try {
 		await updateCartMetadata(cart.id, 'cart_type', 'default');
 		await addItem({ cartId: cart.id, variantId, quantity });
+
+		// Persistent Cart Across Browsers/Devices
+		const customer = await getCustomer();
+		if (customer) {
+			await updateCustomer({
+				metadata: { ...customer.metadata, cartId: cart.id },
+			});
+		}
+
 		revalidateTag('cart');
 	} catch (e) {
 		return 'Error adding item to cart';

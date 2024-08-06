@@ -42,7 +42,7 @@ const Addresses = ({
 	};
 
 	const countriesInRegion = useMemo(
-		() => cart?.region.countries.map((c) => c.iso_2),
+		() => cart?.region.countries.map((c: any) => c.iso_2),
 		[cart?.region]
 	);
 

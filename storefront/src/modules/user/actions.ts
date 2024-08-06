@@ -5,6 +5,7 @@ import {
 	addShippingAddress,
 	createCustomer,
 	deleteShippingAddress,
+	getCustomer,
 	updateCustomer,
 	updateShippingAddress,
 } from '@/actions/customer';
@@ -54,11 +55,23 @@ export async function logCustomerIn(values: {
 	const { email, password } = values;
 
 	try {
-		await getToken({ email, password }).then(() => {
-			revalidateTag('customer');
-		});
+		await getToken({ email, password });
+		const customer = await getCustomer();
+
+		if (customer?.metadata?.cartId) {
+			const cartId = customer?.metadata?.cartId as string;
+
+			cookies().set('_chamdep_cart_id', cartId, {
+				maxAge: 60 * 60 * 24 * 7,
+				httpOnly: true,
+				sameSite: 'strict',
+			});
+		}
+
+		revalidateTag('customer');
+		revalidateTag('cart');
 	} catch (error: any) {
-		console.log('error', error);
+		console.error('Login error:', error);
 		throw new Error('Lỗi: Email hoặc mật khẩu không đúng');
 	}
 }
@@ -217,6 +230,11 @@ export async function signOut() {
 	cookies().set('_chamdep_jwt', '', {
 		maxAge: -1,
 	});
+
+	cookies().set('_chamdep_cart_id', '', {
+		maxAge: -1,
+	});
+
 	revalidateTag('auth');
 	revalidateTag('customer');
 }
