@@ -20,12 +20,18 @@ type SummaryProps = {
 const countryCode = 'vn';
 
 const Summary = ({ cart, selectedItems }: SummaryProps) => {
-	const { refreshCart, allCarts, deleteAndRefreshCart, setCurrentStep } =
-		useCart();
+	const {
+		refreshCart,
+		allCarts,
+		deleteAndRefreshCart,
+		setCurrentStep,
+		isProcessing,
+		setIsProcessing,
+	} = useCart();
 	const [isAdding, setIsAdding] = useState(false);
 	const router = useRouter();
 	const [isOpenModal, setIsOpenModal] = useState(false);
-	const [isProcessing, setIsProcessing] = useState(false);
+	// const [isProcessing, setIsProcessing] = useState(false);
 	const [checkoutCart, setCheckoutCart] = useState<Cart | undefined>(undefined);
 
 	const selectedCartItems = cart.items.filter((item) =>
@@ -143,8 +149,8 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 					})
 				)
 			);
-			setCheckoutCart(newCart as Cart);
 			setCurrentStep(1);
+			setCheckoutCart(newCart as Cart);
 			router.push(`${ERoutes.CHECKOUT}/?cartId=${newCart.id}`);
 		} catch (e) {
 			console.error('Error in handleModalOk:', e);
@@ -157,9 +163,11 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 
 	const handleCancel = () => {
 		setIsOpenModal(false);
+		setIsProcessing(false);
 	};
 
 	const handleCheckCart = () => {
+		setIsProcessing(true);
 		setCurrentStep(1);
 		setIsOpenModal(false);
 		router.push(`${ERoutes.CHECKOUT}/?cartId=${checkoutCart?.id}`);
@@ -185,9 +193,8 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 				</Button>
 			</div>
 			<Modal
-				title="Xác nhận"
+				title="Xác nhận đơn hàng"
 				open={isOpenModal}
-				onOk={handleModalOk}
 				onCancel={handleCancel}
 				okText="Tiếp tục thanh toán đơn hàng mới"
 				cancelText="Kiểm tra giỏ hàng"
@@ -198,6 +205,7 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 						type="default"
 						onClick={handleCheckCart}
 						disabled={isProcessing}
+						loading={isProcessing}
 					>
 						Kiểm tra giỏ hàng
 					</Button>,
@@ -212,7 +220,11 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 						Tiếp tục thanh toán đơn hàng mới
 					</Button>,
 				]}
-			/>
+			>
+				<Text className="text-sm font-normal">
+					Đã tồn tại 1 đơn hàng. Bạn chắc chắn thanh toán đơn hàng này chứ?
+				</Text>
+			</Modal>
 		</div>
 	);
 };

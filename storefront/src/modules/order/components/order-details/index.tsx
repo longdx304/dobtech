@@ -1,6 +1,7 @@
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import { Order } from '@medusajs/medusa';
+import dayjs from 'dayjs';
 
 type OrderDetailsProps = {
 	order: Order;
@@ -25,12 +26,9 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
 			<Text>
 				Ngày thanh toán:{' '}
 				<span data-testid="order-date">
-					{new Date(order.created_at).toDateString()}
+					{`${dayjs(order.created_at).format('DD/MM/YYYY')}`}
 				</span>
 			</Text>
-			{/* <Text>
-				Đơn hàng số: <span data-testid="order-id">{order.display_id}</span>
-			</Text> */}
 
 			{showStatus && (
 				<Flex className="flex-col gap-y-2">
@@ -41,7 +39,8 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
 						</span>
 					</Text>
 					<Text>
-						Trang thái thanh toán: <span>{formatStatus(order.payment_status)}</span>
+						Trang thái thanh toán:{' '}
+						<span>{formatStatus(order.payment_status)}</span>
 					</Text>
 				</Flex>
 			)}

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import LoginTemplate from '../../templates/login-template';
+import { Divider } from 'antd';
 
 const ItemGroup = () => {
 	const { state, onOpen, onClose } = useToggleState(false);
@@ -33,10 +34,7 @@ const ItemGroup = () => {
 	return (
 		<>
 			{/* Login / Register */}
-			<Flex
-				className="flex-col space-y-2"
-				style={{ borderBottom: '11px solid #f6f6f6' }}
-			>
+			<Flex className="flex-col space-y-2">
 				<Flex
 					align="center"
 					justify="space-between"
@@ -50,169 +48,18 @@ const ItemGroup = () => {
 							? `Chào, ${customer.first_name} ${customer.last_name}`
 							: 'Đăng nhập / Đăng ký'}
 					</Text>
-					<Settings size={24} onClick={() => router.push('/user/setting')} />
+					<Settings
+						size={24}
+						className="block lg:hidden"
+						onClick={() => router.push('/user/setting')}
+					/>
 				</Flex>
-
-				{/* <Flex align='center' justify='space-between' className='px-4 pt-2 pb-4 lg:justify-around'>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <TicketPercent size={24} />
-            <Text className='text-xs'>Phiếu giảm giá</Text>
-          </Flex>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <CircleDollarSign size={24} />
-            <Text className='text-xs'>Điểm</Text>
-          </Flex>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <Wallet size={24} />
-            <Text className='text-xs'>Ví</Text>
-          </Flex>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <Gift size={24} />
-            <Text className='text-xs'>Quà tặng</Text>
-          </Flex>
-        </Flex> */}
 			</Flex>
 
-			{/* My order */}
-			{/* <Flex
-        className='flex-col space-y-2 py-4'
-        style={{ borderBottom: '11px solid #f6f6f6' }}
-      >
-        <Flex align='center' justify='space-between' className='px-4 py-2'>
-          <Text className='text-md font-semibold'>Đơn hàng của tôi</Text>
-          <Text className='flex items-center text-xs text-[#767676]'>
-            Xem tất cả <ChevronRight size={12} />
-          </Text>
-        </Flex>
-        <Flex align='center' justify='space-between' className='px-4 pt-2 pb-4'>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <WalletMinimal size={24} />
-            <Text className='text-xs'>Chưa thanh toán</Text>
-          </Flex>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <PackageSearch size={24} />
-            <Text className='text-xs'>Xử lý</Text>
-          </Flex>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <Truck size={24} />
-            <Text className='text-xs'>Đã vận chuyển</Text>
-          </Flex>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <MessageSquareQuote size={24} />
-            <Text className='text-xs'>Đánh giá</Text>
-          </Flex>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <SquareArrowLeft size={24} />
-            <Text className='text-xs'>Trả lại</Text>
-          </Flex>
-        </Flex>
-      </Flex> */}
-
-			{/* Services */}
-			{/* <Flex
-        className='flex-col space-y-2 py-4'
-        style={{ borderBottom: '11px solid #f6f6f6' }}
-      >
-        <Flex align='center' justify='space-between' className='px-4 py-2'>
-          <Text className='text-md font-semibold'>Nhiều dịch vụ hơn</Text>
-        </Flex>
-        <Flex align='center' justify='space-between' className='px-4 pt-2 pb-4'>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <Headset size={24} />
-            <Text className='text-xs'>Câu hỏi</Text>
-          </Flex>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <NotebookPen size={24} />
-            <Text className='text-xs'>Khảo sát</Text>
-          </Flex>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <HandCoins size={24} />
-            <Text className='text-xs'>Chia sẻ & kiềm tiền</Text>
-          </Flex>
-          <Flex
-            align='center'
-            className='flex-col gap-1'
-            onClick={() => {
-              handleLoginClick();
-            }}
-          >
-            <SquareCheckBig size={24} />
-            <Text className='text-xs'>Theo dõi</Text>
-          </Flex>
-        </Flex>
-      </Flex> */}
+			<Divider
+				className="my-0 block lg:hidden"
+				style={{ borderColor: '#f6f6f6', borderWidth: "11px" }}
+			/>
 
 			<Drawer
 				open={state}

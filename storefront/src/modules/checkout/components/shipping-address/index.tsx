@@ -74,9 +74,6 @@ const ShippingAddress = ({
 		});
 	};
 
-	console.log('cart shipping address', cart);
-	console.log('isEditing', isEditing);
-
 	return (
 		<>
 			{cart?.id && isEditing && (
