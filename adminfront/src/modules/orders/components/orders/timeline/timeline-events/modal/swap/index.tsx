@@ -230,9 +230,6 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 			})),
 			no_notification: false,
 		};
-		// if (isLocationFulfillmentEnabled && selectedLocation) {
-		//   data.return_location_id = selectedLocation.value
-		// }
 		data.return_shipping = {
 			option_id: shippingMethod.value,
 			price: Math.round(shippingPrice || 0),

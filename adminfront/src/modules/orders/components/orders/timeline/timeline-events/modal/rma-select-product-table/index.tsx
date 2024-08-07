@@ -58,7 +58,7 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 				images: null,
 				reason: null,
 				note: '',
-				quantity: record.quantity - (record.returned_quantity || 0),
+				quantity: record.quantity - (record.returned_quantity ?? 0),
 			};
 		} else {
 			delete newReturns[record.id];
@@ -70,7 +70,7 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 				...record,
 				reason: null,
 				note: '',
-				return_quantity: record.quantity - (record.returned_quantity || 0),
+				return_quantity: record.quantity - (record.returned_quantity ?? 0),
 			});
 			setDataSource(newVariants as any);
 		}

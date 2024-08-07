@@ -13,7 +13,6 @@ import {
 	useAdminCreateClaim,
 	useAdminOrder,
 	useAdminShippingOptions,
-	useAdminStockLocations,
 } from 'medusa-react';
 import Image from 'next/image';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -24,7 +23,6 @@ import { Radio, RadioGroup } from '@/components/Radio';
 import { Table } from '@/components/Table';
 import { Text, Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import AddProductVariant from '@/modules/orders/components/common/add-product-variant';
 import { getDefaultClaimValues } from '@/modules/orders/components/orders/utils/get-default-values';
@@ -68,46 +66,16 @@ const extractPrice = (prices: any, order: any, quantity?: number) => {
 const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 	const { refetch } = useAdminOrder(order.id);
 	const { mutateAsync, isLoading } = useAdminCreateClaim(order.id);
-	const { isFeatureEnabled } = useFeatureFlag();
-	const isLocationFulfillmentEnabled =
-		isFeatureEnabled('inventoryService') &&
-		isFeatureEnabled('stockLocationService');
 
 	const [itemsToAdd, setItemsToAdd] = useState<SelectProduct[]>([]);
-	const [selectedLocation, setSelectedLocation] = useState<{
-		value: string;
-		label: string;
-	} | null>(null);
-	const [toReturn, setToReturn] = useState<
-		Record<string, { quantity: number }>
-	>({});
-	const [useCustomShippingPrice, setUseCustomShippingPrice] = useState(false);
 
-	const [shippingPrice, setShippingPrice] = useState<number>(0);
 	const [shippingMethod, setShippingMethod] = useState<Option | null>(null);
 	const [shippingMethodReplace, setShippingMethodReplace] =
 		useState<Option | null>(null);
 	const [selectedVariants, setSelectedVariants] = useState<string[]>([]);
-	const [dataSource, setDataSource] = useState<any | null>(null);
+	const [dataSource, setDataSource] = useState<any>(null);
 	const [defaultClaim, setDefaultClaim] =
 		useState<Subset<CreateClaimFormType> | null>(null);
-
-	const {
-		stock_locations,
-		refetch: refetchLocations,
-		isLoading: isLoadingLocations,
-	} = useAdminStockLocations(
-		{},
-		{
-			enabled: isLocationFulfillmentEnabled,
-		}
-	);
-
-	useEffect(() => {
-		if (isLocationFulfillmentEnabled) {
-			refetchLocations();
-		}
-	}, [isLocationFulfillmentEnabled, refetchLocations]);
 
 	useEffect(() => {
 		if (order) {
@@ -123,48 +91,6 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 			region_id: order.region_id,
 		});
 
-	const returnTotal = useMemo(() => {
-		const items = Object.keys(toReturn).map((t) =>
-			dataSource.find((i: any) => i.id === t)
-		);
-
-		return (
-			items.reduce((acc, next) => {
-				if (!next) {
-					return acc;
-				}
-
-				return (
-					acc +
-					((next.refundable || 0) / (next.quantity - next.returned_quantity)) *
-						toReturn[next.id].quantity
-				);
-			}, 0) - (shippingPrice || 0)
-		);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [toReturn, shippingPrice]);
-
-	const additionalTotal = useMemo(() => {
-		return itemsToAdd.reduce((acc, next) => {
-			let amount = next.prices.find(
-				(ma) => ma.region_id === order.region_id
-			)?.amount;
-
-			if (!amount) {
-				amount = next.prices.find(
-					(ma) => ma.currency_code === order.currency_code
-				)?.amount;
-			}
-
-			if (!amount) {
-				amount = 0;
-			}
-
-			const lineTotal = amount * next.quantity;
-			return acc + lineTotal;
-		}, 0);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [itemsToAdd]);
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
 		setSelectedVariants(selectedRowKeys as string[]);
@@ -178,7 +104,7 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 			return;
 		}
 
-		const newReceives = [...(dataSource as any)];
+		const newReceives = [...dataSource];
 		const indexReceiveItem = newReceives?.findIndex(
 			(receive: any) => receive.item_id === item.item_id
 		);
@@ -199,14 +125,14 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 
 		setShippingMethod(selectOption);
 		// const method = shippingOptions?.find((o) => selectedItem.value === o.id)
-		setShippingPrice(0);
 	};
 
 	const handleReason = (reason: any, itemId: string) => {
-		const newVariants = [...(dataSource as any)];
+		const newVariants = [...dataSource];
 		const indexVariant = newVariants.findIndex(
-			(variant) => itemId === variant.id
+			(variant) => itemId === variant.item_id
 		);
+
 		newVariants.splice(indexVariant, 1, {
 			...newVariants[indexVariant],
 			reason: reason?.reason || null,
@@ -225,24 +151,15 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 		}
 
 		setShippingMethodReplace(selectOption);
-		setShippingPrice(0);
 	};
 
-	const handleUpdateShippingPrice = (value: number | undefined) => {
-		if (value !== undefined && value >= 0) {
-			setShippingPrice(value);
-		} else {
-			setShippingPrice(0);
-		}
-	};
-
-	useEffect(() => {
-		if (!useCustomShippingPrice && shippingMethod && shippingOptions) {
-			const method = shippingOptions.find((o) => shippingMethod.value === o.id);
-			setShippingPrice(method?.amount as number);
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [useCustomShippingPrice, shippingMethod]);
+	// useEffect(() => {
+	// 	if (!useCustomShippingPrice && shippingMethod && shippingOptions) {
+	// 		const method = shippingOptions.find((o) => shippingMethod.value === o.id);
+	// 		setShippingPrice(method?.amount as number);
+	// 	}
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [useCustomShippingPrice, shippingMethod]);
 
 	const onAddVariants = (
 		variantIds: SelectProduct['id'],
@@ -327,7 +244,7 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 					  ]
 					: undefined,
 		};
-		console.log('payload', data);
+
 		return mutateAsync(data, {
 			onSuccess: () => {
 				refetch();
@@ -364,6 +281,8 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 			);
 			newReceives?.splice(indexReceiveItem, 1, {
 				...record,
+				reason: null,
+				note: '',
 				quantity: record.original_quantity,
 			});
 			setDataSource(newReceives as any);

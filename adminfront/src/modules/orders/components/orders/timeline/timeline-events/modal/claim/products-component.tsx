@@ -46,21 +46,21 @@ export const EditableCell = ({
 		childNode = (
 			<div>
 				<div className="text-gray-500 flex w-full justify-start text-right">
-					<span
+					<div
 						onClick={() => handleQuantity(-1, record)}
 						className="hover:bg-gray-200 mr-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md"
 					>
 						<Minus size={16} />
-					</span>
+					</div>
 					<span>{record[dataIndex] || ''}</span>
-					<span
+					<div
 						onClick={() => handleQuantity(1, record)}
 						className={clsx(
 							'hover:bg-gray-200 ml-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md'
 						)}
 					>
 						<Plus size={16} />
-					</span>
+					</div>
 				</div>
 				<Button
 					type="default"
@@ -74,7 +74,7 @@ export const EditableCell = ({
 						state={showReturnReason}
 						onClose={() => setShowReturnReason(false)}
 						onSubmit={(reason: { reason?: any; note?: string }) =>
-							handleReason(reason, record.id)
+							handleReason(reason, record.item_id)
 						}
 						initValue={{ reason: record?.reason, note: record?.note }}
 						isClaim={true}

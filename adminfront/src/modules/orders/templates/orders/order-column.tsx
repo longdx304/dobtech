@@ -1,7 +1,5 @@
-import { ActionAbles } from '@/components/Dropdown';
 import { Order } from '@medusajs/medusa';
 import dayjs from 'dayjs';
-import { Truck, Pencil, Trash2 } from 'lucide-react';
 import StatusDot from '@/modules/common/components/status-indicator';
 import { formatNumber } from '@/lib/utils';
 
@@ -45,7 +43,7 @@ const decideFulfillmentStt = (status: any) => {
 	}
 };
 
-const orderColumns = ({ }: Props) => [
+const orderColumns = ({}: Props) => [
 	{
 		title: 'Đơn hàng',
 		dataIndex: 'display_id',

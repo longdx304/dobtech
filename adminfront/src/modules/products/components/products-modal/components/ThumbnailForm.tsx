@@ -44,7 +44,7 @@ const ThumbnailForm: FC<Props> = ({ form }) => {
 					<Upload
 						onFileChosen={handleFilesChosen}
 						placeholder="Khuyến nghị 1200 x 1600 (3:4), tối đa kích thước 10MB mỗi hình ảnh."
-						filetypes={['image/gif', 'image/jpeg', 'image/png', 'image/webp']}
+						filetypes={['image/*']}
 						className="py-2"
 					/>
 				</Form.Item>

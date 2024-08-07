@@ -4,14 +4,10 @@ import {
 	AdminPostProductsReq,
 	Product,
 	ProductCategory,
-	ProductCollection
+	ProductCollection,
 } from '@medusajs/medusa';
-import type { CollapseProps } from 'antd';
-import { Form, message, type FormProps } from 'antd';
-import {
-	Minus,
-	Plus
-} from 'lucide-react';
+import { Form, message, type FormProps, type CollapseProps } from 'antd';
+import { Minus, Plus } from 'lucide-react';
 import { useAdminCreateProduct } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 
@@ -22,10 +18,7 @@ import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import { FormImage } from '@/types/common';
-import {
-	NewProductForm,
-	ProductStatus
-} from '@/types/products';
+import { NewProductForm, ProductStatus } from '@/types/products';
 import {
 	AttributeForm,
 	GeneralForm,
@@ -107,14 +100,13 @@ export default function ProductModal({
 
 		await mutateAsync(payload, {
 			onSuccess: ({ product }) => {
-				console.log('product', product)
 				messageApi.open({
 					type: 'success',
 					content: 'Thêm sản phẩm thành công.',
 				});
 				handleOk();
 				router.push(`${ERoutes.PRODUCTS}/${product.id}`);
-				return;
+				return null;
 			},
 			onError: (error: any) => {
 				console.log('error', error);
@@ -249,9 +241,11 @@ const createPayload = (
 			  }
 			: undefined,
 		// Options
-		options: data?.options?.length ? data.options.map((o) => ({
-			title: o.title,
-		})) : undefined,
+		options: data?.options?.length
+			? data.options.map((o) => ({
+					title: o.title,
+			  }))
+			: undefined,
 		// Variants
 		variants: data?.variants?.map((v) => ({
 			title: v?.title!,
