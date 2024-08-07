@@ -454,7 +454,6 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 					{formatAmountWithSymbol({
 						currency: order.currency_code,
 						amount: refundAmount,
-						digits: 2,
 						tax: order.tax_rate ?? undefined,
 					})}
 				</span>

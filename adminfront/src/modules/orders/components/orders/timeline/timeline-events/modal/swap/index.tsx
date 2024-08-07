@@ -340,7 +340,6 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 					{formatAmountWithSymbol({
 						currency: order.currency_code,
 						amount: additionalTotal,
-						digits: 2,
 						tax: order.tax_rate ?? undefined,
 					})}
 				</span>
@@ -351,7 +350,6 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 					{formatAmountWithSymbol({
 						currency: order.currency_code,
 						amount: additionalTotal - returnTotal,
-						digits: 2,
 						tax: order.tax_rate ?? undefined,
 					})}
 				</span>

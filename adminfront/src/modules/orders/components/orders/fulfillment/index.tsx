@@ -106,9 +106,9 @@ const Fulfillment = ({ order, isLoading }: Props) => {
 	return (
 		<Card loading={isLoading} className="px-4">
 			<div>
-				<Flex align="center" justify="space-between" className="pb-2">
+				<Flex align="flex-start" justify="space-between" className="pb-2">
 					<Title level={4}>{`Fulfillment`}</Title>
-					<div className="flex justify-end items-center gap-4">
+					<div className="flex flex-col-reverse lg:flex-row gap-0 justify-end items-center lg:gap-4">
 						<FulfillmentStatus status={order!.fulfillment_status} />
 						{order.status !== 'canceled' && anyItemsToFulfil && (
 							<Button type="default" onClick={onOpen}>{'Xác nhận đóng gói'}</Button>

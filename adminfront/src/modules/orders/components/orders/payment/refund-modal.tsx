@@ -39,7 +39,7 @@ const RefundModal = ({
 	handleOk,
 	handleCancel,
 	order,
-	initialAmount = 100,
+	initialAmount = 1000,
 	initialReason = 'discount',
 }: Props) => {
 	const [form] = Form.useForm();
@@ -85,7 +85,7 @@ const RefundModal = ({
 	};
 	const formatter = (value: any) => {
 		if (value) {
-			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 		}
 		return value;
 	};

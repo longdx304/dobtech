@@ -160,12 +160,14 @@ const Payment = ({ order, isLoading }: Props) => {
 					</div>
 				))}
 			</div>
-			<RefundModal
-				state={state}
-				handleOk={handleOkRefund}
-				handleCancel={onClose}
-				order={order}
-			/>
+			{state && (
+				<RefundModal
+					state={state}
+					handleOk={handleOkRefund}
+					handleCancel={onClose}
+					order={order}
+				/>
+			)}
 		</Card>
 	);
 };

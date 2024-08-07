@@ -51,7 +51,7 @@ const OrderLine = ({
 				</div>
 			</div>
 			<div className="flex items-center">
-				<div className="md:space-x-2 lg:space-x-4 2xl:space-x-6 mr-3 flex text-[12px]">
+				<div className="space-x-2 lg:space-x-4 2xl:space-x-6 mr-1 flex text-[12px]">
 					<div className="font-normal text-gray-500">
 						{formatAmountWithSymbol({
 							amount: (item?.total ?? 0) / item.quantity,
@@ -71,9 +71,9 @@ const OrderLine = ({
 						})}
 					</div>
 				</div>
-				<div className="font-normal text-gray-500 text-[12px]">
+				{/* <div className="font-normal text-gray-500 text-[12px]">
 					{currencyCode.toUpperCase()}
-				</div>
+				</div> */}
 			</div>
 		</div>
 	);
