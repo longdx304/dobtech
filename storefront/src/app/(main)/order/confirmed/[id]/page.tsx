@@ -41,7 +41,7 @@ export default async function OrderConfirmedPage({ params }: Props) {
 	const { order } = await getOrder(params.id);
 
 	return (
-		<div className="w-full pt-[6rem] lg:pt-[4rem]">
+		<div className="w-full pt-[4rem] lg:pt-[4rem]">
 			<Suspense fallback={<OrderSkeleton />}>
 				<OrderCompletedTemplate order={order} />;
 			</Suspense>

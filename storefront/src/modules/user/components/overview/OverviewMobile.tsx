@@ -1,4 +1,3 @@
-import ProductList from '@/modules/products/components/product-list';
 import ItemGroup from './item-group';
 
 type OverviewMobileProps = {};

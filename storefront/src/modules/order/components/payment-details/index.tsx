@@ -4,6 +4,8 @@ import { paymentInfoMap } from '@/lib/constants';
 import { formatAmount } from '@/lib/utils/prices';
 import { Order } from '@medusajs/medusa';
 import { Divider } from 'antd';
+import dayjs from 'dayjs';
+
 
 type PaymentDetailsProps = {
 	order: Order;
@@ -43,9 +45,9 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
 												amount: payment.amount,
 												region: order.region,
 												includeTaxes: false,
-										  })} được thanh toán ngày ${new Date(
-												payment.created_at
-										  ).toString()}`}
+											})} được thanh toán ngày ${dayjs(payment.created_at).format(
+												'DD/MM/YYYY'
+											)}`}
 								</Text>
 							</div>
 						</div>

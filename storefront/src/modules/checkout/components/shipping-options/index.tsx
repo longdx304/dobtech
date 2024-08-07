@@ -8,7 +8,7 @@ import { Region } from '@medusajs/medusa';
 import { PricedShippingOption } from '@medusajs/medusa/dist/types/pricing';
 import { RadioChangeEvent } from 'antd';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { setShippingMethod } from '../../actions';
 import { Loader } from 'lucide-react';
 
@@ -30,20 +30,38 @@ const ShippingOptions = ({ region, availableShippingMethods }: Props) => {
 		});
 	};
 
-	const set = async (id: string) => {
-		setIsLoading(true);
-		await setShippingMethod(id, cartId)
-			.then(() => {
+	const set = useCallback(
+		async (id: string) => {
+			setIsLoading(true);
+			try {
+				await setShippingMethod(id, cartId);
+			} catch (err) {
+				console.error('Error setting shipping method:', err);
+			} finally {
 				setIsLoading(false);
-			})
-			.catch((err) => {
-				setIsLoading(false);
-			});
-	};
+			}
+		},
+		[cartId]
+	);
+
+	useEffect(() => {
+		if (
+			availableShippingMethods &&
+			availableShippingMethods.length > 0 &&
+			!value
+		) {
+			const defaultMethodId = availableShippingMethods[0].id;
+			setValue(defaultMethodId as string);
+			set(defaultMethodId as string);
+		}
+	}, [availableShippingMethods, value, set]);
 
 	const onChange = (e: RadioChangeEvent) => {
-		setValue(e.target.value);
-		set(e.target.value);
+		const newValue = e.target.value;
+		if (newValue !== value) {
+			setValue(newValue);
+			set(newValue);
+		}
 	};
 
 	return (

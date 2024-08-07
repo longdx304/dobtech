@@ -53,6 +53,8 @@ type CartContextType = {
 	selectedAddress: Address | null;
 	setSelectedAddress: (address: Address) => void;
 	deleteAndRefreshCart: (cartId: string) => Promise<void>;
+	isProcessing: boolean;
+	setIsProcessing: (action: boolean) => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -68,13 +70,16 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 		useState<CartWithCheckoutStep | null>({} as CartWithCheckoutStep);
 	const [currentStep, setCurrentStep] = useState<number>(0);
 	const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+	const [isProcessing, setIsProcessing] = useState(false);
 
 	const fetchCart = async () => {
 		const cart = await retrieveCart();
-		if (cart?.items.length) {
+
+		if (cart?.items?.length) {
 			const enrichedItems = await enrichLineItems(cart?.items, cart?.region_id);
 			cart.items = enrichedItems as LineItem[];
 		}
+
 		setCart(cart as Cart);
 
 		return cart as Cart;
@@ -162,18 +167,29 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 	 *
 	 * @return {Promise<void>} A promise that resolves when the cart is successfully refreshed with the updated data.
 	 */
+	// const refreshCart = async () => {
+	// 	const [updatedCart, updatedAllCarts] = await Promise.all([
+	// 		fetchCart(),
+	// 		fetchAllCarts(),
+	// 	]);
+	// 	setCart(updatedCart);
+	// 	setAllCarts(updatedAllCarts);
+	// };
 	const refreshCart = async () => {
-		const [updatedCart, updatedAllCarts] = await Promise.all([
-			fetchCart(),
-			fetchAllCarts(),
-		]);
-		setCart(updatedCart);
-		setAllCarts(updatedAllCarts);
+		setIsProcessing(true);
+		try {
+			const [updatedCart, updatedAllCarts] = await Promise.all([
+				fetchCart(),
+				fetchAllCarts(),
+			]);
+			setCart(updatedCart);
+			setAllCarts(updatedAllCarts);
+		} finally {
+			setIsProcessing(false);
+		}
 	};
 
 	useEffect(() => {
-		// fetchCart();
-		// fetchAllCarts();
 		refreshCart();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -192,6 +208,8 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 				selectedAddress,
 				setSelectedAddress,
 				deleteAndRefreshCart,
+				isProcessing,
+				setIsProcessing,
 			}}
 		>
 			{children}
