@@ -1,6 +1,6 @@
 'use client';
 
-import { Divider } from 'antd';
+import { Divider, message } from 'antd';
 import { useParams } from 'next/navigation';
 import { useRef, useState } from 'react';
 
@@ -66,6 +66,7 @@ export default function ProductActions({
 			countryCode,
 		});
 		refreshCart();
+		message.success('Sản phẩm được thêm vào giỏ hàng');
 
 		setIsAdding(false);
 		handleCancel();

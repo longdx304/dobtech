@@ -30,7 +30,6 @@ const CartItemSelect: React.FC<CartItemSelectProps> = ({
 
   return (
     <div className="flex items-center gap-2">
-      {/* <span>Số lượng: </span> */}
       <InputNumber
         addonBefore={
           <Button

@@ -66,7 +66,7 @@ const Item = ({ item, region, type = 'full', cartId }: ItemProps) => {
 							</span>
 						</div>
 					</div>
-					<div className="flex gap-4 justify-between items-end">
+					<div className="flex flex-col lg:flex-row gap-4 justify-between lg:items-end ">
 						<div className="flex items-center">
 							<LineItemUnitPrice item={item} region={region} />
 						</div>
