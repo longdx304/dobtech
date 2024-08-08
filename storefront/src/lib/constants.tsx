@@ -24,7 +24,7 @@ export const paymentInfoMap: Record<
     icon: <CreditCard />,
   },
   manual: {
-    title: 'Test payment',
+    title: 'Thanh toán khi nhận hàng',
     icon: <CreditCard />,
   },
   // Add more payment providers here

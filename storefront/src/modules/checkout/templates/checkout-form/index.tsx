@@ -27,7 +27,7 @@ export default function CheckoutForm({
 				region={region!}
 				availableShippingMethods={availableShippingMethods}
 			/>
-			<PaymentOptions />
+			<PaymentOptions cart={cart} />
 		</div>
 	);
 }

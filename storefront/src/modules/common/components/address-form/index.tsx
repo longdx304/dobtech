@@ -9,12 +9,14 @@ import {
 	updateCustomerShippingAddress,
 } from '@/modules/user/actions';
 import { Region } from '@/types/medusa';
-import { Address } from '@medusajs/medusa';
+import { Address, Customer } from '@medusajs/medusa';
 import { Divider, Form, FormProps, message, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import SelectedAddress from './SelectedAddress';
+import _ from 'lodash';
 
 type Props = {
+	customer: Omit<Customer, 'password_hash'> | null;
 	region: Region;
 	onClose: () => void;
 	editingAddress: Address | null;
@@ -30,9 +32,10 @@ export type AddressProps = {
 	ward: string;
 	postalCode: string;
 	countryCode: string;
+	metadata?: object;
 };
 
-const AddressForm = ({ region, onClose, editingAddress }: Props) => {
+const AddressForm = ({ customer, region, onClose, editingAddress }: Props) => {
 	const [form] = Form.useForm();
 	const isDesktop = useIsDesktop();
 
@@ -94,7 +97,11 @@ const AddressForm = ({ region, onClose, editingAddress }: Props) => {
 				onClose();
 				return;
 			} else {
-				await addCustomerShippingAddress(values);
+				if (_.isEmpty(customer?.shipping_addresses)) {
+					await addCustomerShippingAddress(values, true);
+				} else {
+					await addCustomerShippingAddress(values, false);
+				}
 				message.success('Đã thêm địa chỉ mới!');
 				onClose();
 			}
@@ -193,6 +200,7 @@ const AddressForm = ({ region, onClose, editingAddress }: Props) => {
 								handleAddressSelect(value, '', '');
 							}}
 							size="large"
+							showSearch
 						/>
 					) : (
 						<>
@@ -232,6 +240,7 @@ const AddressForm = ({ region, onClose, editingAddress }: Props) => {
 								handleAddressSelect(address.province, value, '')
 							}
 							size="large"
+							showSearch
 						/>
 					) : (
 						<Input
@@ -269,6 +278,7 @@ const AddressForm = ({ region, onClose, editingAddress }: Props) => {
 								handleAddressSelect(address.province, address.district, value)
 							}
 							size="large"
+							showSearch
 						/>
 					) : (
 						<Input

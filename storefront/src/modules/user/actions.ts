@@ -164,7 +164,10 @@ export async function updateCustomerPassword(
 	}
 }
 
-export async function addCustomerShippingAddress(values: AddressProps) {
+export async function addCustomerShippingAddress(
+	values: AddressProps,
+	isDefault?: boolean
+) {
 	const customer = {
 		address: {
 			first_name: values.firstName,
@@ -176,6 +179,7 @@ export async function addCustomerShippingAddress(values: AddressProps) {
 			province: values.province,
 			postal_code: values.postalCode,
 			country_code: values.countryCode,
+			metadata: { is_default: isDefault },
 		},
 	} as StorePostCustomersCustomerAddressesReq;
 
@@ -203,6 +207,7 @@ export async function updateCustomerShippingAddress(
 		province: value.province,
 		postal_code: value.postalCode,
 		country_code: value.countryCode,
+		metadata: value.metadata 
 	} as StorePostCustomersCustomerAddressesAddressReq;
 
 	try {

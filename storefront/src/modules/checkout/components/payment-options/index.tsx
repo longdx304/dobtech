@@ -3,17 +3,51 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Radio, RadioGroup } from '@/components/Radio';
 import { Text } from '@/components/Typography';
+import { Cart, PaymentSession } from '@medusajs/medusa';
 import { RadioChangeEvent } from 'antd';
-import { HandCoins } from 'lucide-react';
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { setPaymentMethod } from '../../actions';
+import { Loader } from 'lucide-react';
+import { paymentInfoMap } from '@/lib/constants';
 
-type Props = {};
+type Props = {
+	cart: Omit<Cart, 'refundable_amount' | 'refunded_total'> | null;
+};
 
-const PaymentOptions = ({}: Props) => {
-	const [value, setValue] = useState<string>('ship-cod');
+const PaymentOptions = ({ cart }: Props) => {
+	const [isLoading, setIsLoading] = useState(false);
+	const [value, setValue] = useState<string>('');
+	const cartId = useSearchParams().get('cartId') || '';
+
+	const set = useCallback(
+		async (providerId: string) => {
+			setIsLoading(true);
+			try {
+				await setPaymentMethod(cartId, providerId);
+			} catch (err) {
+				console.error('Error setting payment method:', err);
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[cartId]
+	);
+
+	useEffect(() => {
+		if (cart?.payment_sessions && cart.payment_sessions.length > 0 && !value) {
+			const defaultMethodId = cart.payment_sessions[0].provider_id;
+			setValue(defaultMethodId);
+			set(defaultMethodId);
+		}
+	}, [cart?.payment_sessions, value, set]);
 
 	const onChange = (e: RadioChangeEvent) => {
-		setValue(e.target.value);
+		const newValue = e.target.value;
+		if (newValue !== value) {
+			setValue(newValue);
+			set(newValue);
+		}
 	};
 
 	return (
@@ -26,12 +60,23 @@ const PaymentOptions = ({}: Props) => {
 				value={value}
 				onChange={onChange}
 			>
-				<Radio className="border border-solid border-gray-200 rounded-md px-4 py-2">
-					<Flex justify="flex-start" align="center" gap={4}>
-						<HandCoins className="text-gray-600" size={24} />
-						<Text className="text-[13px]">Thanh toán khi nhận hàng</Text>
-					</Flex>
-				</Radio>
+				{cart?.payment_sessions?.map((option: PaymentSession) => (
+					<Radio
+						key={option.id}
+						value={option.provider_id}
+						className="border border-solid border-gray-200 rounded-md px-4 py-2"
+					>
+						<Flex vertical justify="flex-start" align="flex-start" gap={2}>
+							<Flex justify="flex-start" align="center" gap={4}>
+								<Text className="text-[13px]" strong>
+									{paymentInfoMap[option.provider_id]?.title ||
+										option.provider_id}
+								</Text>
+							</Flex>
+							{isLoading ? <Loader className="animate-spin" size={12} /> : null}
+						</Flex>
+					</Radio>
+				))}
 			</RadioGroup>
 		</Card>
 	);
