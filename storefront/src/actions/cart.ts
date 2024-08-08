@@ -107,6 +107,21 @@ export async function removeItem({
 		});
 }
 
+export async function setPaymentSession({
+	cartId,
+	providerId,
+}: {
+	cartId: string;
+	providerId: string;
+}) {
+	const headers = getMedusaHeaders(['cart']);
+
+	return medusaClient.carts
+		.setPaymentSession(cartId, { provider_id: providerId }, headers)
+		.then(({ cart }) => cart)
+		.catch((err) => medusaError(err));
+}
+
 export async function completeCart(cartId: string) {
 	const headers = await getMedusaHeaders(['cart']);
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { completeCart, updateCart } from '@/actions/cart';
+import { completeCart, setPaymentSession, updateCart } from '@/actions/cart';
 import { addShippingMethod, deleteDiscount } from '@/actions/checkout';
 import { BACKEND_URL } from '@/lib/constants';
 import { Cart, GiftCard, StorePostCartsCartReq } from '@medusajs/medusa';
@@ -115,6 +115,20 @@ export async function submitDiscountForm(values: any, cartId: string) {
 			await applyGiftCard(code, cartId);
 		});
 		return null;
+	} catch (error: any) {
+		throw error;
+	}
+}
+
+export async function setPaymentMethod(cartId?: string, providerId?: string) {
+	if (!cartId) throw new Error('Không tìm thấy sản phẩm');
+
+	if (!providerId) throw new Error('Không tìm thấy provider');
+
+	try {
+		const cart = await setPaymentSession({ cartId, providerId });
+		revalidateTag('cart');
+		return cart;
 	} catch (error: any) {
 		throw error;
 	}

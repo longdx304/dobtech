@@ -142,6 +142,7 @@ const AddressSelect = ({
 						Địa chỉ giao hàng
 					</Text>
 					<AddressForm
+						customer={customer}
 						region={region}
 						onClose={onClose}
 						editingAddress={editingAddress}

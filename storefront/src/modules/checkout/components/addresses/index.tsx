@@ -9,9 +9,11 @@ import { useCart } from '@/lib/providers/cart/cart-provider';
 import AddressForm from '@/modules/common/components/address-form';
 import { Address, Cart, Customer, Region } from '@medusajs/medusa';
 import { ChevronRight } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import AddressSelect from '../address-select';
 import ShippingAddress from '../shipping-address';
+import { setAddresses } from '../../actions';
+import { message } from 'antd';
 
 const countryCode = 'vn';
 
@@ -25,7 +27,7 @@ const Addresses = ({
 	region: Region;
 }) => {
 	const { state, onOpen, onClose: onAddressClose } = useToggleState(false);
-	const { selectedAddress, setSelectedAddress } = useCart();
+	const { selectedAddress, setSelectedAddress, refreshCart } = useCart();
 
 	const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
@@ -68,10 +70,44 @@ const Addresses = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [customer?.shipping_addresses]);
 
-	// !TODO: check the default address
 	// if selected address is not selected, select the first address
-	const defaultAddress = addressesInRegion?.[0];
+	const defaultAddress: Address = useMemo(() => {
+		return (
+			addressesInRegion?.find(
+				(address) => address.metadata?.is_default === true
+			) || null
+		);
+	}, [addressesInRegion]);
 	const displayAddress = selectedAddress || defaultAddress;
+
+	const updateCartAddress = useCallback(async () => {
+		try {
+			if (!cart || !defaultAddress) return;
+
+			await setAddresses(
+				{
+					firstName: defaultAddress.first_name!,
+					lastName: defaultAddress.last_name!,
+					phone: defaultAddress.phone!,
+					ward: defaultAddress.address_1!,
+					address: defaultAddress.address_2!,
+					district: defaultAddress.city!,
+					province: defaultAddress.province!,
+					postalCode: defaultAddress.postal_code!,
+					countryCode: defaultAddress.country_code!,
+				},
+				customer?.email,
+				cart?.id
+			);
+		} catch (error) {
+			console.log('error', error);
+		}
+	}, [cart, defaultAddress, customer]);
+
+	useEffect(() => {
+		updateCartAddress();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return (
 		<Card>
@@ -143,6 +179,7 @@ const Addresses = ({
 							Địa chỉ giao hàng
 						</Text>
 						<AddressForm
+							customer={customer}
 							region={region}
 							onClose={onAddressClose}
 							editingAddress={editingAddress}

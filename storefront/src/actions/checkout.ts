@@ -4,53 +4,55 @@ import { cache } from 'react';
 import medusaError from '@/lib/utils/medusa-error';
 
 export async function createPaymentSessions(cartId: string) {
-  const headers = await getMedusaHeaders(["cart"])
+	const headers = await getMedusaHeaders(['cart']);
 
-  return medusaClient.carts
-    .createPaymentSessions(cartId, headers)
-    .then(({ cart }) => cart)
-    .catch((err) => {
-      console.log(err)
-      return null
-    })
+	return medusaClient.carts
+		.createPaymentSessions(cartId, headers)
+		.then(({ cart }) => cart)
+		.catch((err) => {
+			console.log(err);
+			return null;
+		});
 }
 
 // Shipping actions
 export const listCartShippingMethods = cache(async function (cartId: string) {
-  const headers = await getMedusaHeaders(["shipping"])
+	const headers = await getMedusaHeaders(['shipping']);
 
-  return medusaClient.shippingOptions
-    .listCartOptions(cartId, headers)
-    .then(({ shipping_options }) => shipping_options)
-    .catch((err) => {
-      console.log(err)
-      return null
-    })
-})
+	return medusaClient.shippingOptions
+		.listCartOptions(cartId, headers)
+		.then(({ shipping_options }) => {
+			return shipping_options;
+		})
+		.catch((err) => {
+			console.log(err);
+			return null;
+		});
+});
 
 export async function addShippingMethod({
-  cartId,
-  shippingMethodId,
+	cartId,
+	shippingMethodId,
 }: {
-  cartId: string
-  shippingMethodId: string
+	cartId: string;
+	shippingMethodId: string;
 }) {
-  const headers = await getMedusaHeaders(["cart"])
+	const headers = await getMedusaHeaders(['cart']);
 
-  return medusaClient.carts
-    .addShippingMethod(cartId, { option_id: shippingMethodId }, headers)
-    .then(({ cart }) => cart)
-    .catch((err) => medusaError(err))
+	return medusaClient.carts
+		.addShippingMethod(cartId, { option_id: shippingMethodId }, headers)
+		.then(({ cart }) => cart)
+		.catch((err) => medusaError(err));
 }
 
 export async function deleteDiscount(cartId: string, code: string) {
-  const headers = await getMedusaHeaders(["cart"])
+	const headers = await getMedusaHeaders(['cart']);
 
-  return medusaClient.carts
-    .deleteDiscount(cartId, code, headers)
-    .then(({ cart }) => cart)
-    .catch((err) => {
-      console.log(err)
-      return null
-    })
+	return medusaClient.carts
+		.deleteDiscount(cartId, code, headers)
+		.then(({ cart }) => cart)
+		.catch((err) => {
+			console.log(err);
+			return null;
+		});
 }
