@@ -155,8 +155,8 @@ const RefundModal = ({
 									{getCurrencyInfo(order?.currency_code)?.symbol_native}
 								</span>
 							}
-							formatter={formatter}
-							parser={parser}
+							// formatter={formatter}
+							// parser={parser}
 						/>
 					</Form.Item>
 				</div>

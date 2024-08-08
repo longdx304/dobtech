@@ -17,7 +17,6 @@ import { FulfillmentStatus, RefundStatus, ReturnStatus } from './order-status';
 import EventContainer, { EventIconColor } from './event-container';
 import EventItemContainer from './event-item-container';
 import { CircleAlert, Ban, Truck, CircleX, AlertCircle } from 'lucide-react';
-import { TooltipIcon } from '@/components/Tooltip';
 import EventActionables from './event-actionables';
 import { Button } from '@/components/Button';
 import dayjs from 'dayjs';
@@ -28,6 +27,7 @@ dayjs.locale('vi');
 type ClaimProps = {
 	event: ClaimEvent;
 	refetch: () => void;
+	refetchOrder: () => void;
 };
 
 type ClaimStatusProps = {
@@ -85,7 +85,7 @@ const ClaimStatus: React.FC<ClaimStatusProps> = ({ event }) => {
 	);
 };
 
-const Claim: React.FC<ClaimProps> = ({ event, refetch }) => {
+const Claim: React.FC<ClaimProps> = ({ event, refetch, refetchOrder }) => {
 	const {
 		state: stateReceiveReturn,
 		onClose: closeReceiveReturn,
@@ -250,6 +250,7 @@ const Claim: React.FC<ClaimProps> = ({ event, refetch }) => {
 			<EventContainer {...args} />
 			{stateReceiveReturn && (
 				<ReceiveReturnModal
+					refetchOrder={refetchOrder}
 					order={event.order}
 					returnRequest={event.claim.return_order}
 					onClose={closeReceiveReturn}
@@ -258,6 +259,7 @@ const Claim: React.FC<ClaimProps> = ({ event, refetch }) => {
 			)}
 			{stateCreateFulfillment && (
 				<CreateFulfillmentModal
+					refetch={refetch}
 					state={stateCreateFulfillment}
 					orderToFulfill={event.claim as any}
 					handleCancel={closeCreateFulfillment}

@@ -16,9 +16,10 @@ import { getErrorMessage } from '@/lib/utils';
 type ReturnRequestedProps = {
 	event: ReturnEvent;
 	refetch: () => void;
+	refetchOrder: () => void;
 };
 
-const Return: React.FC<ReturnRequestedProps> = ({ event, refetch }) => {
+const Return: React.FC<ReturnRequestedProps> = ({ event, refetch, refetchOrder }) => {
 	const cancelReturn = useAdminCancelReturn(event.id);
 
 	const { state, onClose, onOpen } = useToggleState(false);
@@ -74,6 +75,7 @@ const Return: React.FC<ReturnRequestedProps> = ({ event, refetch }) => {
 					order={event.order}
 					returnRequest={event.raw}
 					state={state}
+					refetchOrder={refetchOrder}
 				/>
 			)}
 		</>

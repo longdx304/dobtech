@@ -24,6 +24,7 @@ interface Props {
 	handleCancel: () => void;
 	orderToFulfill: Order;
 	orderId: Order['id'];
+	refetch: () => void;
 }
 
 export const getFulfillAbleQuantity = (item: LineItem): number => {
@@ -36,6 +37,7 @@ const CreateFulfillmentModal = ({
 	handleCancel,
 	orderToFulfill,
 	orderId,
+	refetch,
 }: Props) => {
 	const [errors, setErrors] = useState({});
 	const [quantities, setQuantities] = useState<Record<string, number>>(
@@ -110,10 +112,11 @@ const CreateFulfillmentModal = ({
 					}));
 				break;
 		}
-		await action.mutateAsync(requestObj as any, {
+		return action.mutateAsync(requestObj as any, {
 			onSuccess: () => {
 				message.success(successText);
 				handleOk();
+				refetch();
 			},
 			onError: (err: any) => message.error(getErrorMessage(err)),
 		});

@@ -5,7 +5,7 @@ import {
 	useAdminCreateShipment,
 	useAdminCreateSwapShipment,
 } from 'medusa-react';
-import React, { useState } from 'react';
+import React from 'react';
 import { Form, message } from 'antd';
 import { X } from 'lucide-react';
 
@@ -112,19 +112,6 @@ const MarkShippedModal: React.FC<MarkShippedModalProps> = ({
 				{'Đánh dấu thực hiện đã giao'}
 			</Title>
 			<Form form={form} onFinish={onFinish} className="pt-4" initialValues={{ tracking_numbers: [""] }}>
-				{/* <Form.Item
-					labelCol={{ span: 24 }}
-					name={['tracking_numbers', 0]}
-					label="Số theo dõi"
-					rules={[
-						{
-							required: true,
-							message: 'Vui lòng nhập số theo dõi',
-						},
-					]}
-				>
-					<Input placeholder="Số theo dõi..." />
-				</Form.Item> */}
 				<Form.List labelCol={{ span: 24 }} label="Số theo dõi" name='tracking_numbers'>
 					{(subFields, subOpt) => (
 						<>
@@ -136,12 +123,12 @@ const MarkShippedModal: React.FC<MarkShippedModalProps> = ({
 									<Form.Item
 										name={[subField.name]}
 										className="w-full mb-0"
-										rules={[
-											{
-												required: true,
-												message: 'Vui lòng nhập số theo dõi',
-											},
-										]}
+										// rules={[
+										// 	{
+										// 		required: true,
+										// 		message: 'Vui lòng nhập số theo dõi',
+										// 	},
+										// ]}
 									>
 										<Input
 											placeholder="Số theo dõi..."

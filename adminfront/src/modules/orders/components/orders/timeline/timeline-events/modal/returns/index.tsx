@@ -11,7 +11,7 @@ import { LoaderCircle, SquareArrowOutUpRight } from 'lucide-react';
 import { Select } from '@/components/Select';
 import { getErrorMessage } from '@/lib/utils';
 import { Option } from '@/types/shared';
-import { displayAmount } from '@/utils/prices';
+import { formatAmountWithSymbol } from '@/utils/prices';
 import {
 	useAdminRequestReturn,
 	useAdminShippingOptions,
@@ -26,6 +26,7 @@ import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import { getAllReturnableItems } from '@/modules/orders/components/orders/utils/create-filtering';
 import { removeFalsy } from '@/utils/remove-nullish';
 import RMASelectProductTable from '../rma-select-product-table';
+import { useRouter } from 'next/navigation';
 
 type ReturnMenuProps = {
 	order: Order;
@@ -36,6 +37,7 @@ type ReturnMenuProps = {
 type LineItem = Omit<RawLineItem, 'beforeInsert'>;
 
 const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
+	const router = useRouter();
 	const { client } = useMedusa();
 	const { isFeatureEnabled } = useFeatureFlag();
 	const isLocationFulfillmentEnabled =
@@ -214,8 +216,8 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 		setSubmitting(true);
 		return requestReturnOrder
 			.mutateAsync(data)
-			.then(() => onClose())
 			.then(() => {
+				onClose();
 				message.success('Đã yêu cầu trả lại đơn hàng');
 			})
 			.catch((error) => message.error(getErrorMessage(error)))
@@ -303,7 +305,10 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 						<div className="font-normal mb-4 flex justify-between">
 							<span>{'Vận chuyển'}</span>
 							<div>
-								{displayAmount(order.currency_code, shippingPrice || 0)}{' '}
+								{formatAmountWithSymbol({
+									amount: shippingPrice || 0,
+									currency: order.currency_code,
+								})}{' '}
 								<span className="text-gray-400 ml-3">
 									{order.currency_code.toUpperCase()}
 								</span>
@@ -321,10 +326,10 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 									>
 										<SquareArrowOutUpRight size={16} />
 									</span>
-									{`${displayAmount(
-										order.currency_code,
-										refundAmount
-									)} ${order.currency_code.toUpperCase()}`}
+									{`${formatAmountWithSymbol({
+										amount: refundAmount || 0,
+										currency: order.currency_code,
+									})}`}
 								</div>
 							)}
 						</div>

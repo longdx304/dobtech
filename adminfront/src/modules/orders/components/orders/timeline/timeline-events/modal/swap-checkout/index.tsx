@@ -21,13 +21,14 @@ type Props = {
 	cartId: string;
 	state: boolean;
 	onClose: () => void;
+	refetch: () => void;
 };
 
 const paymentMethods = [
 	paymentProvidersMapper('manual'),
 	paymentProvidersMapper('stripe'),
 ];
-const SwapCheckoutModal: FC<Props> = ({ order, cartId, state, onClose }) => {
+const SwapCheckoutModal: FC<Props> = ({ order, cartId, state, onClose, refetch }) => {
 	const [shippingMethod, setShippingMethod] = useState<Option | null>(null);
 	const [paymentOption, setPaymentOption] = useState<Option | null>(null);
 	const [shippingPrice, setShippingPrice] = useState<number>(0);
@@ -78,6 +79,7 @@ const SwapCheckoutModal: FC<Props> = ({ order, cartId, state, onClose }) => {
 			});
 			await client.carts.complete(cartId);
 			message.success('Tạo phiên thanh toán thành công');
+			refetch();
 			onClose();
 		} catch (error) {
 			message.error(getErrorMessage(error));

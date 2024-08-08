@@ -117,7 +117,6 @@ export function formatAmountWithSymbol({
   digits,
   tax = 0,
 }: FormatMoneyProps) {
-  console.log("currency:", currency)
   let locale = "en-US"
 
   // We need this to display 'Kr' instead of 'DKK'

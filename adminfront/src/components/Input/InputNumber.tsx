@@ -15,7 +15,7 @@ export default function InputNumber({
 }: Props) {
 	const formatter = (value: any) => {
 		if (value) {
-			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 		}
 		return value;
 	};

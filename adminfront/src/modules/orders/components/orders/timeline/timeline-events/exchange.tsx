@@ -37,6 +37,7 @@ dayjs.locale('vi');
 type ExchangeProps = {
 	event: ExchangeEvent;
 	refetch: () => void;
+	refetchOrder: () => void;
 };
 
 type ExchangeStatusProps = {
@@ -66,7 +67,11 @@ const ExchangeStatus: React.FC<ExchangeStatusProps> = ({ event }) => {
 	);
 };
 
-const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
+const Exchange: React.FC<ExchangeProps> = ({
+	event,
+	refetch,
+	refetchOrder,
+}) => {
 	const {
 		state: stateReceiveReturn,
 		onClose: closeReceiveReturn,
@@ -202,6 +207,7 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 			.then((_res) => {
 				message.success('Thanh toán được xử lý thành công');
 				refetch();
+				refetchOrder();
 			})
 			.catch((err) => {
 				message.error(getErrorMessage(err));
@@ -254,6 +260,10 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 		});
 	}
 
+	const handleRefresh = () => {
+		refetch();
+		refetchOrder();
+	};
 	const args = {
 		title: event.canceledAt ? 'Trao đổi đã bị huỷ' : 'Yêu cầu trao đổi',
 		icon: event.canceledAt ? <CircleX size={20} /> : <RefreshCw size={20} />,
@@ -306,6 +316,7 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 			<EventContainer {...args} />
 			{stateReceiveReturn && order && (
 				<ReceiveReturnModal
+					refetchOrder={refetchOrder}
 					order={order}
 					returnRequest={event.raw.return_order}
 					onClose={closeReceiveReturn}
@@ -319,6 +330,7 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 					handleCancel={closeCreateFulfillment}
 					orderId={event.orderId}
 					handleOk={closeCreateFulfillment}
+					refetch={handleRefresh}
 				/>
 			)}
 			{stateSwapCheckout && order && (
@@ -327,6 +339,7 @@ const Exchange: React.FC<ExchangeProps> = ({ event, refetch }) => {
 					order={order}
 					onClose={closeSwapCheckout}
 					cartId={event.raw.cart_id}
+					refetch={handleRefresh}
 				/>
 			)}
 		</>

@@ -18,46 +18,48 @@ interface Props {
 }
 
 export default function OrderDetail({ id }: Props) {
-	const { order, isLoading } = useAdminOrder(id!);
-
+	const { order, isLoading, refetch } = useAdminOrder(id!);
 	const { isFeatureEnabled } = useFeatureFlag();
 
-  const inventoryEnabled = useMemo(() => {
-    return isFeatureEnabled("inventoryService")
-  }, [isFeatureEnabled]);
+	const inventoryEnabled = useMemo(() => {
+		return isFeatureEnabled('inventoryService');
+	}, [isFeatureEnabled]);
 
 	const { reservations, refetch: refetchReservations } = useAdminReservations(
-    {
-      line_item_id: order?.items.map((item) => item.id),
-    },
-    {
-      enabled: inventoryEnabled,
-    }
-  )
+		{
+			line_item_id: order?.items.map((item) => item.id),
+		},
+		{
+			enabled: inventoryEnabled,
+		}
+	);
 
 	useEffect(() => {
-    if (inventoryEnabled) {
-      refetchReservations()
-    }
-  }, [inventoryEnabled, refetchReservations])
-
+		if (inventoryEnabled) {
+			refetchReservations();
+		}
+	}, [inventoryEnabled, refetchReservations]);
 
 	return (
 		<Row gutter={[16, 16]} className="mb-12">
-				<Col span={24}>
-					<BackToOrders />
-				</Col>
-				<Col xs={24} sm={14} md={14} className="flex flex-col gap-y-4">
-					<Information order={order} isLoading={isLoading} />
-					<Summary order={order} isLoading={isLoading} reservations={[]} />
-					<Payment order={order} isLoading={isLoading} />
-					<Fulfillment order={order} isLoading={isLoading} />
-					<CustomerInfo order={order} isLoading={isLoading} />
-				</Col>
-				<Col xs={24} sm={10} md={10}>
-					<Timeline orderId={order?.id} isLoading={isLoading} />
-				</Col>
-				{order && <OrderEditModalContainer order={order} />}
+			<Col span={24}>
+				<BackToOrders />
+			</Col>
+			<Col xs={24} lg={14} className="flex flex-col gap-y-4">
+				<Information order={order} isLoading={isLoading} />
+				<Summary order={order} isLoading={isLoading} reservations={[]} />
+				<Payment order={order} isLoading={isLoading} />
+				<Fulfillment order={order} isLoading={isLoading} refetch={refetch} />
+				<CustomerInfo order={order} isLoading={isLoading} />
+			</Col>
+			<Col xs={24} lg={10}>
+				<Timeline
+					orderId={order?.id}
+					isLoading={isLoading}
+					refetchOrder={refetch}
+				/>
+			</Col>
+			{order && <OrderEditModalContainer order={order} />}
 		</Row>
 	);
 }

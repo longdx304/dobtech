@@ -27,6 +27,7 @@ type Props = {
 	returnRequest: Return;
 	onClose: () => void;
 	state: boolean;
+	refetchOrder: () => void;
 };
 
 export const ReceiveReturnModal = ({
@@ -34,17 +35,14 @@ export const ReceiveReturnModal = ({
 	returnRequest,
 	onClose,
 	state,
+	refetchOrder
 }: Props) => {
 	const [selectedVariants, setSelectedVariants] = useState<string[]>([]);
 	const [receiveItems, setReceiveItems] = useState<any>([]);
 	const [dataSource, setDataSource] = useState<any>([]);
 	const [refundAmount, setRefundAmount] = useState(0);
 
-	const { client } = useMedusa();
 	const { isFeatureEnabled } = useFeatureFlag();
-	const isLocationFulfillmentEnabled =
-		isFeatureEnabled('inventoryService') &&
-		isFeatureEnabled('stockLocationService');
 
 	const { mutateAsync, isLoading } = useAdminReceiveReturn(returnRequest.id);
 	const { orderRelations } = useOrdersExpandParam();
@@ -121,6 +119,7 @@ export const ReceiveReturnModal = ({
 
 				// We need to refetch the order to get the updated state
 				refetch();
+				refetchOrder();
 
 				onClose();
 				setSelectedVariants([]);
@@ -274,10 +273,10 @@ export const ReceiveReturnModal = ({
 						>
 							<SquareArrowOutUpRight size={16} />
 						</span>
-						{`${displayAmount(
-							order.currency_code,
-							refundAmount
-						)} ${order.currency_code.toUpperCase()}`}
+						{formatAmountWithSymbol({
+							amount: refundAmount || 0,
+							currency: order.currency_code,
+						})}
 					</div>
 				</div>
 			</div>

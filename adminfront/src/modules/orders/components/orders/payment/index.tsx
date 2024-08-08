@@ -37,6 +37,18 @@ const Payment = ({ order, isLoading }: Props) => {
 
 	let labelBtn = 'Thu tiền';
 
+	const confirmCapture = () => {
+		AntdModal.confirm({
+			title: 'Xác nhận hoàn tất thanh toán',
+			content: 'Bạn có chắc chắn đã hoàn tất thanh toán?',
+			onOk: async () => {
+				await capturePayment.mutateAsync(void {}, {
+					onSuccess: () => message.success('Đã hoàn tất thanh toán'),
+					onError: (err) => message.error(getErrorMessage(err)),
+				});
+			},
+		});
+	};
 	let action = () => {
 		AntdModal.confirm({
 			title: 'Xác nhận thu tiền',
@@ -93,17 +105,22 @@ const Payment = ({ order, isLoading }: Props) => {
 	return (
 		<Card loading={isLoading} className="px-4">
 			<div>
-				<Flex align="center" justify="space-between" className="pb-2">
+				<div className="pb-2 flex flex-col lg:flex-row lg:justify-between">
 					<Title level={4}>{`Thanh toán`}</Title>
-					<div className="flex justify-end items-center gap-4">
+					<div className="flex justify-end items-center gap-2 flex-wrap">
 						<PaymentStatus status={order!.payment_status} />
+						{order.payment_status === 'partially_refunded' && (
+							<Button type="default" onClick={confirmCapture}>
+								{'Hoàn tất thanh toán'}
+							</Button>
+						)}
 						{order.payment_status !== 'canceled' && (
 							<Button type="default" onClick={action}>
 								{labelBtn}
 							</Button>
 						)}
 					</div>
-				</Flex>
+				</div>
 			</div>
 			<div className="pt-6">
 				{order?.payments?.map((payment) => (
@@ -180,6 +197,14 @@ const PaymentStatus = ({ status }: { status: Order['payment_status'] }) => {
 			return (
 				<StatusIndicator
 					title="Đã thanh toán"
+					variant="success"
+					className="font-normal"
+				/>
+			);
+		case 'partially_refunded':
+			return (
+				<StatusIndicator
+					title="Một phần được hoàn lại"
 					variant="success"
 					className="font-normal"
 				/>

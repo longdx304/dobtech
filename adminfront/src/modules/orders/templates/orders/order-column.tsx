@@ -9,6 +9,8 @@ const decidePaymentStatus = (status: any) => {
 	switch (status) {
 		case 'captured':
 			return <StatusDot variant="success" title={'Đã thanh toán'} />;
+		case 'partially_refunded':
+			return <StatusDot variant="primary" title={'Đã hoàn một phần'} />;
 		case 'awaiting':
 			return <StatusDot variant="default" title={'Chờ xử lý'} />;
 		case 'requires_action':
