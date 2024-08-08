@@ -238,7 +238,7 @@ const convertToLocale = ({
 	currency_code,
 	minimumFractionDigits,
 	maximumFractionDigits,
-	locale = 'en-US',
+	locale = 'vi-VN',
 }: ConvertToLocaleParams) => {
 	const formattedNumber = new Intl.NumberFormat(locale, {
 		minimumFractionDigits,

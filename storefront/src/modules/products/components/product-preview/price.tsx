@@ -30,13 +30,6 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 	} = useToggleState(false);
 	const { setProduct, setRegion } = useProduct();
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	// Format price
-	const formattedPrice = (priceString: string) => {
-		const price = Number(priceString.replace(/[^\d.-]/g, ''));
-		const formattedPrice =
-			isNaN(price) || price === 0 ? '-' : `${price.toLocaleString()}₫`;
-		return formattedPrice;
-	};
 
 	const handleClickCartDesktop = async (e: MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
@@ -74,12 +67,11 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 
 	return (
 		<Flex vertical>
-			{/* <a onClick={handleLinkClick}> */}
 			<Flex justify="space-between" align="center" className="">
 				{price.price_type === 'sale' ? (
 					<Flex align="center">
 						<Text className="text-[16px] font-semibold text-[#FA6338]">
-							{formattedPrice(price.calculated_price)}
+							{price.calculated_price}
 						</Text>
 						<Text className="text-[10px] font-normal border-[#FFD9CE] border-[1px] border-solid text-[#FA6338] px-[3px] py-[2px] ml-2">
 							-{price.percentage_diff}%
@@ -87,7 +79,7 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 					</Flex>
 				) : (
 					<Text className="text-[16px] font-semibold">
-						{formattedPrice(price.calculated_price)}
+						{price.calculated_price}
 					</Text>
 				)}
 
@@ -95,7 +87,6 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 					type="default"
 					shape="circle"
 					onClick={handleClickCartDesktop}
-					// icon={<CartIcon />}
 					icon={
 						isLoading ? (
 							<LoaderCircle size={16} className="animate-spin" />
@@ -109,7 +100,6 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 					type="default"
 					shape="circle"
 					onClick={handleClickCartMobile}
-					// icon={<CartIcon />}
 					icon={
 						isLoading ? (
 							<LoaderCircle size={16} className="animate-spin" />
@@ -120,7 +110,6 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 					className="h-[24px] w-[38px] rounded-[20px] border-black/40 flex md:hidden"
 				/>
 			</Flex>
-			{/* </a> */}
 			<ProductTemplateModal
 				state={state}
 				handleOk={handleModalClose}

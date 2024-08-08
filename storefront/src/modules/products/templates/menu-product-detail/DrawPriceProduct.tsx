@@ -1,4 +1,4 @@
-import { Col, Divider, Row } from 'antd';
+import { Col, Divider, message, Row } from 'antd';
 import { Minus, Plus } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { FC, useState } from 'react';
@@ -15,6 +15,7 @@ import useActionProduct from '@/modules/products/hook/useActionProduct';
 import { Region } from '@medusajs/medusa';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
 import ImageGroup from './ImageGroup';
+import { useCart } from '@/lib/providers/cart/cart-provider';
 
 type Props = {
 	open: boolean;
@@ -48,6 +49,8 @@ const DrawPriceProduct: FC<Props> = ({
 		product,
 	});
 
+	const { refreshCart } = useCart();
+
 	// add the selected variant to the cart
 	const handleAddToCart = async () => {
 		if (!variant?.id) return null;
@@ -59,6 +62,10 @@ const DrawPriceProduct: FC<Props> = ({
 			countryCode,
 		});
 
+		refreshCart();
+
+		message.success('Sản phẩm được thêm vào giỏ hàng');
+		onClose();
 		setIsAdding(false);
 	};
 
