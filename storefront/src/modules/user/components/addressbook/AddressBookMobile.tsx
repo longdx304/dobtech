@@ -66,7 +66,7 @@ const AddressBookMobile = ({ region }: Props) => {
 					...prevAddress.metadata,
 					is_default: false,
 				},
-			});
+			} as any);
 		}
 
 		const updatedAddress = {

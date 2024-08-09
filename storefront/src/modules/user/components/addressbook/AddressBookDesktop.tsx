@@ -48,7 +48,6 @@ const AddressBookDesktop = ({ region }: Props) => {
 		onOpen();
 	};
 
-	console.log('customer outside', customer);
 
 	const setDefaultAddress = async (address: Address) => {
 		const prevAddress = customer?.shipping_addresses.find(
@@ -62,7 +61,7 @@ const AddressBookDesktop = ({ region }: Props) => {
 					...prevAddress.metadata,
 					is_default: false,
 				},
-			});
+			} as any);
 		}
 
 		const updatedAddress = {

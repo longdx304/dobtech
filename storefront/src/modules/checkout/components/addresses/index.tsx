@@ -71,7 +71,7 @@ const Addresses = ({
 	}, [customer?.shipping_addresses]);
 
 	// if selected address is not selected, select the first address
-	const defaultAddress: Address = useMemo(() => {
+	const defaultAddress: Address | null = useMemo(() => {
 		return (
 			addressesInRegion?.find(
 				(address) => address.metadata?.is_default === true
