@@ -519,6 +519,13 @@ export default {
 		},
 	},
 
+	payments: {
+		capturePayment(paymentId, payload) {
+			const path = `/admin/payments/${paymentId}/capture-payment`;
+			return medusaRequest('POST', path, payload);
+		},
+	},
+
 	shippingOptions: {
 		create(shippingOption) {
 			const path = `/admin/shipping-options`;

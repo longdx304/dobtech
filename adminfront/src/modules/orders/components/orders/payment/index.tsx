@@ -1,27 +1,33 @@
 import { Order } from '@medusajs/medusa';
 import { Card } from '@/components/Card';
-import { Flex } from '@/components/Flex';
-import { Text, Title } from '@/components/Typography';
-import { CornerDownRight } from 'lucide-react';
+import { Title } from '@/components/Typography';
+import { Check, CornerDownLeft, CornerDownRight } from 'lucide-react';
 import StatusIndicator from '@/modules/common/components/status-indicator';
-import { Empty, Modal as AntdModal, message, Divider } from 'antd';
+import { Empty, Modal as AntdModal, message, Divider, MenuProps } from 'antd';
 import dayjs from 'dayjs';
 import { useAdminCapturePayment } from 'medusa-react';
 import { getErrorMessage } from '@/lib/utils';
-import { Button } from '@/components/Button';
 import { DisplayTotal } from '@/modules/orders/components/common';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import RefundModal from './refund-modal';
+import { ActionAbles } from '@/components/Dropdown';
+import CaptureModal from './capture-modal';
 
 type Props = {
 	order: Order | undefined;
 	isLoading: boolean;
+	refetch: () => void;
 };
 
-const Payment = ({ order, isLoading }: Props) => {
+const Payment = ({ order, isLoading, refetch }: Props) => {
 	const capturePayment = useAdminCapturePayment(order?.id! || '');
 	const { state, onOpen, onClose } = useToggleState(false);
+	const {
+		state: stateCapture,
+		onOpen: openCapture,
+		onClose: closeCapture,
+	} = useToggleState(false);
 
 	if (!order) {
 		return (
@@ -31,7 +37,7 @@ const Payment = ({ order, isLoading }: Props) => {
 		);
 	}
 
-	let labelBtn = 'Thu tiền';
+	const actions: MenuProps['items'] = [];
 
 	const confirmCapture = () => {
 		AntdModal.confirm({
@@ -39,54 +45,55 @@ const Payment = ({ order, isLoading }: Props) => {
 			content: 'Bạn có chắc chắn đã hoàn tất thanh toán?',
 			onOk: async () => {
 				await capturePayment.mutateAsync(void {}, {
-					onSuccess: () => message.success('Đã hoàn tất thanh toán'),
-					onError: (err) => message.error(getErrorMessage(err)),
+					onSuccess: () => {
+						message.success('Đã hoàn tất thanh toán');
+						return null;
+					},
+					onError: (err) => {
+						message.error(getErrorMessage(err));
+						return null;
+					},
 				});
 			},
 		});
 	};
-	let action = () => {
-		AntdModal.confirm({
-			title: 'Xác nhận thu tiền',
-			content: 'Bạn có chắc chắn đã thu tiền từ khách hàng?',
-			onOk: async () => {
-				await capturePayment.mutateAsync(void {}, {
-					onSuccess: () => message.success('Đã thu tiền thành công'),
-					onError: (err) => message.error(getErrorMessage(err)),
-				});
-			},
-		});
-	};
-
-	const isSystemPayment = order?.payments?.some(
-		(p) => p.provider_id === 'system'
-	);
-
-	const { payment_status } = order!;
-
-	let shouldShowNotice = false;
-	// If payment is a system payment, we want to show a notice
-	if (payment_status === 'awaiting' && isSystemPayment) {
-		shouldShowNotice = true;
-	}
-
-	if (payment_status === 'requires_action' && isSystemPayment) {
-		shouldShowNotice = true;
-	}
-
+	const { payment_status } = order;
 	switch (true) {
-		case payment_status === 'captured' ||
-			payment_status === 'partially_refunded': {
-			labelBtn = 'Hoàn tiền';
-			action = () => onOpen();
+		case payment_status === 'awaiting': {
+			actions.push({
+				label: 'Thu tiền',
+				key: 'capture',
+				icon: <CornerDownRight size={16} />,
+				onClick: openCapture,
+			});
 			break;
 		}
-
-		case shouldShowNotice: {
-			action = () => message.info('Đơn hàng này đang chờ thanh toán tự động');
+		case payment_status === 'captured': {
+			actions.push({
+				label: 'Hoàn tiền',
+				key: 'refund',
+				icon: <CornerDownLeft size={16} />,
+				onClick: onOpen,
+			});
 			break;
 		}
-
+		case payment_status === 'partially_refunded': {
+			actions.push(
+				{
+					label: 'Hoàn tất thanh toán',
+					key: 'capture-payment',
+					icon: <Check size={16} />,
+					onClick: confirmCapture,
+				},
+				{
+					label: 'Hoàn tiền',
+					key: 'refund',
+					icon: <CornerDownLeft size={16} />,
+					onClick: onOpen,
+				}
+			);
+			break;
+		}
 		case payment_status === 'requires_action': {
 			return null;
 		}
@@ -104,17 +111,8 @@ const Payment = ({ order, isLoading }: Props) => {
 				<div className="pb-2 flex flex-col lg:flex-row lg:justify-between">
 					<Title level={4}>{`Thanh toán`}</Title>
 					<div className="flex justify-end items-center gap-2 flex-wrap">
-						<PaymentStatus status={order!.payment_status} />
-						{order.payment_status === 'partially_refunded' && (
-							<Button type="default" onClick={confirmCapture}>
-								{'Hoàn tất thanh toán'}
-							</Button>
-						)}
-						{order.payment_status !== 'canceled' && (
-							<Button type="default" onClick={action}>
-								{labelBtn}
-							</Button>
-						)}
+						<PaymentStatus status={order?.payment_status} />
+						<ActionAbles actions={actions} />
 					</div>
 				</div>
 			</div>
@@ -154,24 +152,61 @@ const Payment = ({ order, isLoading }: Props) => {
 							</div>
 						)}
 						<Divider className="my-2" />
-						<div className="flex justify-between text-xs">
-							<div className="font-semibold text-grey-90">
-								{payment_status === 'captured'
-									? 'Số tiền đã thanh toán'
-									: 'Số tiền cần thanh toán'}
-							</div>
-							<div className="flex">
-								<div className="font-semibold text-gray-900 mr-3">
-									{formatAmountWithSymbol({
-										amount: order.paid_total - order.refunded_total,
-										currency: order.currency_code,
-									})}
+						{payment_status === 'awaiting' && (
+							<div className="flex flex-col gap-1">
+								<div className="flex justify-between text-xs">
+									<div className="font-semibold text-grey-90">
+										{'Số tiền đã thanh toán'}
+									</div>
+									<div className="flex">
+										<div className="font-semibold text-gray-900 mr-3">
+											{formatAmountWithSymbol({
+												amount: payment?.data?.paid_total ?? 0,
+												currency: order.currency_code,
+											})}
+										</div>
+										<div className="font-regular text-gray-500">
+											{order.currency_code.toUpperCase()}
+										</div>
+									</div>
 								</div>
-								<div className="font-regular text-gray-500">
-									{order.currency_code.toUpperCase()}
+								<div className="flex justify-between text-xs">
+									<div className="font-semibold text-grey-90">
+										{'Số tiền cần thanh toán'}
+									</div>
+									<div className="flex">
+										<div className="font-semibold text-gray-900 mr-3">
+											{formatAmountWithSymbol({
+												amount:
+													payment?.amount - (payment?.data?.paided_total ?? 0),
+												currency: order.currency_code,
+											})}
+										</div>
+										<div className="font-regular text-gray-500">
+											{order.currency_code.toUpperCase()}
+										</div>
+									</div>
 								</div>
 							</div>
-						</div>
+						)}
+						{payment_status !== 'awaiting' && (
+							<div className="flex justify-between text-xs">
+								<div className="font-semibold text-grey-90">
+									{'Số tiền đã thanh toán'}
+								</div>
+								<div className="flex">
+									<div className="font-semibold text-gray-900 mr-3">
+										{formatAmountWithSymbol({
+											amount: order.paid_total - order.refunded_total,
+											currency: order.currency_code,
+										})}
+									</div>
+									<div className="font-regular text-gray-500">
+										{order.currency_code.toUpperCase()}
+									</div>
+								</div>
+							</div>
+						)}
 					</div>
 				))}
 			</div>
@@ -181,6 +216,16 @@ const Payment = ({ order, isLoading }: Props) => {
 					handleOk={handleOkRefund}
 					handleCancel={onClose}
 					order={order}
+					refetch={refetch}
+				/>
+			)}
+			{stateCapture && (
+				<CaptureModal
+					state={stateCapture}
+					handleOk={closeCapture}
+					handleCancel={closeCapture}
+					order={order}
+					refetch={refetch}
 				/>
 			)}
 		</Card>

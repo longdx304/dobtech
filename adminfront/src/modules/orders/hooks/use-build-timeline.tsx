@@ -43,7 +43,8 @@ export interface TimelineEvent {
 		| 'edit-canceled'
 		| 'edit-confirmed'
 		| 'payment-required'
-		| 'refund-required';
+		| 'refund-required'
+		| 'paid';
 }
 
 export interface RefundRequiredEvent extends TimelineEvent {
@@ -107,6 +108,10 @@ export interface RefundEvent extends TimelineEvent {
 	currencyCode: string;
 	note?: string;
 	refund: Refund;
+}
+export interface PaidEvent extends TimelineEvent {
+	amount: number;
+	currencyCode: string;
 }
 
 enum ReturnStatus {
@@ -246,7 +251,7 @@ export const useBuildTimeline = (orderId: string) => {
 					} as OrderEditRequestedEvent);
 				}
 
-				// // declined
+				// declined
 				if (edit.declined_at) {
 					events.push({
 						id: edit.id,
@@ -257,7 +262,7 @@ export const useBuildTimeline = (orderId: string) => {
 					} as OrderEditEvent);
 				}
 
-				// // canceled
+				// canceled
 				if (edit.canceled_at) {
 					events.push({
 						id: edit.id,
@@ -324,6 +329,21 @@ export const useBuildTimeline = (orderId: string) => {
 				type: 'refund',
 				refund: event,
 			} as RefundEvent);
+		}
+
+		for (const payment of order.payments) {
+			if (payment?.data?.paid?.length) {
+				for (const paid of payment.data.paid) {
+					events.push({
+						id: `${payment.created_at}-paid`,
+						time: paid.created_at,
+						type: 'paid',
+						orderId: order.id,
+						amount: paid.amount,
+						currencyCode: order.currency_code,
+					} as PaidEvent);
+				}
+			}
 		}
 
 		for (const event of order.fulfillments) {

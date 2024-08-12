@@ -9,7 +9,6 @@ import {
 	OrderPlacedEvent,
 	RefundEvent,
 	TimelineEvent,
-	useBuildTimeline,
 	PaymentRequiredEvent,
 	RefundRequiredEvent,
 	OrderEditEvent,
@@ -17,6 +16,7 @@ import {
 	ReturnEvent,
 	ExchangeEvent,
 	ClaimEvent,
+	PaidEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
 import { Order } from '@medusajs/medusa';
 import { Empty } from 'antd';
@@ -41,20 +41,28 @@ import EditRequested from './timeline-events/order-edit/requested';
 import ReturnMenu from './timeline-events/modal/returns';
 import SwapModal from './timeline-events/modal/swap';
 import ClaimModal from './timeline-events/modal/claim';
+import Paid from './timeline-events/paid';
 
 type Props = {
 	orderId: Order['id'] | undefined;
 	isLoading: boolean;
 	refetchOrder: () => void;
+	events: TimelineEvent[] | undefined;
+	refetch: () => void;
 };
 
-const Timeline = ({ orderId, isLoading, refetchOrder }: Props) => {
+const Timeline = ({
+	orderId,
+	isLoading,
+	refetchOrder,
+	events,
+	refetch,
+}: Props) => {
 	const { orderRelations } = useOrdersExpandParam();
-	const { events, refetch } = useBuildTimeline(orderId!);
+	// const { events, refetch } = useBuildTimeline(orderId!);
 	const [showRequestReturn, setShowRequestReturn] = useState<boolean>(false);
 	const [showCreateSwap, setShowCreateSwap] = useState<boolean>(false);
 	const [showRegisterClaim, setShowRegisterClaim] = useState<boolean>(false);
-	// const createNote = useAdminCreateNote();
 	const { order, isLoading: isOrderLoading } = useAdminOrder(orderId!, {
 		expand: orderRelations,
 	});
@@ -180,6 +188,8 @@ function switchOnType(
 		//   return <Notification event={event as NotificationEvent} />
 		case 'refund':
 			return <Refund event={event as RefundEvent} />;
+		case 'paid':
+			return <Paid event={event as PaidEvent} />;
 		case 'edit-created':
 			return <EditCreated event={event as OrderEditEvent} />;
 		case 'edit-canceled':

@@ -1,5 +1,4 @@
 import Medusa from '@/services/api';
-import _ from 'lodash';
 
 export const updateLineItem = async (lineItemId: string, data: any) => {
 	try {
