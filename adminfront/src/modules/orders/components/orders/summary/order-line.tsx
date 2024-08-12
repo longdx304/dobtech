@@ -3,15 +3,18 @@ import { ReservationItemDTO } from '@medusajs/types';
 
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import { formatAmountWithSymbol } from '@/utils/prices';
-// import { useFeatureFlag } from "../../../../providers/feature-flag-provider"
-// import ReservationIndicator from "../../components/reservation-indicator/reservation-indicator"
 import Image from 'next/image';
+import { Pencil } from 'lucide-react';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import EditPriceModal from './edit-price-modal';
 
 type OrderLineProps = {
 	item: LineItem;
 	currencyCode: string;
 	reservations?: ReservationItemDTO[];
 	isAllocatable?: boolean;
+	paymentStt?: string;
+	refetch?: () => void;
 };
 
 const OrderLine = ({
@@ -19,8 +22,10 @@ const OrderLine = ({
 	currencyCode,
 	reservations,
 	isAllocatable = true,
+	paymentStt = '',
+	refetch,
 }: OrderLineProps) => {
-	// const { isFeatureEnabled } = useFeatureFlag()
+	const { state, onClose, onOpen } = useToggleState();
 	return (
 		<div className="hover:bg-gray-50 rounded-md mx-[-5px] mb-1 flex h-[64px] justify-between px-[5px] cursor-pointer">
 			<div className="flex justify-center items-center space-x-4">
@@ -52,7 +57,10 @@ const OrderLine = ({
 			</div>
 			<div className="flex items-center">
 				<div className="space-x-2 lg:space-x-4 2xl:space-x-6 mr-1 flex text-[12px]">
-					<div className="font-normal text-gray-500">
+					<div className="flex items-center gap-2 font-normal text-gray-500">
+						{['not_paid', 'awaiting'].includes(paymentStt) && (
+							<Pencil size={12} onClick={onOpen} />
+						)}
 						{formatAmountWithSymbol({
 							amount: (item?.total ?? 0) / item.quantity,
 							currency: currencyCode,
@@ -60,9 +68,6 @@ const OrderLine = ({
 						})}
 					</div>
 					<div className="font-normal text-gray-500">x {item.quantity}</div>
-					{/* {isFeatureEnabled("inventoryService") && isAllocatable && (
-            <ReservationIndicator reservations={reservations} lineItem={item} />
-          )} */}
 					<div className="font-normal text-gray-900 min-w-[55px] text-right">
 						{formatAmountWithSymbol({
 							amount: item.total ?? 0,
@@ -71,9 +76,17 @@ const OrderLine = ({
 						})}
 					</div>
 				</div>
-				{/* <div className="font-normal text-gray-500 text-[12px]">
-					{currencyCode.toUpperCase()}
-				</div> */}
+				{state && item && (
+					<EditPriceModal
+						state={state}
+						handleCancel={onClose}
+						handleOk={onClose}
+						item={item}
+						currencyCode={currencyCode}
+						initialAmount={(item.total ?? 0) / 2}
+						refetch={refetch}
+					/>
+				)}
 			</div>
 		</div>
 	);

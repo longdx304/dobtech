@@ -1,26 +1,18 @@
-// @ts-nocheck
-// !check this file
 import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Title } from '@/components/Typography';
-import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import {
 	DisplayTotal,
 	PaymentDetails,
 } from '@/modules/orders/components/common';
 import { useOrderEdit } from '@/modules/orders/components/orders/edit-order-modal/context';
-import {
-	AdminGetVariantsVariantInventoryRes,
-	Order,
-	VariantInventory,
-} from '@medusajs/medusa';
+import { Order } from '@medusajs/medusa';
 import { ReservationItemDTO } from '@medusajs/types';
 import { Divider, Empty } from 'antd';
 import _ from 'lodash';
-import { Package, Pencil } from 'lucide-react';
-import { useMedusa } from 'medusa-react';
-import { useEffect, useMemo, useState } from 'react';
+import { Pencil } from 'lucide-react';
+import { useMemo } from 'react';
 import OrderLine from './order-line';
 
 type Props = {
@@ -28,6 +20,7 @@ type Props = {
 	isLoading: boolean;
 	// inventoryEnabled?: boolean;
 	reservations: ReservationItemDTO[];
+	refetch?: () => void;
 };
 
 const Summary = ({
@@ -35,52 +28,12 @@ const Summary = ({
 	isLoading,
 	// inventoryEnabled = false,
 	reservations = [],
+	refetch,
 }: Props) => {
 	const { showModal } = useOrderEdit();
-	const { client } = useMedusa();
-	const { isFeatureEnabled } = useFeatureFlag();
-	const inventoryEnabled = isFeatureEnabled('inventoryService');
-	const [variantInventoryMap, setVariantInventoryMap] = useState<
-		Map<string, VariantInventory>
-	>(new Map());
-
-	useEffect(() => {
-		if (!inventoryEnabled) {
-			return;
-		}
-
-		const fetchInventory = async () => {
-			const inventory = await Promise.all(
-				order?.items?.map(async (item) => {
-					if (!item.variant_id) {
-						return;
-					}
-					return await client.admin.variants.getInventory(item.variant_id);
-				})
-			);
-
-			setVariantInventoryMap(
-				new Map(
-					inventory
-						.filter(
-							(
-								inventoryItem
-								// eslint-disable-next-line max-len
-							): inventoryItem is Response<AdminGetVariantsVariantInventoryRes> =>
-								!!inventoryItem
-						)
-						.map((i) => {
-							return [i.variant.id, i.variant];
-						})
-				)
-			);
-		};
-
-		fetchInventory();
-	}, [order?.items, inventoryEnabled, client.admin.variants]);
 
 	const reservationItemsMap = useMemo(() => {
-		if (!reservations?.length || !inventoryEnabled) {
+		if (!reservations?.length) {
 			return {};
 		}
 
@@ -96,27 +49,7 @@ const Summary = ({
 			},
 			{}
 		);
-	}, [reservations, inventoryEnabled]);
-
-	const allItemsReserved = useMemo(() => {
-		return order?.items?.every((item) => {
-			if (
-				!item.variant_id ||
-				!variantInventoryMap.get(item.variant_id)?.inventory.length
-			) {
-				return true;
-			}
-
-			const reservations = reservationItemsMap[item.id];
-
-			return (
-				item.quantity === item.fulfilled_quantity ||
-				(reservations &&
-					sum(reservations.map((r) => r.quantity)) ===
-						item.quantity - (item.fulfilled_quantity || 0))
-			);
-		});
-	}, [order?.items, variantInventoryMap, reservationItemsMap]);
+	}, [reservations]);
 
 	const { hasMovements, swapAmount, manualRefund, swapRefund, returnRefund } =
 		useMemo(() => {
@@ -153,7 +86,6 @@ const Summary = ({
 
 	const actions = useMemo(() => {
 		const actionAbles = [];
-		// if (isFeatureEnabled('order_editing')) {
 		actionAbles.push({
 			label: <span>{'Chỉnh sửa đơn hàng'}</span>,
 			icon: <Pencil size={16} />,
@@ -162,18 +94,9 @@ const Summary = ({
 			},
 		});
 		// }
-		if (isFeatureEnabled('inventoryService') && !allItemsReserved) {
-			actionAbles.push({
-				label: <span>{'Cấp phát'}</span>,
-				icon: <Package size={16} />,
-				onClick: () => {
-					// openReserveItemsModal();
-				},
-			});
-		}
 		return actionAbles;
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isFeatureEnabled, allItemsReserved]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	if (!order) {
 		return (
@@ -191,17 +114,19 @@ const Summary = ({
 				<Flex align="center" justify="space-between" className="pb-2">
 					<Title level={4}>{`Tổng quan`}</Title>
 					{/* <Button type="default" onClick={openEdit}>{'Chỉnh sửa đơn hàng'}</Button> */}
-					<ActionAbles actions={actions} />
+					<ActionAbles actions={actions as any} />
 				</Flex>
 			</div>
 			<div>
-				{order?.items?.map((item, i) => (
+				{order?.items?.map((item, i: number) => (
 					<OrderLine
-						key={i}
+						key={item.id}
 						item={item}
 						currencyCode={order.currency_code}
 						reservations={reservationItemsMap[item.id]}
 						isAllocatable={isAllocatable}
+						paymentStt={order.payment_status}
+						refetch={refetch}
 					/>
 				))}
 				<Divider className="my-2" />

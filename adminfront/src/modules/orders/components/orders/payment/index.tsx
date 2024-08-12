@@ -9,10 +9,7 @@ import dayjs from 'dayjs';
 import { useAdminCapturePayment } from 'medusa-react';
 import { getErrorMessage } from '@/lib/utils';
 import { Button } from '@/components/Button';
-import {
-	DisplayTotal,
-	PaymentDetails,
-} from '@/modules/orders/components/common';
+import { DisplayTotal } from '@/modules/orders/components/common';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import RefundModal from './refund-modal';
@@ -24,7 +21,6 @@ type Props = {
 
 const Payment = ({ order, isLoading }: Props) => {
 	const capturePayment = useAdminCapturePayment(order?.id! || '');
-
 	const { state, onOpen, onClose } = useToggleState(false);
 
 	if (!order) {
@@ -160,7 +156,9 @@ const Payment = ({ order, isLoading }: Props) => {
 						<Divider className="my-2" />
 						<div className="flex justify-between text-xs">
 							<div className="font-semibold text-grey-90">
-								{'Tổng số tiền đã thanh toán'}
+								{payment_status === 'captured'
+									? 'Số tiền đã thanh toán'
+									: 'Số tiền cần thanh toán'}
 							</div>
 							<div className="flex">
 								<div className="font-semibold text-gray-900 mr-3">
