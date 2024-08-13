@@ -19,14 +19,19 @@ const PaymentButton = ({ data }: Props) => {
 	const { cart, refreshCart } = useCart();
 
 	const checkoutCartVariants = data?.items.map((item) => item.variant_id);
-	const checkoutCartItemsIds = data?.items.map((item) => item.id);
 	const mainCartVariant = cart?.items.map((item) => item.variant_id);
 
-	const intersection = _.intersection(checkoutCartVariants, mainCartVariant);
+	const intersection = mainCartVariant
+		? _.intersection(checkoutCartVariants, mainCartVariant)
+		: checkoutCartVariants;
 
 	const findLineItemId = (variantId: string[]) => {
 		const result = variantId.map((variant) => {
-			return cart?.items.find((item) => item.variant_id === variant);
+			if (cart?.items) {
+				return cart?.items.find((item) => item.variant_id === variant);
+			} else {
+				return data?.items.find((item) => item.variant_id === variant);
+			}
 		});
 
 		const lineItemIds = result.map((item) => item?.id);
@@ -44,7 +49,11 @@ const PaymentButton = ({ data }: Props) => {
 
 	const handleDeleteLineItem = async (lineItemIds: string[]) => {
 		try {
-			await Promise.all(lineItemIds.map((id) => deleteLineItem(id)));
+			await Promise.all(
+				lineItemIds.map(async (id) => {
+					await deleteLineItem(id);
+				})
+			);
 			refreshCart();
 		} catch (err: any) {
 			setErrorMessage(err.toString());
@@ -57,7 +66,8 @@ const PaymentButton = ({ data }: Props) => {
 		setSubmitting(true);
 
 		try {
-			await handleDeleteLineItem(lineItemIds as string[]);
+			// delete line items from cart checkout with cart main 
+			cart && await handleDeleteLineItem(lineItemIds as string[]);
 			await onPaymentCompleted();
 		} catch (err: any) {
 			setErrorMessage(err.toString());

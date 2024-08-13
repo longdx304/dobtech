@@ -35,7 +35,7 @@ const ItemsPreview = ({ region, cart }: Props) => {
 						modules={[Navigation]}
 						navigation={true}
 					>
-						{items.map((item) => (
+						{items?.map((item) => (
 							<SwiperSlide key={item.id} className="max-w-[120px] text-[14px]">
 								<div className="w-full">
 									<Thumbnail

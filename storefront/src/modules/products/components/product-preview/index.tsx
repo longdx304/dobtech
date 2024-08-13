@@ -3,7 +3,6 @@ import { FC } from 'react';
 import { retrievePricedProductById } from '@/actions/products';
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
-import { cn } from '@/lib/utils';
 import { getProductPrice } from '@/lib/utils/get-product-price';
 import LocalizedClientLink from '@/modules/common/components/localized-client-link';
 import Thumbnail from '@/modules/products/components/thumbnail';
@@ -26,7 +25,7 @@ const ProductPreview: FC<Props> = async ({ data, region }) => {
 		return null;
 	}
 
-	const { cheapestPrice, variantPrice } = getProductPrice({
+	const { cheapestPrice, variantPrice, product } = getProductPrice({
 		product: pricedProduct,
 		region,
 	});

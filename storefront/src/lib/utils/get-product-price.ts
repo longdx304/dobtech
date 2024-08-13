@@ -54,6 +54,12 @@ export function getProductPrice({
 				cheapestVariant.original_price,
 				cheapestVariant.calculated_price
 			),
+			original_tax: cheapestVariant.original_tax,
+			original_price_incl_tax: formatAmount({
+				amount: cheapestVariant.original_price_incl_tax,
+				region,
+				includeTaxes: false,
+			}),
 		};
 	};
 

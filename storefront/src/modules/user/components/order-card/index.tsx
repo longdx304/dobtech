@@ -6,6 +6,7 @@ import LocalizedClientLink from '@/modules/common/components/localized-client-li
 import Thumbnail from '@/modules/products/components/thumbnail';
 import { Order } from '@medusajs/medusa';
 import { useMemo } from 'react';
+import dayjs from 'dayjs';
 
 type OrderCardProps = {
 	order: Omit<Order, 'beforeInsert'>;
@@ -29,7 +30,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
 				className="flex divide-x divide-solid divide-y-0 divide-gray-200"
 			>
 				<Text className="pr-2" data-testid="order-created-at">
-					{new Date(order.created_at).toDateString()}
+					{dayjs(order.created_at).format('DD/MM/YYYY')}
 				</Text>
 				<Text className="px-2" data-testid="order-amount">
 					{formatAmount({

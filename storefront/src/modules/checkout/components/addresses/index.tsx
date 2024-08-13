@@ -10,10 +10,9 @@ import AddressForm from '@/modules/common/components/address-form';
 import { Address, Cart, Customer, Region } from '@medusajs/medusa';
 import { ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { setAddresses } from '../../actions';
 import AddressSelect from '../address-select';
 import ShippingAddress from '../shipping-address';
-import { setAddresses } from '../../actions';
-import { message } from 'antd';
 
 const countryCode = 'vn';
 
@@ -27,7 +26,7 @@ const Addresses = ({
 	region: Region;
 }) => {
 	const { state, onOpen, onClose: onAddressClose } = useToggleState(false);
-	const { selectedAddress, setSelectedAddress, refreshCart } = useCart();
+	const { selectedAddress, setSelectedAddress } = useCart();
 
 	const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 

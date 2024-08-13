@@ -1,6 +1,4 @@
 import { listCustomerOrders } from '@/actions/customer';
-import { Flex } from '@/components/Flex';
-import { Text, Title } from '@/components/Typography';
 import OrderOverview from '@/modules/user/components/order-overview';
 import { Metadata } from 'next';
 

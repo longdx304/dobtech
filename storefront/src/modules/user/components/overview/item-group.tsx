@@ -4,16 +4,13 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
+import { LOGIN_VIEW } from '@/types/auth';
+import { Divider } from 'antd';
 import {
-	CircleDollarSign,
-	Gift,
-	Settings,
-	TicketPercent,
-	Wallet,
+	Settings
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import LoginTemplate from '../../templates/login-template';
-import { Divider } from 'antd';
 
 const ItemGroup = () => {
 	const { state, onOpen, onClose } = useToggleState(false);
@@ -58,7 +55,7 @@ const ItemGroup = () => {
 
 			<Divider
 				className="my-0 block lg:hidden"
-				style={{ borderColor: '#f6f6f6', borderWidth: "11px" }}
+				style={{ borderColor: '#f6f6f6', borderWidth: '11px' }}
 			/>
 
 			<Drawer
@@ -70,7 +67,10 @@ const ItemGroup = () => {
 					wrapper: { height: '100%' },
 				}}
 			>
-				<LoginTemplate onCloseDrawer={onCloseDrawer} />
+				<LoginTemplate
+					initialView={LOGIN_VIEW.SIGN_IN}
+					onCloseDrawer={onCloseDrawer}
+				/>
 			</Drawer>
 		</>
 	);

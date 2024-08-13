@@ -3,6 +3,7 @@ import { useCart } from '@/lib/providers/cart/cart-provider';
 import StepsOrder from '@/modules/cart/components/steps-order';
 import { Cart, Customer, Region } from '@medusajs/medusa';
 import { PricedShippingOption } from '@medusajs/medusa/dist/types/pricing';
+import { useEffect } from 'react';
 import CheckoutForm from '../checkout-form';
 import CheckoutSummary from '../checkout-summary';
 
@@ -19,7 +20,13 @@ export default function CheckoutPreview({
 	region,
 	availableShippingMethods,
 }: Props) {
-	const { currentStep } = useCart();
+	const { currentStep, setCurrentStep, refreshCart } = useCart();
+
+	useEffect(() => {
+		setCurrentStep(1);
+		refreshCart();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return (
 		<div className="pt-4 container box-border flex flex-col gap-8">
