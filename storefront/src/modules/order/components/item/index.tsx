@@ -26,7 +26,7 @@ const Item = ({ item, region }: ItemProps) => {
 					<LineItemUnitPrice item={item} region={region} />
 				</div>
 			</div>
-			<div className="flex justify-between items-center">
+			<div className="flex justify-between items-center gap-10 lg:gap-0">
 				<div className="flex items-center gap-2">
 					<span>Phân loại hàng:</span>
 					<span className="bg-gray-200 px-2 py-1 rounded-lg">

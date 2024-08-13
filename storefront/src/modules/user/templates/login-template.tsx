@@ -1,40 +1,37 @@
 'use client';
 
+import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
+import { LOGIN_VIEW } from '@/types/auth';
 import { useState } from 'react';
 import Login from '../components/login';
 import Register from '../components/register';
-import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
-
-export enum LOGIN_VIEW {
-  SIGN_IN = 'sign-in',
-  REGISTER = 'register',
-}
 
 type LoginTemplateProps = {
-  onCloseDrawer?: () => void;
+	onCloseDrawer?: () => void;
+	initialView?: LOGIN_VIEW;
 };
 
-const LoginTemplate = ({ onCloseDrawer }: LoginTemplateProps) => {
-  const [currentView, setCurrentView] = useState('sign-in');
-  const isDesktop = useIsDesktop();
+const LoginTemplate = ({ onCloseDrawer, initialView }: LoginTemplateProps) => {
+	const [currentView, setCurrentView] = useState(initialView);
+	const isDesktop = useIsDesktop();
 
-  return (
-    <>
-      {currentView === 'sign-in' ? (
-        <Login
-          setCurrentView={setCurrentView}
-          onCloseDrawer={onCloseDrawer}
-          isDesktop={isDesktop}
-        />
-      ) : (
-        <Register
-          setCurrentView={setCurrentView}
-          onCloseDrawer={onCloseDrawer}
-          isDesktop={isDesktop}
-        />
-      )}
-    </>
-  );
+	return (
+		<>
+			{currentView === LOGIN_VIEW.SIGN_IN ? (
+				<Login
+					setCurrentView={setCurrentView}
+					onCloseDrawer={onCloseDrawer}
+					isDesktop={isDesktop}
+				/>
+			) : (
+				<Register
+					setCurrentView={setCurrentView}
+					onCloseDrawer={onCloseDrawer}
+					isDesktop={isDesktop}
+				/>
+			)}
+		</>
+	);
 };
 
 export default LoginTemplate;

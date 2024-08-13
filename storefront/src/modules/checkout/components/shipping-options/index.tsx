@@ -64,7 +64,6 @@ const ShippingOptions = ({ region, availableShippingMethods }: Props) => {
 		}
 	};
 
-	console.log('availableShippingMethods', availableShippingMethods);
 	return (
 		<Card>
 			<Text className="text-xl" strong>

@@ -8,6 +8,7 @@ import {
 	updateCart,
 	updateItem,
 } from '@/actions/cart';
+import { getCustomer, updateCustomer } from '@/actions/customer';
 import { getProductsById } from '@/actions/products';
 import { getRegion } from '@/actions/region';
 import { Cart, LineItem } from '@medusajs/medusa';
@@ -15,7 +16,6 @@ import _ from 'lodash';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { updateCartMetadata } from '../checkout/actions';
-import { getCustomer, updateCustomer } from '@/actions/customer';
 
 /**
  * Retrieves the cart based on the cartId cookie
@@ -60,8 +60,8 @@ export async function getOrSetCart(countryCode: string) {
 	return cart;
 }
 
-export async function retrieveCart() {
-	const cartId = cookies().get('_chamdep_cart_id')?.value;
+export async function retrieveCart(cartId?: string) {
+	cartId = cartId || cookies().get('_chamdep_cart_id')?.value;
 
 	if (!cartId) {
 		return null;

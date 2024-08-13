@@ -1,10 +1,11 @@
 'use client';
+import { addItem, removeItem } from '@/actions/cart';
 import {
 	enrichLineItems,
 	retrieveCart,
 	updateLineItem,
 } from '@/modules/cart/action';
-import { deleteCartCheckout, listAllCart } from '@/modules/checkout/actions';
+import { listAllCart } from '@/modules/checkout/actions';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { Address, Cart, LineItem } from '@medusajs/medusa';
 import {
@@ -52,9 +53,9 @@ type CartContextType = {
 	setCurrentStep: (step: number) => void;
 	selectedAddress: Address | null;
 	setSelectedAddress: (address: Address) => void;
-	deleteAndRefreshCart: (cartId: string) => Promise<void>;
 	isProcessing: boolean;
 	setIsProcessing: (action: boolean) => void;
+	updateExistingCart: (cartId: string, newItems: LineItem[]) => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -97,19 +98,42 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 	};
 
 	/**
-	 * Deletes a cart and refreshes the list of all carts.
+	 * Updates an existing cart by removing all existing line items and adding new ones.
 	 *
-	 * @param {string} cartId - The ID of the cart to be deleted.
-	 * @return {Promise<void>} A promise that resolves when the cart is successfully deleted and the list of carts is refreshed.
-	 * @throws {Error} If there is an error deleting the cart.
+	 * @param {string} cartId - The ID of the cart to be updated.
+	 * @param {LineItem[]} newItems - The new line items to be added to the cart.
+	 * @return {Promise<void>} A promise that resolves when the cart is successfully updated.
+	 * @throws {Error} If there is an error updating the cart.
 	 */
-	const deleteAndRefreshCart = async (cartId: string) => {
+	const updateExistingCart = async (cartId: string, newItems: LineItem[]) => {
+		setIsProcessing(true);
+
+		const cart = await retrieveCart(cartId);
+
 		try {
-			await deleteCartCheckout(cartId);
-			await fetchAllCarts();
+			// Remove all existing line items
+			if (cart?.items) {
+				for (const item of cart.items) {
+					await removeItem({ cartId, lineId: item.id });
+				}
+			}
+			await refreshCart();
+
+			// Add new line items
+			for (const item of newItems) {
+				await addItem({
+					cartId,
+					variantId: item.variant_id!,
+					quantity: item.quantity,
+				});
+			}
+			// Refresh the cart to get the updated state
+			await refreshCart();
 		} catch (error) {
-			console.error('Error deleting cart:', error);
+			console.error('Error updating existing cart:', error);
 			throw error;
+		} finally {
+			setIsProcessing(false);
 		}
 	};
 
@@ -167,14 +191,6 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 	 *
 	 * @return {Promise<void>} A promise that resolves when the cart is successfully refreshed with the updated data.
 	 */
-	// const refreshCart = async () => {
-	// 	const [updatedCart, updatedAllCarts] = await Promise.all([
-	// 		fetchCart(),
-	// 		fetchAllCarts(),
-	// 	]);
-	// 	setCart(updatedCart);
-	// 	setAllCarts(updatedAllCarts);
-	// };
 	const refreshCart = async () => {
 		setIsProcessing(true);
 		try {
@@ -207,9 +223,9 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 				setCurrentStep,
 				selectedAddress,
 				setSelectedAddress,
-				deleteAndRefreshCart,
 				isProcessing,
 				setIsProcessing,
+				updateExistingCart,
 			}}
 		>
 			{children}

@@ -6,6 +6,7 @@ import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
 import LocalizedClientLink from '@/modules/common/components/localized-client-link';
+import { LOGIN_VIEW } from '@/types/auth';
 import { ERoutes } from '@/types/routes';
 import { Button, List } from 'antd';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -148,7 +149,10 @@ const UserSetting = () => {
 					wrapper: { height: '100%' },
 				}}
 			>
-				<LoginTemplate onCloseDrawer={onLoginClose} />
+				<LoginTemplate
+					initialView={LOGIN_VIEW.SIGN_IN}
+					onCloseDrawer={onLoginClose}
+				/>
 			</Drawer>
 
 			{/* Drawer Logout */}

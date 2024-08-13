@@ -1,38 +1,44 @@
 'use client';
 
 import { Button } from '@/components/Button';
+import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import { useCart } from '@/lib/providers/cart/cart-provider';
+import { useCustomer } from '@/lib/providers/user/user-provider';
+import {
+	createAndPopulateCheckoutCart,
+	findCheckoutCart,
+} from '@/lib/utils/handle-checkout-cart';
 import CartTotals from '@/modules/common/components/cart-totals';
+import LoginTemplate from '@/modules/user/templates/login-template';
+import { LOGIN_VIEW } from '@/types/auth';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { ERoutes } from '@/types/routes';
 import { Cart } from '@medusajs/medusa';
 import { message, Modal } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { addToCheckout, createCheckoutCart } from '../action';
 
 type SummaryProps = {
 	cart: CartWithCheckoutStep;
 	selectedItems: string[];
 };
 
-const countryCode = 'vn';
-
 const Summary = ({ cart, selectedItems }: SummaryProps) => {
 	const {
-		refreshCart,
 		allCarts,
-		deleteAndRefreshCart,
-		setCurrentStep,
 		isProcessing,
 		setIsProcessing,
+		setSelectedCartItems,
+		updateExistingCart,
 	} = useCart();
+	const { customer } = useCustomer();
 	const [isAdding, setIsAdding] = useState(false);
 	const router = useRouter();
 	const [isOpenModal, setIsOpenModal] = useState(false);
-	// const [isProcessing, setIsProcessing] = useState(false);
+	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 	const [checkoutCart, setCheckoutCart] = useState<Cart | undefined>(undefined);
+	const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
 	const selectedCartItems = cart.items.filter((item) =>
 		selectedItems.includes(item.id)
@@ -70,12 +76,9 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 	} as CartWithCheckoutStep;
 
 	useEffect(() => {
-		const cart = allCarts.find(
-			(cart) =>
-				cart?.metadata?.cart_type === 'checkout' && cart?.payment_id === null
-		);
+		const cart = findCheckoutCart(allCarts, customer?.email);
 		setCheckoutCart(cart);
-	}, [allCarts]);
+	}, [allCarts, customer]);
 
 	/**
 	 * Function to handle the checkout process for selected items.
@@ -85,29 +88,24 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 	const handleSelectedItemCheckout = async () => {
 		setIsAdding(true);
 		try {
-			if (checkoutCart) {
+			if (selectedCartItems.length === 0) {
+				return message.error('Vui lòng chọn sản phẩm để thanh toán');
+			}
+
+			if (!customer) {
+				setIsLoginModalOpen(true);
+				return;
+			}
+
+			if (checkoutCart && checkoutCart.customer_id === customer.id) {
 				setIsOpenModal(true);
 			} else {
-				const newCart = await createCheckoutCart(countryCode);
-				if (!newCart) {
-					throw new Error('Failed to create checkout cart');
-				}
-				await Promise.all(
-					selectedCartItems.map((item) =>
-						addToCheckout({
-							cartId: newCart.id,
-							variantId: item.variant_id!,
-							quantity: item.quantity,
-						})
-					)
-				);
-				setCheckoutCart(newCart as Cart);
-				setCurrentStep(1);
+				const newCart = await createAndPopulateCheckoutCart(selectedCartItems);
 				router.push(`${ERoutes.CHECKOUT}/?cartId=${newCart.id}`);
 			}
 		} catch (e) {
 			console.error('Error in handleSelectedItemCheckout:', e);
-			message.error('An error occurred while processing your checkout');
+			message.error('Có lỗi xảy ra khi thanh toán!');
 		} finally {
 			setIsAdding(false);
 		}
@@ -131,30 +129,15 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 		setIsProcessing(true);
 		try {
 			if (checkoutCart) {
-				await deleteAndRefreshCart(checkoutCart?.id!);
-				setCheckoutCart(undefined);
-				await refreshCart();
+				await updateExistingCart(checkoutCart.id, selectedCartItems);
+			} else {
+				const newCart = await createAndPopulateCheckoutCart(selectedCartItems);
+				setCheckoutCart(newCart as Cart);
 			}
-			const newCart = await createCheckoutCart(countryCode);
-
-			if (!newCart) {
-				throw new Error('Failed to create checkout cart');
-			}
-			await Promise.all(
-				selectedCartItems.map((item) =>
-					addToCheckout({
-						cartId: newCart.id,
-						variantId: item.variant_id!,
-						quantity: item.quantity,
-					})
-				)
-			);
-			setCurrentStep(1);
-			setCheckoutCart(newCart as Cart);
-			router.push(`${ERoutes.CHECKOUT}/?cartId=${newCart.id}`);
+			router.push(`${ERoutes.CHECKOUT}/?cartId=${checkoutCart?.id}`);
 		} catch (e) {
 			console.error('Error in handleModalOk:', e);
-			message.error('An error occurred while processing your request');
+			message.error('Có lỗi xảy ra khi thanh toán!');
 		} finally {
 			setIsProcessing(false);
 			setIsOpenModal(false);
@@ -168,9 +151,21 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 
 	const handleCheckCart = () => {
 		setIsProcessing(true);
-		setCurrentStep(1);
 		setIsOpenModal(false);
 		router.push(`${ERoutes.CHECKOUT}/?cartId=${checkoutCart?.id}`);
+	};
+
+	const handleGuestCheckout = async () => {
+		setIsLoginModalOpen(false);
+		// Proceed with checkout as a guest
+		const newCart = await createAndPopulateCheckoutCart(selectedCartItems);
+		router.push(`${ERoutes.CHECKOUT}/?cartId=${newCart.id}`);
+	};
+
+	const handleRegister = () => {
+		setSelectedCartItems(selectedCart);
+		setIsLoginModalOpen(false);
+		setIsRegisterModalOpen(true);
 	};
 
 	return (
@@ -192,6 +187,42 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 					}`}
 				</Button>
 			</div>
+			{/* Modal for guest checkout or registration */}
+			<Modal
+				title="Lựa chọn thanh toán"
+				open={isLoginModalOpen}
+				onCancel={() => setIsLoginModalOpen(false)}
+				footer={null}
+			>
+				<Flex className="flex-col gap-y-4">
+					<Text className="text-sm font-normal">
+						Bạn có thể thanh toán ngay hoặc đăng ký tài khoản để tiếp tục.
+					</Text>
+					<Flex
+						gap={6}
+						justify="space-between"
+						className="w-full flex-col lg:flex-row"
+					>
+						<Button onClick={handleGuestCheckout} type="default">
+							Thanh toán ngay
+						</Button>
+						<Button onClick={handleRegister}>
+							Đăng ký tài khoản và thanh toán
+						</Button>
+					</Flex>
+				</Flex>
+			</Modal>
+
+			{/* Modal for registration */}
+			<Modal
+				open={isRegisterModalOpen}
+				onCancel={() => setIsRegisterModalOpen(false)}
+				footer={null}
+			>
+				<LoginTemplate initialView={LOGIN_VIEW.REGISTER} />
+			</Modal>
+
+			{/* Modal if there is a checkout cart to be processed */}
 			<Modal
 				title="Xác nhận đơn hàng"
 				open={isOpenModal}
