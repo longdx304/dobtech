@@ -1,7 +1,7 @@
 'use client';
 
 import { Product } from '@medusajs/medusa';
-import { Modal, message, notification } from 'antd';
+import { Modal, message } from 'antd';
 import _ from 'lodash';
 import { CircleAlert, Plus, Search, CloudUpload, Download } from 'lucide-react';
 import {
@@ -15,12 +15,11 @@ import { useRouter } from 'next/navigation';
 import { ChangeEvent, useMemo, useState } from 'react';
 
 import { deleteProduct } from '@/actions/products';
-import { FloatButton } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { Title } from '@/components/Typography';
-import { Button } from '@/components/Button';
+import { Button, FloatButton } from '@/components/Button';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ProductModal } from '../products-modal';
 import productsColumns from './products-column';
@@ -32,7 +31,7 @@ const PAGE_SIZE = 10;
 
 interface Props {}
 
-const ProductList = ({}: Props) => {
+const ProductList = (props: Props) => {
 	const { client } = useMedusa();
 	const router = useRouter();
 	const { state, onOpen, onClose } = useToggleState(false);
@@ -157,8 +156,8 @@ const ProductList = ({}: Props) => {
 	};
 
 	const handleRowClick = (record: any) => {
-		router.push(`${ERoutes.PRODUCTS}/${record.id}`)
-  };
+		router.push(`${ERoutes.PRODUCTS}/${record.id}`);
+	};
 
 	return (
 		<>

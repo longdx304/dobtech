@@ -7,41 +7,36 @@ import _ from 'lodash';
 import { Table } from '@/components/Table';
 import { useAdminOrders } from 'medusa-react';
 import orderColumns from './order-column';
-import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import { useRouter } from 'next/navigation';
 import { ERoutes } from '@/types/routes';
-import { Region } from '@medusajs/medusa';
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
 const defaultQueryProps = {
-  expand: "customer,shipping_address",
-  fields:
-    "id,status,display_id,created_at,email,fulfillment_status,payment_status,total,currency_code",
-}
+	expand: 'customer,shipping_address',
+	fields:
+		'id,status,display_id,created_at,email,fulfillment_status,payment_status,total,currency_code',
+};
 
-const OrderList: FC<Props> = ({}) => {
+const OrderList: FC<Props> = () => {
 	const router = useRouter();
-	const { isFeatureEnabled } = useFeatureFlag()
-
-  let hiddenColumns = ["sales_channel"]
-  if (isFeatureEnabled("sales_channels")) {
-    if (!defaultQueryProps.expand.includes("sales_channel")) {
-      defaultQueryProps.expand = defaultQueryProps.expand + ",sales_channel"
-    }
-    hiddenColumns = []
-  }
 
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
-	const [currentRegion, setCurrentRegion] = useState<Region | null>(null);
-	const [regionId, setRegionId] = useState<Region['id'] | null>(null);
 
-	const { orders, isLoading, count } = useAdminOrders(defaultQueryProps as any, {
-    keepPreviousData: true,
-  });
+	const { orders, isLoading, count } = useAdminOrders(
+		{
+			...(defaultQueryProps as any),
+			q: searchValue || undefined,
+			offset,
+			limit: DEFAULT_PAGE_SIZE,
+		},
+		{
+			keepPreviousData: true,
+		}
+	);
 
 	const handleChangeDebounce = _.debounce(
 		(e: ChangeEvent<HTMLInputElement>) => {
@@ -62,8 +57,8 @@ const OrderList: FC<Props> = ({}) => {
 	}, [orders]);
 
 	const handleRowClick = (record: any) => {
-		router.push(`${ERoutes.ORDERS}/${record.id}`)
-  };
+		router.push(`${ERoutes.ORDERS}/${record.id}`);
+	};
 
 	return (
 		<div className="w-full">

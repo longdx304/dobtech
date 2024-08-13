@@ -66,13 +66,6 @@ const regionColumns = ({
 						handleShippingOption(record);
 					},
 				},
-				// {
-				// 	label: 'Tuỳ chọn giao hàng trả lại',
-				// 	icon: <Truck size={20} />,
-				// 	onClick: () => {
-				// 		handleReturnShippingOption(record);
-				// 	},
-				// },
 				{
 					label: 'Xoá',
 					icon: <Trash2 size={20} />,

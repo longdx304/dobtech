@@ -21,7 +21,7 @@ type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
 
-const RegionList: FC<Props> = ({}) => {
+const RegionList: FC<Props> = () => {
 	const {
 		state: stateShipping,
 		onOpen: onOpenShipping,
@@ -69,11 +69,6 @@ const RegionList: FC<Props> = ({}) => {
 
 	const handleShippingOption = (record: Region) => {
 		setRegionId(record.id);
-		onOpenShipping();
-	};
-
-	const handleReturnShippingOption = (record: Region) => {
-		setCurrentRegion(record);
 		onOpenShipping();
 	};
 
@@ -163,7 +158,7 @@ const RegionList: FC<Props> = ({}) => {
 					onCloseShipping();
 					setRegionId(null);
 				}}
-				regionId={regionId || ''}
+				regionId={regionId ?? ''}
 			/>
 		</Card>
 	);

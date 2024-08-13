@@ -11,6 +11,7 @@ import {
 	LogOut,
 	Settings,
 	ShoppingCart,
+	SquarePercent,
 	Undo2,
 	User as UserIcon,
 	Users,
@@ -61,6 +62,7 @@ const itemsAdmin: MenuProps['items'] = [
 	getItem('Danh mục', 'product-categories', <LayoutList />),
 	getItem('Định giá', 'pricing', <CircleDollarSign />),
 	getItem('Khách hàng', 'customers', <UsersRound />),
+	getItem('Giảm giá', 'discounts', <SquarePercent />),
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
 		getItem('Tiền tệ', 'currency', <BadgeDollarSign />),
@@ -129,4 +131,5 @@ export const menuRoutes: Record<string, string> = {
 	regions: ERoutes.REGIONS,
 	orders: ERoutes.ORDERS,
 	'return-reasons': ERoutes.RETURN_REASONS,
+	discounts: ERoutes.DISCOUNTS,
 };

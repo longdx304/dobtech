@@ -12,6 +12,7 @@ export enum ERoutes {
 	REGIONS = '/admin/regions',
 	ORDERS = '/admin/orders',
 	RETURN_REASONS = '/admin/return-reasons',
+	DISCOUNTS = '/admin/discounts',
 }
 
 export interface TRouteConfig {
@@ -70,6 +71,10 @@ export const routesConfig: TRouteConfig[] = [
 	},
 	{
 		path: ERoutes.RETURN_REASONS,
+		mode: [],
+	},
+	{
+		path: ERoutes.DISCOUNTS,
 		mode: [],
 	},
 ];
