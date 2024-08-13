@@ -26,6 +26,7 @@ export type PriceType = {
 	original_price?: string;
 	price_type?: 'sale' | 'default';
 	percentage_diff?: string;
+	original_price_incl_tax?: string;
 };
 
 export default function ProductActions({
