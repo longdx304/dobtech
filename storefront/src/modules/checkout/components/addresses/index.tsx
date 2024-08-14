@@ -35,6 +35,11 @@ const Addresses = ({
 		onOpen();
 	};
 
+	/**
+	 * Handles the edit action for the address.
+	 * If an address is currently being edited, it is cleared.
+	 * Then, the modal for editing an address is opened.
+	 */
 	const handleEdit = () => {
 		if (editingAddress) {
 			setEditingAddress(null);
@@ -42,6 +47,7 @@ const Addresses = ({
 		onOpen();
 	};
 
+	// get countries in current region
 	const countriesInRegion = useMemo(
 		() => cart?.region.countries.map((c: any) => c.iso_2),
 		[cart?.region]
@@ -77,8 +83,37 @@ const Addresses = ({
 			) || null
 		);
 	}, [addressesInRegion]);
-	const displayAddress = selectedAddress || defaultAddress;
 
+	/**
+	 * Checks if an address is valid.
+	 *
+	 * @param {Address} address - The address to be checked.
+	 * @return {boolean} True if the address is valid, false otherwise.
+	 */
+	const hasValidAddress = (address: Address | null) => {
+		return (
+			address &&
+			address.address_1 &&
+			address.city &&
+			address.province &&
+			address.first_name &&
+			address.last_name
+		);
+	};
+
+	// display address
+	const displayAddress =
+		selectedAddress ||
+		defaultAddress ||
+		(cart?.shipping_address && hasValidAddress(cart.shipping_address)
+			? cart.shipping_address
+			: null);
+
+	/**
+	 * Updates the cart's address with the default address if it exists.
+	 *
+	 * @return {Promise<void>} A promise that resolves when the address is updated. If there is an error, it will be logged to the console.
+	 */
 	const updateCartAddress = useCallback(async () => {
 		try {
 			if (!cart || !defaultAddress) return;
@@ -126,7 +161,9 @@ const Addresses = ({
 					</Flex>
 				)}
 			</Flex>
-			{customer && addressesInRegion && displayAddress ? (
+
+			{/* Display address if has the customer otherwise open form to fill */}
+			{!!cart?.email && displayAddress ? (
 				<Card className="shadow-none">
 					<Flex className="flex-col" gap={4}>
 						<Flex gap={10} align="baseline">

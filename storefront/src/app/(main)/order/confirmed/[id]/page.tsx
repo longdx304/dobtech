@@ -3,8 +3,9 @@ import { enrichLineItems } from '@/modules/cart/action';
 import { LineItem, Order } from '@medusajs/medusa';
 import { Metadata } from 'next';
 
+import { deletePaymentSession } from '@/actions/checkout';
 import { notFound } from 'next/navigation';
-import React, { lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import OrderSkeleton from './skeleton';
 
 const OrderCompletedTemplate = lazy(
@@ -39,6 +40,12 @@ export const metadata: Metadata = {
 
 export default async function OrderConfirmedPage({ params }: Props) {
 	const { order } = await getOrder(params.id);
+
+	const cart = await deletePaymentSession(order?.cart_id, 'manual');
+
+	if (!cart) {
+		return null;
+	}
 
 	return (
 		<div className="w-full pt-[4rem] lg:pt-[4rem]">
