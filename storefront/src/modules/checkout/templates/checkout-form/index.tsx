@@ -18,9 +18,6 @@ export default function CheckoutForm({
 	region,
 	availableShippingMethods,
 }: Props) {
-
-	// console.log('cart checkout form', cart)
-
 	return (
 		<div className="flex flex-col gap-4">
 			<Addresses cart={cart} customer={customer} region={region!} />

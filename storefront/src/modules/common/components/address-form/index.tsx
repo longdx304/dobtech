@@ -11,9 +11,9 @@ import {
 import { Region } from '@/types/medusa';
 import { Address, Customer } from '@medusajs/medusa';
 import { Divider, Form, FormProps, message, Select } from 'antd';
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import SelectedAddress from './SelectedAddress';
-import _ from 'lodash';
 
 type Props = {
 	customer: Omit<Customer, 'password_hash'> | null;
@@ -201,6 +201,9 @@ const AddressForm = ({ customer, region, onClose, editingAddress }: Props) => {
 							}}
 							size="large"
 							showSearch
+							filterOption={(input, option) =>
+								(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+							}
 						/>
 					) : (
 						<>
@@ -241,6 +244,9 @@ const AddressForm = ({ customer, region, onClose, editingAddress }: Props) => {
 							}
 							size="large"
 							showSearch
+							filterOption={(input, option) =>
+								(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+							}
 						/>
 					) : (
 						<Input
@@ -279,6 +285,9 @@ const AddressForm = ({ customer, region, onClose, editingAddress }: Props) => {
 							}
 							size="large"
 							showSearch
+							filterOption={(input, option) =>
+								(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+							}
 						/>
 					) : (
 						<Input

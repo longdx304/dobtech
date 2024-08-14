@@ -75,7 +75,6 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 
 	const fetchCart = async () => {
 		const cart = await retrieveCart();
-
 		if (cart?.items?.length) {
 			const enrichedItems = await enrichLineItems(cart?.items, cart?.region_id);
 			cart.items = enrichedItems as LineItem[];

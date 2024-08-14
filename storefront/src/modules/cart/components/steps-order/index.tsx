@@ -57,7 +57,7 @@ const StepsOrder = ({ className, currentStep = 0 }: Props) => {
 			<Steps
 				current={currentStep}
 				items={ITEMS_STEP}
-				className="[&_.ant-steps-item-icon]:hidden"
+				className="[&_.ant-steps-item-icon]:hidden [&_.ant-steps-item-tail]:p-[30px_0_0]"
 			/>
 		</Card>
 	);
