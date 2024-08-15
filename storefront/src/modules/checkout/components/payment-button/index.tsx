@@ -1,12 +1,15 @@
 'use client';
 import { Button } from '@/components/Button';
 import { useCart } from '@/lib/providers/cart/cart-provider';
+import { useCustomer } from '@/lib/providers/user/user-provider';
 import { deleteLineItem } from '@/modules/cart/action';
+import ErrorMessage from '@/modules/common/components/error-message';
+import { ERoutes } from '@/types/routes';
 import { Cart } from '@medusajs/medusa';
 import _ from 'lodash';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { placeOrder } from '../../actions';
+import { placeOrder, removeGuestCart } from '../../actions';
 
 type Props = {
 	data: Omit<Cart, 'refundable_amount' | 'refunded_total'>;
@@ -17,7 +20,9 @@ const PaymentButton = ({ data }: Props) => {
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const cartId = useSearchParams().get('cartId') || '';
 	const { cart, refreshCart } = useCart();
+	const { customer } = useCustomer();
 
+	const router = useRouter();
 	const checkoutCartVariants = data?.items.map((item) => item.variant_id);
 	const mainCartVariant = cart?.items.map((item) => item.variant_id);
 
@@ -25,6 +30,12 @@ const PaymentButton = ({ data }: Props) => {
 		? _.intersection(checkoutCartVariants, mainCartVariant)
 		: checkoutCartVariants;
 
+	/**
+	 * Finds the line item IDs for the given variant IDs.
+	 *
+	 * @param {string[]} variantId - The array of variant IDs to find line item IDs for.
+	 * @return {string[]} The array of line item IDs corresponding to the given variant IDs.
+	 */
 	const findLineItemId = (variantId: string[]) => {
 		const result = variantId.map((variant) => {
 			if (cart?.items) {
@@ -40,11 +51,27 @@ const PaymentButton = ({ data }: Props) => {
 
 	const lineItemIds = findLineItemId(intersection as string[]);
 
+	/**
+	 * Handles the completion of a payment by attempting to place an order.
+	 *
+	 * @return {Promise<void>} A promise that resolves when the order has been placed or an error has been handled.
+	 */
 	const onPaymentCompleted = async () => {
-		await placeOrder(cartId).catch((err) => {
+		try {
+			const result = await placeOrder(cartId);
+			if (result.redirect) {
+				// remove guest cart if customer is not logged in but still complete payment
+				!customer && await removeGuestCart();
+				router.push(result.url as any);
+			} else {
+				// Handle non-redirect case
+				// if get error return dashboard
+				router.push(`${ERoutes.DASHBOARD}`);
+			}
+		} catch (err: any) {
 			setErrorMessage(err.toString());
 			setSubmitting(false);
-		});
+		}
 	};
 
 	const handleDeleteLineItem = async (lineItemIds: string[]) => {
@@ -66,8 +93,9 @@ const PaymentButton = ({ data }: Props) => {
 		setSubmitting(true);
 
 		try {
-			// delete line items from cart checkout with cart main 
-			cart && await handleDeleteLineItem(lineItemIds as string[]);
+			// delete line items from cart checkout with cart main
+			// handle case when customer is not logged in
+			customer && cart && (await handleDeleteLineItem(lineItemIds as string[]));
 			await onPaymentCompleted();
 		} catch (err: any) {
 			setErrorMessage(err.toString());
@@ -85,6 +113,10 @@ const PaymentButton = ({ data }: Props) => {
 			>
 				Đặt hàng
 			</Button>
+			<ErrorMessage
+				error={errorMessage}
+				data-testid="manual-payment-error-message"
+			/>
 		</>
 	);
 };

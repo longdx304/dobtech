@@ -17,7 +17,7 @@ export default async function Checkout({
 	searchParams?: { [key: string]: string | string[] | undefined };
 }) {
 	return (
-		<div className="w-full pt-[6rem] lg:pt-[4rem]">
+		<div className="w-full pt-[4rem] lg:pt-[4rem]">
 			<Suspense fallback={<CheckoutSkeleton />}>
 				<CheckoutTemplate params={searchParams} />
 			</Suspense>

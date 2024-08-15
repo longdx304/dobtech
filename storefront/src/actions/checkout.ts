@@ -2,12 +2,27 @@ import { medusaClient } from '@/lib/database/config';
 import { getMedusaHeaders } from './auth';
 import { cache } from 'react';
 import medusaError from '@/lib/utils/medusa-error';
+import { removeGuestCart } from '@/modules/checkout/actions';
 
 export async function createPaymentSessions(cartId: string) {
 	const headers = await getMedusaHeaders(['cart']);
 
 	return medusaClient.carts
 		.createPaymentSessions(cartId, headers)
+		.then(({ cart }) => cart)
+		.catch((err) => {
+			console.log(err);
+			return null;
+		});
+}
+
+export async function deletePaymentSession(
+	cartId: string,
+	provider_id: string
+) {
+
+	return medusaClient.carts
+		.deletePaymentSession(cartId, provider_id)
 		.then(({ cart }) => cart)
 		.catch((err) => {
 			console.log(err);

@@ -7,9 +7,11 @@ import { useCart } from '@/lib/providers/cart/cart-provider';
 import { setAddresses } from '@/modules/checkout/actions';
 import { Cart, Region } from '@medusajs/medusa';
 import { Divider, Form, FormProps, Select, message } from 'antd';
+import { Mail } from 'lucide-react';
 import { useState } from 'react';
 
 export type ShippingAddressProps = {
+	email?: string;
 	firstName: string;
 	lastName: string;
 	phone: string;
@@ -50,7 +52,7 @@ const ShippingAddress = ({
 		};
 
 		try {
-			await setAddresses(shippingAddress, cart?.email, cart?.id);
+			await setAddresses(shippingAddress, values?.email, cart?.id);
 			message.success('Địa chỉ giao hàng đã được cập nhật');
 			refreshCart();
 			setIsEditing(false);
@@ -97,6 +99,25 @@ const ShippingAddress = ({
 					</Form.Item>
 
 					<Divider className="my-4" />
+					<Form.Item
+						labelCol={{ span: 24 }}
+						name="email"
+						rules={[
+							{ type: 'email', message: 'Email không đúng định dạng!' },
+							{
+								required: true,
+								whitespace: true,
+								message: 'Email phải được nhập!',
+							},
+						]}
+						label="Email:"
+					>
+						<Input
+							placeholder="Email"
+							prefix={<Mail size={20} color="rgb(156 163 175)" />}
+							data-testid="email"
+						/>
+					</Form.Item>
 
 					<Form.Item
 						label="Họ"
@@ -190,7 +211,7 @@ const ShippingAddress = ({
 				</Form>
 			)}
 
-			{!isEditing && (
+			{/* {!isEditing && (
 				<Card className="shadow-none">
 					<Flex className="flex-col" gap={4}>
 						<Flex gap={10} align="baseline">
@@ -221,7 +242,7 @@ const ShippingAddress = ({
 						</Flex>
 					</Flex>
 				</Card>
-			)}
+			)} */}
 		</>
 	);
 };

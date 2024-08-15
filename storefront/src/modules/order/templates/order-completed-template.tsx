@@ -3,7 +3,7 @@
 import { Text } from '@/components/Typography';
 import CartTotals, { CartType } from '@/modules/common/components/cart-totals';
 import { Order } from '@medusajs/medusa';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Items from '../components/items';
 import OrderDetails from '../components/order-details';
 import PaymentDetails from '../components/payment-details';
@@ -12,6 +12,7 @@ import { Flex } from '@/components/Flex';
 import { Button } from '@/components/Button';
 import { useRouter } from 'next/navigation';
 import { ERoutes } from '@/types/routes';
+import { useCart } from '@/lib/providers/cart/cart-provider';
 
 type OrderCompletedTemplateProps = {
 	order: Order;
@@ -21,6 +22,12 @@ const OrderCompletedTemplate: React.FC<OrderCompletedTemplateProps> = ({
 	order,
 }) => {
 	const router = useRouter();
+	const { refreshCart } = useCart();
+
+	useEffect(() => {
+		refreshCart();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 	return (
 		<Flex className="pt-2 container box-border flex flex-col gap-8">
 			<div className="pt-4 pb-6 min-h-[calc(100vh-64px)]">
@@ -66,7 +73,7 @@ const OrderCompletedTemplate: React.FC<OrderCompletedTemplateProps> = ({
 								onClick={() =>
 									router.push(`/${ERoutes.USER_ORDERS}/details/${order.id}`)
 								}
-								className='w-full'
+								className="w-full"
 							>
 								Xem đơn đặt hàng
 							</Button>
@@ -81,7 +88,6 @@ const OrderCompletedTemplate: React.FC<OrderCompletedTemplateProps> = ({
 						<PaymentDetails order={order} />
 					</Flex>
 				</Flex>
-				
 			</div>
 		</Flex>
 	);

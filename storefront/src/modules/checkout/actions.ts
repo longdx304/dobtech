@@ -2,10 +2,11 @@
 
 import { completeCart, setPaymentSession, updateCart } from '@/actions/cart';
 import { addShippingMethod, deleteDiscount } from '@/actions/checkout';
+import { getCustomer } from '@/actions/customer';
 import { BACKEND_URL } from '@/lib/constants';
 import { Cart, GiftCard, StorePostCartsCartReq } from '@medusajs/medusa';
 import { revalidateTag } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { ShippingAddressProps } from './components/shipping-address';
 
 export async function setAddresses(
@@ -27,7 +28,7 @@ export async function setAddresses(
 			postal_code: values.postalCode,
 			country_code: values.countryCode,
 		},
-		email: email ? email : 'anonymous@gmail.com',
+		email: email,
 	} as StorePostCartsCartReq;
 
 	try {
@@ -147,10 +148,23 @@ export async function placeOrder(cartId?: string) {
 	}
 
 	if (cart?.type === 'order') {
-		redirect(`/order/confirmed/${cart?.data.id}`);
+		return { redirect: true, url: `/order/confirmed/${cart?.data.id}` };
 	}
 
-	return cart;
+	return { redirect: false, cart };
+}
+
+export async function removeGuestCart() {
+	const customer = await getCustomer();
+	console.log('customer placeOrder', customer);
+
+	if (!customer) {
+		cookies().set('_chamdep_cart_id', '', {
+			maxAge: -1,
+		});
+	}
+
+	revalidateTag('cart');
 }
 
 export async function listAllCart(): Promise<Cart[]> {

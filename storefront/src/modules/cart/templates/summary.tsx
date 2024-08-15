@@ -18,6 +18,7 @@ import { Cart } from '@medusajs/medusa';
 import { message, Modal } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { retrieveCart } from '../action';
 
 type SummaryProps = {
 	cart: CartWithCheckoutStep;
@@ -101,6 +102,7 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 				setIsOpenModal(true);
 			} else {
 				const newCart = await createAndPopulateCheckoutCart(selectedCartItems);
+				setIsProcessing(true);
 				router.push(`${ERoutes.CHECKOUT}/?cartId=${newCart.id}`);
 			}
 		} catch (e) {
@@ -157,9 +159,10 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 
 	const handleGuestCheckout = async () => {
 		setIsLoginModalOpen(false);
+		setIsProcessing(true);
 		// Proceed with checkout as a guest
-		const newCart = await createAndPopulateCheckoutCart(selectedCartItems);
-		router.push(`${ERoutes.CHECKOUT}/?cartId=${newCart.id}`);
+		const guestCart = await retrieveCart();
+		router.push(`${ERoutes.CHECKOUT}/?cartId=${guestCart?.id}`);
 	};
 
 	const handleRegister = () => {
@@ -227,11 +230,16 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 				title="Xác nhận đơn hàng"
 				open={isOpenModal}
 				onCancel={handleCancel}
-				okText="Tiếp tục thanh toán đơn hàng mới"
-				cancelText="Kiểm tra giỏ hàng"
-				footer={[
+				footer={null} // Remove the footer prop to allow custom layout
+			>
+				<Text className="text-sm font-normal">
+					Đã tồn tại 1 đơn hàng. Bạn chắc chắn thanh toán đơn hàng này chứ?
+				</Text>
+				<Flex
+					className="flex-col lg:flex-row gap-y-4 mt-3"
+					justify="space-between"
+				>
 					<Button
-						key="check"
 						size="middle"
 						type="default"
 						onClick={handleCheckCart}
@@ -239,9 +247,8 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 						loading={isProcessing}
 					>
 						Kiểm tra giỏ hàng
-					</Button>,
+					</Button>
 					<Button
-						key="submit"
 						size="middle"
 						type="primary"
 						onClick={handleModalOk}
@@ -249,12 +256,8 @@ const Summary = ({ cart, selectedItems }: SummaryProps) => {
 						disabled={isProcessing}
 					>
 						Tiếp tục thanh toán đơn hàng mới
-					</Button>,
-				]}
-			>
-				<Text className="text-sm font-normal">
-					Đã tồn tại 1 đơn hàng. Bạn chắc chắn thanh toán đơn hàng này chứ?
-				</Text>
+					</Button>
+				</Flex>
 			</Modal>
 		</div>
 	);
