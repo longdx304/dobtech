@@ -9,7 +9,7 @@ import Settings from './section/configration';
 import DiscountNewConditions from './section/condition';
 
 type DiscountFormProps = {
-	closeForm?: () => void;
+	closeForm: () => void;
 };
 
 const ExpandIcon = ({ isActive }: { isActive: boolean }) =>
@@ -57,7 +57,7 @@ const DiscoutForm = ({ closeForm }: DiscountFormProps) => {
 					/>
 				</Flex>
 			),
-			children: <DiscountNewConditions />,
+			children: <DiscountNewConditions closeForm={closeForm} />,
 		},
 	];
 	return (

@@ -160,7 +160,7 @@ const LayeredModal = ({
 	return (
 		<Modal
 			open={open}
-			onCancel={onCancel}
+			onCancel={emptyScreensAndClose}
 			okText="Đồng ý"
 			cancelText="Hủy"
 			footer={renderFooter}

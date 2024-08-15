@@ -4,7 +4,11 @@ import {
 	DiscountConditionType,
 } from '@/types/discount';
 import { useContext, useMemo } from 'react';
-import AddProductConditionSelector from './condition-tables/add-condition-tables';
+import ProductConditionSelector from './condition-tables/add-condition-tables/products';
+import CustomerGroupConditionSelector from './condition-tables/add-condition-tables/customer-groups';
+import CollectionConditionSelector from './condition-tables/add-condition-tables/collections';
+import TypeConditionSelector from './condition-tables/add-condition-tables/types';
+import TagConditionSelector from './condition-tables/add-condition-tables/tags';
 
 export type ConditionItem = {
 	label: string;
@@ -25,25 +29,16 @@ export type AddConditionFooterProps = {
 		| 'product_types'
 		| 'product_tags'
 		| 'customer_groups';
-	items: { id: string; label: string }[];
+	items: string[];
 	operator: DiscountConditionOperator;
-	onClose: () => void;
+	onClose?: () => void;
 };
 
 const useConditionModalItems = ({
 	isDetails,
-	onClose,
+	onClose = () => {},
 }: UseConditionModalItemsProps) => {
 	const layeredModalContext = useContext(LayeredModalContext);
-
-	const onConfirm = ({
-		type,
-		items,
-		operator,
-		onClose,
-	}: AddConditionFooterProps) => {
-		console.log(type, items, operator, onClose);
-	};
 
 	const items: ConditionItem[] = useMemo(
 		() => [
@@ -60,83 +55,78 @@ const useConditionModalItems = ({
 							// <DetailsProductConditionSelector onClose={onClose} />
 							<></>
 						) : (
-							<AddProductConditionSelector onClose={onClose} />
+							<ProductConditionSelector onClose={onClose} />
 						),
 					}),
 			},
-			// {
-			// 	label: t('discount-form-customer-group', 'Customer group'),
-			// 	value: DiscountConditionType.CUSTOMER_GROUPS,
-			// 	description: t(
-			// 		'discount-form-only-for-specific-customer-groups',
-			// 		'Only for specific customer groups'
-			// 	),
-			// 	onClick: () => {
-			// 		layeredModalContext.push({
-			// 			title: t('discount-form-choose-groups', 'Choose groups'),
-			// 			onBack: () => layeredModalContext.pop(),
-			// 			view: isDetails ? (
-			// 				<DetailsCustomerGroupConditionSelector onClose={onClose} />
-			// 			) : (
-			// 				<AddCustomerGroupConditionSelector onClose={onClose} />
-			// 			),
-			// 		});
-			// 	},
-			// },
-			// {
-			// 	label: t('discount-form-tag', 'Tag'),
-			// 	value: DiscountConditionType.PRODUCT_TAGS,
-			// 	description: t(
-			// 		'discount-form-only-for-specific-tags',
-			// 		'Only for specific tags'
-			// 	),
-			// 	onClick: () =>
-			// 		layeredModalContext.push({
-			// 			title: 'Choose tags',
-			// 			onBack: () => layeredModalContext.pop(),
-			// 			view: isDetails ? (
-			// 				<DetailsTagConditionSelector onClose={onClose} />
-			// 			) : (
-			// 				<AddTagConditionSelector onClose={onClose} />
-			// 			),
-			// 		}),
-			// },
-			// {
-			// 	label: t('discount-form-collection', 'Collection'),
-			// 	value: DiscountConditionType.PRODUCT_COLLECTIONS,
-			// 	description: t(
-			// 		'discount-form-only-for-specific-product-collections',
-			// 		'Only for specific product collections'
-			// 	),
-			// 	onClick: () =>
-			// 		layeredModalContext.push({
-			// 			title: t('discount-form-choose-collections', 'Choose collections'),
-			// 			onBack: () => layeredModalContext.pop(),
-			// 			view: isDetails ? (
-			// 				<DetailsCollectionConditionSelector onClose={onClose} />
-			// 			) : (
-			// 				<AddCollectionConditionSelector onClose={onClose} />
-			// 			),
-			// 		}),
-			// },
-			// {
-			// 	label: t('discount-form-type', 'Type'),
-			// 	value: DiscountConditionType.PRODUCT_TYPES,
-			// 	description: t(
-			// 		'discount-form-only-for-specific-product-types',
-			// 		'Only for specific product types'
-			// 	),
-			// 	onClick: () =>
-			// 		layeredModalContext.push({
-			// 			title: t('discount-form-choose-types', 'Choose types'),
-			// 			onBack: () => layeredModalContext.pop(),
-			// 			view: isDetails ? (
-			// 				<DetailsTypeConditionSelector onClose={onClose} />
-			// 			) : (
-			// 				<AddTypeConditionSelector onClose={onClose} />
-			// 			),
-			// 		}),
-			// },
+			{
+				label: 'Nhóm khách hàng',
+				value: DiscountConditionType.CUSTOMER_GROUPS,
+				description: 'Chỉ áp dụng cho các nhóm khách hàng cụ thể',
+				onClick: () =>
+					layeredModalContext.push({
+						title: 'Chọn nhóm khách hàng',
+						onBack: () => layeredModalContext.pop(),
+						footer: null,
+						view: isDetails ? (
+							// <DetailsCustomerGroupConditionSelector onClose={onClose} />
+							<></>
+						) : (
+							<CustomerGroupConditionSelector onClose={onClose} />
+						),
+					}),
+			},
+			{
+				label: 'Thẻ sản phẩm',
+				value: DiscountConditionType.PRODUCT_TAGS,
+				description: 'Chỉ áp dụng cho các thẻ cụ thể',
+				onClick: () =>
+					layeredModalContext.push({
+						title: 'Chọn thẻ sản phẩm',
+						onBack: () => layeredModalContext.pop(),
+						footer: null,
+						view: isDetails ? (
+							// <DetailsCustomerGroupConditionSelector onClose={onClose} />
+							<></>
+						) : (
+							<TagConditionSelector onClose={onClose} />
+						),
+					}),
+			},
+			{
+				label: 'Bộ sưu tập',
+				value: DiscountConditionType.PRODUCT_COLLECTIONS,
+				description: 'Chỉ áp dụng cho các bộ sưu tập cụ thể',
+				onClick: () =>
+					layeredModalContext.push({
+						title: 'Chọn bộ sưu tập',
+						onBack: () => layeredModalContext.pop(),
+						footer: null,
+						view: isDetails ? (
+							// <DetailsCollectionConditionSelector onClose={onClose} />
+							<></>
+						) : (
+							<CollectionConditionSelector onClose={onClose} />
+						),
+					}),
+			},
+			{
+				label: 'Loại sản phẩm',
+				value: DiscountConditionType.PRODUCT_TYPES,
+				description: 'Chỉ áp dụng cho các loại sản phẩm cụ thể',
+				onClick: () =>
+					layeredModalContext.push({
+						title: 'Chọn loại sản phẩm',
+						onBack: () => layeredModalContext.pop(),
+						footer: null,
+						view: isDetails ? (
+							// <DetailsTypeConditionSelector onClose={onClose} />
+							<></>
+						) : (
+							<TypeConditionSelector onClose={onClose} />
+						),
+					}),
+			},
 		],
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[isDetails]

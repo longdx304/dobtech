@@ -5,16 +5,17 @@ import { Button } from '@/components/Button';
 import { Plus } from 'lucide-react';
 import { LayeredModalContext } from '@/lib/providers/layer-modal-provider';
 import AddConditionsModal from '../../add-conditions-modal';
+import ConditionItem from './condition-item';
 
 type DiscountNewConditionsProps = {
 	discount?: Discount;
-	onClose: () => void;
+	closeForm: () => void;
 	isDetails?: boolean;
 };
 
 const DiscountNewConditions: FC<DiscountNewConditionsProps> = ({
 	discount,
-	onClose,
+	closeForm,
 	isDetails,
 }) => {
 	const layeredModalContext = useContext(LayeredModalContext);
@@ -58,11 +59,11 @@ const DiscountNewConditions: FC<DiscountNewConditionsProps> = ({
 				type="text"
 				className="text-sm w-32 font-semibold justify-center"
 			>
-				Hủy
+				Quay lại
 			</Button>
-			<Button className="text-sm min-w-32 justify-center" onClick={() => {}}>
+			{/* <Button className="text-sm min-w-32 justify-center" onClick={() => {}}>
 				Lưu
-			</Button>
+			</Button> */}
 		</div>
 	);
 
@@ -77,22 +78,27 @@ const DiscountNewConditions: FC<DiscountNewConditionsProps> = ({
 				</div>
 			),
 			onBack: () => layeredModalContext.pop(),
-			view: <AddConditionsModal conditions={conditions} />,
+			view: <AddConditionsModal />,
+			// view: <AddConditionsModal conditions={conditions} />,
 			footer,
 		});
 	};
 
 	return (
 		<div>
-			{filteredConditions.map((condition) => {
-				return (
-					<div key={condition.type}>
-						<h3>{condition.type}</h3>
-						<p>{condition.operator}</p>
-						<p>{condition.items.length}</p>
-					</div>
-				);
-			})}
+			<div className="flex flex-col gap-2 mb-4">
+				{filteredConditions.map((condition, i) => (
+					<ConditionItem
+						key={condition.type}
+						index={i}
+						discountId={discount?.id}
+						conditionId={condition.id}
+						type={condition.type}
+						setCondition={setConditions}
+						items={condition.items}
+					/>
+				))}
+			</div>
 			{!allSet && (
 				<Button
 					type="default"

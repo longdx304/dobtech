@@ -14,7 +14,7 @@ const ConditionOperator: FC<ConditionOperatorProps> = ({ value, onChange }) => {
 		<RadioGroup
 			value={value}
 			onChange={(e) => onChange(e.target.value as DiscountConditionOperator)}
-			className="w-full flex flex-wrap sm:flex-nowrap gap-4"
+			className="w-full flex flex-wrap sm:flex-nowrap gap-4 mt-4"
 		>
 			<Radio
 				value={DiscountConditionOperator.IN}

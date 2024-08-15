@@ -1,23 +1,24 @@
 import { LayeredModalContext } from '@/lib/providers/layer-modal-provider';
-import { AddConditionSelectorProps, ConditionMap } from '@/types/discount';
 import { useContext, useEffect, useState } from 'react';
 import useConditionModalItems, {
 	ConditionItem,
 } from './use-condition-modal-item';
 import { ChevronRightIcon } from 'lucide-react';
+import { useDiscountForm } from './discount-form-context';
 
 type AddConditionsModalProps = {
 	isDetails?: boolean;
-	conditions: ConditionMap;
+	// conditions: ConditionMap;
 	save?: () => void;
 };
 
 const AddConditionsModal = ({
-	isDetails,
-	conditions,
+	isDetails = false,
+	// conditions,
 	save,
 }: AddConditionsModalProps) => {
 	const layeredModalContext = useContext(LayeredModalContext);
+	const { conditions } = useDiscountForm();
 	const [items, setItems] = useState<ConditionItem[]>(
 		useConditionModalItems({
 			onClose: () => layeredModalContext.pop(),
