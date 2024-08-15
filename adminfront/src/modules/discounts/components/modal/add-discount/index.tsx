@@ -34,7 +34,12 @@ const AddDiscountModal: React.FC<AddDiscountModalProps> = ({
 			>
 				Hủy
 			</Button>
-			<Button className="text-sm w-32 justify-center">Đồng ý</Button>
+			<Button
+				className="text-sm min-w-32 justify-center"
+				onClick={() => form.submit()}
+			>
+				Xuất bản giảm giá
+			</Button>
 		</div>
 	);
 

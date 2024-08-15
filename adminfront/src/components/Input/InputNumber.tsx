@@ -12,7 +12,7 @@ export default function InputNumber({
 	className,
 	allowClear = false,
 	...props
-}: Props) {
+}: Readonly<Props>) {
 	const formatter = (value: any) => {
 		if (value) {
 			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');

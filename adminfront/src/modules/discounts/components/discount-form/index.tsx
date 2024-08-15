@@ -5,6 +5,8 @@ import { CircleAlert, Minus, Plus } from 'lucide-react';
 import { TooltipIcon } from '@/components/Tooltip';
 import DiscountType from './section/discount-type';
 import General from './section/discount-general';
+import Settings from './section/configration';
+import DiscountNewConditions from './section/condition';
 
 type DiscountFormProps = {
 	closeForm?: () => void;
@@ -42,7 +44,7 @@ const DiscoutForm = ({ closeForm }: DiscountFormProps) => {
 		{
 			key: 'configuration',
 			label: 'Cấu hình',
-			children: null,
+			children: <Settings />,
 		},
 		{
 			key: 'condition',
@@ -55,7 +57,7 @@ const DiscoutForm = ({ closeForm }: DiscountFormProps) => {
 					/>
 				</Flex>
 			),
-			children: null,
+			children: <DiscountNewConditions />,
 		},
 	];
 	return (

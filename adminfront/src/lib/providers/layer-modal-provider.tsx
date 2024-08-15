@@ -1,9 +1,10 @@
 'use client';
 import { Button } from '@/components/Button';
+import { Text } from '@/components/Typography';
 import { Modal, ModalProps } from 'antd';
 import clsx from 'clsx';
 import { Undo2, X } from 'lucide-react';
-import {
+import React, {
 	createContext,
 	ReactNode,
 	useContext,
@@ -18,10 +19,11 @@ enum LayeredModalActions {
 }
 
 export type LayeredModalScreen = {
-	title: string;
+	title: string | ReactNode;
 	subtitle?: string;
 	onBack: () => void;
 	onConfirm?: () => void;
+	footer?: ReactNode;
 	view: ReactNode;
 };
 
@@ -54,11 +56,6 @@ const reducer = (state: any, action: any) => {
 		}
 	}
 };
-
-type LayeredModalProps = {
-	context: ILayeredModalContext;
-	onCancel: () => void;
-} & ModalProps;
 
 export const LayeredModalProvider = ({ children }: any) => {
 	const [state, dispatch] = useReducer(reducer, defaultContext);
@@ -98,11 +95,20 @@ export const useLayeredModal = () => {
 	return context;
 };
 
+type LayeredModalProps = {
+	context: ILayeredModalContext;
+	onCancel: () => void;
+	title?: ReactNode | string;
+	footer: ReactNode;
+} & ModalProps;
+
 const LayeredModal = ({
 	context,
 	children,
 	onCancel,
 	open,
+	title,
+	footer,
 	...props
 }: LayeredModalProps) => {
 	const emptyScreensAndClose = () => {
@@ -111,67 +117,75 @@ const LayeredModal = ({
 	};
 	const screen = context.screens[context.screens.length - 1];
 
+	const renderTitle = useMemo(() => {
+		if (screen) {
+			return (
+				<div className="flex items-center">
+					<Button
+						type="text"
+						size="small"
+						className="text-gray-500 h-10 w-10 border"
+						onClick={screen?.onBack}
+					>
+						<Undo2 size={40} strokeWidth={2} />
+					</Button>
+					<div className="gap-4 flex items-center">
+						<Text strong className="text-[20px] font-normal ml-4">
+							{screen?.title}
+						</Text>
+						{screen?.subtitle && (
+							<span className="font-medium text-gray-500">
+								({screen?.subtitle})
+							</span>
+						)}
+					</div>
+				</div>
+			);
+		}
+		return title;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [screen]);
+
+	const renderFooter = useMemo(
+		() => {
+			if (screen) {
+				return screen.footer;
+			}
+			return footer;
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[screen]
+	);
+
 	return (
 		<Modal
 			open={open}
 			onCancel={onCancel}
 			okText="Đồng ý"
 			cancelText="Hủy"
+			footer={renderFooter}
 			styles={{
 				header: { borderBottom: '1px solid #e5e7eb', paddingBottom: '12px' },
 				footer: { borderTop: '1px solid #e5e7eb', paddingTop: '16px' },
 				body: { padding: '0px 16px' },
 			}}
+			title={renderTitle}
 			{...props}
 		>
 			<div
 				className={clsx(
 					'flex flex-col justify-between transition-transform duration-200',
 					{
-						'translate-x-0': typeof screen !== 'undefined',
-						'translate-x-full': typeof screen === 'undefined',
+						'translate-x-0 opacity-1': typeof screen !== 'undefined',
+						'translate-x-full opacity-0': typeof screen === 'undefined',
 					}
 				)}
 			>
-				{screen ? (
-					<>
-						<div className="flex justify-between items-center">
-							<div className="flex items-center">
-								<Button
-									type="text"
-									size="small"
-									className="text-gray-500 h-8 w-8 border"
-									onClick={screen.onBack}
-								>
-									<Undo2 size={20} />
-								</Button>
-								<div className="gap-4 flex items-center">
-									<h2 className="font-normal ml-4">{screen.title}</h2>
-									{screen.subtitle && (
-										<span className="font-medium text-gray-500">
-											({screen.subtitle})
-										</span>
-									)}
-								</div>
-							</div>
-							<Button
-								type="text"
-								size="small"
-								className="text-gray-500 h-8 w-8 border"
-								onClick={emptyScreensAndClose}
-							>
-								<X />
-							</Button>
-						</div>
-						{screen.view}
-					</>
-				) : (
-					<></>
-				)}
+				{screen ? screen.view : <></>}
 			</div>
 			<div
 				className={clsx('transition-transform duration-200', {
-					'-translate-x-full': typeof screen !== 'undefined',
+					'-translate-x-full opacity-1': typeof screen !== 'undefined',
 				})}
 			>
 				<div
