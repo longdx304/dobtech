@@ -99,7 +99,7 @@ type LayeredModalProps = {
 	context: ILayeredModalContext;
 	onCancel: () => void;
 	title?: ReactNode | string;
-	footer: ReactNode;
+	footer?: ReactNode;
 } & ModalProps;
 
 const LayeredModal = ({

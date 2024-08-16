@@ -40,7 +40,6 @@ const DiscountList = () => {
 		}
 	);
 
-	console.log('discounts:', discounts);
 	const handleChangeDebounce = _.debounce(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			const { value: inputValue } = e.target;
@@ -70,7 +69,7 @@ const DiscountList = () => {
 	}, []);
 
 	const handleRowClick = (record: any) => {
-		router.push(`${ERoutes.ORDERS}/${record.id}`);
+		router.push(`${ERoutes.DISCOUNTS}/${record.id}`);
 	};
 
 	return (

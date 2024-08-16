@@ -44,22 +44,20 @@ const ExpandIcon = ({ isActive }: { isActive: boolean }) => (
 );
 
 const Settings: React.FC<SettingsProps> = ({ isEdit, promotion }) => {
-	const { isDynamic, hasExpiryDate, handleConfigurationChanged } =
-		useDiscountForm();
-	const [openItems, setOpenItems] = useState<string[]>(
-		isEdit && promotion
-			? getActiveTabs(promotion)
-			: [...(hasExpiryDate ? ['ends_at'] : [])]
-	);
+	const [activeTabs, setActiveTabs] = useState<string[]>([]);
+	const { isDynamic, handleConfigurationChanged, form } = useDiscountForm();
 
-	const marginTransition =
-		'transition-[margin] duration-300 ease-[cubic-bezier(0.87, 0, 0.13, 1) forwards]';
-
-	const [render, setRender] = useState(false);
 	useEffect(() => {
-		setTimeout(() => setRender(true), 300);
-	}, []);
-
+		if (promotion) {
+			setActiveTabs(getActiveTabs(promotion));
+			form.setFieldsValue({
+				starts_at: promotion.starts_at ? dayjs(promotion.starts_at) : dayjs(),
+				ends_at: promotion.ends_at ? dayjs(promotion.ends_at) : null,
+				usage_limit: promotion.usage_limit,
+				valid_duration: promotion.valid_duration,
+			});
+		}
+	}, [promotion, form]);
 	const itemsCollapse = useMemo(() => {
 		const items = [
 			{
@@ -88,7 +86,7 @@ const Settings: React.FC<SettingsProps> = ({ isEdit, promotion }) => {
 						<DatePicker
 							showTime
 							format="DD-MM-YYYY HH:mm"
-							minDate={dayjs()}
+							// minDate={dayjs()}
 							placeholder="Chọn ngày bắt đầu"
 							className="w-full"
 						/>
@@ -244,13 +242,13 @@ const Settings: React.FC<SettingsProps> = ({ isEdit, promotion }) => {
 	const handleChange = (values: string | string[]) => {
 		if (Array.isArray(values)) {
 			handleConfigurationChanged(values);
-			setOpenItems(values);
 		}
 	};
 	return (
 		<Collapse
 			className="bg-white [&_.ant-collapse-header]:px-0 [&_.ant-collapse-header]:text-base [&_.ant-collapse-header]:font-medium"
-			defaultActiveKey={[]}
+			activeKey={activeTabs}
+			// defaultActiveKey={activeTabs}
 			items={itemsCollapse as any}
 			expandIconPosition="end"
 			bordered={false}

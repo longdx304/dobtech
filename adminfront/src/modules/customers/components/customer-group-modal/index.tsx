@@ -51,11 +51,9 @@ const CustomerGroupModal: FC<Props> = ({
 					onSuccess: () => {
 						message.success('Cập nhật thông tin thành công.');
 						handleOk();
-						return;
 					},
 					onError: (error) => {
 						message.error(getErrorMessage(error));
-						return;
 					},
 				}
 			);
@@ -69,11 +67,9 @@ const CustomerGroupModal: FC<Props> = ({
 				onSuccess: () => {
 					message.success('Tạo nhóm khách hàng thành công.');
 					handleOk();
-					return;
 				},
 				onError: (error) => {
 					message.error(getErrorMessage(error));
-					return;
 				},
 			}
 		);

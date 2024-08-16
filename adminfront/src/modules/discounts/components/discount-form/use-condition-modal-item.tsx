@@ -9,6 +9,11 @@ import CustomerGroupConditionSelector from './condition-tables/add-condition-tab
 import CollectionConditionSelector from './condition-tables/add-condition-tables/collections';
 import TypeConditionSelector from './condition-tables/add-condition-tables/types';
 import TagConditionSelector from './condition-tables/add-condition-tables/tags';
+import DetailsProductConditionSelector from '../details/conditions/tables/products';
+import DetailsCustomerGroupConditionSelector from '../details/conditions/tables/customer-groups';
+import DetailsTagConditionSelector from '../details/conditions/tables/tags';
+import DetailsCollectionConditionSelector from '../details/conditions/tables/collections';
+import DetailsTypeConditionSelector from '../details/conditions/tables/types';
 
 export type ConditionItem = {
 	label: string;
@@ -52,8 +57,7 @@ const useConditionModalItems = ({
 						onBack: () => layeredModalContext.pop(),
 						footer: null,
 						view: isDetails ? (
-							// <DetailsProductConditionSelector onClose={onClose} />
-							<></>
+							<DetailsProductConditionSelector onClose={onClose} />
 						) : (
 							<ProductConditionSelector onClose={onClose} />
 						),
@@ -69,8 +73,7 @@ const useConditionModalItems = ({
 						onBack: () => layeredModalContext.pop(),
 						footer: null,
 						view: isDetails ? (
-							// <DetailsCustomerGroupConditionSelector onClose={onClose} />
-							<></>
+							<DetailsCustomerGroupConditionSelector onClose={onClose} />
 						) : (
 							<CustomerGroupConditionSelector onClose={onClose} />
 						),
@@ -86,8 +89,7 @@ const useConditionModalItems = ({
 						onBack: () => layeredModalContext.pop(),
 						footer: null,
 						view: isDetails ? (
-							// <DetailsCustomerGroupConditionSelector onClose={onClose} />
-							<></>
+							<DetailsTagConditionSelector onClose={onClose} />
 						) : (
 							<TagConditionSelector onClose={onClose} />
 						),
@@ -103,8 +105,7 @@ const useConditionModalItems = ({
 						onBack: () => layeredModalContext.pop(),
 						footer: null,
 						view: isDetails ? (
-							// <DetailsCollectionConditionSelector onClose={onClose} />
-							<></>
+							<DetailsCollectionConditionSelector onClose={onClose} />
 						) : (
 							<CollectionConditionSelector onClose={onClose} />
 						),
@@ -120,8 +121,7 @@ const useConditionModalItems = ({
 						onBack: () => layeredModalContext.pop(),
 						footer: null,
 						view: isDetails ? (
-							// <DetailsTypeConditionSelector onClose={onClose} />
-							<></>
+							<DetailsTypeConditionSelector onClose={onClose} />
 						) : (
 							<TypeConditionSelector onClose={onClose} />
 						),

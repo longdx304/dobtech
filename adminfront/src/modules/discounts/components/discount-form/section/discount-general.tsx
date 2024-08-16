@@ -25,7 +25,7 @@ const General: FC<GeneralProps> = ({ discount }) => {
 	const regions = (Form.useWatch('regions', form) as any) ?? undefined;
 
 	useEffect(() => {
-		if (type === 'fixed' && regions) {
+		if ((type === 'fixed' || discount?.rule?.type === 'fixed') && regions) {
 			let id: string;
 
 			if (Array.isArray(regions) && regions.length) {
@@ -79,25 +79,29 @@ const General: FC<GeneralProps> = ({ discount }) => {
 					<Input placeholder="SUMMERSALE10" />
 				</Form.Item>
 			</Col>
-			{type !== 'free_shipping' && (
+			{(type !== 'free_shipping' ||
+				discount?.rule?.type === 'free_shipping') && (
 				<Col xs={24} sm={12}>
 					<Form.Item
 						labelCol={{ span: 24 }}
 						name={['rule', 'value']}
-						label={type === 'fixed' ? 'Số tiền' : 'Phần trăm'}
+						label={
+							type === 'fixed' || discount?.rule?.type === 'fixed'
+								? 'Số tiền'
+								: 'Phần trăm'
+						}
 						className="mb-0"
 						rules={[
 							{ required: true, message: 'Yêu cầu nhập giá trị.' },
 							{ type: 'number', message: 'Giá trị phải là số.' },
 						]}
 					>
-						{type === 'fixed' ? (
+						{type === 'fixed' || discount?.rule?.type === 'fixed' ? (
 							<InputNumber
 								// min={1}
 								allowClear
 								placeholder="30.000"
 								prefix={fixedRegionCurrency}
-								controls={{ upIcon: '+', downIcon: '-' }}
 							/>
 						) : (
 							<InputNumber

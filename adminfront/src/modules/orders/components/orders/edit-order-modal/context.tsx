@@ -3,12 +3,7 @@ import { OrderEdit } from '@medusajs/medusa';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 
 import { useAdminOrderEdits, useAdminCreateOrderEdit } from 'medusa-react';
-import React, {
-	PropsWithChildren,
-	useContext,
-	useEffect,
-	useState,
-} from 'react';
+import React, { PropsWithChildren, useContext, useState } from 'react';
 import { message } from 'antd';
 
 type OrderEditContextType = {
@@ -42,9 +37,11 @@ export const OrderEditProvider = ({
 		onOpen,
 		onClose: hideModal,
 	} = useToggleState(false);
-	const [activeOrderEditId, setActiveOrderEditId] = useState<string | undefined>(undefined)
+	const [activeOrderEditId, setActiveOrderEditId] = useState<
+		string | undefined
+	>(undefined);
 
-	const { order_edits, count, refetch } = useAdminOrderEdits({
+	const { order_edits } = useAdminOrderEdits({
 		order_id: orderId,
 		// limit: count, // TODO
 	});
@@ -52,15 +49,17 @@ export const OrderEditProvider = ({
 
 	const handleOpenModal = async () => {
 		await createOrderEdit({ order_id: orderId })
-			.then(({ order_edit }) => {setActiveOrderEditId(order_edit.id)})
+			.then(({ order_edit }) => {
+				setActiveOrderEditId(order_edit.id);
+			})
 			.catch(() => {
 				message.error(
 					'Đã có một chỉnh sửa đơn hàng đang hoạt động trên đơn hàng này'
 				);
 				hideModal();
-			})
+			});
 		onOpen();
-			// .finally(() => (isRequestRunningFlag = false));
+		// .finally(() => (isRequestRunningFlag = false));
 	};
 
 	return (

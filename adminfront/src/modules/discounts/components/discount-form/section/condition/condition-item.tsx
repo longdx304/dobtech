@@ -190,7 +190,7 @@ const ConditionItem = <Type extends DiscountConditionType>({
 					}`}</div>
 					<div className="flex w-full flex-1 flex-col justify-center truncate">
 						<div className="font-semibold">{getTitle(type)}</div>
-						<span className="text-gay-400 text-xs">
+						<span className="text-gray-400 text-xs">
 							{`Số lượng: ${items.length}`}
 						</span>
 					</div>
