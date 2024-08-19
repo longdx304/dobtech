@@ -3,13 +3,12 @@ import LayeredModal, {
 } from '@/lib/providers/layer-modal-provider';
 import { Discount, DiscountCondition } from '@medusajs/medusa';
 import { useContext } from 'react';
-import DetailsProductConditionSelector from './tables/products';
-import DetailsCollectionConditionSelector from './tables/collections';
-import DetailsTypeConditionSelector from './tables/types';
-import DetailsTagConditionSelector from './tables/tags';
-import DetailsCustomerGroupConditionSelector from './tables/customer-groups';
 import { EditConditionProvider } from './edit-condition/edit-condition-provider';
-import ProductConditionsTable from './edit-condition/product';
+import ProductConditionsTable from './edit-condition/add-condition-resources/products/product';
+import CustomerGroupConditionsTable from './edit-condition/add-condition-resources/customer-groups/customer-groups';
+import CollectionConditionsTable from './edit-condition/add-condition-resources/collections/collections';
+import ProductTypesConditionsTable from './edit-condition/add-condition-resources/product-types/product-types';
+import TagConditionsTable from './edit-condition/add-condition-resources/tags/tag';
 
 type Props = {
 	open: boolean;
@@ -25,16 +24,29 @@ const EditConditions = ({ open, condition, discount, onClose }: Props) => {
 		switch (condition.type) {
 			case 'products':
 				return <ProductConditionsTable />;
-			// case 'product_collections':
-			// 	return <DetailsCollectionConditionSelector onClose={onClose} isEdit />;
-			// case 'product_types':
-			// 	return <DetailsTypeConditionSelector onClose={onClose} isEdit />;
-			// case 'product_tags':
-			// 	return <DetailsTagConditionSelector onClose={onClose} isEdit />;
-			// case 'customer_groups':
-			// 	return (
-			// 		<DetailsCustomerGroupConditionSelector onClose={onClose} isEdit />
-			// 	);
+			case 'product_collections':
+				return <CollectionConditionsTable />;
+			case 'product_types':
+				return <ProductTypesConditionsTable />;
+			case 'product_tags':
+				return <TagConditionsTable />;
+			case 'customer_groups':
+				return <CustomerGroupConditionsTable />;
+		}
+	};
+
+	const renderTitle = () => {
+		switch (condition.type) {
+			case 'products':
+				return 'Chọn sản phẩm';
+			case 'product_collections':
+				return 'Chọn bộ sưu tập';
+			case 'product_types':
+				return 'Chọn loại sản phẩm';
+			case 'product_tags':
+				return 'Chọn tag sản phẩm';
+			case 'customer_groups':
+				return 'Chọn nhóm khách hàng';
 		}
 	};
 
@@ -50,7 +62,7 @@ const EditConditions = ({ open, condition, discount, onClose }: Props) => {
 				onOk={onClose}
 				open={open}
 				// footer={footer}
-				title="Chỉnh sửa mã giảm giá"
+				title={renderTitle()}
 				className="layered-modal"
 				width={800}
 			>

@@ -62,9 +62,9 @@ export const EditConditionProvider = ({
 		);
 	};
 
-	const removeConditionResources = (resourcesToRemove: string[]) => {
+	const removeConditionResources = (resourcesToRemove: Key[]) => {
 		removeConditionResourceBatch.mutate(
-			{ resources: resourcesToRemove.map((r) => ({ id: r })) },
+			{ resources: resourcesToRemove.map((r) => ({ id: r as string })) },
 			{
 				onSuccess: () => {
 					message.success('Xóa thành công');

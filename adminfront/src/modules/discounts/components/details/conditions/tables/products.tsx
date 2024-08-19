@@ -20,7 +20,7 @@ const DetailsProductConditionSelector = ({
 }: ConditionSelectorProps) => {
 	const params = defaultQueryProps;
 	const { conditions } = useConditions();
-	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+	const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
@@ -57,7 +57,7 @@ const DetailsProductConditionSelector = ({
 		500
 	);
 
-	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
+	const handleRowSelectionChange = (selectedRowKeys: string[]) => {
 		setSelectedRowKeys(selectedRowKeys);
 	};
 

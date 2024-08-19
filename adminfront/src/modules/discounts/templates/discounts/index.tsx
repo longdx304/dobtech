@@ -4,30 +4,35 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { ERoutes } from '@/types/routes';
-import { Plus, Search } from 'lucide-react';
+import { CircleAlert, Plus, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useMemo, useState } from 'react';
 import _ from 'lodash';
 import discountColumns from './discount-column';
 import { Discount } from '@medusajs/medusa';
 import { FloatButton } from '@/components/Button';
-import { useAdminDiscounts } from 'medusa-react';
+import { useAdminDiscounts, useMedusa } from 'medusa-react';
 import { Card } from '@/components/Card';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import AddDiscountModal from '../../components/modal/add-discount';
 import { DiscountFormProvider } from '../../components/discount-form/discount-form-context';
+import { message, Modal } from 'antd';
+import { getErrorMessage } from '@/lib/utils';
+import useCopyPromotion from './use-copy-promotion';
 
 const DEFAULT_PAGE_SIZE = 10;
 const DiscountList = () => {
 	const router = useRouter();
+	const { client } = useMedusa();
 
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
+	const [loadingTabled, setLoadingTable] = useState<boolean>(false);
 
 	const { state, onOpen, onClose } = useToggleState(false);
-	const { discounts, isLoading, count } = useAdminDiscounts(
+	const { discounts, isLoading, count, refetch } = useAdminDiscounts(
 		{
 			is_dynamic: false,
 			expand: 'rule,rule.conditions,rule.conditions.products,regions',
@@ -53,10 +58,60 @@ const DiscountList = () => {
 		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
-	const handleEdit = (record: Discount) => {};
-	const handleChangeStatus = (id: Discount['id'], status: boolean) => {};
-	const handleDelete = (id: Discount['id']) => {};
-	const handleDuplicate = (id: Discount['id']) => {};
+	const handleEdit = (record: Discount) => {
+		router.push(`${ERoutes.DISCOUNTS}/${record.id}`);
+	};
+
+	const handleChangeStatus = async (id: Discount['id'], status: boolean) => {
+		setLoadingTable(true);
+		await client.admin.discounts
+			.update(id, { is_disabled: status })
+			.then(() => {
+				message.success('Cập nhật trạng thái thành công');
+				refetch();
+			})
+			.catch((error: any) => {
+				message.error(getErrorMessage(error));
+			});
+		setLoadingTable(false);
+	};
+
+	const handleDelete = async (id: Discount['id']) => {
+		setLoadingTable(true);
+		Modal.confirm({
+			title: 'Bạn có muốn xoá mã giảm giá này không ?',
+			content:
+				'Mã giảm giá sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá mã giảm giá này chứ?',
+
+			icon: (
+				<CircleAlert
+					style={{ width: 32, height: 24 }}
+					className="mr-2"
+					color="#E7B008"
+				/>
+			),
+			okType: 'danger',
+			okText: 'Đồng ý',
+			cancelText: 'Huỷ',
+			async onOk() {
+				await client.admin.discounts
+					.delete(id)
+					.then(() => {
+						message.success('Xóa mã giảm giá thành công');
+						refetch();
+					})
+					.catch((error: any) => {
+						message.error(getErrorMessage(error));
+					});
+			},
+		});
+		setLoadingTable(false);
+	};
+
+	const copyPromotion = useCopyPromotion();
+	const handleDuplicate = (record: Discount) => {
+		copyPromotion(record);
+	};
 
 	const columns = useMemo(() => {
 		return discountColumns({

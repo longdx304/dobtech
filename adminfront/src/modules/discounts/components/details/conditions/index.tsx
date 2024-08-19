@@ -8,7 +8,6 @@ import { Discount } from '@medusajs/medusa';
 import { Pencil } from 'lucide-react';
 import NumberedItem from '../../common/numbered-item';
 import { useDiscountConditions } from './use-discount-conditions';
-// import EditConditions from './edit-Conditions';
 import { ConditionsProvider } from './conditions-provider';
 import AddConditionsModal from './add-conditions-modal';
 import EditConditions from './edit-conditions';

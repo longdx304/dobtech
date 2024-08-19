@@ -16,13 +16,17 @@ type SelectableTableProps<T extends object> = TableProps & {
 	className?: string;
 	data?: T[];
 	columns: any;
-	selectedRowKeys: Key[];
+	selectedRowKeys: string[];
 	handleSearchDebounce: (e: ChangeEvent<HTMLInputElement>) => void;
-	handleRowSelectionChange: (selectedRowKeys: Key[], selectedRows: T[]) => void;
+	handleRowSelectionChange: (
+		selectedRowKeys: string[],
+		selectedRows: T[]
+	) => void;
 	count?: number;
 	currentPage?: number;
 	handleChangePage?: (page: number) => void;
 	loadingTable?: boolean;
+	tableActions?: ReactNode;
 };
 
 const PAGE_SIZE = 10;
@@ -44,12 +48,16 @@ export default function SelectableTable<
 	currentPage,
 	handleChangePage,
 	loadingTable,
+	tableActions,
 	...props
 }: Readonly<SelectableTableProps<T>>) {
 	return (
 		<>
 			<Flex align="center" justify="space-between" className="mt-4 pb-4">
-				<Text>{`Đã chọn ${selectedRowKeys?.length || 0}`}</Text>
+				<Flex align="center" justify="flex-start" gap={6}>
+					<Text>{`Đã chọn ${selectedRowKeys?.length || 0}`}</Text>{' '}
+					{tableActions}
+				</Flex>
 				<Input
 					// size="small"
 					placeholder="Tìm kiếm..."
@@ -60,6 +68,7 @@ export default function SelectableTable<
 				/>
 			</Flex>
 			<Table
+				{...props}
 				rowSelection={{
 					type: 'checkbox',
 					selectedRowKeys: selectedRowKeys,

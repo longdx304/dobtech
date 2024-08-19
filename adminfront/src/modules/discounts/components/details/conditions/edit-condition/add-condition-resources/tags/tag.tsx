@@ -1,17 +1,18 @@
-import { ChangeEvent, Key, useEffect, useState } from 'react';
-import { defaultQueryProps } from '../../../discount-form/condition-tables/shared/common';
-import { useEditConditionContext } from './edit-condition-provider';
-import { useAdminProducts } from 'medusa-react';
-import { ProductColumns } from '../../../discount-form/condition-tables/shared/columns';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { defaultQueryProps } from '../../../../../discount-form/condition-tables/shared/common';
+import { useEditConditionContext } from '../../edit-condition-provider';
+import { useAdminProductTags } from 'medusa-react';
+import { ProductColumns } from '../../../../../discount-form/condition-tables/shared/columns';
 import SelectableTable from '@/components/Table/selectable-table';
-import { Product } from '@medusajs/medusa';
+import { ProductTag } from '@medusajs/medusa';
 import debounce from 'lodash/debounce';
+import ExistingConditionTableActions from '../../condition-table-actions';
 
 const DEFAULT_PAGE_SIZE = 10;
-const ProductConditionsTable = () => {
+const TagConditionsTable = () => {
 	const params = defaultQueryProps;
 
-	const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+	const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
@@ -22,9 +23,9 @@ const ProductConditionsTable = () => {
 	const {
 		isLoading: isLoadingProducts,
 		count,
-		products,
+		product_tags,
 		refetch,
-	} = useAdminProducts(
+	} = useAdminProductTags(
 		{
 			discount_condition_id: condition.id,
 			...params,
@@ -66,7 +67,7 @@ const ProductConditionsTable = () => {
 		setSearchValue(inputValue);
 	}, 500);
 
-	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
+	const handleRowSelectionChange = (selectedRowKeys: string[]) => {
 		setSelectedRowKeys(selectedRowKeys);
 	};
 
@@ -75,16 +76,23 @@ const ProductConditionsTable = () => {
 			<SelectableTable
 				count={count ?? 0}
 				selectedRowKeys={selectedRowKeys}
-				data={(products as Product[]) || []}
+				data={(product_tags as ProductTag[]) || []}
 				columns={columns}
 				loadingTable={isLoadingProducts}
 				currentPage={currentPage}
 				handleChangePage={handleChangePage}
 				handleSearchDebounce={handleSearchDebounce}
 				handleRowSelectionChange={handleRowSelectionChange}
+				tableActions={
+					<ExistingConditionTableActions
+						numberOfSelectedRows={selectedRowKeys.length}
+						onDeselect={onDeselect}
+						onRemove={onRemove}
+					/>
+				}
 			/>
 		</div>
 	);
 };
 
-export default ProductConditionsTable;
+export default TagConditionsTable;

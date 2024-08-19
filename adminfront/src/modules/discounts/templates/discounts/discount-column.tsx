@@ -2,7 +2,7 @@ import { ActionAbles } from '@/components/Dropdown';
 import StatusIndicator from '@/modules/common/components/status-indicator';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { Discount } from '@medusajs/medusa';
-import { MonitorX, Pencil, Trash2 } from 'lucide-react';
+import { Copy, MonitorX, Pencil, Trash2 } from 'lucide-react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
@@ -18,7 +18,7 @@ type Props = {
 	handleEdit: (record: Discount) => void;
 	handleChangeStatus: (id: string, status: boolean) => void;
 	handleDelete: (id: string) => void;
-	handleDuplicate: (id: string) => void;
+	handleDuplicate: (record: Discount) => void;
 };
 
 const getPromotionAmount = (promotion: Discount) => {
@@ -159,34 +159,38 @@ const discountColumns = ({
 				{
 					label: 'Chỉnh sửa thông tin',
 					icon: <Pencil size={20} />,
-					onClick: () => {
+					onClick: ({ domEvent }: any) => {
+						domEvent.stopPropagation();
 						handleEdit(record);
 					},
 				},
 				{
 					label: (
 						<span className="w-full">
-							{record.is_disabled ? 'Ngừng xuất bản' : 'Xuất bản'}
+							{record.is_disabled ? 'Xuất bản' : 'Ngừng xuất bản'}
 						</span>
 					),
 					key: 'stop-publishing',
 					icon: <MonitorX size={20} />,
-					onClick: () => {
+					onClick: ({ domEvent }: any) => {
+						domEvent.stopPropagation();
 						handleChangeStatus(record.id, !record.is_disabled);
 					},
 				},
 				{
 					label: 'Sao chép',
 					key: 'dulicate',
-					icon: <MonitorX size={20} />,
-					onClick: () => {
-						handleDuplicate(record.id);
+					icon: <Copy size={20} />,
+					onClick: ({ domEvent }: any) => {
+						domEvent.stopPropagation();
+						handleDuplicate(record);
 					},
 				},
 				{
 					label: 'Xoá',
 					icon: <Trash2 size={20} />,
-					onClick: () => {
+					onClick: ({ domEvent }: any) => {
+						domEvent.stopPropagation();
 						handleDelete(record.id);
 					},
 					danger: true,
