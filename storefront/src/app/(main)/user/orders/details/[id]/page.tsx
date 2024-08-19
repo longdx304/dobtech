@@ -1,7 +1,11 @@
 import { retrieveOrder } from '@/actions/cart';
-import OrderDetailsTemplate from '@/modules/order/templates/order-details-template';
 import { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
+
+const OrderDetailsTemplate = dynamic(
+	() => import('@/modules/order/templates/order-details-template')
+);
 
 type Props = {
 	params: { id: string };

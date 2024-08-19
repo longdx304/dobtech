@@ -5,15 +5,15 @@ import { CartProvider } from '@/lib/providers/cart/cart-provider';
 import { MedusaProvider } from '@/lib/providers/medusa-provider';
 import { RegionProvider } from '@/lib/providers/region-provider';
 import { CustomerProvider } from '@/lib/providers/user/user-provider';
-import { retrieveCart } from '@/modules/cart/action';
-import Header from '@/modules/common/components/header';
-import Menu from '@/modules/common/components/menu';
 import { TTreeCategories } from '@/types/productCategory';
-import { App, ConfigProvider } from 'antd';
 import type { Metadata } from 'next';
 import { cache } from 'react';
 import '../../app/globals.css';
-import theme from '../../theme';
+
+import dynamic from 'next/dynamic';
+
+const Header = dynamic(() => import('@/modules/common/components/header'));
+const Menu = dynamic(() => import('@/modules/common/components/menu'));
 
 export const metadata: Metadata = {
 	title: 'CHAMDEP VN | Giày dép nam nữ trẻ em',
@@ -55,23 +55,18 @@ export default async function PageLayout({
 		categories?.map((category) => getAncestors(category)) || null;
 
 	const customer = await getCustomer();
-	const cart = await retrieveCart();
 
 	return (
-		<ConfigProvider theme={theme}>
-			<App>
-				<MedusaProvider>
-					<RegionProvider regionData={region!}>
-						<CustomerProvider initialCustomer={customer}>
-							<CartProvider>
-								<Header categories={formatCategories} />
-								<Menu categories={formatCategories} />
-								<div>{children}</div>
-							</CartProvider>
-						</CustomerProvider>
-					</RegionProvider>
-				</MedusaProvider>
-			</App>
-		</ConfigProvider>
+		<MedusaProvider>
+			<RegionProvider regionData={region!}>
+				<CustomerProvider initialCustomer={customer}>
+					<CartProvider>
+						<Header categories={formatCategories} />
+						<Menu categories={formatCategories} />
+						<main>{children}</main>
+					</CartProvider>
+				</CustomerProvider>
+			</RegionProvider>
+		</MedusaProvider>
 	);
 }

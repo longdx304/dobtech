@@ -21,7 +21,7 @@ export default function NotFound() {
       </p>
       <div className='w-full max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl mx-auto'>
         <Image
-          src='/images/404.png'
+          src='/images/404.webp'
           alt='404'
           width={600}
           height={400}

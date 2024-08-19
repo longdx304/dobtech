@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse, userAgent } from 'next/server';
 import { ERoutes } from './types/routes';
 import { BACKEND_URL } from '@/lib/constants';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty'
 
 async function getUser(accessToken: string | undefined) {
 	if (accessToken) {
@@ -38,9 +38,9 @@ export async function middleware(request: NextRequest) {
       },
     });
   } else {
-    if (!_.isEmpty(data) && pathname === `/${ERoutes.AUTH}`) {
+    if (!isEmpty(data) && pathname === `/${ERoutes.AUTH}`) {
       return NextResponse.redirect(new URL(`/${ERoutes.USER}`, request.url));
-    } else if (_.isEmpty(data) && pathname === `/${ERoutes.USER}`) {
+    } else if (isEmpty(data) && pathname === `/${ERoutes.USER}`) {
       return NextResponse.redirect(new URL(`/${ERoutes.AUTH}`, request.url));
     }
   }
