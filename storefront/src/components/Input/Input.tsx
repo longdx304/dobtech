@@ -1,11 +1,8 @@
-import { Input as AntdInput, InputProps as AntdInputProps } from 'antd';
 import { cn } from '@/lib/utils';
-import { Flex } from '@/components/Flex';
-import { ErrorText } from '@/components/Typography';
+import { Input as AntdInput, InputProps as AntdInputProps } from 'antd';
 
 interface Props extends AntdInputProps {
 	className?: string;
-	// error?: string;
 }
 
 export default function Input({ className, ...props }: Props) {

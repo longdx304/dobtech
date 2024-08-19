@@ -1,5 +1,5 @@
-import { Radio as AntdRadio, RadioProps } from 'antd';
 import { cn } from '@/lib/utils';
+import { Radio as AntdRadio, RadioProps } from 'antd';
 
 interface Props extends RadioProps {
 	className?: string;

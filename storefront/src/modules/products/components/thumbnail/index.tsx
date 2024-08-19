@@ -24,9 +24,9 @@ const Thumbnail: FC<Props> = ({ thumbnail, size, className }) => {
 					alt="Product Thumbnail"
 					className="absolute inset-0 object-cover object-center group-hover:scale-110 transition-all"
 					draggable={false}
-					quality={50}
 					sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
 					fill
+					quality={100}
 				/>
 			) : (
 				<div className="w-full h-full absolute inset-0 flex items-center justify-center bg-slate-200 group-hover:scale-110 transition-all">

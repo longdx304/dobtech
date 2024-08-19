@@ -40,12 +40,11 @@ export const findCheckoutCart = (
 	allCarts: Cart[],
 	customerEmail?: string
 ): Cart | undefined => {
-	const result =  allCarts.find(
+	const result = allCarts.find(
 		(cart) =>
 			cart?.metadata?.cart_type === 'checkout' &&
 			cart?.payment_id === null &&
 			cart?.email === customerEmail
 	);
-	console.log('result', result)
-	return result
+	return result;
 };

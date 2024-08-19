@@ -1,6 +1,6 @@
 'use client';
 import { Collapse } from '@/components/Collapse';
-import { CollapseProps } from 'antd/lib';
+import { CollapseProps } from 'antd/es';
 import React from 'react';
 
 type OptionListProps = {

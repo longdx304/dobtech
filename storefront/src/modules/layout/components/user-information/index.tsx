@@ -68,6 +68,7 @@ const UserInformation = () => {
 				icon={<User className="stroke-2" color="#767676" />}
 				shape="circle"
 				type="text"
+				aria-label="User Information"
 			/>
 		</Dropdown>
 	);

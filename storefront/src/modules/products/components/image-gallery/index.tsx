@@ -26,7 +26,7 @@ export default function ImageGallery({
 
 		if (!Array.isArray(product.images) || product.images.length === 0) {
 			if (!product.thumbnail) {
-				return ['/images/product-img.png'];
+				return ['/images/product-img.webp'];
 			}
 			return [product.thumbnail];
 		}

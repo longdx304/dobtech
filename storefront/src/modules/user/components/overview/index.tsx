@@ -1,5 +1,11 @@
-import ProductList from '@/modules/products/components/product-list';
-import OverviewPreview from './preview';
+import dynamic from 'next/dynamic';
+const ProductList = dynamic(
+	() => import('@/modules/products/components/product-list')
+);
+
+const OverviewPreview = dynamic(() => import('./preview'), {
+	ssr: false,
+});
 
 const Overview = () => {
 	return (
@@ -15,7 +21,7 @@ const Overview = () => {
 				</div>
 			</div>
 		</>
-	)
+	);
 };
 
 export default Overview;

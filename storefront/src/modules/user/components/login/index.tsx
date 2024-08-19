@@ -30,7 +30,8 @@ const Login = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 	const [form] = Form.useForm();
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
-	const { selectedCartItems, updateExistingCart, allCarts, refreshCart } = useCart();
+	const { selectedCartItems, updateExistingCart, allCarts, refreshCart } =
+		useCart();
 
 	const onFinish: FormProps<LoginProps>['onFinish'] = async (values) => {
 		setLoading(true);
@@ -57,10 +58,11 @@ const Login = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 					// setCheckoutCart(newCart as Cart);
 					cartId = newCart?.id;
 				}
-				await refreshCart()
+				await refreshCart();
 				router.push(`${ERoutes.CHECKOUT}/?cartId=${cartId}`);
 			} else {
 				if (!isDesktop) {
+					console.log('mobile');
 					onCloseDrawer?.();
 				} else {
 					router.push(`/${ERoutes.USER}`);

@@ -1,11 +1,15 @@
-import { FC } from 'react';
-
 import { getProductsList } from '@/actions/products';
 import { getRegion } from '@/actions/region';
 import { ProductProvider } from '@/lib/providers/product/product-provider';
 import { VariantImagesProvider } from '@/lib/providers/product/variant-images-provider';
-import ProductPreview from '@/modules/products/components/product-preview';
+import dynamic from 'next/dynamic';
+import { FC } from 'react';
 import Pagination from './pagination';
+
+const ProductPreview = dynamic(
+	() => import('@/modules/products/components/product-preview')
+);
+
 
 interface ProductListProps {
 	page?: number;
@@ -30,7 +34,11 @@ const ProductList: FC<ProductListProps> = async ({ page = 1 }) => {
 					{data.products?.length > 0 && (
 						<div className="grid xl:grid-cols-6 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 sm:grid-cols-2 w-full gap-x-3 gap-y-3 lg:gap-x-4 lg:gap-y-4">
 							{data.products?.map((product, index) => (
-								<ProductPreview key={product.id} data={product} region={region!} />
+								<ProductPreview
+									key={product.id}
+									data={product}
+									region={region!}
+								/>
 							))}
 						</div>
 					)}

@@ -5,11 +5,15 @@ import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCart } from '@/lib/providers/cart/cart-provider';
 import { useCustomer } from '@/lib/providers/user/user-provider';
-import AddressForm from '@/modules/common/components/address-form';
 import { Address, Cart, Region } from '@medusajs/medusa';
 import { Col, List, Row, message } from 'antd';
 import { useState } from 'react';
 import { setAddresses } from '../../actions';
+import dynamic from 'next/dynamic';
+
+const AddressForm = dynamic(
+	() => import('@/modules/common/components/address-form')
+);
 
 const AddressSelect = ({
 	region,

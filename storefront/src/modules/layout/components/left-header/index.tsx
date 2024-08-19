@@ -28,6 +28,7 @@ const LeftHeader: React.FC<Props> = ({ categories }) => {
           shape='circle'
           type='text'
           onClick={() => setOpen(true)}
+          aria-label='Open menu'
         />
       )}
 
@@ -39,12 +40,14 @@ const LeftHeader: React.FC<Props> = ({ categories }) => {
             shape='circle'
             type='text'
             onClick={() => router.back()}
+            aria-label='Back page'
           />
           <Button
             icon={<AlignJustify color='#767676' size={24} strokeWidth='2' />}
             shape='circle'
             type='text'
             onClick={() => setOpen(true)}
+            aria-label='Open menu'
           />
         </Flex>
       )}

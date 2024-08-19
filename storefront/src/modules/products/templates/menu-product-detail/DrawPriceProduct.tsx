@@ -8,6 +8,7 @@ import { Drawer } from '@/components/Drawer';
 import { Flex } from '@/components/Flex';
 import { InputNumber } from '@/components/Input';
 import { Text } from '@/components/Typography';
+import { useCart } from '@/lib/providers/cart/cart-provider';
 import { addToCart } from '@/modules/cart/action';
 import OptionSelect from '@/modules/products/components/option-select';
 import ProductPrice from '@/modules/products/components/product-price';
@@ -15,7 +16,6 @@ import useActionProduct from '@/modules/products/hook/useActionProduct';
 import { Region } from '@medusajs/medusa';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
 import ImageGroup from './ImageGroup';
-import { useCart } from '@/lib/providers/cart/cart-provider';
 
 type Props = {
 	open: boolean;

@@ -7,7 +7,11 @@ import { getRegion } from '@/actions/region';
 import { getCheckoutStep } from '@/lib/utils/get-checkout-step';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { notFound } from 'next/navigation';
-import CheckoutPreview from './checkout-preview';
+import dynamic from 'next/dynamic';
+
+const CheckoutPreview = dynamic(() => import('./checkout-preview'), {
+	ssr: false,
+});
 
 const countryCode = 'vn';
 

@@ -36,7 +36,7 @@ const ProfilePhone = () => {
       <Flex className='p-5 flex-col'>
         <Flex className='flex-col' align='center' justify='center'>
           <Image
-            src='/images/phone.png'
+            src='/images/phone.webp'
             alt='Phone'
             width={72}
             height={72}

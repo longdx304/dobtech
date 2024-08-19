@@ -5,11 +5,13 @@ import { Title } from '@/components/Typography';
 import LocalizedClientLink from '@/modules/common/components/localized-client-link';
 import { Order } from '@medusajs/medusa';
 import { X } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import React from 'react';
-import Items from '../components/items';
-import OrderDetails from '../components/order-details';
-import OrderSummary from '../components/order-summary';
-import ShippingDetails from '../components/shipping-details';
+
+const Items = dynamic(() => import('../components/items'));
+const OrderDetails = dynamic(() => import('../components/order-details'));
+const ShippingDetails = dynamic(() => import('../components/shipping-details'));
+const OrderSummary = dynamic(() => import('../components/order-summary'));
 
 type OrderDetailsTemplateProps = {
 	order: Order;

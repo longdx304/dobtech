@@ -1,5 +1,4 @@
 'use client';
-
 import { Divider, message } from 'antd';
 import { useParams } from 'next/navigation';
 import { useRef, useState } from 'react';
@@ -12,7 +11,7 @@ import { addToCart } from '@/modules/cart/action';
 import ProductInfo from '@/modules/products/components/product-info';
 import useActionProduct from '@/modules/products/hook/useActionProduct';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { Minus, Plus } from 'lucide-react';
 import OptionSelect from '../option-select';
 
@@ -58,7 +57,7 @@ export default function ProductActions({
 
 	// add the selected variant to the cart
 	const handleAddToCart = async () => {
-		if (_.isEmpty(variant) && !variant) return null;
+		if (isEmpty(variant) && !variant) return null;
 		setIsAdding(true);
 
 		await addToCart({

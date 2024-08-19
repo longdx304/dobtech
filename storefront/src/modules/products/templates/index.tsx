@@ -1,10 +1,14 @@
 import React, { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 
 import SkeletonRelatedProducts from '@/modules/skeletons/templates/skeleton-related-products';
-import ImageGallery from '../components/image-gallery';
-import ProductActions from '../components/product-actions';
-import ProductTabs from '../components/product-tabs';
-import RelatedProducts from '../components/related-products';
+import ProductTabs from '@/modules/products/components/product-tabs';
+import ImageGallery from '@/modules/products/components/image-gallery';
+import ProductActions from '@/modules/products/components/product-actions';
+
+const RelatedProducts = dynamic(
+	() => import('@/modules/products/components/related-products')
+);
 
 type ProductTemplateProps = {
 	countryCode: string;
