@@ -7,6 +7,7 @@ import {
 	ClipboardPenLine,
 	Earth,
 	Ellipsis,
+	Gift,
 	LayoutList,
 	LogOut,
 	Settings,
@@ -63,6 +64,7 @@ const itemsAdmin: MenuProps['items'] = [
 	getItem('Định giá', 'pricing', <CircleDollarSign />),
 	getItem('Khách hàng', 'customers', <UsersRound />),
 	getItem('Giảm giá', 'discounts', <SquarePercent />),
+	getItem('Thẻ quà tặng', 'gift-cards', <Gift />),
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
 		getItem('Tiền tệ', 'currency', <BadgeDollarSign />),
@@ -132,4 +134,5 @@ export const menuRoutes: Record<string, string> = {
 	orders: ERoutes.ORDERS,
 	'return-reasons': ERoutes.RETURN_REASONS,
 	discounts: ERoutes.DISCOUNTS,
+	'gift-cards': ERoutes.GIFT_CARDS,
 };

@@ -75,6 +75,7 @@ const AddProductModal: FC<Props> = ({
 			limit: PAGE_SIZE,
 			offset: (currentPage - 1) * PAGE_SIZE,
 			q: searchValue || undefined,
+			is_giftcard: false,
 		});
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {

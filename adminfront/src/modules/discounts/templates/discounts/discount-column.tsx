@@ -167,7 +167,7 @@ const discountColumns = ({
 				{
 					label: (
 						<span className="w-full">
-							{record.is_disabled ? 'Xuất bản' : 'Ngừng xuất bản'}
+							{record.is_disabled ? 'Kích hoạt' : 'Ngừng kích hoạt'}
 						</span>
 					),
 					key: 'stop-publishing',

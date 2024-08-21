@@ -25,6 +25,7 @@ const ProductsForm: FC<Props> = ({ setProductForm, setCurrentStep }) => {
 		limit: PAGE_SIZE,
 		offset: (currentPage - 1) * PAGE_SIZE,
 		q: searchValue || undefined,
+		is_giftcard: false,
 	});
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
@@ -111,7 +112,9 @@ const ProductsForm: FC<Props> = ({ setProductForm, setCurrentStep }) => {
 					<Button type="default" onClick={onBack}>
 						Quay lại
 					</Button>
-					<Button onClick={onSubmit} data-testid="add-product">Tiếp tục</Button>
+					<Button onClick={onSubmit} data-testid="add-product">
+						Tiếp tục
+					</Button>
 				</Flex>
 			</Col>
 		</Row>

@@ -37,7 +37,7 @@ const ProductColumns = [
 		render: (status: string) => (
 			<div className="flex items-center">
 				<Dot color={status === 'published' ? '#47B881' : '#E74C3C'} />
-				<span>{status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}</span>
+				<span>{status === 'published' ? 'Đang hoạt động' : 'Bản nháp'}</span>
 			</div>
 		),
 	},

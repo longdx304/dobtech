@@ -12,7 +12,7 @@ interface Props {
 	params: { id: string };
 }
 
-export default async function OrderDetailPage({ params }: Props) {
+export default async function DiscountDetailPage({ params }: Props) {
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
 			<DiscountDetail id={params.id} />

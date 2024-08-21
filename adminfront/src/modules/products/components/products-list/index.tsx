@@ -52,6 +52,7 @@ const ProductList = (props: Props) => {
 			limit: PAGE_SIZE,
 			offset: (currentPage - 1) * PAGE_SIZE,
 			q: searchValue || undefined,
+			is_giftcard: false,
 		});
 
 	const { product_categories, isLoading: isLoadingCategories } =

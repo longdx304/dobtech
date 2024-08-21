@@ -12,7 +12,7 @@ import { SquareArrowOutUpRight } from 'lucide-react';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import { getErrorMessage } from '@/lib/utils';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
-import { formatAmountWithSymbol, displayAmount } from '@/utils/prices';
+import { formatAmountWithSymbol } from '@/utils/prices';
 import { Modal } from '@/components/Modal';
 import { Text, Title } from '@/components/Typography';
 import useOrdersExpandParam from '@/modules/orders/components/orders/utils/use-admin-expand-parameter';
@@ -35,7 +35,7 @@ export const ReceiveReturnModal = ({
 	returnRequest,
 	onClose,
 	state,
-	refetchOrder
+	refetchOrder,
 }: Props) => {
 	const [selectedVariants, setSelectedVariants] = useState<string[]>([]);
 	const [receiveItems, setReceiveItems] = useState<any>([]);

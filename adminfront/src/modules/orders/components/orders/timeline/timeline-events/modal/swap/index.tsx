@@ -5,11 +5,10 @@ import {
 	ReturnReason,
 } from '@medusajs/medusa';
 import { message } from 'antd';
-import { LoaderCircle, SquareArrowOutUpRight } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 
 import { Select } from '@/components/Select';
 import { Option } from '@/types/shared';
-import { displayAmount } from '@/utils/prices';
 import { getErrorMessage } from '@/lib/utils';
 import {
 	useAdminCreateSwap,
@@ -24,7 +23,6 @@ import { Modal } from '@/components/Modal';
 import { Text, Title } from '@/components/Typography';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import { getAllReturnableItems } from '@/modules/orders/components/orders/utils/create-filtering';
-import { removeFalsy } from '@/utils/remove-nullish';
 import RMASelectProductTable from '../rma-select-product-table';
 import AddProductVariant from '@/modules/orders/components/common/add-product-variant';
 import useToggleState from '@/lib/hooks/use-toggle-state';

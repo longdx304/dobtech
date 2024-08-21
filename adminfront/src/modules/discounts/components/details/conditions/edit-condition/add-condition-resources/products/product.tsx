@@ -32,6 +32,7 @@ const ProductConditionsTable = () => {
 			offset,
 			q: searchValue,
 			limit: DEFAULT_PAGE_SIZE,
+			is_giftcard: false,
 		},
 		{
 			keepPreviousData: true,

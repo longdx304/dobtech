@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 interface Props {}
 
-export default async function Orders(props: Props) {
+export default async function Discounts(props: Props) {
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
 			<DiscountList />

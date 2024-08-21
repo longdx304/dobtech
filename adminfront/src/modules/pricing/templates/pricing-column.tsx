@@ -48,7 +48,7 @@ const pricingColumns = ({
 						className="w-[20px]"
 					/>
 					<Text className="text-xs">
-						{_ === 'active' ? 'Đã xuất bản' : 'Bản nháp'}
+						{_ === 'active' ? 'Đang hoạt động' : 'Bản nháp'}
 					</Text>
 				</Flex>
 			);
@@ -90,7 +90,7 @@ const pricingColumns = ({
 				{
 					label: (
 						<span className="w-full">
-							{record.status === 'active' ? 'Ngừng xuất bản' : 'Xuất bản'}
+							{record.status === 'active' ? 'Ngừng kích hoạt' : 'Kích hoạt'}
 						</span>
 					),
 					key: 'stop-publishing',

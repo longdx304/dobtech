@@ -7,7 +7,8 @@ import { ERoutes } from '@/types/routes';
 import { CircleAlert, Plus, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useMemo, useState } from 'react';
-import _ from 'lodash';
+import debounce from 'lodash/debounce';
+
 import discountColumns from './discount-column';
 import { Discount } from '@medusajs/medusa';
 import { FloatButton } from '@/components/Button';
@@ -45,13 +46,10 @@ const DiscountList = () => {
 		}
 	);
 
-	const handleChangeDebounce = _.debounce(
-		(e: ChangeEvent<HTMLInputElement>) => {
-			const { value: inputValue } = e.target;
-			setSearchValue(inputValue);
-		},
-		500
-	);
+	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
+		const { value: inputValue } = e.target;
+		setSearchValue(inputValue);
+	}, 500);
 
 	const handleChangePage = (page: number) => {
 		setNumPages(page);
@@ -136,14 +134,14 @@ const DiscountList = () => {
 				<Input
 					// size="small"
 					name="search"
-					placeholder="Tìm kiếm đơn hàng..."
+					placeholder="Tìm kiếm mã giảm giá..."
 					prefix={<Search size={16} />}
 					onChange={handleChangeDebounce}
 					className="w-[300px]"
 				/>
 			</Flex>
 			<Table
-				loading={isLoading}
+				loading={isLoading || loadingTabled}
 				columns={columns as any}
 				dataSource={discounts ?? []}
 				rowKey="id"

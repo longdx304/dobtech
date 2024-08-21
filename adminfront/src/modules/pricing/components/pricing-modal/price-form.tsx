@@ -35,6 +35,7 @@ const PriceForm: FC<Props> = ({
 			q: searchValue || undefined,
 			id: productForm || undefined,
 			expand: 'variants.prices',
+			is_giftcard: false,
 		},
 		{
 			enabled: !!productForm?.length,

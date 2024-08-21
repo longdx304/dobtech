@@ -35,7 +35,7 @@ const General = ({ discount }: Props) => {
 				onSuccess: ({ discount: { is_disabled } }) => {
 					message.success(
 						!is_disabled
-							? 'Giảm giá được xuất bản thành công'
+							? 'Đã kích hoạt mã giảm giá'
 							: 'Đã chuyển mã giảm giá sang bản nháp'
 					);
 				},
@@ -113,7 +113,7 @@ const General = ({ discount }: Props) => {
 											size={20}
 											className="w-[20px]"
 										/>
-										<Text>{'Đã xuất bản'}</Text>
+										<Text>{'Đang hoạt động'}</Text>
 									</Flex>
 								),
 							},

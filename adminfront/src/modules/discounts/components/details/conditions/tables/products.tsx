@@ -30,7 +30,13 @@ const DetailsProductConditionSelector = ({
 	);
 
 	const { isLoading, count, products } = useAdminProducts(
-		{ ...params, offset, q: searchValue, limit: DEFAULT_PAGE_SIZE },
+		{
+			...params,
+			offset,
+			q: searchValue,
+			limit: DEFAULT_PAGE_SIZE,
+			is_giftcard: false,
+		},
 		{
 			keepPreviousData: true,
 		}

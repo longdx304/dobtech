@@ -56,7 +56,7 @@ const productsColumns = ({}: Props) => [
 						className="w-[20px]"
 					/>
 					<Text className="text-xs">
-						{_ === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+						{_ === 'published' ? 'Đang hoạt động' : 'Bản nháp'}
 					</Text>
 				</Flex>
 			);
