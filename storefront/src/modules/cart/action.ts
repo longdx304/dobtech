@@ -11,8 +11,8 @@ import {
 import { getCustomer, updateCustomer } from '@/actions/customer';
 import { getProductsById } from '@/actions/products';
 import { getRegion } from '@/actions/region';
-import { Cart, LineItem } from '@medusajs/medusa';
-import _ from 'lodash';
+import { LineItem } from '@medusajs/medusa';
+import omit from 'lodash/omit';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { updateCartMetadata } from '../checkout/actions';
@@ -206,7 +206,7 @@ export async function enrichLineItems(
 			...item,
 			variant: {
 				...variant,
-				product: _.omit(product, 'variants'),
+				product: omit(product, 'variants'),
 			},
 		};
 	}) as LineItem[];

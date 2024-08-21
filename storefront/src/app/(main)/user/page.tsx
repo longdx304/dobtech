@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 
-import Overview from '@/modules/user/components/overview';
+const Overview = dynamic(() => import('@/modules/user/components/overview'));
 
 export const metadata: Metadata = {
 	title: 'CHAMDEP VN | Trang cá nhân',

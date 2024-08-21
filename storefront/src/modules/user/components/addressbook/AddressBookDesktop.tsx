@@ -3,15 +3,19 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
-import AddressForm from '@/modules/common/components/address-form';
 import { Address, Region } from '@medusajs/medusa';
 import { Col, List, message, Modal, Row } from 'antd';
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import {
 	deleteCustomerShippingAddress,
 	updateCustomerShippingAddress,
 } from '../../actions';
 
+const AddressForm = dynamic(
+	() => import('@/modules/common/components/address-form'),
+	{ ssr: false }
+);
 type Props = {
 	region: Region;
 };
@@ -47,7 +51,6 @@ const AddressBookDesktop = ({ region }: Props) => {
 		setEditingAddress(null);
 		onOpen();
 	};
-
 
 	const setDefaultAddress = async (address: Address) => {
 		const prevAddress = customer?.shipping_addresses.find(
@@ -114,13 +117,6 @@ const AddressBookDesktop = ({ region }: Props) => {
 												{item.postal_code}
 											</Text>
 											<Flex gap={8} className="absolute bottom-2 right-5">
-												{/* <Button
-													type="link"
-													onClick={() => {}}
-													className="text-[12px] text-[#2d68a8] p-0"
-												>
-													Đặt Địa Chỉ Mặc Định
-												</Button> */}
 												{!item.metadata?.is_default && (
 													<Button
 														type="link"

@@ -114,7 +114,7 @@ export const EmptyCart = () => {
 	return (
 		<div className="flex pt-8 pb-12 flex-col gap-y-2 items-center justify-center">
 			<Image
-				src={'/images/empty-cart.png'}
+				src={'/images/empty-cart.webp'}
 				alt="Empty cart"
 				width={150}
 				height={150}

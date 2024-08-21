@@ -1,9 +1,10 @@
 'use client';
 import { Checkbox } from '@/components/Checkbox';
+import Table from '@/components/Table';
+import { Title } from '@/components/Typography';
 import Thumbnail from '@/modules/products/components/thumbnail';
 import { LineItem, Region } from '@medusajs/medusa';
 import type { CheckboxProps } from 'antd';
-import { Table, Typography } from 'antd';
 import React from 'react';
 import Item from '../components/item';
 
@@ -15,7 +16,6 @@ type ItemsTemplateProps = {
 	onItemSelectionChange: (selectedRowKeys: React.Key[]) => void;
 };
 
-const { Title } = Typography;
 
 const ItemsTemplate = ({
 	items,

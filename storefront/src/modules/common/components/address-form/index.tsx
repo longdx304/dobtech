@@ -1,7 +1,8 @@
 import { Button } from '@/components/Button';
 import { Drawer } from '@/components/Drawer';
 import { Input } from '@/components/Input';
-import jsonAddress from '@/lib/data/address.json';
+import { Select } from '@/components/Select';
+import useAddressData from '@/lib/hooks/use-address-data';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
 import {
@@ -10,10 +11,14 @@ import {
 } from '@/modules/user/actions';
 import { Region } from '@/types/medusa';
 import { Address, Customer } from '@medusajs/medusa';
-import { Divider, Form, FormProps, message, Select } from 'antd';
-import _ from 'lodash';
-import { useEffect, useState } from 'react';
-import SelectedAddress from './SelectedAddress';
+import { Form, FormProps, message } from 'antd';
+import isEmpty from 'lodash/isEmpty';
+import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from 'react';
+
+const Divider = dynamic(() => import('antd/es/divider'), { ssr: false });
+
+const SelectedAddress = React.lazy(() => import('./SelectedAddress'));
 
 type Props = {
 	customer: Omit<Customer, 'password_hash'> | null;
@@ -39,6 +44,8 @@ const AddressForm = ({ customer, region, onClose, editingAddress }: Props) => {
 	const [form] = Form.useForm();
 	const isDesktop = useIsDesktop();
 
+	const { loading, error, getProvinces, getDistricts, getWards } =
+		useAddressData();
 	const {
 		state: isAddressOpen,
 		onOpen: onAddressOpen,
@@ -97,7 +104,7 @@ const AddressForm = ({ customer, region, onClose, editingAddress }: Props) => {
 				onClose();
 				return;
 			} else {
-				if (_.isEmpty(customer?.shipping_addresses)) {
+				if (isEmpty(customer?.shipping_addresses)) {
 					await addCustomerShippingAddress(values, true);
 				} else {
 					await addCustomerShippingAddress(values, false);
@@ -191,19 +198,24 @@ const AddressForm = ({ customer, region, onClose, editingAddress }: Props) => {
 						<Select
 							placeholder="Chọn tỉnh/thành phố"
 							className="rounded-none lg:block hidden [&_.ant-select-selector]:!rounded-none"
-							options={jsonAddress.map((province) => ({
+							options={getProvinces().map((province) => ({
 								label: province.Name,
 								value: province.Name,
 							}))}
 							value={address.province}
-							onChange={(value) => {
+							onChange={(value: any) => {
 								handleAddressSelect(value, '', '');
 							}}
 							size="large"
 							showSearch
-							filterOption={(input, option) =>
-								(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-							}
+							filterOption={(input, option) => {
+								if (typeof option?.label === 'string') {
+									return option.label
+										.toLowerCase()
+										.includes(input.toLowerCase());
+								}
+								return false;
+							}}
 						/>
 					) : (
 						<>
@@ -228,25 +240,24 @@ const AddressForm = ({ customer, region, onClose, editingAddress }: Props) => {
 						<Select
 							placeholder="Chọn quận/huyện"
 							className="rounded-none hidden lg:block [&_.ant-select-selector]:!rounded-none"
-							options={
-								address.province
-									? jsonAddress
-											.find((prov) => prov.Name === address.province)
-											?.Districts.map((district) => ({
-												label: district.Name,
-												value: district.Name,
-											}))
-									: []
-							}
+							options={getDistricts(address.province)?.map((district) => ({
+								label: district.Name,
+								value: district.Name,
+							}))}
 							value={address.district}
-							onChange={(value) =>
+							onChange={(value: any) =>
 								handleAddressSelect(address.province, value, '')
 							}
 							size="large"
 							showSearch
-							filterOption={(input, option) =>
-								(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-							}
+							filterOption={(input, option) => {
+								if (typeof option?.label === 'string') {
+									return option.label
+										.toLowerCase()
+										.includes(input.toLowerCase());
+								}
+								return false;
+							}}
 						/>
 					) : (
 						<Input
@@ -268,26 +279,24 @@ const AddressForm = ({ customer, region, onClose, editingAddress }: Props) => {
 						<Select
 							placeholder="Chọn khu vực"
 							className="rounded-none hidden lg:block [&_.ant-select-selector]:!rounded-none"
-							options={
-								address.district
-									? jsonAddress
-											.find((prov) => prov.Name === address.province)
-											?.Districts.find((dist) => dist.Name === address.district)
-											?.Wards.map((ward) => ({
-												label: ward.Name,
-												value: ward.Name,
-											}))
-									: []
-							}
+							options={getWards(address.district)?.map((ward) => ({
+								label: ward.Name,
+								value: ward.Name,
+							}))}
 							value={address.ward}
-							onChange={(value) =>
+							onChange={(value: any) =>
 								handleAddressSelect(address.province, address.district, value)
 							}
 							size="large"
 							showSearch
-							filterOption={(input, option) =>
-								(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-							}
+							filterOption={(input, option) => {
+								if (typeof option?.label === 'string') {
+									return option.label
+										.toLowerCase()
+										.includes(input.toLowerCase());
+								}
+								return false;
+							}}
 						/>
 					) : (
 						<Input

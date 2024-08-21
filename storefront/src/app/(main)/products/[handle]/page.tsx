@@ -3,6 +3,8 @@ import { getProductByHandle } from '@/actions/products';
 import ProductTemplate from '@/modules/products/templates';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
+import ProductDetailsSkeleton from './skeleton';
 
 type Props = {
 	params: { handle: string | null };
@@ -43,10 +45,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Readonly<Props>) {
 	return (
 		<div className="w-full box-border container pt-[4rem] lg:pt-[8rem]">
-			<ProductTemplate
-				countryCode={'vn'}
-				handle={decodeURIComponent(params.handle!)}
-			/>
+			<Suspense fallback={<ProductDetailsSkeleton />}>
+				<ProductTemplate
+					countryCode={'vn'}
+					handle={decodeURIComponent(params.handle!)}
+				/>
+			</Suspense>
 		</div>
 	);
 }

@@ -2,7 +2,7 @@ import { MoneyAmount } from '@medusajs/medusa';
 
 import { Region, Variant } from '@/types/medusa';
 
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { ProductVariantInfo, RegionInfo } from '@/types/product';
 import { noDivisionCurrencies } from '@/lib/constants';
 
@@ -230,7 +230,7 @@ const convertToDecimal = (amount: number, region: RegionInfo) => {
 };
 
 const getTaxRate = (region?: RegionInfo) => {
-	return region && !_.isEmpty(region) ? region?.tax_rate / 100 : 0;
+	return region && !isEmpty(region) ? region?.tax_rate / 100 : 0;
 };
 
 const convertToLocale = ({

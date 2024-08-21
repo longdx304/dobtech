@@ -1,5 +1,5 @@
 import type { InputNumberProps } from 'antd';
-import { InputNumber as AntdInputNumber, Flex } from 'antd';
+import AntdInputNumber from 'antd/es/input-number';
 
 import { cn } from '@/lib/utils';
 

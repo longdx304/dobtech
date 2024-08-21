@@ -1,18 +1,28 @@
 'use client';
-import { Region } from '@medusajs/medusa';
-import { LoaderCircle } from 'lucide-react';
-import { FC, MouseEvent, useState } from 'react';
-
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useProduct } from '@/lib/providers/product/product-provider';
-import DrawPriceProduct from '@/modules/products/templates/menu-product-detail/DrawPriceProduct';
-import ProductTemplateModal from '@/modules/products/templates/product-template-modal';
+import dynamic from 'next/dynamic';
+
+import { Region } from '@medusajs/medusa';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
+import { LoaderCircle } from 'lucide-react';
+import { FC, MouseEvent, useState } from 'react';
 import { PriceType } from '../product-actions';
 import CartIcon from './CartIcon';
+
+const ProductTemplateModal = dynamic(
+	() => import('@/modules/products/templates/product-template-modal'),
+	{ ssr: false }
+);
+
+const DrawPriceProduct = dynamic(
+	() =>
+		import('@/modules/products/templates/menu-product-detail/DrawPriceProduct'),
+	{ ssr: false }
+);
 
 interface Props {
 	price: PriceType;

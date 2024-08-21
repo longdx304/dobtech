@@ -53,7 +53,7 @@ const ImageGroup: FC<Props> = ({ product }) => {
           alt={product?.handle!}
           width={120}
           height={120}
-          src={currentImage || "/images/product-img.png"}
+          src={currentImage || "/images/product-img.webp"}
         />
         </Image.PreviewGroup>
       )}
@@ -62,7 +62,7 @@ const ImageGroup: FC<Props> = ({ product }) => {
           alt={product?.handle!}
           width={120}
           height={120}
-          src={itemsImage || "/images/product-img.png"}
+          src={itemsImage || "/images/product-img.webp"}
         />
       )}
     </div>

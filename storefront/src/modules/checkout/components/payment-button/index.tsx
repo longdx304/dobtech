@@ -6,7 +6,7 @@ import { deleteLineItem } from '@/modules/cart/action';
 import ErrorMessage from '@/modules/common/components/error-message';
 import { ERoutes } from '@/types/routes';
 import { Cart } from '@medusajs/medusa';
-import _ from 'lodash';
+import intersection from 'lodash/intersection';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { placeOrder, removeGuestCart } from '../../actions';
@@ -26,8 +26,8 @@ const PaymentButton = ({ data }: Props) => {
 	const checkoutCartVariants = data?.items.map((item) => item.variant_id);
 	const mainCartVariant = cart?.items.map((item) => item.variant_id);
 
-	const intersection = mainCartVariant
-		? _.intersection(checkoutCartVariants, mainCartVariant)
+	const _intersection = mainCartVariant
+		? intersection(checkoutCartVariants, mainCartVariant)
 		: checkoutCartVariants;
 
 	/**
@@ -49,7 +49,7 @@ const PaymentButton = ({ data }: Props) => {
 		return lineItemIds;
 	};
 
-	const lineItemIds = findLineItemId(intersection as string[]);
+	const lineItemIds = findLineItemId(_intersection as string[]);
 
 	/**
 	 * Handles the completion of a payment by attempting to place an order.

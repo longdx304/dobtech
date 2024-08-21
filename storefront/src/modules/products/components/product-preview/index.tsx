@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import dynamic from 'next/dynamic';
 
 import { retrievePricedProductById } from '@/actions/products';
 import { Flex } from '@/components/Flex';

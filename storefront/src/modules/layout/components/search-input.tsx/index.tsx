@@ -1,17 +1,16 @@
 'use client';
 
 import { Dropdown } from '@/components/Dropdown';
+import SearchInput from '@/components/Input/SearchInput';
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
 import RecentSearch from '@/modules/search/components/recent-search';
 import SuggestSearch from '@/modules/search/components/suggest-search';
-import { Input, Menu } from 'antd';
-import _ from 'lodash';
+import { Menu } from 'antd';
+import debounce from 'lodash/debounce';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useRef, useState } from 'react';
 
-const { Search } = Input;
-
-const SearchInput = () => {
+const SearchProduct = () => {
 	const { setItem, getItem } = useLocalStorage('recentSearches');
 	const [searchValue, setSearchValue] = useState<string | null>(null);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -47,16 +46,13 @@ const SearchInput = () => {
 		setIsDropdownOpen(false);
 	};
 
-	const handleChangeDebounce = _.debounce(
-		(e: ChangeEvent<HTMLInputElement>) => {
-			const { value: inputValue } = e.target;
+	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
+		const { value: inputValue } = e.target;
 
-			// Update search
-			setSearchValue(inputValue);
-			setIsDropdownOpen(true);
-		},
-		500
-	);
+		// Update search
+		setSearchValue(inputValue);
+		setIsDropdownOpen(true);
+	}, 500);
 
 	const dropdownContent = (
 		<Menu style={{ padding: '24px' }}>
@@ -79,7 +75,7 @@ const SearchInput = () => {
 			placement="bottom"
 			onOpenChange={handleDropdownClick}
 		>
-			<Search
+			<SearchInput
 				className="[&_.ant-input-outlined:focus]:shadow-none max-w-[300px]"
 				placeholder="Tìm kiếm"
 				onSearch={onSearch}
@@ -93,4 +89,4 @@ const SearchInput = () => {
 	);
 };
 
-export default SearchInput;
+export default SearchProduct;

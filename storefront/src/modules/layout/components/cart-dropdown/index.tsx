@@ -33,6 +33,7 @@ const CartDropdown = ({
 			showZero
 			offset={[0, 10]}
 			onClick={handleClick}
+			aria-label="View Cart"
 		/>
 	);
 

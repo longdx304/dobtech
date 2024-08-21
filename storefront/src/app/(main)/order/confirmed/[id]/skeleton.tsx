@@ -1,9 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 'use client';
-import { Skeleton } from 'antd';
-import { Image } from 'lucide-react';
 import { Card } from '@/components/Card';
-import { Flex } from '@/components/Flex';
+import { Skeleton } from 'antd';
 
 const OrderSkeleton = () => {
 	return (
@@ -24,19 +22,3 @@ const OrderSkeleton = () => {
 };
 
 export default OrderSkeleton;
-
-// const ProductsSkeleton = () => {
-// 	return (
-// 		<Flex
-// 			vertical
-// 			className="shadow group rounded lg:hover:shadow-lg transition-all cursor-pointer pb-4"
-// 		>
-// 			<div className="w-full h-auto aspect-[1/1]">
-// 				<Skeleton.Node active className="w-full h-full">
-// 					<Image size={40} style={{ color: '#bfbfbf' }} />
-// 				</Skeleton.Node>
-// 			</div>
-// 			<Skeleton active paragraph={{ rows: 1 }} className="px-4" />
-// 		</Flex>
-// 	);
-// };

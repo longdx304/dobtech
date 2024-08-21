@@ -4,11 +4,11 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
-import AddressForm from '@/modules/common/components/address-form';
 import { Region } from '@/types/medusa';
 import { Address } from '@medusajs/medusa';
 import { message, Modal, Switch } from 'antd';
 import { ChevronLeft, Plus, Trash2 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -17,6 +17,10 @@ import {
 	updateCustomerShippingAddress,
 } from '../../actions';
 
+const AddressForm = dynamic(
+	() => import('@/modules/common/components/address-form'),
+	{ ssr: false }
+);
 type Props = {
 	region: Region;
 };
@@ -81,7 +85,6 @@ const AddressBookMobile = ({ region }: Props) => {
 		message.success('Đã thay đổi địa chỉ mặc định');
 	};
 
-	console.log('customer mobile', customer);
 	return (
 		<Flex
 			justify="space-between"
@@ -104,7 +107,7 @@ const AddressBookMobile = ({ region }: Props) => {
 				{customer?.shipping_addresses.length === 0 ? (
 					<Flex align="center" justify="center" className="py-16 flex-col">
 						<Image
-							src="/images/empty-address.png"
+							src="/images/empty-address.webp"
 							width={150}
 							height={150}
 							alt="Empty address"
@@ -141,10 +144,11 @@ const AddressBookMobile = ({ region }: Props) => {
 											onChange={() => setDefaultAddress(address)}
 											checked={address.metadata?.is_default === true}
 										/>
-                    <Text className="text-[#767676] text-[13px]">
-                      {address.metadata?.is_default === true && 'Mặc định'}
-                      {address.metadata?.is_default === false && 'Đặt làm địa chỉ mặc định'}
-                    </Text>
+										<Text className="text-[#767676] text-[13px]">
+											{address.metadata?.is_default === true && 'Mặc định'}
+											{address.metadata?.is_default === false &&
+												'Đặt làm địa chỉ mặc định'}
+										</Text>
 									</Flex>
 									<Button
 										className="ml-auto bg-white shadow-none text-black border-none"

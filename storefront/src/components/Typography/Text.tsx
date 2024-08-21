@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { Typography } from 'antd';
+import AntdText from 'antd/es/typography/Text';
 import { ReactNode } from 'react';
 
 interface Props {
@@ -13,9 +13,7 @@ interface Props {
 	style?: React.CSSProperties;
 }
 
-import { BaseType } from 'antd/lib/typography/Base';
-
-const { Text: AntdText } = Typography;
+import { BaseType } from 'antd/es/typography/Base';
 
 export default function Text({
 	className,

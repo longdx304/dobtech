@@ -2,11 +2,18 @@ import { getCart } from '@/actions/cart';
 import { getCustomer } from '@/actions/customer';
 import { getCheckoutStep } from '@/lib/utils/get-checkout-step';
 import { enrichLineItems } from '@/modules/cart/action';
-import ProductList from '@/modules/products/components/product-list';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { LineItem } from '@medusajs/medusa';
+import dynamic from 'next/dynamic';
 import { cookies } from 'next/headers';
-import CartPreview from './cart-preview';
+
+const ProductList = dynamic(
+	() => import('@/modules/products/components/product-list')
+);
+
+const CartPreview = dynamic(() => import('./cart-preview'), {
+	ssr: false,
+});
 
 type Props = {};
 
