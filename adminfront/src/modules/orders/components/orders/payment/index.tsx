@@ -5,7 +5,7 @@ import { Check, CornerDownLeft, CornerDownRight } from 'lucide-react';
 import StatusIndicator from '@/modules/common/components/status-indicator';
 import { Empty, Modal as AntdModal, message, Divider, MenuProps } from 'antd';
 import dayjs from 'dayjs';
-import { useAdminCapturePayment } from 'medusa-react';
+import { useAdminCapturePayment, useCartOrder, useGetCart } from 'medusa-react';
 import { getErrorMessage } from '@/lib/utils';
 import { DisplayTotal } from '@/modules/orders/components/common';
 import { formatAmountWithSymbol } from '@/utils/prices';
@@ -178,7 +178,7 @@ const Payment = ({ order, isLoading, refetch }: Props) => {
 										<div className="font-semibold text-gray-900 mr-3">
 											{formatAmountWithSymbol({
 												amount:
-													payment?.amount - (payment?.data?.paided_total ?? 0),
+													payment?.amount - (payment?.data?.paid_total ?? 0),
 												currency: order.currency_code,
 											})}
 										</div>
@@ -189,26 +189,26 @@ const Payment = ({ order, isLoading, refetch }: Props) => {
 								</div>
 							</div>
 						)}
-						{payment_status !== 'awaiting' && (
-							<div className="flex justify-between text-xs">
-								<div className="font-semibold text-grey-90">
-									{'Số tiền đã thanh toán'}
-								</div>
-								<div className="flex">
-									<div className="font-semibold text-gray-900 mr-3">
-										{formatAmountWithSymbol({
-											amount: order.paid_total - order.refunded_total,
-											currency: order.currency_code,
-										})}
-									</div>
-									<div className="font-regular text-gray-500">
-										{order.currency_code.toUpperCase()}
-									</div>
-								</div>
-							</div>
-						)}
 					</div>
 				))}
+				{payment_status !== 'awaiting' && (
+					<div className="flex justify-between text-xs">
+						<div className="font-semibold text-grey-90">
+							{'Số tiền đã thanh toán'}
+						</div>
+						<div className="flex">
+							<div className="font-semibold text-gray-900 mr-3">
+								{formatAmountWithSymbol({
+									amount: order.paid_total - order.refunded_total,
+									currency: order.currency_code,
+								})}
+							</div>
+							<div className="font-regular text-gray-500">
+								{order.currency_code.toUpperCase()}
+							</div>
+						</div>
+					</div>
+				)}
 			</div>
 			{state && (
 				<RefundModal

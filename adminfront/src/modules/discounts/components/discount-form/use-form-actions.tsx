@@ -11,9 +11,6 @@ export const useFormActions = () => {
 	const { conditions } = useDiscountForm();
 
 	const onSaveAsInactive = async (values: DiscountFormValues) => {
-		console.log('values', {
-			...formValuesToCreateDiscountMapper(values, conditions),
-		});
 		await createDiscount.mutateAsync(
 			{
 				...formValuesToCreateDiscountMapper(values, conditions),
@@ -31,9 +28,6 @@ export const useFormActions = () => {
 	};
 
 	const onSaveAsActive = async (values: DiscountFormValues) => {
-		console.log('values', {
-			...formValuesToCreateDiscountMapper(values, conditions),
-		});
 		await createDiscount.mutateAsync(
 			{
 				...formValuesToCreateDiscountMapper(values, conditions),

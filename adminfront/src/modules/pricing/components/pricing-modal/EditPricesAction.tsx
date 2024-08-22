@@ -34,9 +34,7 @@ const EditPricesActions: FC<Props> = ({
 	}, [_regions]);
 
 	// Handle user click dropdown
-	const handleDropdownClick = ({ key }: { key: string }) => {
-		console.log('key', key);
-	};
+	const handleDropdownClick = ({ key }: { key: string }) => {};
 
 	const renderCurrencyLabel = (currency: any) => {
 		return (

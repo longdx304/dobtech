@@ -239,6 +239,19 @@ const SwapModal: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 				onClose();
 			},
 			onError: (err: any) => {
+				if (
+					getErrorMessage(err) ===
+					'Cannot swap an order that has not been captured'
+				) {
+					return message.error(
+						'Không thể trao đổi đơn hàng khi chưa hoàn tất thanh toán'
+					);
+				} else if (
+					getErrorMessage(err) ===
+					'Cannot swap an order that has not been fulfilled'
+				) {
+					return message.error('Không thể trao đổi đơn hàng chưa được giao');
+				}
 				message.error(getErrorMessage(err));
 			},
 		});

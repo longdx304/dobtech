@@ -59,7 +59,6 @@ const ModalDenomination = ({
 		useState<boolean>(false);
 
 	const isEdit = !!denomination;
-	console.log('isEdit:', isEdit);
 
 	const defaultValues: DenominationFormType | undefined = useMemo(() => {
 		if (!store) {
@@ -107,7 +106,6 @@ const ModalDenomination = ({
 			} as DenominationFormType;
 		}
 	}, [store, denomination, isEdit]);
-	console.log('defaultValues:', defaultValues);
 
 	useEffect(() => {
 		if (defaultValues) {

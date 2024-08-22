@@ -105,11 +105,11 @@ const EditPriceModal = ({
 					<Form.Item
 						labelCol={{ span: 24 }}
 						name="amount"
-						label="Số tiền hoàn trả"
+						label="Giá tiền"
 						rules={[
 							{
 								required: true,
-								message: 'Vui lòng nhập số tiền hoàn trả',
+								message: 'Vui lòng nhập số tiền muốn thay đổi',
 							},
 						]}
 					>

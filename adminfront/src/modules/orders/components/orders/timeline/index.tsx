@@ -18,7 +18,7 @@ import {
 	ClaimEvent,
 	PaidEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
-import { Order } from '@medusajs/medusa';
+import { Order, Region } from '@medusajs/medusa';
 import { Empty } from 'antd';
 import { CircleAlert, RefreshCcw, RotateCcw } from 'lucide-react';
 import { useAdminOrder } from 'medusa-react';
@@ -42,6 +42,7 @@ import ReturnMenu from './timeline-events/modal/returns';
 import SwapModal from './timeline-events/modal/swap';
 import ClaimModal from './timeline-events/modal/claim';
 import Paid from './timeline-events/paid';
+import ChangedPrice from './timeline-events/order-edit/changed-price';
 
 type Props = {
 	orderId: Order['id'] | undefined;
@@ -111,7 +112,9 @@ const Timeline = ({
 				<div className="flex flex-col text-xs">
 					{events?.map((event, i) => {
 						return (
-							<div key={i}>{switchOnType(event, refetch, refetchOrder)}</div>
+							<div key={i}>
+								{switchOnType(event, refetch, refetchOrder, order?.region)}
+							</div>
 						);
 					})}
 				</div>
@@ -146,7 +149,8 @@ export default Timeline;
 function switchOnType(
 	event: TimelineEvent,
 	refetch: () => void,
-	refetchOrder: () => void
+	refetchOrder: () => void,
+	region: Region | undefined
 ) {
 	switch (event.type) {
 		case 'placed':
@@ -204,6 +208,8 @@ function switchOnType(
 			return <RefundRequired event={event as RefundRequiredEvent} />;
 		case 'payment-required':
 			return <PaymentRequired event={event as PaymentRequiredEvent} />;
+		case 'change-price':
+			return <ChangedPrice event={event as any} region={region} />;
 		default:
 			return null;
 	}

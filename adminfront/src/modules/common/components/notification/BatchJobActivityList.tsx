@@ -152,7 +152,6 @@ const BatchJobActivityCard = (props: { batchJob: BatchJob }) => {
 			};
 			reader.readAsText(blob, 'utf-8');
 		} catch (e) {
-			console.log('Download error', e);
 			notification.error({
 				description: `Đã xảy ra lỗi trong khi tải xuống tệp ${operation.toLowerCase()}`,
 			});

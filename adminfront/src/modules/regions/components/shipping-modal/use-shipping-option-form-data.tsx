@@ -142,8 +142,6 @@ export const useShippingOptionFormData = (
 			requirements: getRequirementsData(data) as any,
 		};
 
-		console.log('payload getShippingOptionData', payload);
-
 		if (isReturn) {
 			payload.is_return = true;
 			payload.price_type = 'flat_rate' as any;

@@ -11,6 +11,7 @@ import {
 	useAdminNotifications,
 	useAdminOrder,
 	useAdminOrderEdits,
+	useGetCart,
 } from 'medusa-react';
 import { useMemo } from 'react';
 import useOrdersExpandParam from '../components/orders/utils/use-admin-expand-parameter';
@@ -44,7 +45,8 @@ export interface TimelineEvent {
 		| 'edit-confirmed'
 		| 'payment-required'
 		| 'refund-required'
-		| 'paid';
+		| 'paid'
+		| 'change-price';
 }
 
 export interface RefundRequiredEvent extends TimelineEvent {
@@ -174,6 +176,9 @@ export const useBuildTimeline = (orderId: string) => {
 	} = useAdminOrder(orderId, {
 		expand: orderRelations,
 	});
+	const { cart, isLoading: isCartLoading } = useGetCart(order?.cart_id ?? '', {
+		enabled: !!order,
+	});
 
 	const { order_edits: edits, isLoading: isOrderEditsLoading } =
 		useAdminOrderEdits({ order_id: orderId });
@@ -289,7 +294,7 @@ export const useBuildTimeline = (orderId: string) => {
 		events.push({
 			id: `${order.id}-placed`,
 			time: order.created_at,
-			amount: order.total,
+			amount: cart?.total ?? order.total,
 			currency_code: order.currency_code,
 			tax: order.tax_rate,
 			type: 'placed',
@@ -329,6 +334,18 @@ export const useBuildTimeline = (orderId: string) => {
 				type: 'refund',
 				refund: event,
 			} as RefundEvent);
+		}
+
+		if ((order.metadata?.timeline as any[])?.length) {
+			for (const event of order.metadata.timeline as any[]) {
+				events.push({
+					...event,
+					id: event.line_item_id,
+					time: event.created_at,
+					type: 'change-price',
+					orderId: order.id,
+				} as TimelineEvent);
+			}
 		}
 
 		for (const payment of order.payments) {
@@ -579,6 +596,8 @@ export const useBuildTimeline = (orderId: string) => {
 		isOrderLoading,
 		isNotesLoading,
 		isOrderEditsLoading,
+		isCartLoading,
+		cart,
 	]);
 
 	return {

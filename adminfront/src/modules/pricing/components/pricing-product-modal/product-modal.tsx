@@ -67,7 +67,6 @@ const ProductModal: FC<Props> = ({
 								});
 							}
 						});
-						console.log('pricesPayload', pricesPayload);
 						if (pricesPayload.length > 0) {
 							return pricesPayload;
 						} else {

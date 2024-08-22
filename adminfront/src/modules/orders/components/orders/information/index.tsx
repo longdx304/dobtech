@@ -19,7 +19,6 @@ const Information = ({ order, isLoading }: Props) => {
 	const cancelOrder = useAdminCancelOrder(order?.id!);
 
 	const handleCancelOrder = () => {
-		console.log('cancel order');
 		AntdModal.confirm({
 			title: 'Xác nhận huỷ đơn hàng',
 			content: 'Bạn có chắc chắn muốn huỷ đơn hàng này?',
@@ -90,15 +89,38 @@ export default Information;
 const OrderStatus = ({ status }: { status: Order['status'] }) => {
 	switch (status) {
 		case 'completed':
-			return <StatusIndicator variant="success" title="Đã hoàn thành" className="font-normal" />;
+			return (
+				<StatusIndicator
+					variant="success"
+					title="Đã hoàn thành"
+					className="font-normal"
+				/>
+			);
 		case 'pending':
-			return <StatusIndicator variant="default" title="Đang xử lý" className="font-normal" />;
+			return (
+				<StatusIndicator
+					variant="default"
+					title="Đang xử lý"
+					className="font-normal"
+				/>
+			);
 		case 'canceled':
-			return <StatusIndicator variant="danger" title="Đã huỷ" className="font-normal" />;
+			return (
+				<StatusIndicator
+					variant="danger"
+					title="Đã huỷ"
+					className="font-normal"
+				/>
+			);
 		case 'requires_action':
-			return <StatusIndicator variant="danger" title="Yêu cầu xử lý" className="font-normal" />;
+			return (
+				<StatusIndicator
+					variant="danger"
+					title="Yêu cầu xử lý"
+					className="font-normal"
+				/>
+			);
 		default:
 			return null;
 	}
 };
-

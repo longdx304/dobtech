@@ -25,6 +25,7 @@ const orderRelations = [
 	'swaps.additional_items.variant.product.profiles',
 	'swaps.fulfillments',
 	'returnable_items',
+	'region'
 ];
 
 /**

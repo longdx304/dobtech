@@ -23,7 +23,7 @@ export default function OrderDetail({ id }: Readonly<Props>) {
 	const refetchOrder = () => {
 		refetch();
 		refetchTimeline();
-	}
+	};
 	return (
 		<Row gutter={[16, 16]} className="mb-12">
 			<Col span={24}>
@@ -35,7 +35,7 @@ export default function OrderDetail({ id }: Readonly<Props>) {
 					order={order}
 					isLoading={isLoading}
 					reservations={[]}
-					refetch={refetch}
+					refetch={refetchOrder}
 				/>
 				<Payment order={order} isLoading={isLoading} refetch={refetchOrder} />
 				<Fulfillment order={order} isLoading={isLoading} refetch={refetch} />

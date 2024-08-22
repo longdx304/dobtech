@@ -54,7 +54,6 @@ const denominationColumns = ({
 						price.region_id === null &&
 						price.price_list_id === null
 				);
-				console.log('otherCurrencies:', otherCurrencies);
 
 				let remainder: MoneyAmount[] = [];
 

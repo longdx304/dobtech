@@ -83,7 +83,7 @@ const OrderLine = ({
 						handleOk={onClose}
 						item={item}
 						currencyCode={currencyCode}
-						initialAmount={(item.total ?? 0) / 2}
+						initialAmount={(item.total ?? 0) / item.quantity}
 						refetch={refetch}
 					/>
 				)}

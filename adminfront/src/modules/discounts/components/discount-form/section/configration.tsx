@@ -44,12 +44,10 @@ const ExpandIcon = ({ isActive }: { isActive: boolean }) => (
 );
 
 const Settings: React.FC<SettingsProps> = ({ isEdit, promotion }) => {
-	const [activeTabs, setActiveTabs] = useState<string[]>([]);
 	const { isDynamic, handleConfigurationChanged, form } = useDiscountForm();
 
 	useEffect(() => {
 		if (promotion) {
-			setActiveTabs(getActiveTabs(promotion));
 			form.setFieldsValue({
 				starts_at: promotion.starts_at ? dayjs(promotion.starts_at) : dayjs(),
 				ends_at: promotion.ends_at ? dayjs(promotion.ends_at) : null,
@@ -247,7 +245,6 @@ const Settings: React.FC<SettingsProps> = ({ isEdit, promotion }) => {
 	return (
 		<Collapse
 			className="bg-white [&_.ant-collapse-header]:px-0 [&_.ant-collapse-header]:text-base [&_.ant-collapse-header]:font-medium"
-			activeKey={activeTabs}
 			// defaultActiveKey={activeTabs}
 			items={itemsCollapse as any}
 			expandIconPosition="end"

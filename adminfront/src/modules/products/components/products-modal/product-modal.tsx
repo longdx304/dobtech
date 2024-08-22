@@ -109,7 +109,6 @@ export default function ProductModal({
 				return null;
 			},
 			onError: (error: any) => {
-				console.log('error', error);
 				messageApi.open({
 					type: 'error',
 					content: getErrorMessage(error),

@@ -83,7 +83,6 @@ const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 				handleOk();
 			})
 			.catch((e: any) => {
-				console.log('e', e);
 				messageApi.success('Có lỗi xảy ra, vui lòng thử lại sau.');
 			});
 	};

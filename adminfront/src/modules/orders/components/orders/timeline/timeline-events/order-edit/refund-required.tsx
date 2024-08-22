@@ -68,6 +68,7 @@ const RefundRequired: React.FC<RequestedProps> = ({ event }) => {
 					order={order}
 					initialAmount={refundableAmount}
 					initialReason="other"
+					refetch={() => {}}
 				/>
 			)}
 		</>

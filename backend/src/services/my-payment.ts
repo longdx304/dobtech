@@ -81,6 +81,19 @@ class MyPaymentService extends TransactionBaseService {
 			}
 		);
 	}
+
+	async updateAmountPayment(id: string, amount: number): Promise<Payment> {
+		return await this.atomicPhase_(
+			async (transactionManager: EntityManager) => {
+				const paymentRepository = transactionManager.withRepository(
+					this.paymentRepository_
+				);
+				return await paymentRepository.save({
+					id,
+					amount,
+				});
+			});
+	}
 }
 
 export default MyPaymentService;

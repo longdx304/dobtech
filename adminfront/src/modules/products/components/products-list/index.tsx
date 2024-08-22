@@ -98,9 +98,6 @@ const ProductList = (props: Props) => {
 					message.error('Xoá sản phẩm thất bại!');
 				}
 			},
-			onCancel() {
-				console.log('Cancel');
-			},
 		});
 	};
 
