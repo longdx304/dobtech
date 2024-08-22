@@ -156,7 +156,6 @@ export async function placeOrder(cartId?: string) {
 
 export async function removeGuestCart() {
 	const customer = await getCustomer();
-	console.log('customer placeOrder', customer);
 
 	if (!customer) {
 		cookies().set('_chamdep_cart_id', '', {

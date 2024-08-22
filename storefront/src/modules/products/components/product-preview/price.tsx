@@ -81,7 +81,7 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 				{price.price_type === 'sale' ? (
 					<Flex align="center">
 						<Text className="text-[16px] font-semibold text-[#FA6338]">
-							{price.original_price_incl_tax}
+							{price.calculated_price_incl_tax}
 						</Text>
 						<Text className="text-[10px] font-normal border-[#FFD9CE] border-[1px] border-solid text-[#FA6338] px-[3px] py-[2px] ml-2">
 							-{price.percentage_diff}%

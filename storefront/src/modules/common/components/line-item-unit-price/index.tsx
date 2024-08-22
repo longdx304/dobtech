@@ -20,6 +20,8 @@ const LineItemUnitPrice = ({
 	type = 'full',
 }: LineItemUnitPriceProps) => {
 	const originalPrice = (item.variant as CalculatedVariant).original_price;
+	const calculatedPriceInclTax = (item.variant as CalculatedVariant)
+		.original_price_incl_tax;
 	const hasReducedPrice = (originalPrice * item.quantity || 0) > item.total!;
 	const reducedPrice = (item.total || 0) / item.quantity!;
 
@@ -36,7 +38,7 @@ const LineItemUnitPrice = ({
 						<Flex align="center" justify="center" gap={4}>
 							<Text className="text-[12px] text-[#767676] line-through text-nowrap">
 								{formatAmount({
-									amount: originalPrice,
+									amount: calculatedPriceInclTax,
 									region: region,
 									includeTaxes: false,
 								})}
@@ -91,7 +93,7 @@ const LineItemUnitPrice = ({
 					{hasReducedPrice && (
 						<Text className="text-[10px] text-[#767676] line-through text-nowrap">
 							{formatAmount({
-								amount: originalPrice,
+								amount: calculatedPriceInclTax,
 								region: region,
 								includeTaxes: false,
 							})}

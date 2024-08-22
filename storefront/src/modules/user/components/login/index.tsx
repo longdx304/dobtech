@@ -62,7 +62,6 @@ const Login = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 				router.push(`${ERoutes.CHECKOUT}/?cartId=${cartId}`);
 			} else {
 				if (!isDesktop) {
-					console.log('mobile');
 					onCloseDrawer?.();
 				} else {
 					router.push(`/${ERoutes.USER}`);
