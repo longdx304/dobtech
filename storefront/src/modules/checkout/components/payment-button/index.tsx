@@ -107,7 +107,7 @@ const PaymentButton = ({ data }: Props) => {
 			<Button
 				type="primary"
 				block
-				className="flex items-center justify-center w-full rounded-none text-lg uppercase mt-4 font-bold"
+				className="flex items-center justify-center w-full rounded-none text-lg uppercase mt-4 mb-5 font-bold"
 				onClick={handleCheckout}
 				loading={submitting}
 			>
