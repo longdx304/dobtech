@@ -79,7 +79,9 @@ const UserSetting = () => {
 					}}
 				>
 					<Flex align="center" justify="space-between" className="px-4 py-2">
-						<Text className="text-lg font-semibold">
+						<Text
+							className="text-lg font-semibold"
+						>
 							{customer
 								? `Chào, ${customer.first_name} ${customer.last_name}`
 								: 'Đăng nhập / Đăng ký'}

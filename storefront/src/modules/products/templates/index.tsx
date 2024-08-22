@@ -20,7 +20,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 	handle,
 }) => {
 	return (
-		<>
+		<div data-testid="product-container">
 			<div className="flex flex-col lg:flex-row justify-between w-full pb-8 gap-4">
 				<div className="w-full lg:w-fit lg:flex-grow lg:pr-4">
 					<ImageGallery />
@@ -40,7 +40,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 					<RelatedProducts handle={handle} countryCode={countryCode} />
 				</Suspense>
 			</div>
-		</>
+		</div>
 	);
 };
 

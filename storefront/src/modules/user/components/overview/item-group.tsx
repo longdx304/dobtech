@@ -6,9 +6,7 @@ import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
 import { LOGIN_VIEW } from '@/types/auth';
 import { Divider } from 'antd';
-import {
-	Settings
-} from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import LoginTemplate from '../../templates/login-template';
 
@@ -40,7 +38,7 @@ const ItemGroup = () => {
 						handleLoginClick();
 					}}
 				>
-					<Text className="text-lg font-semibold">
+					<Text className="text-lg font-semibold" data-testid="welcome-message">
 						{customer
 							? `Chào, ${customer.first_name} ${customer.last_name}`
 							: 'Đăng nhập / Đăng ký'}

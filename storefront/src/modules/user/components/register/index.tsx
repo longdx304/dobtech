@@ -97,7 +97,10 @@ const Register = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 	};
 
 	return (
-		<div className="register-form flex flex-col items-center">
+		<div
+			className="register-form flex flex-col items-center"
+			data-testid="register-page"
+		>
 			<h1 className="text-large-semi uppercase mt-0">CHAMDEP</h1>
 			<Form form={form} onFinish={onFinish}>
 				<Form.Item
@@ -114,6 +117,7 @@ const Register = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 					<Input
 						placeholder="Họ"
 						prefix={<User size={20} color="rgb(156 163 175)" />}
+						data-testid="first-name-input"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -130,6 +134,7 @@ const Register = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 					<Input
 						placeholder="Tên"
 						prefix={<User size={20} color="rgb(156 163 175)" />}
+						data-testid="last-name-input"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -148,7 +153,7 @@ const Register = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 					<Input
 						placeholder="Email"
 						prefix={<Mail size={20} color="rgb(156 163 175)" />}
-						data-testid="email"
+						data-testid="email-input"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -166,6 +171,7 @@ const Register = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 					<Input
 						placeholder="Số điện thoại"
 						prefix={<Phone size={20} color="rgb(156 163 175)" />}
+						data-testid="phone-input"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -179,7 +185,7 @@ const Register = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 					<InputPassword
 						placeholder="Mật khẩu"
 						prefix={<Lock size={20} color="rgb(156 163 175)" />}
-						data-testid="password"
+						data-testid="password-input"
 					/>
 				</Form.Item>
 
@@ -188,10 +194,14 @@ const Register = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 						type="primary"
 						htmlType="submit"
 						className="register-form-button mb-4"
+						data-testid="register-button"
 					>
 						Đăng ký
 					</Button>
-					<a onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}>
+					<a
+						onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
+						data-testid="login-link"
+					>
 						Đã có tài khoản? Đăng nhập ngay
 					</a>
 				</Form.Item>

@@ -9,7 +9,7 @@ const OverviewPreview = dynamic(() => import('./preview'), {
 
 const Overview = () => {
 	return (
-		<>
+		<div data-testid="overview-page-wrapper">
 			<OverviewPreview />
 			{/* Products */}
 			<div className="flex-col space-y-2 py-4">
@@ -20,7 +20,7 @@ const Overview = () => {
 					<ProductList />
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 
