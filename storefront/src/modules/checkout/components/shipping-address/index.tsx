@@ -1,10 +1,8 @@
 import { Button } from '@/components/Button';
-import { Card } from '@/components/Card';
-import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
-import { Text } from '@/components/Typography';
 import { useCart } from '@/lib/providers/cart/cart-provider';
 import { setAddresses } from '@/modules/checkout/actions';
+import { addCustomerShippingAddress } from '@/modules/user/actions';
 import { Cart, Region } from '@medusajs/medusa';
 import { Divider, Form, FormProps, Select, message } from 'antd';
 import { Mail } from 'lucide-react';
@@ -53,27 +51,14 @@ const ShippingAddress = ({
 
 		try {
 			await setAddresses(shippingAddress, values?.email, cart?.id);
+			await addCustomerShippingAddress(values, true);
+
 			message.success('Địa chỉ giao hàng đã được cập nhật');
 			refreshCart();
 			setIsEditing(false);
 		} catch {
 			message.error('Có lỗi xảy ra khi cập nhật địa chỉ giao hàng');
 		}
-	};
-
-	const handleEdit = () => {
-		setIsEditing(true);
-		form.setFieldsValue({
-			firstName: cart?.shipping_address?.first_name,
-			lastName: cart?.shipping_address?.last_name,
-			phone: cart?.shipping_address?.phone,
-			address: cart?.shipping_address?.address_2,
-			province: cart?.shipping_address?.city,
-			district: cart?.shipping_address?.province,
-			ward: cart?.shipping_address?.address_1,
-			postalCode: cart?.shipping_address?.postal_code,
-			countryCode: cart?.shipping_address?.country_code,
-		});
 	};
 
 	return (
@@ -210,39 +195,6 @@ const ShippingAddress = ({
 					</Form.Item>
 				</Form>
 			)}
-
-			{/* {!isEditing && (
-				<Card className="shadow-none">
-					<Flex className="flex-col" gap={4}>
-						<Flex gap={10} align="baseline">
-							<Text className="font-bold">
-								{cart?.shipping_address?.first_name}{' '}
-								{cart?.shipping_address?.last_name}
-							</Text>
-							<Text className="text-[#666666] text-[13px]">
-								{cart?.shipping_address?.phone}
-							</Text>
-						</Flex>
-						<Text className="text-[12px]">
-							{cart?.shipping_address?.address_2}
-						</Text>
-						<Text className="text-[12px]">
-							{cart?.shipping_address?.address_1},{cart?.shipping_address?.city}
-							, {cart?.shipping_address?.province},
-							{cart?.shipping_address?.postal_code}
-						</Text>
-						<Flex gap={8} className="absolute bottom-2 right-5">
-							<Button
-								type="link"
-								onClick={handleEdit}
-								className="text-[12px] text-[#2d68a8] p-0"
-							>
-								Chỉnh Sửa
-							</Button>
-						</Flex>
-					</Flex>
-				</Card>
-			)} */}
 		</>
 	);
 };

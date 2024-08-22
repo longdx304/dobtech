@@ -28,6 +28,17 @@ export async function setAddresses(
 			postal_code: values.postalCode,
 			country_code: values.countryCode,
 		},
+		billing_address: {
+			first_name: values.firstName,
+			last_name: values.lastName,
+			phone: values.phone,
+			address_1: values.ward,
+			address_2: values.address,
+			city: values.district,
+			province: values.province,
+			postal_code: values.postalCode,
+			country_code: values.countryCode,
+		},
 		email: email,
 	} as StorePostCartsCartReq;
 
@@ -156,7 +167,6 @@ export async function placeOrder(cartId?: string) {
 
 export async function removeGuestCart() {
 	const customer = await getCustomer();
-	console.log('customer placeOrder', customer);
 
 	if (!customer) {
 		cookies().set('_chamdep_cart_id', '', {

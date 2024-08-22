@@ -41,7 +41,10 @@ const ProductPreview: FC<Props> = async ({ data, region }) => {
 			</LocalizedClientLink>
 			<Flex vertical className="p-2 pb-3 w-full box-border">
 				<LocalizedClientLink href={`products/${data.handle}`}>
-					<Text className="leading-4 text-[0.875rem] line-clamp-1 w-full text-black font-normal">
+					<Text
+						className="leading-4 text-[0.875rem] line-clamp-1 w-full text-black font-normal"
+						data-testid="product-title"
+					>
 						{data?.title}
 					</Text>
 				</LocalizedClientLink>

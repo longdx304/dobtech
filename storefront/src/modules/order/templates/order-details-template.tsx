@@ -21,7 +21,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
 	order,
 }) => {
 	return (
-		<Flex justify="center" className="flex-col gap-y-4">
+		<Flex justify="center" className="flex-col gap-y-4 ">
 			<Flex justify="space-between" align="center" className="gap-2">
 				<Title level={2}>Chi tiết đơn hàng</Title>
 				<LocalizedClientLink

@@ -29,15 +29,22 @@ const UserInformation = () => {
 				{
 					key: 'dropdown-1',
 					label: (
-						<a href={`/${ERoutes.USER}`}>
+						<span
+							onClick={() => router.push(`/${ERoutes.USER}`)}
+							data-testid="nav-account-link"
+						>
 							{customer.first_name} {customer.last_name}
-						</a>
+						</span>
 					),
 					icon: <User />,
 				},
 				{
 					key: 'dropdown-2',
-					label: <a href={`/${ERoutes.USER_ORDERS}`}>Đơn hàng của tôi</a>,
+					label: (
+						<span onClick={() => router.push(`/${ERoutes.USER_ORDERS}`)}>
+							Đơn hàng của tôi
+						</span>
+					),
 				},
 				{
 					type: 'divider',
@@ -52,9 +59,12 @@ const UserInformation = () => {
 				{
 					key: 'dropdown-1',
 					label: (
-						<a rel="noopener noreferrer" href="/user/auth">
+						<span
+							onClick={() => router.push(`/${ERoutes.AUTH}`)}
+							data-testid="nav-account-link"
+						>
 							Đăng nhập / đăng kí
-						</a>
+						</span>
 					),
 					icon: <User />,
 				},
@@ -65,7 +75,13 @@ const UserInformation = () => {
 	return (
 		<Dropdown menu={menu}>
 			<Button
-				icon={<User className="stroke-2" color="#767676" />}
+				icon={
+					<User
+						className="stroke-2"
+						color="#767676"
+						data-testid="nav-account-dropdown"
+					/>
+				}
 				shape="circle"
 				type="text"
 				aria-label="User Information"

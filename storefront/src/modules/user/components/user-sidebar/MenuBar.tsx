@@ -53,6 +53,7 @@ const Menubar = ({ className }: Props) => {
       items={_menuItems}
       style={{ borderInlineEnd: 'none' }}
       defaultOpenKeys={['overview-2']}
+      data-testid="account-nav"
     />
   );
 };

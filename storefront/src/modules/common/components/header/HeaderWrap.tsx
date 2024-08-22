@@ -37,7 +37,7 @@ const HeaderWrap: FC<Props> = ({}) => {
 				<CartButton />
 
 				{/* User Information */}
-				<UserInformation />
+				<UserInformation data-testid="nav-account-link" />
 			</Flex>
 		</Flex>
 	);

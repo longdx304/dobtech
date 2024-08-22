@@ -83,7 +83,7 @@ const Login = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 					<Spin size="large" />
 				</div>
 			)}
-			<div className="login-form flex flex-col items-center">
+			<div className="login-form flex flex-col items-center" data-testid="login-page">
 				<h1 className="text-large-semi uppercase">CHAMDEP</h1>
 				<Form form={form} onFinish={onFinish}>
 					<Form.Item
@@ -102,7 +102,7 @@ const Login = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 						<Input
 							placeholder="Email"
 							prefix={<Mail size={20} color="rgb(156 163 175)" />}
-							data-testid="email"
+							data-testid="email-input"
 						/>
 					</Form.Item>
 					<Form.Item
@@ -116,7 +116,7 @@ const Login = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 						<InputPassword
 							placeholder="Mật khẩu"
 							prefix={<Lock size={20} color="rgb(156 163 175)" />}
-							data-testid="password"
+							data-testid="password-input"
 						/>
 					</Form.Item>
 					<Form.Item>
@@ -132,11 +132,15 @@ const Login = ({ setCurrentView, onCloseDrawer, isDesktop }: Props) => {
 							type="primary"
 							htmlType="submit"
 							className="login-form-button mb-4"
+							data-testid="sign-in-button"
 						>
 							Đăng nhập
 						</Button>
 						hoặc{' '}
-						<a onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}>
+						<a
+							onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
+							data-testid="register-button"
+						>
 							Đăng ký ngay
 						</a>
 					</Form.Item>

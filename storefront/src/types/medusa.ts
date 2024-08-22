@@ -10,6 +10,8 @@ export type CalculatedVariant = ProductVariant & {
   original_price: number
   original_tax: number,
   original_price_incl_tax: number
+  calculated_price_incl_tax: number
+  calculated_tax: number
 }
 
 export type CartWithCheckoutStep = Omit<

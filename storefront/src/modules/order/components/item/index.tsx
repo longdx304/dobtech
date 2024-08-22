@@ -17,13 +17,8 @@ const Item = ({ item, region }: ItemProps) => {
 			<div className="flex justify-between items-center">
 				<Text data-testid="product-title">{item.title}</Text>
 				<div className="flex items-center gap-1">
-					<Text
-						style={{ width: '-webkit-fill-available' }}
-						className="text-[12px]"
-					>
-						{item.quantity}x
-					</Text>
-					<LineItemUnitPrice item={item} region={region} />
+					<Text className="text-[12px] font-bold">Số lượng: </Text>
+					<Text className="text-[12px]">{item.quantity}</Text>
 				</div>
 			</div>
 			<div className="flex justify-between items-center gap-10 lg:gap-0">
