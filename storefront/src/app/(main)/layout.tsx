@@ -36,11 +36,13 @@ export default async function PageLayout({
 			id: string;
 			label: string;
 			key: string;
+			metadata?: Record<string, string>;
 			children?: any[];
 		} = {
 			id: category.id,
 			label: category.name,
 			key: category.handle,
+			metadata: category.metadata,
 		};
 
 		if (category.category_children && category.category_children.length > 0) {

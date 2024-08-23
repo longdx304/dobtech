@@ -9,9 +9,10 @@ import dynamic from 'next/dynamic';
 import { Region } from '@medusajs/medusa';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
 import { LoaderCircle } from 'lucide-react';
-import { FC, MouseEvent, useState } from 'react';
+import { FC, MouseEvent, useEffect, useState } from 'react';
 import { PriceType } from '../product-actions';
 import CartIcon from './CartIcon';
+import { useCart } from '@/lib/providers/cart/cart-provider';
 
 const ProductTemplateModal = dynamic(
 	() => import('@/modules/products/templates/product-template-modal'),
@@ -74,6 +75,14 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 	const handleModalClose = () => {
 		onClose();
 	};
+
+	const { refreshCart } = useCart();
+
+	// Refresh cart for persistent cart different devices
+	useEffect(() => {
+		refreshCart();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return (
 		<Flex vertical>

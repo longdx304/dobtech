@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { TooltipIcon, Tooltip } from '@/components/Tooltip';
 import { Button } from '@/components/Button';
 import { Dropdown } from '@/components/Dropdown';
+import { deleteImages } from '@/actions/images';
 
 type Props = {
 	depth: number;
@@ -49,14 +50,18 @@ const CategoryItem = (props: Props) => {
 		},
 	];
 
+	const handleDeleteFile = async (url: string) => {
+		await deleteImages(url);
+	};
 	// Handle menu click edit or delete
-	const handleMenuClick: MenuProps['onClick'] = (e) => {
+	const handleMenuClick: MenuProps['onClick'] = async (e) => {
 		// Case item is edit
 		if (e.key === 'edit') {
 			props.handleEdit(item);
 			return;
 		}
 		// Case item is delete
+		await handleDeleteFile(props.item.metadata.thumbnail as any);
 		props.handleDelete(item.id as any);
 	};
 

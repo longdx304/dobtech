@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 import { Col, Form, MenuProps, Row } from 'antd';
 import { Trash2 } from 'lucide-react';
@@ -50,10 +51,9 @@ const ThumbnailForm: FC<Props> = ({ form }) => {
 				</Form.Item>
 			</Col>
 			<Col span={24}>
-				{thumbnail?.length > 0 && (
+				{Array.isArray(thumbnail) && thumbnail?.length > 0 ? (
 					<div className="mt-large">
 						<h2 className="inter-large-semibold mb-small">Upload</h2>
-
 						<div className="gap-y-2xsmall flex flex-col">
 							{thumbnail.map((field: any, index: number) => {
 								return (
@@ -68,7 +68,19 @@ const ThumbnailForm: FC<Props> = ({ form }) => {
 							})}
 						</div>
 					</div>
-				)}
+				) : typeof thumbnail === 'string' && thumbnail ? (
+					<div className="mt-large">
+						<h2 className="inter-large-semibold mb-small">Uploaded Image</h2>
+						<div className="gap-y-2xsmall flex flex-col">
+							<Image
+								// eslint-disable-next-line jsx-a11y/alt-text
+								image={{ url: thumbnail, name: 'Thumbnail' }}
+								index={0}
+								remove={removeImage}
+							/>
+						</div>
+					</div>
+				) : null}
 			</Col>
 		</Row>
 	);

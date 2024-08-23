@@ -11,6 +11,7 @@ interface Props {
 }
 
 const Thumbnail: FC<Props> = ({ thumbnail, size, className }) => {
+
 	return (
 		<div
 			className={cn(

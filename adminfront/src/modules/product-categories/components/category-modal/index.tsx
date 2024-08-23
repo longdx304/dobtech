@@ -1,27 +1,26 @@
 'use client';
 
-import {
-	AdminPostProductCategoriesReq,
-	ProductCategory,
-} from '@medusajs/medusa';
-import { App, Col, Form, Row, message, type FormProps } from 'antd';
-import _ from 'lodash';
-import { Highlighter, CircleAlert } from 'lucide-react';
-import React, { useEffect } from 'react';
-import {
-	useAdminCreateProductCategory,
-	useAdminUpdateProductCategory,
-} from 'medusa-react';
-
-// import { createCategory, updateCategory } from '@/actions/productCategories';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { Input, TextArea } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
 import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
-import { TCategoryRequest } from '@/types/productCategories';
-import { useMemo } from 'react';
+import { ProductCategory } from '@medusajs/medusa';
+import { Col, Form, message, Row, type FormProps } from 'antd';
+import _ from 'lodash';
+import { CircleAlert, Highlighter } from 'lucide-react';
+import {
+	useAdminCreateProductCategory,
+	useAdminUpdateProductCategory,
+} from 'medusa-react';
+import React, { useEffect } from 'react';
+// import { TCategoryRequest } from '@/types/productCategories';
+import { deleteImages, prepareImages } from '@/actions/images';
 import { getErrorMessage } from '@/lib/utils';
+import { ThumbnailForm } from '@/modules/products/components/products-modal/components';
+import { FormImage } from '@/types/common';
+import { ThumbnailFormType } from '@/types/products';
+import { useMemo } from 'react';
 
 interface Props {
 	stateModal: boolean;
@@ -32,6 +31,17 @@ interface Props {
 	categories: ProductCategory[];
 	refetch: () => void;
 }
+
+type ExtendedProductCategory = ProductCategory & {
+	thumbnail: ThumbnailFormType;
+};
+
+type TCategoryRequest = Partial<ExtendedProductCategory>;
+
+type TCategoryRequestWithThumbnail = TCategoryRequest & {
+	thumbnail: ThumbnailFormType;
+};
+
 const CategoryModal: React.FC<Props> = ({
 	stateModal,
 	handleOk,
@@ -44,7 +54,6 @@ const CategoryModal: React.FC<Props> = ({
 	const createCategory = useAdminCreateProductCategory();
 	const updateCategory = useAdminUpdateProductCategory(category?.id ?? '');
 	const [form] = Form.useForm();
-	// const { message } = App.useApp();
 
 	const titleModal = `${
 		_.isEmpty(category) ? 'Thêm mới' : 'Cập nhật'
@@ -58,6 +67,7 @@ const CategoryModal: React.FC<Props> = ({
 				description: category?.description ?? '',
 				is_active: category?.is_active ?? true,
 				is_internal: category?.is_internal ?? false,
+				thumbnail: category?.metadata?.thumbnail || null,
 			});
 	}, [category, form]);
 
@@ -98,15 +108,38 @@ const CategoryModal: React.FC<Props> = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [parentCategory, categories]);
 
+	const handleDeleteFile = async (url: string) => {
+		await deleteImages(url);
+	};
 	// Submit form
-	const onFinish: FormProps<TCategoryRequest>['onFinish'] = async (values) => {
-		// Create user
+	const onFinish: FormProps<TCategoryRequestWithThumbnail>['onFinish'] = async (
+		values
+	) => {
+		// Upload the thumbnail image if it exists
+		let preppedImages: FormImage[] = [];
+		if (values.thumbnail && values.thumbnail.length > 0) {
+			try {
+				preppedImages = await prepareImages(values.thumbnail, []);
+			} catch (error) {
+				message.error('Đã xảy ra lỗi khi tải hình ảnh lên.');
+				return;
+			}
+		}
+
+		// The payload with the thumbnail image in metadata
+		const payload: Record<string, unknown> = {
+			...values,
+			parent_category_id: category
+				? category.parent_category_id
+				: parentCategory?.id ?? null,
+			metadata: {
+				...(category?.metadata || {}),
+				thumbnail: preppedImages.length > 0 ? preppedImages[0].url : '',
+			},
+		};
+
+		delete payload.thumbnail;
 		if (_.isEmpty(category)) {
-			const payload: Record<string, unknown> = {
-				...values,
-				parent_category_id: parentCategory?.id ?? null,
-			};
-			// const result = await createCategory(payload);
 			await createCategory.mutateAsync(payload as any, {
 				onSuccess: () => {
 					message.success('Đăng ký danh mục sản phẩm thành công');
@@ -121,10 +154,13 @@ const CategoryModal: React.FC<Props> = ({
 			});
 		} else {
 			// Update user
-			// const result = await updateCategory(category.id, values);
-			updateCategory.mutateAsync(values as any, {
+			await updateCategory.mutateAsync(payload as any, {
 				onSuccess: () => {
+					if (!!category?.metadata?.thumbnail) {
+						handleDeleteFile(category?.metadata?.thumbnail as string);
+					}
 					message.success('Cập nhật danh mục sản phẩm thành công');
+					refetch();
 					handleCancel();
 				},
 				onError: (error: any) => {
@@ -197,6 +233,10 @@ const CategoryModal: React.FC<Props> = ({
 							/>
 						</Form.Item>
 					</Col>
+					<Col span={24}>
+						<ThumbnailForm form={form} />
+					</Col>
+
 					<Col span={24}>
 						<Form.Item
 							labelCol={{ span: 24 }}

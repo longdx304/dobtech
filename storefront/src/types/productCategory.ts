@@ -4,6 +4,7 @@ export type TTreeCategories = {
 	id: string;
 	label: string;
 	key: string;
+  metadata?: Record<string, string>;
 	children?: TTreeCategories[];
 };
 

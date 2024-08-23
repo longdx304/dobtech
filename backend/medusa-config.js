@@ -22,15 +22,16 @@ try {
 } catch (e) {}
 
 // CORS when consuming Medusa from admin
-const ADMIN_CORS =
-  process.env.ADMIN_CORS ||
-  '/.+/';
+const ADMIN_CORS = process.env.ADMIN_CORS || '/.+/';
 
 // CORS to avoid issues when consuming Medusa from a client
 const STORE_CORS = process.env.STORE_CORS || 'http://localhost:8000';
 
 const DATABASE_URL =
   process.env.DATABASE_URL || 'postgres://localhost/medusa-starter-default';
+
+const TEST_DATABASE_URL =
+  process.env.TEST_DATABASE_URL || 'postgres://localhost/medusa-test';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
@@ -54,6 +55,12 @@ const plugins = [
       cache_control: process.env.S3_CACHE_CONTROL,
       // optional
       download_file_duration: process.env.S3_DOWNLOAD_FILE_DURATION,
+    },
+  },
+  {
+    resolve: `medusa-plugin-categories`,
+    options: {
+      enableUI: true,
     },
   },
 ];
@@ -80,6 +87,7 @@ const projectConfig = {
   cookieSecret: process.env.COOKIE_SECRET,
   store_cors: STORE_CORS,
   database_url: DATABASE_URL,
+  // database_url: TEST_DATABASE_URL,
   admin_cors: ADMIN_CORS,
   redis_url: REDIS_URL,
 };

@@ -1,7 +1,6 @@
 'use client';
-import { useCart } from '@/lib/providers/cart/cart-provider';
 import Image from 'next/image';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -12,13 +11,6 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 const ProductBanner = () => {
-	const { refreshCart } = useCart();
-
-	useEffect(() => {
-		refreshCart();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
 	const slides = useMemo(() => {
 		return [...Array(3)].map((_, index) => (
 			<SwiperSlide key={index} className="aspect-[16/9] lg:aspect-[20/9]">
