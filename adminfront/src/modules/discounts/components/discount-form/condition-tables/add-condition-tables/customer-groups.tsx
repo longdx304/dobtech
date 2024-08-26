@@ -66,7 +66,7 @@ const CustomerGroupConditionSelector = ({
 			<ConditionOperator value={operator} onChange={setOperator} />
 			<SelectableTable
 				data={customer_groups as CustomerGroup[]}
-				selectedRowKeys={selectedRowKeys}
+				selectedRowKeys={selectedRowKeys as string[]}
 				handleSearchDebounce={handleSearchDebounce}
 				handleRowSelectionChange={handleRowSelectionChange}
 				count={count}

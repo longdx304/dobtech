@@ -39,6 +39,7 @@ const General: FC<GeneralProps> = ({ discount }) => {
 				setFixedRegionCurrency(reg.currency.symbol);
 			}
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [type, opts, regions]);
 
 	const regionOptions = useMemo(() => {

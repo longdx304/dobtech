@@ -17,6 +17,7 @@ import { useMemo } from 'react';
 import useOrdersExpandParam from '../components/orders/utils/use-admin-expand-parameter';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
+import _ from 'lodash';
 
 export interface TimelineEvent {
 	id: string;
@@ -349,8 +350,9 @@ export const useBuildTimeline = (orderId: string) => {
 		}
 
 		for (const payment of order.payments) {
-			if (payment?.data?.paid?.length) {
-				for (const paid of payment.data.paid) {
+			const paidData = payment.data?.paid;
+			if (_.isArray(paidData) && paidData.length > 0) {
+				for (const paid of paidData) {
 					events.push({
 						id: `${payment.created_at}-paid`,
 						time: paid.created_at,

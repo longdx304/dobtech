@@ -141,7 +141,7 @@ const Payment = ({ order, isLoading, refetch }: Props) => {
 									<div className="font-normal text-gray-900 mr-3">
 										-
 										{formatAmountWithSymbol({
-											amount: payment.amount_refunded,
+											amount: payment.amount_refunded as number,
 											currency: order.currency_code,
 										})}
 									</div>
@@ -161,7 +161,7 @@ const Payment = ({ order, isLoading, refetch }: Props) => {
 									<div className="flex">
 										<div className="font-semibold text-gray-900 mr-3">
 											{formatAmountWithSymbol({
-												amount: payment?.data?.paid_total ?? 0,
+												amount: (payment?.data?.paid_total as number) ?? 0,
 												currency: order.currency_code,
 											})}
 										</div>
@@ -178,7 +178,8 @@ const Payment = ({ order, isLoading, refetch }: Props) => {
 										<div className="font-semibold text-gray-900 mr-3">
 											{formatAmountWithSymbol({
 												amount:
-													payment?.amount - (payment?.data?.paid_total ?? 0),
+													(payment?.amount as number) -
+													((payment?.data?.paid_total as number) ?? 0),
 												currency: order.currency_code,
 											})}
 										</div>

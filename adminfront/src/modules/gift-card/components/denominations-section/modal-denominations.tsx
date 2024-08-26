@@ -118,6 +118,7 @@ const ModalDenomination = ({
 				setShowOtherCurrencies(true);
 			}
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [defaultValues]);
 
 	const footer = useMemo(

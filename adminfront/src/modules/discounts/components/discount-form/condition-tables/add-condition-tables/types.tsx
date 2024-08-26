@@ -64,7 +64,7 @@ const TypeConditionSelector = ({ isEdit = false }: ConditionSelectorProps) => {
 			<ConditionOperator value={operator} onChange={setOperator} />
 			<SelectableTable
 				data={product_tags as ProductTag[]}
-				selectedRowKeys={selectedRowKeys}
+				selectedRowKeys={selectedRowKeys as string[]}
 				handleSearchDebounce={handleSearchDebounce}
 				handleRowSelectionChange={handleRowSelectionChange}
 				count={count}

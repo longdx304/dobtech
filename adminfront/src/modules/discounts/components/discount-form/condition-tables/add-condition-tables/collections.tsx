@@ -66,7 +66,7 @@ const CollectionConditionSelector = ({
 			<ConditionOperator value={operator} onChange={setOperator} />
 			<SelectableTable
 				data={collections as ProductCollection[]}
-				selectedRowKeys={selectedRowKeys}
+				selectedRowKeys={selectedRowKeys as string[]}
 				handleSearchDebounce={handleSearchDebounce}
 				handleRowSelectionChange={handleRowSelectionChange}
 				count={count}

@@ -44,7 +44,7 @@ const CaptureModal = ({
 		return (
 			payment.amount -
 			payment.amount_refunded -
-			(payment?.data?.paid_total ?? 0)
+			((payment?.data?.paid_total as number) ?? 0)
 		);
 	}, [payment]);
 
