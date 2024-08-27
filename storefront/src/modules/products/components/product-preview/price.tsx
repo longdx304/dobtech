@@ -54,7 +54,6 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 		setRegion(region);
 		setIsLoading(false);
 		onOpen();
-		return;
 	};
 
 	const handleClickCartMobile = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -69,7 +68,6 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 		setRegion(region);
 		setIsLoading(false);
 		onOpenDrawer();
-		return;
 	};
 
 	const handleModalClose = () => {
@@ -78,11 +76,14 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 
 	const { refreshCart } = useCart();
 
-	// Refresh cart for persistent cart different devices
+	// Refresh cart for persistent cart on different devices
 	useEffect(() => {
 		refreshCart();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	// Format price
+	const formatPrice = (price: string) => (price.includes('NaN') ? '-' : price);
 
 	return (
 		<Flex vertical>
@@ -90,7 +91,7 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 				{price.price_type === 'sale' ? (
 					<Flex align="center">
 						<Text className="text-[16px] font-semibold text-[#FA6338]">
-							{price.calculated_price_incl_tax}
+							{formatPrice(price.calculated_price_incl_tax as string)}
 						</Text>
 						<Text className="text-[10px] font-normal border-[#FFD9CE] border-[1px] border-solid text-[#FA6338] px-[3px] py-[2px] ml-2">
 							-{price.percentage_diff}%
@@ -98,7 +99,7 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 					</Flex>
 				) : (
 					<Text className="text-[16px] font-semibold">
-						{price.original_price_incl_tax}
+						{formatPrice(price.original_price_incl_tax as string)}
 					</Text>
 				)}
 
@@ -114,7 +115,7 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 						)
 					}
 					className="h-[24px] w-[38px] rounded-[20px] border-black/40 hidden md:flex"
-					arial-label='Open cart option'
+					aria-label='Open cart option'
 				/>
 				<Button
 					type="default"

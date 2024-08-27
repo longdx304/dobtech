@@ -38,6 +38,8 @@ export default function ProductPrice({
 		return <span className={cn('text-xl font-bold')}>-</span>;
 	}
 
+	const formatPrice = (price: string) => (price.includes('NaN') ? '-' : price);
+	
 	return (
 		<div className="bg-white">
 			<div
@@ -51,7 +53,7 @@ export default function ProductPrice({
 						'text-[#FA6338]': selectedPrice.price_type === 'sale',
 					})}
 				>
-					{selectedPrice.calculated_price_incl_tax}
+					{formatPrice(selectedPrice.calculated_price_incl_tax)}
 				</span>
 				{selectedPrice.price_type === 'sale' && (
 					<div className="flex items-center text-xs">
@@ -66,7 +68,7 @@ export default function ProductPrice({
 							data-testid="original-product-price"
 							data-value={selectedPrice.calculated_price_incl_tax}
 						>
-							{selectedPrice.original_price_incl_tax}
+							{formatPrice(selectedPrice.original_price_incl_tax)}
 						</span>
 					</div>
 				)}

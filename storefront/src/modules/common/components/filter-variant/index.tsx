@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { useState } from 'react';

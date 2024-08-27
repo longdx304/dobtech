@@ -1,7 +1,7 @@
 'use client';
 import { Pagination as AntPagination } from '@/components/Pagination';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 interface PaginationProps {
 	total: number;
@@ -25,13 +25,15 @@ const Pagination: React.FC<PaginationProps> = ({
 	};
 
 	return (
-		<AntPagination
-			current={currentPage}
-			total={total}
-			pageSize={pageSize}
-			onChange={handlePageChange}
-			className="pt-4"
-		/>
+		<Suspense>
+			<AntPagination
+				current={currentPage}
+				total={total}
+				pageSize={pageSize}
+				onChange={handlePageChange}
+				className="pt-4"
+			/>
+		</Suspense>
 	);
 };
 

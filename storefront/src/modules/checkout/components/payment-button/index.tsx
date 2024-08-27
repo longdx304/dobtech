@@ -8,7 +8,7 @@ import { ERoutes } from '@/types/routes';
 import { Cart } from '@medusajs/medusa';
 import { intersection } from 'lodash-es';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { placeOrder, removeGuestCart } from '../../actions';
 
 type Props = {
@@ -103,7 +103,7 @@ const PaymentButton = ({ data }: Props) => {
 	};
 
 	return (
-		<>
+		<Suspense>
 			<Button
 				type="primary"
 				block
@@ -117,7 +117,7 @@ const PaymentButton = ({ data }: Props) => {
 				error={errorMessage}
 				data-testid="manual-payment-error-message"
 			/>
-		</>
+		</Suspense>
 	);
 };
 

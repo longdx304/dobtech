@@ -54,24 +54,7 @@ const nextConfig = withStoreConfig({
 	images: {
 		unoptimized: true,
 		formats: ['image/avif', 'image/webp'],
-		domains: ['dob-ecommerce.s3.ap-southeast-1.amazonaws.com'],
 		remotePatterns: [
-			{
-				protocol: 'http',
-				hostname: 'localhost',
-			},
-			{
-				protocol: 'https',
-				hostname: 'medusa-public-images.s3.eu-west-1.amazonaws.com',
-			},
-			{
-				protocol: 'https',
-				hostname: 'medusa-server-testing.s3.amazonaws.com',
-			},
-			{
-				protocol: 'https',
-				hostname: 'medusa-server-testing.s3.us-east-1.amazonaws.com',
-			},
 			{
 				protocol: 'https',
 				hostname: 'dob-ecommerce.s3.ap-southeast-1.amazonaws.com',

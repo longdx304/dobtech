@@ -1,4 +1,5 @@
 'use client';
+
 import { cn } from '@/lib/utils';
 import { Flex } from '@/components/Flex';
 import { Image } from '@/components/Image';

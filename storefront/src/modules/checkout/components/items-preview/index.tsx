@@ -10,7 +10,7 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 // Import Swiper core styles
-import 'swiper/css/bundle';
+import 'swiper/css';
 import 'swiper/css/navigation';
 
 type Props = {

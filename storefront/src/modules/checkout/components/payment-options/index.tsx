@@ -6,7 +6,7 @@ import { Text } from '@/components/Typography';
 import { Cart, PaymentSession } from '@medusajs/medusa';
 import { RadioChangeEvent } from 'antd';
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { setPaymentMethod } from '../../actions';
 import { Loader } from 'lucide-react';
 import { paymentInfoMap } from '@/lib/constants';
@@ -51,34 +51,38 @@ const PaymentOptions = ({ cart }: Props) => {
 	};
 
 	return (
-		<Card>
-			<Text className="text-xl" strong>
-				Phương thức thanh toán
-			</Text>
-			<RadioGroup
-				className="w-full flex flex-col justify-start gap-4 pt-4"
-				value={value}
-				onChange={onChange}
-			>
-				{cart?.payment_sessions?.map((option: PaymentSession) => (
-					<Radio
-						key={option.id}
-						value={option.provider_id}
-						className="border border-solid border-gray-200 rounded-md px-4 py-2"
-					>
-						<Flex vertical justify="flex-start" align="flex-start" gap={2}>
-							<Flex justify="flex-start" align="center" gap={4}>
-								<Text className="text-[13px]" strong>
-									{paymentInfoMap[option.provider_id]?.title ||
-										option.provider_id}
-								</Text>
+		<Suspense>
+			<Card>
+				<Text className="text-xl" strong>
+					Phương thức thanh toán
+				</Text>
+				<RadioGroup
+					className="w-full flex flex-col justify-start gap-4 pt-4"
+					value={value}
+					onChange={onChange}
+				>
+					{cart?.payment_sessions?.map((option: PaymentSession) => (
+						<Radio
+							key={option.id}
+							value={option.provider_id}
+							className="border border-solid border-gray-200 rounded-md px-4 py-2"
+						>
+							<Flex vertical justify="flex-start" align="flex-start" gap={2}>
+								<Flex justify="flex-start" align="center" gap={4}>
+									<Text className="text-[13px]" strong>
+										{paymentInfoMap[option.provider_id]?.title ||
+											option.provider_id}
+									</Text>
+								</Flex>
+								{isLoading ? (
+									<Loader className="animate-spin" size={12} />
+								) : null}
 							</Flex>
-							{isLoading ? <Loader className="animate-spin" size={12} /> : null}
-						</Flex>
-					</Radio>
-				))}
-			</RadioGroup>
-		</Card>
+						</Radio>
+					))}
+				</RadioGroup>
+			</Card>
+		</Suspense>
 	);
 };
 

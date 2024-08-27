@@ -1,4 +1,5 @@
 'use client';
+
 import Image from 'next/image';
 import { useMemo } from 'react';
 
@@ -6,7 +7,7 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 // Import Swiper styles
-import 'swiper/css/bundle';
+import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 

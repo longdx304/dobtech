@@ -8,7 +8,7 @@ import { Region } from '@medusajs/medusa';
 import { PricedShippingOption } from '@medusajs/medusa/dist/types/pricing';
 import { RadioChangeEvent } from 'antd';
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { setShippingMethod } from '../../actions';
 import { Loader } from 'lucide-react';
 
@@ -65,44 +65,46 @@ const ShippingOptions = ({ region, availableShippingMethods }: Props) => {
 	};
 
 	return (
-		<Card>
-			<Text className="text-xl" strong>
-				Tuỳ chọn giao hàng
-			</Text>
-			<RadioGroup
-				className="w-full flex flex-col justify-start gap-4 pt-4"
-				value={value}
-				onChange={onChange}
-			>
-				{availableShippingMethods?.map((option) => (
-					<Radio
-						key={option.id}
-						value={option.id}
-						className="border border-solid border-gray-200 rounded-md px-4 py-2"
-					>
-						<Flex vertical justify="flex-start" align="flex-start" gap={2}>
-							<Flex justify="flex-start" align="center" gap={4}>
-								<Text className="text-[13px]" strong>
-									{option.name}
-								</Text>
-								{option?.amount === 0 && (
-									<Text className="text-xs text-green-800 bg-green-50 px-2 py-[2px]">
-										{'Miễn phí vận chuyển'}
+		<Suspense>
+			<Card>
+				<Text className="text-xl" strong>
+					Tuỳ chọn giao hàng
+				</Text>
+				<RadioGroup
+					className="w-full flex flex-col justify-start gap-4 pt-4"
+					value={value}
+					onChange={onChange}
+				>
+					{availableShippingMethods?.map((option) => (
+						<Radio
+							key={option.id}
+							value={option.id}
+							className="border border-solid border-gray-200 rounded-md px-4 py-2"
+						>
+							<Flex vertical justify="flex-start" align="flex-start" gap={2}>
+								<Flex justify="flex-start" align="center" gap={4}>
+									<Text className="text-[13px]" strong>
+										{option.name}
+									</Text>
+									{option?.amount === 0 && (
+										<Text className="text-xs text-green-800 bg-green-50 px-2 py-[2px]">
+											{'Miễn phí vận chuyển'}
+										</Text>
+									)}
+								</Flex>
+								{isLoading ? (
+									<Loader className="animate-spin" size={12} />
+								) : (
+									<Text className="text-xs" strong>
+										{getAmount(option.amount)}
 									</Text>
 								)}
 							</Flex>
-							{isLoading ? (
-								<Loader className="animate-spin" size={12} />
-							) : (
-								<Text className="text-xs" strong>
-									{getAmount(option.amount)}
-								</Text>
-							)}
-						</Flex>
-					</Radio>
-				))}
-			</RadioGroup>
-		</Card>
+						</Radio>
+					))}
+				</RadioGroup>
+			</Card>
+		</Suspense>
 	);
 };
 
