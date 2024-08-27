@@ -4,26 +4,15 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useProduct } from '@/lib/providers/product/product-provider';
-import dynamic from 'next/dynamic';
 
+import DrawPriceProduct from '@/modules/products/templates/menu-product-detail/DrawPriceProduct';
+import ProductTemplateModal from '@/modules/products/templates/product-template-modal';
 import { Region } from '@medusajs/medusa';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
 import { LoaderCircle } from 'lucide-react';
-import { FC, MouseEvent, useEffect, useState } from 'react';
+import { FC, MouseEvent, useState } from 'react';
 import { PriceType } from '../product-actions';
 import CartIcon from './CartIcon';
-import { useCart } from '@/lib/providers/cart/cart-provider';
-
-const ProductTemplateModal = dynamic(
-	() => import('@/modules/products/templates/product-template-modal'),
-	{ ssr: false }
-);
-
-const DrawPriceProduct = dynamic(
-	() =>
-		import('@/modules/products/templates/menu-product-detail/DrawPriceProduct'),
-	{ ssr: false }
-);
 
 interface Props {
 	price: PriceType;
@@ -74,14 +63,6 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 		onClose();
 	};
 
-	const { refreshCart } = useCart();
-
-	// Refresh cart for persistent cart on different devices
-	useEffect(() => {
-		refreshCart();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
 	// Format price
 	const formatPrice = (price: string) => (price.includes('NaN') ? '-' : price);
 
@@ -115,7 +96,7 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 						)
 					}
 					className="h-[24px] w-[38px] rounded-[20px] border-black/40 hidden md:flex"
-					aria-label='Open cart option'
+					aria-label="Open cart option"
 				/>
 				<Button
 					type="default"
@@ -129,7 +110,7 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 						)
 					}
 					className="h-[24px] w-[38px] rounded-[20px] border-black/40 flex md:hidden"
-					aria-label='Open cart drawer'
+					aria-label="Open cart drawer"
 				/>
 			</Flex>
 			<ProductTemplateModal

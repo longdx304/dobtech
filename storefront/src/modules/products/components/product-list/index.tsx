@@ -2,13 +2,9 @@ import { getProductsList } from '@/actions/products';
 import { getRegion } from '@/actions/region';
 import { ProductProvider } from '@/lib/providers/product/product-provider';
 import { VariantImagesProvider } from '@/lib/providers/product/variant-images-provider';
-import dynamic from 'next/dynamic';
 import { FC } from 'react';
+import ProductPreview from '../product-preview';
 import Pagination from './pagination';
-
-const ProductPreview = dynamic(
-	() => import('@/modules/products/components/product-preview')
-);
 
 interface ProductListProps {
 	page?: number;
@@ -43,13 +39,11 @@ const ProductList: FC<ProductListProps> = async ({ page = 1 }) => {
 						</div>
 					)}
 
-					{!!page && (
-						<Pagination
-							total={data.count}
-							currentPage={page || 1}
-							pageSize={PAGE_SIZE}
-						/>
-					)}
+					<Pagination
+						total={data.count}
+						currentPage={page || 1}
+						pageSize={PAGE_SIZE}
+					/>
 				</div>
 			</VariantImagesProvider>
 		</ProductProvider>

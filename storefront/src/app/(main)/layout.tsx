@@ -7,10 +7,13 @@ import { RegionProvider } from '@/lib/providers/region-provider';
 import { CustomerProvider } from '@/lib/providers/user/user-provider';
 import { TTreeCategories } from '@/types/productCategory';
 import type { Metadata } from 'next';
-import { cache } from 'react';
+import { cache, Suspense } from 'react';
 import '../../app/globals.css';
 
+import StyleComponentsRegistry from '@/lib/providers/antd-provider';
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 import dynamic from 'next/dynamic';
+import HomepageSkeleton from './skeleton';
 
 const Header = dynamic(() => import('@/modules/common/components/header'));
 const Menu = dynamic(() => import('@/modules/common/components/menu'));
@@ -59,16 +62,22 @@ export default async function PageLayout({
 	const customer = await getCustomer();
 
 	return (
-		<MedusaProvider>
-			<RegionProvider regionData={region!}>
-				<CustomerProvider initialCustomer={customer}>
-					<CartProvider>
-						<Header categories={formatCategories} />
-						<Menu categories={formatCategories} />
-						<main>{children}</main>
-					</CartProvider>
-				</CustomerProvider>
-			</RegionProvider>
-		</MedusaProvider>
+		<AntdRegistry>
+			<StyleComponentsRegistry>
+				<MedusaProvider>
+					<RegionProvider regionData={region!}>
+						<CustomerProvider initialCustomer={customer}>
+							<CartProvider>
+								<Header categories={formatCategories} />
+								<Menu categories={formatCategories} />
+								<Suspense fallback={<HomepageSkeleton />}>
+									<main>{children}</main>
+								</Suspense>
+							</CartProvider>
+						</CustomerProvider>
+					</RegionProvider>
+				</MedusaProvider>
+			</StyleComponentsRegistry>
+		</AntdRegistry>
 	);
 }
