@@ -1,12 +1,6 @@
-import { Suspense, lazy } from 'react';
+import ProductList from '@/modules/products/components/product-list';
+import { Suspense } from 'react';
 import HomepageSkeleton from './skeleton';
-
-// const ProductBanner = lazy(
-// 	() => import('@/modules/products/components/product-banner')
-// );
-const ProductList = lazy(
-	() => import('@/modules/products/components/product-list')
-);
 
 interface Props {
 	searchParams: {
