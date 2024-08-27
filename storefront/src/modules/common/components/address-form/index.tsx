@@ -12,7 +12,7 @@ import {
 import { Region } from '@/types/medusa';
 import { Address, Customer } from '@medusajs/medusa';
 import { Form, FormProps, message } from 'antd';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 

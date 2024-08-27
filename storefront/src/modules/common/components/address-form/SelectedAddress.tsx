@@ -5,7 +5,7 @@ import SearchInput from '@/components/Input/SearchInput';
 import { Tabs } from '@/components/Tabs';
 
 import useAddressData from '@/lib/hooks/use-address-data';
-import debounce from 'lodash/debounce';
+import { debounce } from 'lodash-es';
 import { Check } from 'lucide-react';
 
 type Province = {

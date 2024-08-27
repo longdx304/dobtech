@@ -12,7 +12,7 @@ import { getCustomer, updateCustomer } from '@/actions/customer';
 import { getProductsById } from '@/actions/products';
 import { getRegion } from '@/actions/region';
 import { LineItem } from '@medusajs/medusa';
-import omit from 'lodash/omit';
+import { omit } from 'lodash-es';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { updateCartMetadata } from '../checkout/actions';

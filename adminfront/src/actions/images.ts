@@ -1,5 +1,4 @@
 import Medusa from '@/services/api';
-import _ from 'lodash';
 import { FormImage } from '@/types/common';
 
 const splitImages = (

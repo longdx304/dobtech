@@ -2,7 +2,7 @@ import { MoneyAmount } from '@medusajs/medusa';
 
 import { Region, Variant } from '@/types/medusa';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { ProductVariantInfo, RegionInfo } from '@/types/product';
 import { noDivisionCurrencies } from '@/lib/constants';
 

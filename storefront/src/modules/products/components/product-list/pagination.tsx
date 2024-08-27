@@ -1,7 +1,7 @@
 'use client';
-import React from 'react';
 import { Pagination as AntPagination } from '@/components/Pagination';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import React from 'react';
 
 interface PaginationProps {
 	total: number;

@@ -1,7 +1,6 @@
 'use client';
 import { User } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
-import _ from 'lodash';
 import { CircleAlert, Plus, Search } from 'lucide-react';
 import { useAdminDeleteUser } from 'medusa-react';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -17,6 +16,7 @@ import { UserModal } from '@/modules/account/components/account-modal';
 import { IAdminResponse } from '@/types/account';
 import { useAdminUsers } from 'medusa-react';
 import accountColumns from './account-column';
+import debounce from 'lodash/debounce';
 
 interface Props {}
 
@@ -94,7 +94,7 @@ const AccountList = ({}: Props) => {
 		[users]
 	);
 
-	const handleChangeDebounce = _.debounce(
+	const handleChangeDebounce = debounce(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			const { value: inputValue } = e.target;
 

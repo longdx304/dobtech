@@ -12,9 +12,16 @@ type Props = {
 	customer: Omit<Customer, 'password_hash'> | null;
 };
 const CartPreview = ({ cart, customer }: Props) => {
-	const { currentStep, refreshCart, setCurrentStep, isProcessing } = useCart();
+	const {
+		currentStep,
+		refreshCart,
+		setCurrentStep,
+		isProcessing,
+		refreshAllCarts,
+	} = useCart();
 
 	useEffect(() => {
+		refreshAllCarts();
 		setCurrentStep(0);
 		refreshCart();
 		// eslint-disable-next-line react-hooks/exhaustive-deps

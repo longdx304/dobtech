@@ -16,13 +16,15 @@ const HeaderWrap: FC<Props> = ({}) => {
 			justify="space-between"
 			align="center"
 		>
-			<div className="items-center">
+			<div className="items-center w-[125px] h-[48px] overflow-hidden">
 				<LocalizedClientLink href="/">
 					<Image
 						src="/images/dob-icon.webp"
 						width={125}
 						height={48}
 						alt="Dob Icon"
+						className='w-full h-full object-contain'
+						priority
 					/>
 				</LocalizedClientLink>
 			</div>

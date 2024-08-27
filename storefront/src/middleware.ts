@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse, userAgent } from 'next/server';
 import { ERoutes } from './types/routes';
 import { BACKEND_URL } from '@/lib/constants';
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from 'lodash-es';
 
 async function getUser(accessToken: string | undefined) {
 	if (accessToken) {
@@ -31,19 +31,19 @@ export async function middleware(request: NextRequest) {
 	const accessToken = request.cookies.get('_chamdep_jwt')?.value;
 	const data = await getUser(accessToken);
 
-  if (device.type === 'mobile') {
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
-  } else {
-    if (!isEmpty(data) && pathname === `/${ERoutes.AUTH}`) {
-      return NextResponse.redirect(new URL(`/${ERoutes.USER}`, request.url));
-    } else if (isEmpty(data) && pathname === `/${ERoutes.USER}`) {
-      return NextResponse.redirect(new URL(`/${ERoutes.AUTH}`, request.url));
-    }
-  }
+	if (device.type === 'mobile') {
+		return NextResponse.next({
+			request: {
+				headers: requestHeaders,
+			},
+		});
+	} else {
+		if (!isEmpty(data) && pathname === `/${ERoutes.AUTH}`) {
+			return NextResponse.redirect(new URL(`/${ERoutes.USER}`, request.url));
+		} else if (isEmpty(data) && pathname === `/${ERoutes.USER}`) {
+			return NextResponse.redirect(new URL(`/${ERoutes.AUTH}`, request.url));
+		}
+	}
 }
 
 export const config = {

@@ -28,7 +28,7 @@ const CartDropdown = ({
 
 	const CartButton = (
 		<BadgeButton
-			icon={<ShoppingCart className="stroke-2" />}
+			icon={<ShoppingCart className="stroke-2" aria-label="Button Cart" />}
 			count={totalItems}
 			showZero
 			offset={[0, 10]}

@@ -2,10 +2,9 @@
 
 // Authentication actions
 import { medusaClient } from '@/lib/database/config';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 
 import { IAdminAuth, IAdminResponse, IUserRequest } from '@/types/account';
 import { TResponse } from '@/types/common';
@@ -21,7 +20,6 @@ export async function getToken(credentials: IAdminAuth) {
 			},
 		})
 		.then(({ access_token }) => {
-			console.log('access_token', access_token);
 			access_token &&
 				cookies().set('_admin_chamdep_jwt', access_token, {
 					maxAge: 60 * 60 * 24 * 7,
@@ -88,7 +86,6 @@ export async function createUser(payload: IUserRequest) {
 	const headers = await getMedusaHeaders(['users']);
 	const { email, fullName, phone, permissions } = payload;
 
-	console.log('payload', payload)
 	return medusaClient.admin.users
 		.create(
 			{
@@ -101,7 +98,7 @@ export async function createUser(payload: IUserRequest) {
 			headers
 		)
 		.then(async (data) => {
-			if (!_.isEmpty(data.user)) {
+			if (!isEmpty(data.user)) {
 				// await setMetadata(user.id, { phone, rolesUser });
 				revalidateTag('users');
 				return data.user;
@@ -126,7 +123,7 @@ export async function updateUser(userId: string, payload: IUserRequest) {
 			headers
 		)
 		.then(async ({ user }) => {
-			if (!_.isEmpty(user)) {
+			if (!isEmpty(user)) {
 				// await setMetadata(user.id, { phone, rolesUser });
 				revalidateTag('users');
 				return user;

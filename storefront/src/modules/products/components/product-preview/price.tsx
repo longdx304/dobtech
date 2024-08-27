@@ -114,6 +114,7 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 						)
 					}
 					className="h-[24px] w-[38px] rounded-[20px] border-black/40 hidden md:flex"
+					arial-label='Open cart option'
 				/>
 				<Button
 					type="default"
@@ -127,6 +128,7 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 						)
 					}
 					className="h-[24px] w-[38px] rounded-[20px] border-black/40 flex md:hidden"
+					aria-label='Open cart drawer'
 				/>
 			</Flex>
 			<ProductTemplateModal

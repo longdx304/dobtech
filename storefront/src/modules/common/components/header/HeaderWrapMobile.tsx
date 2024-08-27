@@ -20,12 +20,14 @@ const HeaderWrapMobile: FC<Props> = ({ categories }) => {
 				<LeftHeader categories={categories} />
 			</div>
 			<div className="absolute z-11 w-full flex justify-center items-center">
-				<LocalizedClientLink href="/" className="h-[42px]">
+				<LocalizedClientLink href="/" className="w-[100px] h-[42px] overflow-hidden">
 					<Image
 						src="/images/dob-icon.webp"
 						width={100}
 						height={42}
 						alt="Dob Icon"
+						className='w-full h-full object-contain'
+						priority
 					/>
 				</LocalizedClientLink>
 			</div>

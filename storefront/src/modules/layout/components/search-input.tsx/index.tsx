@@ -6,7 +6,7 @@ import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
 import RecentSearch from '@/modules/search/components/recent-search';
 import SuggestSearch from '@/modules/search/components/suggest-search';
 import { Menu } from 'antd';
-import debounce from 'lodash/debounce';
+import { debounce } from 'lodash-es';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useRef, useState } from 'react';
 

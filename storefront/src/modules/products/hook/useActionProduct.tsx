@@ -1,6 +1,5 @@
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { isEmpty, isEqual } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
 
 type Props = {

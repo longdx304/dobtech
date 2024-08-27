@@ -15,7 +15,7 @@ import {
 	IUserRequest,
 	rolesEmployee,
 } from '@/types/account';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { useAdminCreateUser, useAdminUpdateUser } from 'medusa-react';
 
 interface Props {
@@ -36,7 +36,7 @@ export default function UserModal({
 	const createUser = useAdminCreateUser();
 	const updateUser = useAdminUpdateUser(user?.id ?? '');
 
-	const titleModal = `${_.isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
+	const titleModal = `${isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
 
 	useEffect(() => {
 		form?.setFieldsValue({
@@ -68,7 +68,7 @@ export default function UserModal({
 	// Submit form
 	const onFinish: FormProps<IUserRequest>['onFinish'] = async (values) => {
 		// Create user
-		if (_.isEmpty(user)) {
+		if (isEmpty(user)) {
 			const payload = createPayload(values);
 			createUser.mutateAsync(payload, {
 				onSuccess: () => {
@@ -122,7 +122,7 @@ export default function UserModal({
 					<Input
 						placeholder="Email"
 						prefix={<Mail />}
-						disabled={!_.isEmpty(user)}
+						disabled={!isEmpty(user)}
 						data-testid="email"
 					/>
 				</Form.Item>

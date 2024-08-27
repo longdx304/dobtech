@@ -5,14 +5,13 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import Item from '@/modules/cart/components/item';
 import Thumbnail from '@/modules/products/components/thumbnail';
-import { Cart, LineItem, Region } from '@medusajs/medusa';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Cart, Region } from '@medusajs/medusa';
 import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 // Import Swiper core styles
-import 'swiper/css';
+import 'swiper/css/bundle';
+import 'swiper/css/navigation';
 
 type Props = {
 	cart: Omit<Cart, 'refunded_total' | 'refundable_amount'>;

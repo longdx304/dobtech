@@ -1,5 +1,4 @@
-import isEqual from 'lodash/isEqual';
-import omit from 'lodash/omit';
+import { isEqual, omit } from 'lodash-es';
 
 export default function compareAddresses(address1: any, address2: any) {
   return isEqual(

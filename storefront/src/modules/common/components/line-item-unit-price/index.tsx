@@ -23,14 +23,18 @@ const LineItemUnitPrice = ({
 	const calculatedPriceInclTax = (item.variant as CalculatedVariant)
 		.original_price_incl_tax;
 	const hasReducedPrice = (originalPrice * item.quantity || 0) > item.total!;
+
+	// checkout
 	const reducedPrice = (item.total || 0) / item.quantity!;
+	const unitPrice = item.unit_price;
+	const hasReducedPriceCheckout = reducedPrice < unitPrice;
 
 	return (
 		<Flex
 			vertical
 			justify="center"
 			align="flex-start"
-			className={`w-full ${hasReducedPrice && 'block'}`}
+			className={`w-full ${hasReducedPriceCheckout && 'block'}`}
 		>
 			{type === 'full' && (
 				<>
@@ -79,7 +83,7 @@ const LineItemUnitPrice = ({
 				<>
 					<Text
 						className={`text-[14px] font-semibold text-nowrap pr-1 ${
-							hasReducedPrice
+							hasReducedPriceCheckout
 								? 'text-[#FA6338]'
 								: 'text-black text-center w-full'
 						}`}

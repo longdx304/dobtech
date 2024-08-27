@@ -8,7 +8,7 @@ import SearchInput from '@/components/Input/SearchInput';
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
 import RecentSearch from '@/modules/search/components/recent-search';
 import SuggestSearch from '@/modules/search/components/suggest-search';
-import debounce from 'lodash/debounce';
+import { debounce } from 'lodash-es';
 
 type SearchModalProps = {};
 

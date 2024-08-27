@@ -6,7 +6,6 @@ import { notification } from 'antd';
 
 import { usePolling } from './polling-provider';
 import { queryClient } from '../constants/query-client';
-import _ from 'lodash';
 
 let lastDisplayedNotificationAt = Date.now();
 

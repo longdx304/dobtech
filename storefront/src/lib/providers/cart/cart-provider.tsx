@@ -56,6 +56,7 @@ type CartContextType = {
 	isProcessing: boolean;
 	setIsProcessing: (action: boolean) => void;
 	updateExistingCart: (cartId: string, newItems: LineItem[]) => void;
+	refreshAllCarts: () => Promise<void>;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -193,11 +194,17 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 	const refreshCart = async () => {
 		setIsProcessing(true);
 		try {
-			const [updatedCart, updatedAllCarts] = await Promise.all([
-				fetchCart(),
-				fetchAllCarts(),
-			]);
+			const updatedCart = await fetchCart();
 			setCart(updatedCart);
+		} finally {
+			setIsProcessing(false);
+		}
+	};
+
+	const refreshAllCarts = async () => {
+		setIsProcessing(true);
+		try {
+			const updatedAllCarts = await fetchAllCarts();
 			setAllCarts(updatedAllCarts);
 		} finally {
 			setIsProcessing(false);
@@ -225,6 +232,7 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 				isProcessing,
 				setIsProcessing,
 				updateExistingCart,
+				refreshAllCarts,
 			}}
 		>
 			{children}

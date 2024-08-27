@@ -26,7 +26,11 @@ const analyzerConfig = withBundleAnalyzer({
 const lessConfig = [
 	withLess,
 	{
-		lessLoaderOptions: {},
+		lessLoaderOptions: {
+			lessOptions: {
+				javascriptEnabled: true,
+			},
+		},
 	},
 ];
 
@@ -39,15 +43,18 @@ const nextConfig = withStoreConfig({
 	experimental: {
 		optimizePackageImports: ['lucide-react', 'lodash', 'antd'],
 	},
+	serverExternalPackages: ['playwright'],
 	staticPageGenerationTimeout: 1000,
 	productionBrowserSourceMaps: true,
 	reactStrictMode: true,
 	optimizeFonts: true,
 	compress: true,
 	swcMinify: true,
+	postcss: true,
 	images: {
 		unoptimized: true,
 		formats: ['image/avif', 'image/webp'],
+		domains: ['dob-ecommerce.s3.ap-southeast-1.amazonaws.com'],
 		remotePatterns: [
 			{
 				protocol: 'http',
@@ -76,6 +83,12 @@ const nextConfig = withStoreConfig({
 		if (!dev && !isServer) {
 			config.optimization.usedExports = true;
 		}
+
+		// Add warning suppression for formidable
+		config.ignoreWarnings = [
+			{ module: /node_modules\/formidable\/src\/Formidable\.js/ },
+			{ file: /node_modules\/formidable\/src\/index\.js/ },
+		];
 		return config;
 	},
 });

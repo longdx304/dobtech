@@ -23,14 +23,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({
 	data,
 	type = CartType.CART,
 }) => {
-	const {
-		subtotal,
-		discount_total,
-		gift_card_total,
-		tax_total,
-		shipping_total,
-		total,
-	} = data;
+	const { subtotal, discount_total, tax_total, shipping_total, total } = data;
 
 	const getAmount = (amount: number | null | undefined) => {
 		return formatAmount({
@@ -68,18 +61,16 @@ const CartTotals: React.FC<CartTotalsProps> = ({
 						</div>
 
 						{/* Discount */}
-						{!!discount_total && (
-							<div className="flex items-center justify-between">
-								<Text>Phiếu giảm giá</Text>
-								<Text
-									className="text-red-500"
-									data-testid="order-discount"
-									data-value={discount_total || 0}
-								>
-									- {getAmount(discount_total)}
-								</Text>
-							</div>
-						)}
+						<div className="flex items-center justify-between">
+							<Text>Phiếu giảm giá</Text>
+							<Text
+								className={discount_total ? 'text-green-500' : 'text-black'}
+								data-testid="order-discount"
+								data-value={discount_total || 0}
+							>
+								- {getAmount(discount_total)}
+							</Text>
+						</div>
 
 						{/* Shipping */}
 						<div className="flex items-center justify-between">
@@ -99,20 +90,6 @@ const CartTotals: React.FC<CartTotalsProps> = ({
 								{getAmount(tax_total)}
 							</Text>
 						</div>
-
-						{/* Gift Card */}
-						{!!gift_card_total && (
-							<div className="flex items-center justify-between">
-								<Text>Thẻ quà tặng</Text>
-								<Text
-									className="text-green-500"
-									data-testid="order-gift-card"
-									data-value={gift_card_total || 0}
-								>
-									- {getAmount(gift_card_total)}
-								</Text>
-							</div>
-						)}
 
 						{/* Divider */}
 						<Divider className="my-2 mx-0" />
@@ -178,20 +155,6 @@ const CartTotals: React.FC<CartTotalsProps> = ({
 								{getAmount(tax_total)}
 							</Text>
 						</div>
-
-						{/* Gift Card */}
-						{!!gift_card_total && (
-							<div className="flex items-center justify-between">
-								<Text>Thẻ quà tặng</Text>
-								<Text
-									className="text-green-500"
-									data-testid="order-gift-card"
-									data-value={gift_card_total || 0}
-								>
-									- {getAmount(gift_card_total)}
-								</Text>
-							</div>
-						)}
 
 						{/* Divider */}
 						<Divider className="my-2 mx-0" />

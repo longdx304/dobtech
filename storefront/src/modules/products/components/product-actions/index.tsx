@@ -11,7 +11,7 @@ import { addToCart } from '@/modules/cart/action';
 import ProductInfo from '@/modules/products/components/product-info';
 import useActionProduct from '@/modules/products/hook/useActionProduct';
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { Minus, Plus } from 'lucide-react';
 import OptionSelect from '../option-select';
 

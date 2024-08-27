@@ -4,7 +4,6 @@ import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Text } from '@/components/Typography';
-import { useCart } from '@/lib/providers/cart/cart-provider';
 import { formatAmount } from '@/lib/utils/prices';
 import {
 	removeDiscount,
@@ -25,7 +24,6 @@ type FormDiscountProps = {
 };
 
 const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
-	const { refreshCart } = useCart();
 	const [form] = Form.useForm();
 	const { discounts, gift_cards, region } = cart;
 	const [error, setError] = useState<string | null>(null);
@@ -61,7 +59,6 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
 		try {
 			await submitDiscountForm(values, cart?.id);
 			message.success('Mã giảm giá đã được áp dụng');
-			refreshCart();
 		} catch (error: any) {
 			const errorMessage =
 				error?.response?.data?.message || 'Mã phiếu giảm giá không hợp lệ';

@@ -6,7 +6,7 @@ import { deleteLineItem } from '@/modules/cart/action';
 import ErrorMessage from '@/modules/common/components/error-message';
 import { ERoutes } from '@/types/routes';
 import { Cart } from '@medusajs/medusa';
-import intersection from 'lodash/intersection';
+import { intersection } from 'lodash-es';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { placeOrder, removeGuestCart } from '../../actions';
@@ -61,7 +61,7 @@ const PaymentButton = ({ data }: Props) => {
 			const result = await placeOrder(cartId);
 			if (result.redirect) {
 				// remove guest cart if customer is not logged in but still complete payment
-				!customer && await removeGuestCart();
+				!customer && (await removeGuestCart());
 				router.push(result.url as any);
 			} else {
 				// Handle non-redirect case
