@@ -42,9 +42,7 @@
     "medusa-fulfillment-manual": "latest",
     "medusa-interfaces": "latest",
     "medusa-payment-manual": "latest",
-    "medusa-payment-stripe": "latest",
     "medusa-plugin-categories": "^1.0.6",
-    "medusa-plugin-variant-images": "^1.0.5",
     "prism-react-renderer": "^2.0.4",
     "typeorm": "^0.3.16"
   },
