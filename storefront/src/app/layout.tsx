@@ -1,11 +1,9 @@
 import { cn } from '@/lib/utils';
-import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider } from 'antd';
 import { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import theme from 'theme';
 import Favicon from '/public/images/Metadata/favicon.ico';
-import StyleComponentsRegistry from '@/lib/providers/antd-provider';
 const BASE_URL =
 	process.env.NEXT_PUBLIC_STOREFRONT_URL || 'https://localhost:8000';
 
@@ -26,13 +24,9 @@ export default function RootLayout(props: { children: React.ReactNode }) {
 			</head>
 
 			<body className={cn(font.className, 'w-full')}>
-				<AntdRegistry>
-					<StyleComponentsRegistry>
-						<ConfigProvider theme={theme}>
-							<main className="relative">{props.children}</main>
-						</ConfigProvider>
-					</StyleComponentsRegistry>
-				</AntdRegistry>
+				<ConfigProvider theme={theme}>
+					<main className="relative">{props.children}</main>
+				</ConfigProvider>
 			</body>
 		</html>
 	);

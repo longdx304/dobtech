@@ -13,7 +13,7 @@ export default async function Home({ searchParams }: Props) {
 
 	return (
 		<main className="w-full container box-border pt-[6rem] lg:pt-[8rem]">
-			<Suspense fallback={<HomepageSkeleton />}>
+			<Suspense key={page} fallback={<HomepageSkeleton />}>
 				{/* <ProductBanner /> */}
 				<ProductList page={page} />
 			</Suspense>
