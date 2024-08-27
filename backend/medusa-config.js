@@ -59,9 +59,6 @@ const plugins = [
   },
   {
     resolve: `medusa-plugin-categories`,
-    options: {
-      enableUI: true,
-    },
   },
 ];
 
