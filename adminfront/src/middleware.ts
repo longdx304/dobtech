@@ -7,6 +7,7 @@ import { ERole } from './types/account';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+
 async function getUser(accessToken: string | undefined) {
 	if (accessToken) {
 		return fetch(`${BACKEND_URL}/admin/auth`, {
