@@ -4,7 +4,6 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useProduct } from '@/lib/providers/product/product-provider';
-
 import DrawPriceProduct from '@/modules/products/templates/menu-product-detail/DrawPriceProduct';
 import ProductTemplateModal from '@/modules/products/templates/product-template-modal';
 import { Region } from '@medusajs/medusa';

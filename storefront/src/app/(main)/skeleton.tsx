@@ -19,6 +19,7 @@ export default function HomepageSkeleton() {
 				))}
 			</div>
 		</main>
+
 	);
 }
 

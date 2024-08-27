@@ -1,6 +1,6 @@
+import ProductList from '@/modules/products/components/product-list';
 import { Suspense } from 'react';
 import HomepageSkeleton from './skeleton';
-import ProductList from '@/modules/products/components/product-list';
 
 interface Props {
 	searchParams: {
