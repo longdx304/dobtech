@@ -1,7 +1,7 @@
 'use client';
 import { Product } from '@medusajs/medusa';
 import { Col, Empty, MenuProps, Row } from 'antd';
-import { Pencil } from 'lucide-react';
+import { Images, Pencil } from 'lucide-react';
 import { FC } from 'react';
 
 import { Card } from '@/components/Card';
@@ -11,6 +11,7 @@ import { Image } from '@/components/Image';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import MediaModal from './edit-modals/MediaModal';
+import VariantImgsModal from './edit-modals/VariantImgsModal';
 
 type Props = {
 	product: Product;
@@ -19,17 +20,31 @@ type Props = {
 
 const ImageMedia: FC<Props> = ({ product, loadingProduct }) => {
 	const { state, onOpen, onClose } = useToggleState(false);
+	const {
+		state: stateVariantImgs,
+		onOpen: onOpenVariantImgs,
+		onClose: onCloseVariantImgs,
+	} = useToggleState(false);
 	const actions = [
 		{
 			label: <span className="w-full">Chỉnh sửa</span>,
 			key: 'edit',
 			icon: <Pencil size={20} />,
 		},
+		{
+			label: <span className="w-full">Hình ảnh cho biến thể</span>,
+			key: 'variant-images',
+			icon: <Images size={20} />,
+		},
 	];
 
 	const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
 		if (key === 'edit') {
 			onOpen();
+			return;
+		}
+		if (key === 'variant-images') {
+			onOpenVariantImgs();
 			return;
 		}
 	};
@@ -80,6 +95,12 @@ const ImageMedia: FC<Props> = ({ product, loadingProduct }) => {
 				state={state}
 				handleOk={onClose}
 				handleCancel={onClose}
+				product={product}
+			/>
+			<VariantImgsModal
+				state={stateVariantImgs}
+				handleOk={onCloseVariantImgs}
+				handleCancel={onCloseVariantImgs}
 				product={product}
 			/>
 		</Card>

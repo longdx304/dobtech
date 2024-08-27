@@ -6,7 +6,7 @@
 .pnp.js
 .yarn/install-state.gz
 package-lock.json
-
+yarn.lock
 # testing
 /coverage
 
@@ -37,11 +37,28 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+.yarn
+.swc
+dump.rdb
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth
 
 # Auto Generated PWA files
 **/public/sw.js
 **/public/workbox-*.js
 **/public/worker-*.js
+**/public/fallback-*.js
 **/public/sw.js.map
 **/public/workbox-*.js.map
 **/public/worker-*.js.map
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

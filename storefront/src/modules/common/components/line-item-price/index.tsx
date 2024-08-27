@@ -16,37 +16,16 @@ const LineItemPrice = ({
   region,
   style = "default",
 }: LineItemPriceProps) => {
-  const originalPrice =
-    (item.variant as CalculatedVariant).original_price * item.quantity
-  const hasReducedPrice = (item.total || 0) < originalPrice
+  const originalPrice = (item.variant as CalculatedVariant).original_price * item.quantity;
+  const hasReducedPrice = (item.total || 0) < originalPrice;
 
   return (
     <div className="flex flex-col gap-x-2 text-md items-end">
       <div className="text-left">
-        {hasReducedPrice && (
-          <>
-            <p>
-              {style === "default" && (
-                <span className="text-md">Original: </span>
-              )}
-              <span className="line-through text-md" data-testid="product-original-price">
-                {formatAmount({
-                  amount: originalPrice,
-                  region: region,
-                  includeTaxes: false,
-                })}
-              </span>
-            </p>
-            {style === "default" && (
-              <span className="text-md">
-                -{getPercentageDiff(originalPrice, item.total || 0)}%
-              </span>
-            )}
-          </>
-        )}
         <span
-          className={cn("text-md", {
-            "text-lg": hasReducedPrice,
+          className={cn("text-md font-bold text-[16px]", {
+            "text-[#FA6338]": hasReducedPrice,
+            "text-black": !hasReducedPrice,
           })}
           data-testid="product-price"
         >
@@ -58,7 +37,7 @@ const LineItemPrice = ({
         </span>
       </div>
     </div>
-  )
+  );
 }
 
-export default LineItemPrice
+export default LineItemPrice;

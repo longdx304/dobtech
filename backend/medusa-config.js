@@ -22,15 +22,16 @@ try {
 } catch (e) {}
 
 // CORS when consuming Medusa from admin
-const ADMIN_CORS =
-  process.env.ADMIN_CORS ||
-  'http://localhost:7001,http://localhost:3000,https://dob-ecommerce-admin.vercel.app';
+const ADMIN_CORS = process.env.ADMIN_CORS || '/.+/';
 
 // CORS to avoid issues when consuming Medusa from a client
 const STORE_CORS = process.env.STORE_CORS || 'http://localhost:8000';
 
 const DATABASE_URL =
   process.env.DATABASE_URL || 'postgres://localhost/medusa-starter-default';
+
+const TEST_DATABASE_URL =
+  process.env.TEST_DATABASE_URL || 'postgres://localhost/medusa-test';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
@@ -43,16 +44,6 @@ const plugins = [
       upload_dir: 'uploads',
     },
   },
-  // {
-  //   resolve: '@medusajs/admin',
-  //   /** @type {import('@medusajs/admin').PluginOptions} */
-  //   options: {
-  //     autoRebuild: true,
-  //     develop: {
-  //       open: process.env.OPEN_BROWSER !== 'false',
-  //     },
-  //   },
-  // },
   {
     resolve: `medusa-file-s3`,
     options: {
@@ -64,24 +55,27 @@ const plugins = [
       cache_control: process.env.S3_CACHE_CONTROL,
       // optional
       download_file_duration: process.env.S3_DOWNLOAD_FILE_DURATION,
-      // prefix: process.env.S3_PREFIX,
     },
+  },
+  {
+    resolve: `medusa-plugin-categories`,
   },
 ];
 
 const modules = {
-  /*eventBus: {
-    resolve: "@medusajs/event-bus-redis",
+  eventBus: {
+    resolve: '@medusajs/event-bus-redis',
     options: {
-      redisUrl: REDIS_URL
-    }
+      redisUrl: REDIS_URL,
+    },
   },
   cacheService: {
-    resolve: "@medusajs/cache-redis",
+    resolve: '@medusajs/cache-redis',
     options: {
-      redisUrl: REDIS_URL
-    }
-  },*/
+      redisUrl: REDIS_URL,
+      ttl: 0,
+    },
+  },
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule["projectConfig"]} */
@@ -90,13 +84,16 @@ const projectConfig = {
   cookieSecret: process.env.COOKIE_SECRET,
   store_cors: STORE_CORS,
   database_url: DATABASE_URL,
+  // database_url: TEST_DATABASE_URL,
   admin_cors: ADMIN_CORS,
-  // Uncomment the following lines to enable REDIS
   redis_url: REDIS_URL,
 };
 
 const featureFlags = {
   product_categories: true,
+  order_editing: true,
+  sales_channels: true,
+  publishable_api_keys: true,
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */

@@ -1,5 +1,5 @@
 'use client';
-import { Form, message, type FormProps , Checkbox} from 'antd';
+import { Form, message, type FormProps } from 'antd';
 import { Mail, Phone, UserRound } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -8,16 +8,15 @@ import { CheckboxGroup } from '@/components/Checkbox';
 import { Input } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
+import { getErrorMessage } from '@/lib/utils';
 import {
 	EPermissions,
 	IAdminResponse,
 	IUserRequest,
 	rolesEmployee,
 } from '@/types/account';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { useAdminCreateUser, useAdminUpdateUser } from 'medusa-react';
-import { User } from '@medusajs/medusa';
-import { getErrorMessage } from '@/lib/utils';
 
 interface Props {
 	state: boolean;
@@ -37,7 +36,7 @@ export default function UserModal({
 	const createUser = useAdminCreateUser();
 	const updateUser = useAdminUpdateUser(user?.id ?? '');
 
-	const titleModal = `${_.isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
+	const titleModal = `${isEmpty(user) ? 'Thêm mới' : 'Cập nhật'} nhân viên`;
 
 	useEffect(() => {
 		form?.setFieldsValue({
@@ -69,7 +68,7 @@ export default function UserModal({
 	// Submit form
 	const onFinish: FormProps<IUserRequest>['onFinish'] = async (values) => {
 		// Create user
-		if (_.isEmpty(user)) {
+		if (isEmpty(user)) {
 			const payload = createPayload(values);
 			createUser.mutateAsync(payload, {
 				onSuccess: () => {
@@ -123,7 +122,7 @@ export default function UserModal({
 					<Input
 						placeholder="Email"
 						prefix={<Mail />}
-						disabled={!_.isEmpty(user)}
+						disabled={!isEmpty(user)}
 						data-testid="email"
 					/>
 				</Form.Item>

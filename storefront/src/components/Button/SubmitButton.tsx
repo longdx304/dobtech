@@ -1,7 +1,6 @@
-import React, { ReactNode } from 'react';
-// import { useFormStatus } from 'react-dom';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/Button';
+import { cn } from '@/lib/utils';
+import { ReactNode } from 'react';
 
 interface Props {
 	className?: string;
@@ -17,14 +16,10 @@ const SubmitButton = ({
 	icons,
 	...props
 }: Props) => {
-	// const { pending } = useFormStatus();
-
 	return (
 		<Button
 			className={cn('py-[10px]', className)}
 			htmlType="submit"
-			// disabled={pending}
-			// loading={pending}
 			data-testid={dataTestId}
 			icon={icons}
 			{...props}

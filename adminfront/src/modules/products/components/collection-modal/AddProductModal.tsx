@@ -67,15 +67,16 @@ const AddProductModal: FC<Props> = ({
 }) => {
 	// State to manage selected rows in the table
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-	const [selectedProducts, setSelectedProducts] = useState<DataType[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [searchValue, setSearchValue] = useState('');
 
-	const { products, isLoading, isRefetching, refetch, count } = useAdminProducts({
-		limit: PAGE_SIZE,
-		offset: (currentPage - 1) * PAGE_SIZE,
-		q: searchValue || undefined,
-	});
+	const { products, isLoading, isRefetching, refetch, count } =
+		useAdminProducts({
+			limit: PAGE_SIZE,
+			offset: (currentPage - 1) * PAGE_SIZE,
+			q: searchValue || undefined,
+			is_giftcard: false,
+		});
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
 		setSelectedRowKeys(selectedRowKeys);
@@ -136,7 +137,7 @@ const AddProductModal: FC<Props> = ({
 					type: 'checkbox',
 					selectedRowKeys: selectedRowKeys,
 					onChange: handleRowSelectionChange,
-					preserveSelectedRowKeys: true
+					preserveSelectedRowKeys: true,
 				}}
 				loading={isLoading || isRefetching}
 				columns={columns}
@@ -147,7 +148,8 @@ const AddProductModal: FC<Props> = ({
 					pageSize: PAGE_SIZE,
 					current: currentPage as number,
 					onChange: handleChangePage,
-					showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} sản phẩm`,
+					showTotal: (total, range) =>
+						`${range[0]}-${range[1]} trong ${total} sản phẩm`,
 				}}
 			/>
 		</Modal>

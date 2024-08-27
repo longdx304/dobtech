@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
+import { Suspense, useCallback } from 'react';
 
 import SortProducts, { SortOptions } from './sort-products';
 
@@ -35,13 +35,13 @@ const RefinementList = ({
   };
 
   return (
-    <>
+    <Suspense>
       <SortProducts
         sortBy={sortBy}
         setQueryParams={setQueryParams}
         data-testid={dataTestId}
       />
-    </>
+    </Suspense>
   );
 };
 

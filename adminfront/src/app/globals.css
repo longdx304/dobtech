@@ -26,7 +26,7 @@ body {
 .ant-form-item-label label {
 	font-size: 14px !important;
 	font-weight: 500;
-	color: #6B7280 !important;
+	color: #6b7280 !important;
 }
 
 .ant-form .ant-form-item {
@@ -35,6 +35,21 @@ body {
 
 /* Antd Tooltip */
 .ant-tooltip .ant-tooltip-inner {
-	color: #6B7280 !important;
+	color: #6b7280 !important;
 	font-size: 12px;
+}
+
+/* Antd Input number */
+.ant-input-number .ant-input-number-handler-wrap {
+	opacity: 1 !important;
+}
+
+/* Antd Modal */
+.ant-modal .ant-modal-title {
+	font-size: 20px !important;
+}
+
+.ant-modal .ant-modal-content .ant-modal-close {
+	border: 1px solid #e4e7eb !important;
+	border-radius: 8px;
 }

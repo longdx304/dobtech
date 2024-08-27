@@ -1,8 +1,8 @@
 'use client';
-import React, { useState } from 'react';
 import { Button } from '@/components/Button';
-import { Mail, ChevronLeft, AlignJustify } from 'lucide-react';
+import { AlignJustify, ChevronLeft } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 
 import { Flex } from '@/components/Flex';
 import DrawCategory from '@/modules/common/components/menu/DrawCategory';
@@ -28,6 +28,7 @@ const LeftHeader: React.FC<Props> = ({ categories }) => {
           shape='circle'
           type='text'
           onClick={() => setOpen(true)}
+          aria-label='Open menu'
         />
       )}
 
@@ -39,12 +40,14 @@ const LeftHeader: React.FC<Props> = ({ categories }) => {
             shape='circle'
             type='text'
             onClick={() => router.back()}
+            aria-label='Back page'
           />
           <Button
             icon={<AlignJustify color='#767676' size={24} strokeWidth='2' />}
             shape='circle'
             type='text'
             onClick={() => setOpen(true)}
+            aria-label='Open menu'
           />
         </Flex>
       )}

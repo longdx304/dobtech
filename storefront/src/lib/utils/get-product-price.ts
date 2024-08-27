@@ -32,6 +32,7 @@ export function getProductPrice({
 		const variants = product.variants as unknown as CalculatedVariant[];
 
 		const cheapestVariant = variants.reduce((prev, curr) => {
+			if (!curr.calculated_price) return prev;
 			return prev.calculated_price < curr.calculated_price ? prev : curr;
 		});
 
@@ -53,6 +54,19 @@ export function getProductPrice({
 				cheapestVariant.original_price,
 				cheapestVariant.calculated_price
 			),
+			original_tax: cheapestVariant.original_tax,
+			calculated_tax: cheapestVariant.calculated_tax,
+			original_price_incl_tax: formatAmount({
+				amount: cheapestVariant.original_price_incl_tax,
+				region,
+				includeTaxes: false,
+			}),
+			calculated_price_incl_tax: formatAmount({
+				amount: cheapestVariant.calculated_price_incl_tax,
+				region,
+				includeTaxes: false,
+			})
+
 		};
 	};
 
@@ -87,6 +101,18 @@ export function getProductPrice({
 				variant.original_price,
 				variant.calculated_price
 			),
+			original_tax: variant.original_tax,
+			original_price_incl_tax: formatAmount({
+				amount: variant.original_price_incl_tax,
+				region,
+				includeTaxes: false,
+			}),
+			calculated_tax: variant.calculated_tax,
+			calculated_price_incl_tax: formatAmount({
+				amount: variant.calculated_price_incl_tax,
+				region,
+				includeTaxes: false,
+			})
 		};
 	};
 

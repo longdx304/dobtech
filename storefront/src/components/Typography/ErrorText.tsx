@@ -1,12 +1,10 @@
 import React from 'react';
-import { Typography } from 'antd';
+import Text from 'antd/es/typography/Text';
 
 interface ErrorTextProps {
 	error?: string | null;
 	'data-testid'?: string;
 }
-
-const { Text } = Typography;
 
 export default function ErrorText({
 	error,

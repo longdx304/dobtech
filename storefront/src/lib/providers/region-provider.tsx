@@ -1,11 +1,12 @@
-"use client";
+'use client';
 import { Region } from '@medusajs/medusa';
 import React, {
 	PropsWithChildren,
 	useContext,
 	useEffect,
 	useState,
-} from "react";
+	useMemo,
+} from 'react';
 
 type TRegionContext = {
 	region: Region | null;
@@ -31,17 +32,17 @@ export const RegionProvider = ({
 		setRegion(regionData);
 	}, [regionData]);
 
+	const value = useMemo(() => ({ region }), [region]);
+
 	return (
-		<RegionContext.Provider value={{ region }}>
-			{children}
-		</RegionContext.Provider>
+		<RegionContext.Provider value={value}>{children}</RegionContext.Provider>
 	);
 };
 
 export const useRegion = () => {
 	const context = useContext(RegionContext);
 	if (context === undefined) {
-		throw new Error("useRegion must be used within a RegionProvider");
+		throw new Error('useRegion must be used within a RegionProvider');
 	}
 	return context;
 };

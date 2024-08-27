@@ -1,7 +1,6 @@
-// @ts-nocheck
 'use client';
 import { Collapse } from '@/components/Collapse';
-import { CollapseProps } from 'antd/lib';
+import { CollapseProps } from 'antd/es';
 import React from 'react';
 
 type OptionListProps = {
@@ -16,13 +15,12 @@ const OptionList = ({ color, size }: OptionListProps) => {
       label: 'Màu sắc',
       children: (
         <ul className='space-y-4'>
-          {color.options.map((option, optionIdx) => (
+          {color.options.map((option: any, optionIdx: any) => (
             <li key={option.value} className='flex items-center'>
               <input
                 type='checkbox'
                 id={`color-${optionIdx}`}
                 onChange={() => {}}
-                // checked={filter.color.includes(option.value)}
                 className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
               />
               <label
@@ -44,7 +42,7 @@ const OptionList = ({ color, size }: OptionListProps) => {
       label: 'Kích thước',
       children: (
         <ul className='space-y-4'>
-          {size.options.map((option, optionIdx) => (
+          {size.options.map((option: any, optionIdx: any) => (
             <li key={option.value} className='flex items-center'>
               <input
                 type='checkbox'

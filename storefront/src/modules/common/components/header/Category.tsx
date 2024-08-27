@@ -45,7 +45,7 @@ const Category: FC<Props> = ({ categories }) => {
 					{categories?.map((category) => (
 						<Text
 							className={cn(
-								"text-[13px] text-[#666666] text font-normal cursor-pointer hover:bg-slate-100 rounded-t-[6px] py-2 px-2"
+								"text-[13px] text-[#666666] text font-normal cursor-pointer hover:bg-slate-100 rounded-t-[6px] py-2 px-4"
 							)}
 							key={category.id}
 							onMouseEnter={() => handleMouseEnter(category.id)}

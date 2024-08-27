@@ -1,5 +1,6 @@
+'use client';
 import { cn } from '@/lib/utils';
-import { Typography } from 'antd';
+import AntdTitle from 'antd/es/typography/Title';
 import { ReactNode } from 'react';
 
 interface Props {
@@ -7,8 +8,6 @@ interface Props {
 	children?: ReactNode;
 	level?: 1 | 2 | 3 | 4 | 5;
 }
-
-const { Title: AntdTitle } = Typography;
 
 export default function Title({
 	className,

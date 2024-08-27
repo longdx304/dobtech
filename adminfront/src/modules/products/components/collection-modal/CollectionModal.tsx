@@ -39,11 +39,10 @@ const CollectionModal: FC<Props> = ({
 			title: collection?.title,
 			handle: collection?.handle,
 		});
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [collection]);
 
 	const onFinish: FormProps<CollectionFormProps>['onFinish'] = (values) => {
-		console.log('values', values);
 		if (_.isEmpty(collection)) {
 			createCollection.mutateAsync(values, {
 				onSuccess: () => {

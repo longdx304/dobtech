@@ -1,21 +1,24 @@
-import { listCategories } from "@/actions/productCategory";
-import { MedusaProvider } from "@/lib/providers/medusa-provider";
-import Header from "@/modules/common/components/header";
-import Menu from "@/modules/common/components/menu";
-import { TTreeCategories } from "@/types/productCategory";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { App, ConfigProvider } from "antd";
-import type { Metadata } from "next";
-import { cache } from "react";
-import "../../app/globals.css";
-import theme from "../../theme";
-import { RegionProvider } from "@/lib/providers/region-provider";
-import { getRegion } from "@/actions/region";
+import { getCustomer } from '@/actions/customer';
+import { listCategories } from '@/actions/productCategory';
+import { getRegion } from '@/actions/region';
+import { CartProvider } from '@/lib/providers/cart/cart-provider';
+import { MedusaProvider } from '@/lib/providers/medusa-provider';
+import { RegionProvider } from '@/lib/providers/region-provider';
+import { CustomerProvider } from '@/lib/providers/user/user-provider';
+import { TTreeCategories } from '@/types/productCategory';
+import type { Metadata } from 'next';
+import { cache } from 'react';
+import '../../app/globals.css';
+
+import dynamic from 'next/dynamic';
+
+const Header = dynamic(() => import('@/modules/common/components/header'));
+const Menu = dynamic(() => import('@/modules/common/components/menu'));
 
 export const metadata: Metadata = {
-	title: "CHAMDEP VN | Giày dép nam nữ trẻ em",
-	description: "Giày dép nam nữ trẻ em",
-	manifest: "/manifest.json",
+	title: 'CHAMDEP VN | Giày dép nam nữ trẻ em',
+	description: 'Giày dép nam nữ trẻ em',
+	manifest: '/manifest.json',
 };
 
 const fetchCategories = cache(async () => await listCategories());
@@ -25,7 +28,7 @@ export default async function PageLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const region = await getRegion("vn");
+	const region = await getRegion('vn');
 	const categories = await fetchCategories();
 
 	const getAncestors = (category: any) => {
@@ -33,17 +36,16 @@ export default async function PageLayout({
 			id: string;
 			label: string;
 			key: string;
+			metadata?: Record<string, string>;
 			children?: any[];
 		} = {
 			id: category.id,
 			label: category.name,
 			key: category.handle,
+			metadata: category.metadata,
 		};
 
-		if (
-			category.category_children &&
-			category.category_children.length > 0
-		) {
+		if (category.category_children && category.category_children.length > 0) {
 			convertedCategory.children = category.category_children.map(
 				(child: any) => getAncestors(child)
 			);
@@ -54,19 +56,19 @@ export default async function PageLayout({
 	const formatCategories: TTreeCategories[] | null =
 		categories?.map((category) => getAncestors(category)) || null;
 
+	const customer = await getCustomer();
+
 	return (
-		<AntdRegistry>
-			<ConfigProvider theme={theme}>
-				<App>
-					<MedusaProvider>
-						<RegionProvider regionData={region!}>
-							<Header categories={formatCategories} />
-							<Menu categories={formatCategories} />
-							<div className="pb-20">{children}</div>
-						</RegionProvider>
-					</MedusaProvider>
-				</App>
-			</ConfigProvider>
-		</AntdRegistry>
+		<MedusaProvider>
+			<RegionProvider regionData={region!}>
+				<CustomerProvider initialCustomer={customer}>
+					<CartProvider>
+						<Header categories={formatCategories} />
+						<Menu categories={formatCategories} />
+						<main>{children}</main>
+					</CartProvider>
+				</CustomerProvider>
+			</RegionProvider>
+		</MedusaProvider>
 	);
 }

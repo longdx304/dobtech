@@ -10,7 +10,7 @@ import {
 	IProductResponse,
 	IProductVariant,
 } from '@/types/products';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { revalidateTag } from 'next/cache';
 import { getMedusaHeaders } from './common';
 
@@ -87,7 +87,7 @@ export async function createProduct(payload: IProductRequest) {
 			headers
 		)
 		.then(async ({ product }) => {
-			if (!_.isEmpty(product)) {
+			if (!isEmpty(product)) {
 				revalidateTag('products');
 				return product;
 			}
@@ -164,7 +164,7 @@ export async function updateProduct(
 			headers
 		)
 		.then(({ product }) => {
-			if (!_.isEmpty(product)) {
+			if (!isEmpty(product)) {
 				return product;
 			}
 		})
@@ -183,7 +183,7 @@ export async function updateProduct(
 				headers
 			)
 			.then(({ product }) => {
-				if (!_.isEmpty(product)) {
+				if (!isEmpty(product)) {
 					return product;
 				}
 			})

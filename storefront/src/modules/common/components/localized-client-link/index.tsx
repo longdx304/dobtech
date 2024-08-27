@@ -8,22 +8,25 @@ import React from 'react';
  * without having to explicitly pass it as a prop.
  */
 const LocalizedClientLink = ({
-  children,
-  href,
-  ...props
+	children,
+	href,
+	onClick,
+	passHref,
+	className,
+	...props
 }: {
-  children?: React.ReactNode;
-  href: string;
-  className?: string;
-  onClick?: () => void;
-  passHref?: true;
-  [x: string]: any;
+	children?: React.ReactNode;
+	href: string;
+	className?: string;
+	onClick?: () => void;
+	passHref?: true;
+	[x: string]: any;
 }) => {
-  return (
-    <Link href={`/${href}`} {...props}>
-      {children}
-    </Link>
-  );
+	return (
+		<Link href={`/${href}`} {...props} className={className}>
+			{children}
+		</Link>
+	);
 };
 
 export default LocalizedClientLink;

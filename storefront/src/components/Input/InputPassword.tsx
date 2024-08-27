@@ -1,4 +1,5 @@
-import { Input as AntdInput, InputProps as AntdInputProps } from 'antd';
+import { InputProps as AntdInputProps } from 'antd';
+import AntInputPassword from 'antd/es/input/Password';
 
 import { cn } from '@/lib/utils';
 
@@ -8,6 +9,6 @@ interface Props extends AntdInputProps {
 
 export default function InputPassword({ className, ...props }: Props) {
 	return (
-		<AntdInput.Password size="large" className={cn('p-3 gap-2', className)} {...props} />
+		<AntInputPassword size="large" className={cn('p-3 gap-2', className)} {...props} />
 	);
 }

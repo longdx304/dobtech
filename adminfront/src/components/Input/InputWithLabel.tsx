@@ -10,7 +10,7 @@ interface Props extends AntdInputProps {
 	error?: string;
 }
 
-export default function Input({ error, label, className, ...props }: Props) {
+export default function InputWithLabel({ error, label, className, ...props }: Props) {
 	return (
 		<Flex vertical gap={4}>
 			<Text strong>{label}</Text>

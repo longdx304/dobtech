@@ -2,12 +2,7 @@
 import { ProductCategory } from '@medusajs/medusa';
 import { Divider, Modal, message } from 'antd';
 import _ from 'lodash';
-import {
-	ChevronDown,
-	CircleAlert,
-	GripVertical,
-	Plus
-} from 'lucide-react';
+import { ChevronDown, CircleAlert, GripVertical, Plus } from 'lucide-react';
 import {
 	useAdminDeleteProductCategory,
 	useAdminProductCategories,
@@ -25,22 +20,7 @@ import useToggleState from '@/lib/hooks/use-toggle-state';
 import CategoryItem from '../category-item';
 import CategoryModal from '../category-modal';
 
-interface Props {}
 
-/**
- * Product categories empty state placeholder.
- */
-const ProductCategoriesEmptyState = () => {
-	return (
-		<div className="flex min-h-[600px] items-center justify-center">
-			<p className="text-grey-40">
-				{
-					'Chưa có danh mục sản phẩm nào, hãy sử dụng nút ở trên để tạo danh mục đầu tiên của bạn.'
-				}
-			</p>
-		</div>
-	);
-};
 
 const CategoryList = () => {
 	const { client } = useMedusa();
@@ -54,7 +34,12 @@ const CategoryList = () => {
 	);
 	const [categoryId, setCategoryId] = useState<string | null>(null);
 
-	const { product_categories: data, isLoading, refetch, isRefetching } = useAdminProductCategories({
+	const {
+		product_categories: data,
+		isLoading,
+		refetch,
+		isRefetching,
+	} = useAdminProductCategories({
 		parent_category_id: 'null',
 		include_descendants_tree: true,
 	});
@@ -143,7 +128,6 @@ const CategoryList = () => {
 					onError: () => {
 						message.error('Xoá danh mục thất bại');
 					},
-				
 				});
 			},
 			onCancel() {
@@ -208,7 +192,10 @@ const CategoryList = () => {
 				className="absolute"
 				icon={<Plus color="white" size={20} strokeWidth={2} />}
 				type="primary"
-				onClick={onOpen}
+				onClick={() => {
+					setParentCategory(null); 
+					onOpen(); 
+				}}
 				data-testid="btnAddCategories"
 			/>
 			{/* Table categories */}

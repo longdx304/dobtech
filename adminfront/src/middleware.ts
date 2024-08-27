@@ -1,11 +1,12 @@
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import intersection from 'lodash/intersection';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { ERoutes, routesConfig } from '@/types/routes';
 import { ERole } from './types/account';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-// const BACKEND_URL = 'http://13.213.42.237:9000';
+
 
 async function getUser(accessToken: string | undefined) {
 	if (accessToken) {
@@ -30,13 +31,13 @@ export async function middleware(request: NextRequest) {
 		const isPublicRoute = publicRoutes.includes(pathname);
 
 		// Decrypt the session from the cookie
-		const accessToken = request.cookies.get('_medusa_jwt')?.value;
+		const accessToken = request.cookies.get('_admin_chamdep_jwt')?.value;
 		// Get current user information
 		const data = await getUser(accessToken);
 
 		// If route is public, program executing
 		if (isPublicRoute || pathname === ERoutes.LOGIN) {
-			if (!_.isEmpty(data)) {
+			if (!isEmpty(data)) {
 				return NextResponse.redirect(
 					new URL(ERoutes.DASHBOARD, request.url),
 					307
@@ -46,7 +47,7 @@ export async function middleware(request: NextRequest) {
 		}
 
 		// Redirect Login page if user hasn't logged in
-		if (_.isEmpty(data)) {
+		if (isEmpty(data)) {
 			return NextResponse.redirect(new URL(ERoutes.LOGIN, request.url), 307);
 		}
 
@@ -66,10 +67,10 @@ export async function middleware(request: NextRequest) {
 		}
 
 		// Check current user has permission into routes
-		const hasPermissions = _.intersection(routesMode, permissions?.split(','));
+		const hasPermissions = intersection(routesMode, permissions?.split(','));
 
 		// If user hasn't permission return homepage
-		if (_.isEmpty(hasPermissions)) {
+		if (isEmpty(hasPermissions)) {
 			return NextResponse.redirect(
 				new URL(ERoutes.DASHBOARD, request.url),
 				307

@@ -12,3 +12,15 @@ export type FormImage = {
   nativeFile?: File;
 	selected?: boolean;
 }
+
+export type MetadataField = {
+  key: string
+  value: string
+  state?: "existing" | "new"
+}
+
+export type MetadataFormType = {
+  entries: MetadataField[]
+  deleted?: string[]
+  ignored?: Record<string, any>
+}

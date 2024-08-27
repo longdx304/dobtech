@@ -7,6 +7,13 @@ export enum ERoutes {
 	PRODUCTS = '/admin/products',
 	DASHBOARD = '/admin/dashboard',
 	PRODUCT_CATEGORIES = '/admin/product-categories',
+	PRICING = '/admin/pricing',
+	CUSTOMERS = '/admin/customers',
+	REGIONS = '/admin/regions',
+	ORDERS = '/admin/orders',
+	RETURN_REASONS = '/admin/return-reasons',
+	DISCOUNTS = '/admin/discounts',
+	GIFT_CARDS = '/admin/gift-cards',
 }
 
 export interface TRouteConfig {
@@ -46,5 +53,33 @@ export const routesConfig: TRouteConfig[] = [
 	{
 		path: ERoutes.PRODUCT_CATEGORIES,
 		mode: [EPermissions.WarehouseManager],
+	},
+	{
+		path: ERoutes.PRICING,
+		mode: [],
+	},
+	{
+		path: ERoutes.CUSTOMERS,
+		mode: [],
+	},
+	{
+		path: ERoutes.REGIONS,
+		mode: [],
+	},
+	{
+		path: ERoutes.ORDERS,
+		mode: [],
+	},
+	{
+		path: ERoutes.RETURN_REASONS,
+		mode: [],
+	},
+	{
+		path: ERoutes.DISCOUNTS,
+		mode: [],
+	},
+	{
+		path: ERoutes.GIFT_CARDS,
+		mode: [],
 	},
 ];

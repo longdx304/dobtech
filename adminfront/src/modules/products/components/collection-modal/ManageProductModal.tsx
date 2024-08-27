@@ -80,6 +80,7 @@ const ManageProductModal: FC<Props> = ({
 			limit: PAGE_SIZE,
 			collection_id: [collection?.id ?? ''],
 			offset: (currentPage - 1) * PAGE_SIZE,
+			is_giftcard: false,
 		});
 	const removeProducts = useAdminRemoveProductsFromCollection(collection!.id);
 

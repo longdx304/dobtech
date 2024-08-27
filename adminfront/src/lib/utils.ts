@@ -42,23 +42,55 @@ export const updateSearchQuery = (
 };
 
 /**
- * @param num 
- * @param option 
+ * @param num
+ * @param option
  * @returns format price number
  */
-const formatNumber = (num: number, option?: Intl.NumberFormatOptions) => {
-  return num?.toLocaleString('vi-VN', option);
+export const formatNumber = (
+	num: number,
+	option?: Intl.NumberFormatOptions
+) => {
+	return num?.toLocaleString('vi-VN', option);
 };
 
-export default formatNumber;
-
 export const getErrorMessage = (error: any) => {
-  let msg = error?.response?.data?.message
-  if (msg[0].message) {
-    msg = msg[0].message
-  }
-  if (!msg) {
-    msg = "Đã xảy ra lỗi khi thực hiện thao tác. Vui lòng thử lại sau."
-  }
-  return msg
+	let msg = error?.response?.data?.message;
+	if (msg[0] && msg[0]?.message) {
+		msg = msg[0].message;
+	}
+	if (!msg) {
+		msg = 'Đã xảy ra lỗi khi thực hiện thao tác. Vui lòng thử lại sau.';
+	}
+	return msg;
+};
+
+const units: [string, number][] = [
+	['B', 1],
+	['Kb', 1000],
+	['Mb', 1000000],
+	['Gb', 1000000000],
+];
+
+export function bytesConverter(size: number): string | undefined {
+	let result: string | undefined = undefined;
+
+	for (const [unit, divider] of units) {
+		if (size >= divider) {
+			result = `${(size / divider).toFixed(2)} ${unit}`;
+		}
+	}
+
+	return result;
 }
+
+export const getErrorStatus = (
+	error: Error
+): { status: number; message: string } | undefined => {
+	const formattedError = JSON.parse(JSON.stringify(error));
+
+	if ('status' in formattedError && 'message' in formattedError) {
+		return { status: formattedError.status, message: formattedError.message };
+	}
+
+	return undefined;
+};

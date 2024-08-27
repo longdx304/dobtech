@@ -1,6 +1,5 @@
-import React from 'react'
+import DashboardTemplate from '@/modules/dashboard';
 import { Metadata } from 'next';
-import { Empty } from '@/components/Empty';
 
 export const metadata: Metadata = {
 	title: 'Dashboard',
@@ -8,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardPage() {
-	return <Empty description={false} className="pt-20" />;
+	return <DashboardTemplate />
 }

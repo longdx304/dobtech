@@ -1,7 +1,5 @@
-import { Tag as AntdTag, TagProps } from 'antd';
 import { cn } from '@/lib/utils';
-import { Flex } from '@/components/Flex';
-import { ErrorText } from '@/components/Typography';
+import { Tag as AntdTag, TagProps } from 'antd';
 
 interface Props extends TagProps {
 	className?: string;

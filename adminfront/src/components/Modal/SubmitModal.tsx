@@ -1,9 +1,9 @@
 'use client';
-import { Modal as AntdModal, ModalProps, Form } from 'antd';
+import { Modal as AntdModal, ModalProps } from 'antd';
 
+import { Button } from '@/components/Button';
 import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';
-import { Button } from '@/components/Button';
 
 interface Props extends ModalProps {
 	className?: string;
@@ -11,6 +11,7 @@ interface Props extends ModalProps {
 	handleCancel: () => void;
 	form: any;
 	isLoading?: boolean;
+	footer?: ReactNode;
 }
 
 export default function SubmitModal({
@@ -19,27 +20,37 @@ export default function SubmitModal({
 	form,
 	children,
 	isLoading,
+	footer = null,
 	...props
 }: Props) {
+	const renderFooter = () => {
+		if (footer) return footer;
+		return [
+			<Button
+				key="1"
+				type="default"
+				danger
+				onClick={handleCancel}
+				loading={isLoading}
+			>
+				Huỷ
+			</Button>,
+			<Button
+				htmlType="submit"
+				key="submit"
+				onClick={() => form?.submit()}
+				data-testid="submitButton"
+				loading={isLoading}
+			>
+				Xác nhận
+			</Button>,
+		];
+	};
 	return (
 		<AntdModal
 			className={cn('', className)}
-			// afterClose={() => form.resetFields()}
 			onCancel={handleCancel}
-			footer={[
-				<Button key="1" type="default" danger onClick={handleCancel} loading={isLoading}>
-					Huỷ
-				</Button>,
-				<Button
-					htmlType="submit"
-					key="submit"
-					onClick={() => form?.submit()}
-					data-testid="submitButton"
-					loading={isLoading}
-				>
-					Xác nhận
-				</Button>
-			]}
+			footer={renderFooter()}
 			{...props}
 		>
 			{children}

@@ -1,26 +1,28 @@
-import { getProductsList } from '@/actions/products';
-import ProductBanner from '@/modules/products/components/product-banner';
-import ProductList from '@/modules/products/components/product-list';
-import { Text } from "@/components/Typography";
+import { Suspense, lazy } from 'react';
+import HomepageSkeleton from './skeleton';
+
+// const ProductBanner = lazy(
+// 	() => import('@/modules/products/components/product-banner')
+// );
+const ProductList = lazy(
+	() => import('@/modules/products/components/product-list')
+);
 
 interface Props {
-  searchParams: Record<string, unknown>;
+	searchParams: {
+		page?: string;
+	};
 }
 
 export default async function Home({ searchParams }: Props) {
-  //  * *
-  //  TODO: typescript type any
-  //  */
-  const { response } = await getProductsList({
-    pageParam: 0,
-    // queryParams,
-  } as any);
+	const page = searchParams.page ? parseInt(searchParams.page) : 1;
 
-  return (
-    <main className='w-full container box-border pt-[6rem] lg:pt-[8rem]'>
-      <ProductBanner />
-			<h2 className="flex justify-center items-center">Sản phẩm mới</h2>
-      <ProductList data={response} />
-    </main>
-  );
+	return (
+		<main className="w-full container box-border pt-[6rem] lg:pt-[8rem]">
+			<Suspense fallback={<HomepageSkeleton />}>
+				{/* <ProductBanner /> */}
+				<ProductList page={page} />
+			</Suspense>
+		</main>
+	);
 }

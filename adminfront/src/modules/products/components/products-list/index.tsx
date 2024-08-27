@@ -3,45 +3,56 @@
 import { Product } from '@medusajs/medusa';
 import { Modal, message } from 'antd';
 import _ from 'lodash';
-import { CircleAlert, Plus, Search } from 'lucide-react';
+import { CircleAlert, Plus, Search, CloudUpload, Download } from 'lucide-react';
 import {
 	useAdminCollections,
 	useAdminProductCategories,
 	useAdminProducts,
 	useMedusa,
+	useAdminCreateBatchJob,
 } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useMemo, useState } from 'react';
 
 import { deleteProduct } from '@/actions/products';
-import { FloatButton } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { Title } from '@/components/Typography';
+import { Button, FloatButton } from '@/components/Button';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ProductModal } from '../products-modal';
 import productsColumns from './products-column';
 import { ERoutes } from '@/types/routes';
-
+import { getErrorMessage } from '@/lib/utils';
+import { usePolling } from '@/lib/providers/polling-provider';
+import ImportModal from './import-modal';
 const PAGE_SIZE = 10;
 
 interface Props {}
 
-const ProductList = ({}: Props) => {
+const ProductList = (props: Props) => {
 	const { client } = useMedusa();
 	const router = useRouter();
 	const { state, onOpen, onClose } = useToggleState(false);
+	const {
+		state: stateImport,
+		onOpen: onOpenImport,
+		onClose: onCloseImport,
+	} = useToggleState(false);
+	const { resetInterval } = usePolling();
 
 	const [currentPage, setCurrentPage] = useState(1);
 	const [searchValue, setSearchValue] = useState('');
 	const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
 
+	const createBatchJob = useAdminCreateBatchJob();
 	const { products, isLoading, count, isRefetching, refetch } =
 		useAdminProducts({
 			limit: PAGE_SIZE,
 			offset: (currentPage - 1) * PAGE_SIZE,
 			q: searchValue || undefined,
+			is_giftcard: false,
 		});
 
 	const { product_categories, isLoading: isLoadingCategories } =
@@ -87,9 +98,6 @@ const ProductList = ({}: Props) => {
 					message.error('Xoá sản phẩm thất bại!');
 				}
 			},
-			onCancel() {
-				console.log('Cancel');
-			},
 		});
 	};
 
@@ -102,21 +110,12 @@ const ProductList = ({}: Props) => {
 			});
 	};
 
-	const handleRow = (id: string) => {
-		return {
-			onClick: () => {
-				router.push(`${ERoutes.PRODUCTS}/${id}`);
-			},
-		};
-	};
-
 	const columns = useMemo(
 		() =>
 			productsColumns({
 				handleDeleteProduct,
 				handleEditProduct,
 				handleChangeStatus,
-				handleRow,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[products]
@@ -136,6 +135,28 @@ const ProductList = ({}: Props) => {
 		500
 	);
 
+	const handleCreateExport = () => {
+		const reqObj = {
+			type: 'product-export',
+			context: {},
+			dry_run: false,
+		};
+
+		createBatchJob.mutate(reqObj, {
+			onSuccess: () => {
+				resetInterval();
+				message.success('Khởi tạo file sản phẩm thành công!');
+			},
+			onError: (err) => {
+				message.error(getErrorMessage(err));
+			},
+		});
+	};
+
+	const handleRowClick = (record: any) => {
+		router.push(`${ERoutes.PRODUCTS}/${record.id}`);
+	};
+
 	return (
 		<>
 			<Flex align="center" justify="flex-start" className="">
@@ -152,6 +173,25 @@ const ProductList = ({}: Props) => {
 					className="w-[300px]"
 				/>
 			</Flex>
+			<Flex align="center" justify="flex-end" gap="small" className="pb-4">
+				<Button
+					type="default"
+					icon={<CloudUpload size={18} />}
+					className="flex items-center text-sm h-[34px]"
+					onClick={onOpenImport}
+				>
+					{'Nhập file sản phẩm'}
+				</Button>
+				<Button
+					type="default"
+					icon={<Download size={18} />}
+					className="flex items-center text-sm h-[34px]"
+					onClick={handleCreateExport}
+					loading={createBatchJob?.isLoading}
+				>
+					{'Xuất file sản phẩm'}
+				</Button>
+			</Flex>
 			<Table
 				loading={
 					isLoading ||
@@ -162,6 +202,10 @@ const ProductList = ({}: Props) => {
 				columns={columns as any}
 				dataSource={products ?? []}
 				rowKey="id"
+				onRow={(record) => ({
+					onClick: () => handleRowClick(record),
+					className: 'cursor-pointer',
+				})}
 				pagination={{
 					total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
 					pageSize: PAGE_SIZE,
@@ -173,7 +217,7 @@ const ProductList = ({}: Props) => {
 				scroll={{ x: 700 }}
 			/>
 			<FloatButton
-				className="absolute"
+				// className="absolute"
 				icon={<Plus color="white" size={20} />}
 				type="primary"
 				onClick={onOpen}
@@ -189,6 +233,11 @@ const ProductList = ({}: Props) => {
 					productCollections={collections}
 				/>
 			)}
+			<ImportModal
+				state={stateImport}
+				handleOk={onCloseImport}
+				handleCancel={onCloseImport}
+			/>
 		</>
 	);
 };

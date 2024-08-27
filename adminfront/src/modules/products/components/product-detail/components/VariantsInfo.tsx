@@ -115,9 +115,6 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 					messageApi.error('Xoá biến thể thất bại!');
 				}
 			},
-			onCancel() {
-				console.log('Cancel');
-			},
 		});
 	};
 

@@ -13,7 +13,6 @@ interface Props {
 
 const MediaForm: FC<Props> = ({ form }) => {
 	const media = Form.useWatch('media', form) || [];
-	console.log('media', media);
 
 	const handleFilesChosen = (files: File[]) => {
 		if (files.length) {

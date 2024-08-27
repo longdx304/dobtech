@@ -96,6 +96,7 @@ const Upload: FC<Props> = ({
         multiple={multiple}
         type="file"
         onChange={handleFileUpload}
+				capture="environment"
         className="hidden"
       />
     </div>
