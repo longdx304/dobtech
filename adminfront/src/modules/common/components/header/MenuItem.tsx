@@ -53,7 +53,7 @@ const itemDropdown: any = [
 const itemOverview = (role: string, permissions: string[]) =>
 	[
 		getItem('Đơn hàng', 'orders', <ShoppingCart />),
-		getItem('Quản lý sản phẩm', 'products', <ClipboardPenLine />),
+		getItem('Sản phẩm', 'products', <ClipboardPenLine />),
 		getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
 	].filter(() => true);
 
@@ -105,7 +105,7 @@ export const menuItems = (
 	const permissions = (user as any)?.permissions?.split(',');
 	return [
 		getItem(
-			'Sản phẩm',
+			'Tổng quan',
 			'overview',
 			null,
 			itemOverview(role, permissions) as MenuItem[],

@@ -102,6 +102,7 @@ export type VariantFormType = {
 	mid_code?: string;
 	hs_code?: string;
 	origin_country?: string;
+	supplier_price?: number;
 }
 
 export type DimensionsFormType = {
