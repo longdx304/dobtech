@@ -1,18 +1,17 @@
 'use client';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
-import { Title } from '@/components/Typography';
-import { Search } from 'lucide-react';
-import { ChangeEvent, FC, useMemo, useState } from 'react';
-import _ from 'lodash';
-import { Card } from '@/components/Card';
-import useToggleState from '@/lib/hooks/use-toggle-state';
 import { Table } from '@/components/Table';
-import { useAdminCustomers } from 'medusa-react';
-import customerColumns from './customer-column';
+import { Title } from '@/components/Typography';
+import useToggleState from '@/lib/hooks/use-toggle-state';
 import { Customer } from '@medusajs/medusa';
+import _ from 'lodash';
+import { Search } from 'lucide-react';
+import { useAdminCustomers } from 'medusa-react';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
 import EditCustomerModal from '../../components/edit-customer-modal';
 import OrdersModal from '../../components/orders-modal';
+import customerColumns from './customer-column';
 
 type Props = {};
 
