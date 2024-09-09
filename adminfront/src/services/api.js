@@ -745,4 +745,34 @@ export default {
 			return medusaRequest('DELETE', path);
 		},
 	},
+
+	supplier: {
+		list(search = {}) {
+			const params = Object.keys(search)
+				.map((k) => `${k}=${search[k]}`)
+				.join('&');
+			const path = `/admin/supplier${params && `?${params}`}`;
+			return medusaRequest('GET', path);
+		},
+
+		create(data) {
+			const path = `/admin/supplier`;
+			return medusaRequest('POST', path, data);
+		},
+
+		retrieve(id) {
+			const path = `/admin/supplier/${id}`;
+			return medusaRequest('GET', path);
+		},
+
+		update(id, data) {
+			const path = `/admin/supplier/${id}`;
+			return medusaRequest('PUT', path, data);
+		},
+
+		delete(id) {
+			const path = `/admin/supplier/${id}`;
+			return medusaRequest('DELETE', path);
+		},
+	}
 };

@@ -7,7 +7,6 @@ import {
 	ClipboardPenLine,
 	Earth,
 	Ellipsis,
-	Gift,
 	LayoutList,
 	LogOut,
 	Settings,
@@ -17,6 +16,7 @@ import {
 	User as UserIcon,
 	Users,
 	UsersRound,
+	Warehouse
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -63,8 +63,8 @@ const itemsAdmin: MenuProps['items'] = [
 	getItem('Danh mục', 'product-categories', <LayoutList />),
 	getItem('Định giá', 'pricing', <CircleDollarSign />),
 	getItem('Khách hàng', 'customers', <UsersRound />),
+	getItem('Nhà Cung Cấp', 'suppliers', <Warehouse />),
 	getItem('Giảm giá', 'discounts', <SquarePercent />),
-	// getItem('Thẻ quà tặng', 'gift-cards', <Gift />),
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
 		getItem('Tiền tệ', 'currency', <BadgeDollarSign />),
@@ -134,5 +134,5 @@ export const menuRoutes: Record<string, string> = {
 	orders: ERoutes.ORDERS,
 	'return-reasons': ERoutes.RETURN_REASONS,
 	discounts: ERoutes.DISCOUNTS,
-	// 'gift-cards': ERoutes.GIFT_CARDS,
+	suppliers: ERoutes.SUPPLIERS,
 };

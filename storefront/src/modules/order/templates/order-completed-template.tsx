@@ -7,14 +7,12 @@ import { useCart } from '@/lib/providers/cart/cart-provider';
 import CartTotals, { CartType } from '@/modules/common/components/cart-totals';
 import { ERoutes } from '@/types/routes';
 import { Order } from '@medusajs/medusa';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
-
-const Items = dynamic(() => import('../components/items'));
-const OrderDetails = dynamic(() => import('../components/order-details'));
-const ShippingDetails = dynamic(() => import('../components/shipping-details'));
-const PaymentDetails = dynamic(() => import('../components/payment-details'));
+import Items from '../components/items';
+import OrderDetails from '../components/order-details';
+import PaymentDetails from '../components/payment-details';
+import ShippingDetails from '../components/shipping-details';
 
 type OrderCompletedTemplateProps = {
 	order: Order;
