@@ -87,7 +87,7 @@ const SupplierModal: FC<Props> = ({
 				<Row gutter={[16, 8]} className="pt-4">
 					<Col xs={24}>
 						<Form.Item name="email" label="Email">
-							<Input disabled={isEditing} placeholder="Email nhà cung cấp" />
+							<Input placeholder="Email nhà cung cấp" />
 						</Form.Item>
 					</Col>
 					<Col xs={24}>
