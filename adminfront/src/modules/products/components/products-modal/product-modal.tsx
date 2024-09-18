@@ -29,6 +29,7 @@ import {
 import { AddVariant } from './components/variant-form';
 import { getErrorMessage } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
+import { persistedPrice } from '@/utils/prices';
 
 interface Props {
 	state: boolean;
@@ -58,12 +59,14 @@ export default function ProductModal({
 
 	// handle form submit
 	const onFinish: FormProps<NewProductForm>['onFinish'] = async (values) => {
+		console.log('values:', values);
 		// Payload
 		const payload = createPayload(
 			values,
 			true,
 			isFeatureEnabled('sales_channels')
 		);
+		console.log('payload:', payload);
 
 		// Prepped images thumbnail
 		if (values.thumbnail?.length) {
@@ -266,6 +269,7 @@ const createPayload = (
 			hs_code: v?.hs_code || undefined,
 			mid_code: v?.mid_code || undefined,
 			origin_country: v?.origin_country || undefined,
+			supplier_price: +persistedPrice('vnd', v?.supplier_price ?? 0),
 		})),
 		// Dimensions
 		width: data?.dimensions?.width || undefined,
