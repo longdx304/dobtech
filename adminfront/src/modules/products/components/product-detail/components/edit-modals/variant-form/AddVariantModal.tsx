@@ -24,7 +24,7 @@ type Props = {
 	handleOk: () => void;
 	handleCancel: () => void;
 	product: Product;
-	variant?: ProductVariant & { supplier_price: number };
+	variant?: ProductVariant & { supplier_price?: number };
 	typeVariant: 'CREATE' | 'UPDATE' | 'COPY' | null;
 };
 
@@ -73,7 +73,7 @@ const AddVariantModal: FC<Props> = ({
 			if (typeVariant === 'UPDATE') {
 				form.setFieldsValue({
 					...variant,
-					supplier_price: normalizeAmount('vnd', variant?.supplier_price),
+					supplier_price: normalizeAmount('vnd', variant?.supplier_price ?? 0),
 					options: variant.options.map((option) => ({
 						option_id: option.option_id,
 						value: [option.value],
