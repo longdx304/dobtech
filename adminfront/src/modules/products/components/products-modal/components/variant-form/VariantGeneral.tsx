@@ -2,7 +2,7 @@ import { Col, Form, Row } from 'antd';
 import { CircleAlert } from 'lucide-react';
 import { FC } from 'react';
 
-import { Input } from '@/components/Input';
+import { Input, InputNumber } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { TooltipIcon } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
@@ -33,6 +33,16 @@ const VariantGeneral: FC<Props> = ({ form, field }) => {
 					className="mb-2"
 				>
 					<Input placeholder="Màu trắng / XL..." />
+				</Form.Item>
+			</Col>
+			<Col xs={24} sm={12}>
+				<Form.Item
+					labelCol={{ span: 24 }}
+					name={[field.name, 'supplier_price']}
+					label="Giá nhập hàng"
+					className="mb-2"
+				>
+					<InputNumber className="w-full" placeholder="0" min={0} allowClear />
 				</Form.Item>
 			</Col>
 			<Col span={24}>
