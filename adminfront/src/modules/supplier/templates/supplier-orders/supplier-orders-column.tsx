@@ -1,11 +1,8 @@
-import { ActionAbles } from '@/components/Dropdown';
-import { formatNumber } from '@/lib/utils';
 import { Supplier, SupplierOrders } from '@/types/supplier';
-import { Pencil, Trash2 } from 'lucide-react';
+import dayjs from 'dayjs';
 
 type Props = {
-	handleEditSupplierOrders: (record: SupplierOrders) => void;
-	handleDeleteSupplierOrders: (id: string) => void;
+	supplier: Supplier[] | null;
 };
 
 const decideFulfillmentStt = (status: any) => {
@@ -30,10 +27,7 @@ const decideFulfillmentStt = (status: any) => {
 			return 'Yêu cầu xử lý';
 	}
 };
-const supplierOrdersColumn = ({
-	handleEditSupplierOrders,
-	handleDeleteSupplierOrders,
-}: Props) => [
+const supplierOrdersColumn = ({ supplier }: Props) => [
 	{
 		title: 'Đơn hàng',
 		dataIndex: 'display_id',
@@ -52,9 +46,10 @@ const supplierOrdersColumn = ({
 		width: 150,
 		className: 'text-xs',
 		render: (_: SupplierOrders['id'], record: Supplier) => {
-			// has id, take supplier name
-			return _ || '-';
-		}
+			const supplierName = supplier?.find((item) => item.id === _)?.supplier_name;
+
+			return supplierName || '-';
+		},
 	},
 	{
 		title: 'Trạng thái thanh toán',
@@ -66,48 +61,13 @@ const supplierOrdersColumn = ({
 		},
 	},
 	{
-		title: 'Tổng tiền',
-		dataIndex: 'total',
-		key: 'total',
-		className: 'text-xs',
-		render: (_: any) => {
-			return `${formatNumber(_)}đ`;
-		},
-	},
-	{
-		title: 'Ngày thêm',
+		title: 'Ngày đặt hàng',
 		dataIndex: 'created_at',
 		key: 'created_at',
 		className: 'text-xs',
-	},
-	{
-		title: '',
-		key: 'action',
-		width: 40,
-		fixed: 'right',
-		className: 'text-xs',
-		align: 'center',
-		render: (_: any, record: any) => {
-			const actions = [
-				{
-					label: 'Chỉnh sửa thông tin',
-					icon: <Pencil size={20} />,
-					onClick: () => {
-						handleEditSupplierOrders(record);
-					},
-				},
-				{
-					label: 'Xoá',
-					danger: true,
-					icon: <Trash2 size={20} />,
-					onClick: () => {
-						handleDeleteSupplierOrders(record.id);
-					},
-				},
-			];
-
-			return <ActionAbles actions={actions as any} />;
-		},
+		render: (_: SupplierOrders['created_at']) => {
+			return dayjs(_).format('DD/MM/YYYY');
+		}
 	},
 ];
 

@@ -33,3 +33,11 @@ const getRelativeTime = (dates: { from: Date | string; to: Date | string }) => {
 }
 
 export default getRelativeTime
+
+export const formatDate = (date: Date | string) => {
+	return new Date(date).toLocaleDateString('vi-VN', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+};

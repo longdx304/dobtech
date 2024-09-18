@@ -29,21 +29,21 @@ const supplierColumn = ({
 	},
 	{
 		title: 'Thời gian sản xuất',
-		dataIndex: 'default_estimated_production_time',
-		key: 'default_estimated_production_time',
+		dataIndex: 'estimated_production_time',
+		key: 'estimated_production_time',
 		width: 150,
 		className: 'text-xs',
-		render: (_: Supplier['default_estimated_production_time']) => {
+		render: (_: Supplier['estimated_production_time']) => {
 			return _ + ' ngày';
 		},
 	},
 	{
 		title: 'Thời gian quyết toán',
-		dataIndex: 'default_settlement_time',
-		key: 'default_settlement_time',
+		dataIndex: 'settlement_time',
+		key: 'settlement_time',
 		width: 150,
 		className: 'text-xs',
-		render: (_: Supplier['default_settlement_time']) => {
+		render: (_: Supplier['settlement_time']) => {
 			return _ + ' ngày';
 		},
 	},

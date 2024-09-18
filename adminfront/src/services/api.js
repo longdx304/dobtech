@@ -69,6 +69,7 @@ export default {
 			const path = `/admin/notifications${params && `?${params}`}`;
 			return medusaRequest('GET', path);
 		},
+
 		resend(id, config) {
 			const path = `/admin/notifications/${id}/resend`;
 			return medusaRequest('POST', path, config);
@@ -629,9 +630,9 @@ export default {
 			for (const f of files) {
 				formData.append('files', f);
 			}
-
 			return medusaRequest('POST', '/admin/uploads', formData);
 		},
+
 		delete(payload) {
 			const path = `/admin/upload-file`;
 			return medusaRequest('DELETE', path, payload);
@@ -774,5 +775,25 @@ export default {
 			const path = `/admin/supplier/${id}`;
 			return medusaRequest('DELETE', path);
 		},
-	}
+	},
+
+	suplierOrders: {
+		list(search = {}) {
+			const params = Object.keys(search)
+				.map((k) => `${k}=${search[k]}`)
+				.join('&');
+			const path = `/admin/supplier-order${params && `?${params}`}`;
+			return medusaRequest('GET', path);
+		},
+
+		create(data) {
+			const path = `/admin/supplier-order`;
+			return medusaRequest('POST', path, data);
+		},
+
+		retrieve(id) {
+			const path = `/admin/supplier-order/${id}`;
+			return medusaRequest('GET', path);
+		},
+	},
 };

@@ -7,10 +7,9 @@ import useToggleState from '@/lib/hooks/use-toggle-state';
 import { SupplierOrders } from '@/types/supplier';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
-import { useAdminProducts } from 'medusa-react';
-import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
 import SupplierOrdersModal from '../../components/supplier-orders-modal';
-import { useAdminSuppliers } from '../../hooks';
+import { useAdminSupplierOrders, useAdminSuppliers } from '../../hooks';
 import supplierOrdersColumn from './supplier-orders-column';
 
 type Props = {};
@@ -29,13 +28,21 @@ const SupplierOrdersList: FC<Props> = () => {
 	const [numPages, setNumPages] = useState<number>(1);
 	const [currentSupplierOrders, setCurrentSupplierOrders] =
 		useState<SupplierOrders | null>(null);
-	const [supplierId, setSupplierId] = useState<string | null>(null);
 
-	const { products, isLoading: isLoadingProducts } = useAdminProducts();
-	const { data, isLoading: isLoadingSuppliers } = useAdminSuppliers({
-		q: '',
+	const {
+		data: dataSupplierOrders,
+		isLoading,
+		isRefetching,
+	} = useAdminSupplierOrders({
+		q: searchValue || '',
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
+	});
+
+	const { data: dataSuppliers } = useAdminSuppliers({
+		q: '',
+		offset: 0,
+		limit: 100,
 	});
 
 	const handleChangeDebounce = _.debounce(
@@ -51,56 +58,17 @@ const SupplierOrdersList: FC<Props> = () => {
 		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
-	const handleEditSupplierOrders = (record: SupplierOrders) => {
-		setCurrentSupplierOrders(record);
-		openSupplierOrdersModal();
-	};
-
 	const handleCreateSupplierOrders = () => {
 		setCurrentSupplierOrders(null);
 		openSupplierOrdersModal();
 	};
 
-	const handleDeleteSupplierOrders = (record: SupplierOrders['id']) => {};
-
 	const columns = useMemo(() => {
 		return supplierOrdersColumn({
-			handleEditSupplierOrders,
-			handleDeleteSupplierOrders,
+			supplier: dataSuppliers?.suppliers ?? [],
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
-	// mock data
-	const [supplierOrders, setSupplierOrders] = useState<SupplierOrders[]>([]);
-
-	useEffect(() => {
-		// Simulating API call to fetch supplier orders
-		const fetchSupplierOrders = async () => {
-			// Replace this with actual API call
-			const mockData: SupplierOrders[] = [
-				{
-					id: '1',
-					display_id: 1,
-					supplier_id: 'supplier1',
-					user_id: 'user1',
-					cart_id: 'cart1',
-					status: 'pending',
-					payment_status: 'awaiting',
-					fulfillment_status: 'not_fulfilled',
-					estimated_production_time: '7 days',
-					settlement_time: '30 days',
-					tax_rate: 0.1,
-					metadata: {},
-					created_at: '2024-03-15T00:00:00Z',
-					updated_at: '2024-03-15T00:00:00Z',
-				},
-			];
-			setSupplierOrders(mockData);
-		};
-
-		fetchSupplierOrders();
-	}, []);
+	}, [dataSuppliers]);
 
 	const handleCloseModal = () => {
 		closeSupplierOrdersModal();
@@ -122,13 +90,13 @@ const SupplierOrdersList: FC<Props> = () => {
 				/>
 			</Flex>
 			<Table
-				loading={false}
+				loading={isLoading || isRefetching}
 				columns={(columns as any) ?? []}
-				dataSource={supplierOrders}
+				dataSource={dataSupplierOrders?.supplierOrder ?? []}
 				rowKey="id"
 				scroll={{ x: 700 }}
 				pagination={{
-					total: supplierOrders.length,
+					total: dataSupplierOrders?.count ?? 0,
 					pageSize: DEFAULT_PAGE_SIZE,
 					current: numPages,
 					onChange: handleChangePage,
@@ -148,9 +116,7 @@ const SupplierOrdersList: FC<Props> = () => {
 					state={stateSupplierOrdersModal}
 					handleOk={handleCloseModal}
 					handleCancel={handleCloseModal}
-					// supplierOrders={currentSupplierOrders}
-					products={products || []}
-					suppliers={data?.suppliers || []}
+					suppliers={dataSuppliers?.suppliers || []}
 				/>
 			)}
 		</div>

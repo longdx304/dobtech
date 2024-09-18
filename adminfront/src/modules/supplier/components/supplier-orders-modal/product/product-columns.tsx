@@ -1,79 +1,108 @@
-import { Product } from '@medusajs/medusa';
-import { Dot } from 'lucide-react';
+import { ProductVariant } from '@medusajs/medusa';
 import Image from 'next/image';
 
 import { Flex } from '@/components/Flex';
+import { InputNumber } from '@/components/Input';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
-import { formatNumber } from '@/lib/utils';
+import clsx from 'clsx';
+import { Minus, Plus } from 'lucide-react';
+import { ItemPrice, ItemQuantity } from '../index';
 
-interface Props {}
-const productColumns = ({}: Props) => [
+interface Props {
+	itemQuantities: ItemQuantity[];
+	handleToAddQuantity: (value: number, variantId: string) => void;
+	itemPrices: ItemPrice[];
+	handlePriceChange: (value: number, variantId: string) => void;
+}
+const productColumns = ({
+	itemQuantities,
+	handleToAddQuantity,
+	itemPrices,
+	handlePriceChange,
+}: Props) => [
 	{
 		title: 'Tên sản phẩm',
-		key: 'information',
-		width: 150,
+		key: 'product',
+		dataIndex: 'product',
 		className: 'text-xs',
 		fixed: 'left',
-		render: (_: any, record: Product) => (
-			<Flex className="flex items-center gap-3">
-				<Image
-					src={record?.thumbnail ?? '/images/product-img.png'}
-					alt="Product Thumbnail"
-					width={30}
-					height={40}
-					className="rounded-md hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer"
-				/>
-				<Tooltip title={record.title}>
-					<Text className="text-xs line-clamp-2">{record.title}</Text>
-				</Tooltip>
-			</Flex>
-		),
-	},
-	{
-		title: 'Trạng thái',
-		dataIndex: 'status',
-		key: 'status',
-		className: 'text-xs',
-		width: 150,
-		render: (_: Product['status']) => {
+		render: (_: any, record: ProductVariant) => {
 			return (
-				<Flex justify="flex-start" align="center" gap="2px">
-					<Dot
-						color={_ === 'published' ? 'rgb(52 211 153)' : 'rgb(156 163 175)'}
-						size={20}
-						strokeWidth={3}
-						className="w-[20px]"
+				<Flex className="flex items-center gap-3">
+					<Image
+						src={_?.thumbnail ?? '/images/product-img.png'}
+						alt="Product variant Thumbnail"
+						width={30}
+						height={40}
+						className="rounded-md cursor-pointer"
 					/>
-					<Text className="text-xs">
-						{_ === 'published' ? 'Đang hoạt động' : 'Bản nháp'}
-					</Text>
+					<Flex vertical className="">
+						<Tooltip title={_.title}>
+							<Text className="text-xs line-clamp-2">{_.title}</Text>
+						</Tooltip>
+						<span className="text-gray-500">{record.title}</span>
+					</Flex>
 				</Flex>
 			);
 		},
 	},
 	{
-		title: 'Sẵn có',
-		key: 'profile',
-		dataIndex: 'profile',
+		title: 'Số lượng',
+		key: 'quantity',
+		dataIndex: 'quantity',
 		className: 'text-xs',
-		width: 200,
-		render: (_: Product['profile']) => {
-			return _?.name || '-';
+		editable: true,
+		render: (_: number, record: any) => {
+			const itemQuantity = itemQuantities.find(
+				(item) => item.variantId === record.id
+			);
+			const quantity = itemQuantity ? itemQuantity.quantity : 0;
+			return (
+				<div className="text-gray-500 flex w-full justify-start text-right">
+					<span
+						onClick={() => handleToAddQuantity(-1, record.id)}
+						className="hover:bg-gray-200 mr-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md"
+					>
+						<Minus size={16} strokeWidth={2} />
+					</span>
+					<span>{quantity || 0}</span>
+					<span
+						onClick={() => handleToAddQuantity(1, record.id)}
+						className={clsx(
+							'hover:bg-gray-200 ml-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md'
+						)}
+					>
+						<Plus size={16} />
+					</span>
+				</div>
+			);
 		},
 	},
 	{
-		title: 'Tồn kho',
-		key: 'variants',
-		dataIndex: 'variants',
+		title: 'Giá tiền',
+		key: 'price_from_supplier',
+		dataIndex: 'price_from_supplier',
 		className: 'text-xs',
 		width: 250,
-		render: (_: Product['variants']) => {
-			const total = _.reduce(
-				(acc, variant) => acc + variant.inventory_quantity,
-				0
+		render: (_: any, record: any) => {
+			const itemPrice = itemPrices.find((item) => item.variantId === record.id);
+			const price = itemPrice ? itemPrice.unit_price : record.supplier_price;
+
+			return (
+				<div className="flex items-center justify-start gap-2">
+					<InputNumber
+						className="w-full"
+						value={price}
+						min={0}
+						formatter={(value) =>
+							`${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+						}
+						parser={(value) => value!.replace(/\$\s?|(,*)/g, '')}
+						onChange={(value) => handlePriceChange(value as number, record.id)}
+					/>
+				</div>
 			);
-			return `${formatNumber(total)} còn hàng cho ${_?.length || 0} biến thể`;
 		},
 	},
 ];

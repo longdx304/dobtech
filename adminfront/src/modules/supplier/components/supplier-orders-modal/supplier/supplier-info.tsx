@@ -21,6 +21,7 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
 	const openModal = () => {
+		setSelectedRowKeys([]);
 		setIsModalVisible(true);
 		setSelectedSupplier(null);
 	};
@@ -65,6 +66,14 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 					</p>
 					<p>
 						<strong>Địa chi:</strong> {selectedSupplier.address}
+					</p>
+					<p>
+						<strong>Ngày sản xuất dự kiến:</strong>{' '}
+						{selectedSupplier.estimated_production_time} ngày
+					</p>
+					<p>
+						<strong>Ngày thanh toán dự kiến:</strong>{' '}
+						{selectedSupplier.settlement_time} ngày
 					</p>
 					{/* Option to change supplier */}
 					<Button onClick={openModal}>Đổi nhà cung cấp</Button>

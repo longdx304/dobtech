@@ -1,11 +1,12 @@
+
 export interface Supplier {
 	id: string;
 	email: string;
 	supplier_name: string;
 	phone: string;
 	address: string;
-	default_estimated_production_time: number;
-	default_settlement_time: number;
+	estimated_production_time: number;
+	settlement_time: number;
 	metadata: Record<string, any>;
 	created_at: string;
 	updated_at: string;
@@ -16,6 +17,24 @@ export interface SupplierListResponse {
 	count: number;
 	offset: number;
 	limit: number;
+}
+
+export interface LineItemReq {
+	variantId: string;
+	quantity: number;
+	unit_price?: number;
+}
+
+export interface SupplierOrdersReq {
+	lineItems: LineItemReq[];
+	supplierId: string;
+	userId: string;
+	email: string;
+	countryCode: string;
+	estimated_production_time: Date;
+	settlement_time: Date;
+	document_url: string;
+	metadata?: Record<string, unknown>;
 }
 
 export interface SupplierOrders {
@@ -37,9 +56,10 @@ export interface SupplierOrders {
 	canceled_at?: string | null;
 }
 
-export interface SupplierOrdersListResponse {
-	orders: SupplierOrders[];
+export interface SupplierOrderListRes {
+	supplierOrder: SupplierOrders[];
 	count: number;
 	offset: number;
 	limit: number;
 }
+

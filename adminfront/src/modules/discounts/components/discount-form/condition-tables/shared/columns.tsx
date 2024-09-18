@@ -1,10 +1,7 @@
 import {
-	CustomerGroup,
 	Product,
-	ProductCollection,
-	ProductTag,
+	ProductCollection
 } from '@medusajs/medusa';
-import { render } from '@testing-library/react';
 import { Dot } from 'lucide-react';
 import Image from 'next/image';
 
@@ -105,9 +102,5 @@ const TypeColumns = [
 ];
 
 export {
-	ProductColumns,
-	CustomerGroupColumns,
-	TagColumns,
-	CollectionColumns,
-	TypeColumns,
+	CollectionColumns, CustomerGroupColumns, ProductColumns, TagColumns, TypeColumns
 };

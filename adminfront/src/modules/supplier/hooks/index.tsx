@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { SupplierListResponse, SupplierOrderListRes } from '@/types/supplier';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../../services/api';
-import { SupplierListResponse } from '@/types/supplier';
 
 interface Query {
 	offset?: number;
@@ -85,5 +85,48 @@ export const useAdminDeleteSupplier = (id: string) => {
 				queryClient.invalidateQueries(['admin-suppliers']);
 			},
 		}
+	);
+};
+
+// Supplier Orders
+
+export const useAdminSupplierOrders = (query: Query = {}, options = {}) => {
+	return useQuery(
+		['admin-supplier-order', query],
+		async () => {
+			const response = await api.suplierOrders.list(query);
+			return response.data as unknown as SupplierOrderListRes;
+		},
+		{
+			keepPreviousData: true,
+			...options,
+		}
+	);
+};
+
+export const useAdminCreateSupplierOrders = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async (data) => {
+			const response = await api.suplierOrders.create(data);
+			return response.data;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries(['admin-supplier-order']);
+			},
+		}
+	);
+};
+
+export const useAdminSupplierOrdersById = (id: string, options = {}) => {
+	return useQuery(
+		['admin-supplier-orders', id],
+		async () => {
+			const response = await api.suplierOrders.retrieve(id);
+			return response.data;
+		},
+		options
 	);
 };

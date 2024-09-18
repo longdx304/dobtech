@@ -18,8 +18,8 @@ type SupplierFormProps = {
 	supplier_name: string;
 	phone: string;
 	address: string;
-	default_estimated_production_time: number;
-	default_settlement_time: number;
+	estimated_production_time: number;
+	settlement_time: number;
 };
 
 const SupplierModal: FC<Props> = ({
@@ -41,9 +41,9 @@ const SupplierModal: FC<Props> = ({
 				supplier_name: supplier.supplier_name,
 				phone: supplier.phone,
 				address: supplier.address,
-				default_estimated_production_time:
-					supplier.default_estimated_production_time,
-				default_settlement_time: supplier.default_settlement_time,
+				estimated_production_time:
+					supplier.estimated_production_time,
+				settlement_time: supplier.settlement_time,
 			});
 		} else {
 			form.resetFields();
@@ -124,7 +124,7 @@ const SupplierModal: FC<Props> = ({
 					</Col>
 					<Col xs={24} sm={12}>
 						<Form.Item
-							name="default_estimated_production_time"
+							name="estimated_production_time"
 							label="Thời gian sản xuất ước tính (ngày)"
 							rules={[
 								{
@@ -139,7 +139,7 @@ const SupplierModal: FC<Props> = ({
 					</Col>
 					<Col xs={24} sm={12}>
 						<Form.Item
-							name="default_settlement_time"
+							name="settlement_time"
 							label="Thời gian thanh toán mặc định (ngày)"
 							rules={[
 								{

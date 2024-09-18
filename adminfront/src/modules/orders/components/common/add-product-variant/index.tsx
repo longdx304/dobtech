@@ -1,18 +1,15 @@
 'use client';
-import { useState, ChangeEvent, useMemo } from 'react';
-import { ProductVariant } from '@medusajs/medusa';
+import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { Table } from '@/components/Table';
 import { Title } from '@/components/Typography';
-import { Flex } from '@/components/Flex';
-import { Tooltip } from '@/components/Tooltip';
-import { Input } from '@/components/Input';
-import productsColumns from './products-column';
-import { Search, LoaderCircle } from 'lucide-react';
-import { useAdminVariants, useAdminVariantsInventory } from 'medusa-react';
-import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
+import { ProductVariant } from '@medusajs/medusa';
 import _ from 'lodash';
-import { useEffect } from 'react';
+import { Search } from 'lucide-react';
+import { useAdminVariants } from 'medusa-react';
+import { ChangeEvent, useEffect, useState } from 'react';
+import productsColumns from './products-column';
 
 type AddProductVariantProps = {
 	state: boolean;
@@ -22,7 +19,6 @@ type AddProductVariantProps = {
 	customerId: string;
 	isReplace?: boolean;
 	isLoading?: boolean;
-	// onSubmit: (variants: ProductVariant[]) => void;
 	onSubmit: (variantIds: string[], variants?: ProductVariant[]) => void;
 	title: string;
 	selectedItems?: string[];

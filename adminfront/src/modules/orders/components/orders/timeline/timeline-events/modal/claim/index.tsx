@@ -340,7 +340,6 @@ const ClaimModal: React.FC<ClaimProps> = ({ order, state, onClose }) => {
 						preserveSelectedRowKeys: true,
 						onSelect: handleReceiveToggle,
 					}}
-					// loading={isLoading}
 					columns={columns as any}
 					dataSource={dataSource ?? []}
 					rowKey="item_id"
