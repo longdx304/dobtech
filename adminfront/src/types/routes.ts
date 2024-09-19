@@ -14,6 +14,7 @@ export enum ERoutes {
 	RETURN_REASONS = '/admin/return-reasons',
 	DISCOUNTS = '/admin/discounts',
 	SUPPLIERS = '/admin/suppliers',
+	GIFT_CARDS = '/admin/gift-cards',
 }
 
 export interface TRouteConfig {
@@ -76,6 +77,10 @@ export const routesConfig: TRouteConfig[] = [
 	},
 	{
 		path: ERoutes.DISCOUNTS,
+		mode: [],
+	},
+	{
+		path: ERoutes.GIFT_CARDS,
 		mode: [],
 	},
 	{
