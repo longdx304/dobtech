@@ -32,6 +32,7 @@ import { ERoutes } from '@/types/routes';
 import { persistedPrice } from '@/utils/prices';
 
 interface Props {
+	type?: string;
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
@@ -41,6 +42,7 @@ interface Props {
 }
 
 export default function ProductModal({
+	type = 'create',
 	state: stateModal,
 	handleOk,
 	handleCancel,
@@ -108,7 +110,7 @@ export default function ProductModal({
 					content: 'Thêm sản phẩm thành công.',
 				});
 				handleOk();
-				router.push(`${ERoutes.PRODUCTS}/${product.id}`);
+				type === 'create' && router.push(`${ERoutes.PRODUCTS}/${product.id}`);
 				return null;
 			},
 			onError: (error: any) => {

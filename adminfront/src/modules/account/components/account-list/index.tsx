@@ -88,21 +88,19 @@ const AccountList = ({}: Props) => {
 		setCurrentPage(page);
 	};
 
+	
 	const columns = useMemo(
 		() => accountColumns({ handleDeleteUser, handleEditUser }),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[users]
 	);
 
-	const handleChangeDebounce = debounce(
-		(e: ChangeEvent<HTMLInputElement>) => {
-			const { value: inputValue } = e.target;
+	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
+		const { value: inputValue } = e.target;
 
-			// Update search query
-			setSearchValue(inputValue);
-		},
-		500
-	);
+		// Update search query
+		setSearchValue(inputValue);
+	}, 500);
 
 	return (
 		<Card className="w-full">
