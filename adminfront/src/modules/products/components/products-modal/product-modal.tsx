@@ -29,8 +29,10 @@ import {
 import { AddVariant } from './components/variant-form';
 import { getErrorMessage } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
+import { persistedPrice } from '@/utils/prices';
 
 interface Props {
+	type?: string;
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
@@ -40,6 +42,7 @@ interface Props {
 }
 
 export default function ProductModal({
+	type = 'create',
 	state: stateModal,
 	handleOk,
 	handleCancel,
@@ -58,12 +61,14 @@ export default function ProductModal({
 
 	// handle form submit
 	const onFinish: FormProps<NewProductForm>['onFinish'] = async (values) => {
+		console.log('values:', values);
 		// Payload
 		const payload = createPayload(
 			values,
 			true,
 			isFeatureEnabled('sales_channels')
 		);
+		console.log('payload:', payload);
 
 		// Prepped images thumbnail
 		if (values.thumbnail?.length) {
@@ -105,7 +110,7 @@ export default function ProductModal({
 					content: 'Thêm sản phẩm thành công.',
 				});
 				handleOk();
-				router.push(`${ERoutes.PRODUCTS}/${product.id}`);
+				type === 'create' && router.push(`${ERoutes.PRODUCTS}/${product.id}`);
 				return null;
 			},
 			onError: (error: any) => {
@@ -266,6 +271,7 @@ const createPayload = (
 			hs_code: v?.hs_code || undefined,
 			mid_code: v?.mid_code || undefined,
 			origin_country: v?.origin_country || undefined,
+			supplier_price: +persistedPrice('vnd', v?.supplier_price ?? 0),
 		})),
 		// Dimensions
 		width: data?.dimensions?.width || undefined,

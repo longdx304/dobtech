@@ -24,7 +24,7 @@ export default function CheckoutPreview({
 
 	useEffect(() => {
 		setCurrentStep(1);
-		refreshCart();
+		// refreshCart();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 

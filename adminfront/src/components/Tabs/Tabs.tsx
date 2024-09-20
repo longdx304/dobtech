@@ -1,7 +1,6 @@
-import { FC } from 'react';
 
-import { Tabs as AntdTabs, type TabsProps } from 'antd';
 import { cn } from '@/lib/utils';
+import { Tabs as AntdTabs, type TabsProps } from 'antd';
 
 interface Props extends TabsProps {
 	className?: string;

@@ -3,6 +3,7 @@ import { Copy, Pencil, Trash2 } from 'lucide-react';
 import { ActionAbles } from '@/components/Dropdown';
 import { ProductVariant } from '@medusajs/medusa';
 import { MenuProps } from 'antd';
+import { formatAmountWithSymbol } from '@/utils/prices';
 
 interface Props {
 	handleDeleteVariant: (variantId: ProductVariant['id']) => void;
@@ -35,9 +36,17 @@ const variantsColumns = ({
 		key: 'inventory_quantity',
 	},
 	{
+		title: 'Giá nhập hàng',
+		dataIndex: 'supplier_price',
+		key: 'supplier_price',
+		render: (_: any) => {
+			return formatAmountWithSymbol({ amount: _, currency: 'vnd' });
+		},
+	},
+	{
 		title: '',
 		key: 'action',
-		width: 40,
+		width: 60,
 		fixed: 'right',
 		render: (_: any, record: ProductVariant) => {
 			const actions = [

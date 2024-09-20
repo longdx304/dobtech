@@ -7,7 +7,6 @@ import {
 	ClipboardPenLine,
 	Earth,
 	Ellipsis,
-	Gift,
 	LayoutList,
 	LogOut,
 	Settings,
@@ -17,6 +16,7 @@ import {
 	User as UserIcon,
 	Users,
 	UsersRound,
+	Warehouse
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -53,7 +53,7 @@ const itemDropdown: any = [
 const itemOverview = (role: string, permissions: string[]) =>
 	[
 		getItem('Đơn hàng', 'orders', <ShoppingCart />),
-		getItem('Quản lý sản phẩm', 'products', <ClipboardPenLine />),
+		getItem('Sản phẩm', 'products', <ClipboardPenLine />),
 		getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
 	].filter(() => true);
 
@@ -63,8 +63,8 @@ const itemsAdmin: MenuProps['items'] = [
 	getItem('Danh mục', 'product-categories', <LayoutList />),
 	getItem('Định giá', 'pricing', <CircleDollarSign />),
 	getItem('Khách hàng', 'customers', <UsersRound />),
+	getItem('Nhà Cung Cấp', 'suppliers', <Warehouse />),
 	getItem('Giảm giá', 'discounts', <SquarePercent />),
-	// getItem('Thẻ quà tặng', 'gift-cards', <Gift />),
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
 		getItem('Tiền tệ', 'currency', <BadgeDollarSign />),
@@ -105,7 +105,7 @@ export const menuItems = (
 	const permissions = (user as any)?.permissions?.split(',');
 	return [
 		getItem(
-			'Sản phẩm',
+			'Tổng quan',
 			'overview',
 			null,
 			itemOverview(role, permissions) as MenuItem[],
@@ -134,5 +134,5 @@ export const menuRoutes: Record<string, string> = {
 	orders: ERoutes.ORDERS,
 	'return-reasons': ERoutes.RETURN_REASONS,
 	discounts: ERoutes.DISCOUNTS,
-	// 'gift-cards': ERoutes.GIFT_CARDS,
+	suppliers: ERoutes.SUPPLIERS,
 };
