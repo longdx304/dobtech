@@ -1,4 +1,4 @@
-import { ProductVariant } from '@medusajs/medusa';
+import { ProductVariant, Region } from '@medusajs/medusa';
 import Image from 'next/image';
 
 import { Flex } from '@/components/Flex';
@@ -9,6 +9,7 @@ import { ItemPrice, ItemQuantity } from '../index';
 interface Props {
 	itemQuantities: ItemQuantity[];
 	itemPrices: ItemPrice[];
+	region?: Region;
 }
 /**
  * productTotalColumns
@@ -21,7 +22,7 @@ interface Props {
  * const columns = productTotalColumns({ itemQuantities, itemPrices });
  * <Table columns={columns} dataSource={data} />
  */
-const productTotalColumns = ({ itemQuantities, itemPrices }: Props) => [
+const productTotalColumns = ({ itemQuantities, itemPrices, region }: Props) => [
 	{
 		title: 'Tên sản phẩm',
 		key: 'product',
@@ -67,12 +68,20 @@ const productTotalColumns = ({ itemQuantities, itemPrices }: Props) => [
 		dataIndex: 'price',
 		className: 'text-xs',
 		render: (_: number, record: any) => {
-			const itemPrice = itemPrices?.find((item) => item?.variantId === record?.id);
+			const itemPrice = itemPrices?.find(
+				(item) => item?.variantId === record?.id
+			);
 			const price = itemPrice ? itemPrice?.unit_price : 0;
+
 			return (
-				<Text className="text-xs">{price?.toLocaleString()} VND</Text> || (
-					<Text className="text-xs">0 VND</Text>
-				) || <Text className="text-xs">{price || 0}</Text>
+				(
+					<Text className="text-xs">
+						{price?.toLocaleString()}
+						{region?.currency.symbol}
+					</Text>
+				) || <Text className="text-xs">0{region?.currency.symbol}</Text> || (
+					<Text className="text-xs">{price || 0}</Text>
+				)
 			);
 		},
 	},

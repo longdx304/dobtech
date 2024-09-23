@@ -5,7 +5,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 type Props = {
 	// handleViewOrder: (record: Supplier) => void;
 	handleEditSupplier: (record: Supplier) => void;
-	handleDeleteSupplier: (id: string) => void;
+	handleDeleteSupplier: (supplierId: Supplier['id']) => void;
 };
 
 const supplierColumn = ({
