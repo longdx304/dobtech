@@ -45,7 +45,7 @@ const supplierOrdersColumn = ({ supplier }: Props) => [
 		key: 'supplier_id',
 		width: 150,
 		className: 'text-xs',
-		render: (_: SupplierOrders['id'], record: Supplier) => {
+		render: (_: SupplierOrders['id'], record: SupplierOrders) => {
 			const supplierName = supplier?.find((item) => item.id === _)?.supplier_name;
 
 			return supplierName || '-';

@@ -2,27 +2,34 @@ import { Collapse } from '@/components/Collapse';
 import { Flex } from '@/components/Flex';
 import { Supplier } from '@/types/supplier';
 import { CollapseProps } from 'antd';
+import { Dayjs } from 'dayjs';
 import { Minus, Plus } from 'lucide-react';
-import { FC, useCallback, useState } from 'react';
+import { FC, useState } from 'react';
 import General from './general';
 import SupplierInfo from './supplier-info';
 
 type SupplierFormProps = {
 	suppliers: Supplier[];
-	onFinish: (supplier: Supplier) => void;
+	selectedSupplier: Supplier | null;
+	setSelectedSupplier: (supplier: Supplier | null) => void;
+	supplierDates: {
+		settlementDate: Dayjs | null;
+		productionDate: Dayjs | null;
+	};
+	handleSettlementDateChange: (date: Dayjs | null) => void;
+	handleProductionDateChange: (date: Dayjs | null) => void;
+	updateDatesFromSupplier: (supplier: Supplier | null) => void;
 };
 
-const SupplierForm: FC<SupplierFormProps> = ({ suppliers, onFinish }) => {
-	const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
-		null
-	);
-
-	const handleSupplierSelect = (supplier: Supplier | null) => {
-		setSelectedSupplier(supplier);
-		if (supplier) {
-			onFinish(supplier);
-		}
-	};
+const SupplierForm: FC<SupplierFormProps> = ({
+	suppliers,
+	selectedSupplier,
+	setSelectedSupplier,
+	supplierDates,
+	handleSettlementDateChange,
+	handleProductionDateChange,
+	updateDatesFromSupplier,
+}) => {
 	const itemsCollapse: CollapseProps['items'] = [
 		{
 			key: 'info',
@@ -35,7 +42,11 @@ const SupplierForm: FC<SupplierFormProps> = ({ suppliers, onFinish }) => {
 				<SupplierInfo
 					suppliers={suppliers}
 					selectedSupplier={selectedSupplier}
-					setSelectedSupplier={handleSupplierSelect}
+					setSelectedSupplier={setSelectedSupplier}
+					supplierDates={supplierDates}
+					handleSettlementDateChange={handleSettlementDateChange}
+					handleProductionDateChange={handleProductionDateChange}
+					updateDatesFromSupplier={updateDatesFromSupplier}
 				/>
 			),
 		},

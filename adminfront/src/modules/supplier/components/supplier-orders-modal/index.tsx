@@ -8,10 +8,14 @@ import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PDFViewer } from '@react-pdf/renderer';
 import { message } from 'antd';
-import dayjs from 'dayjs';
-import { useAdminVariants } from 'medusa-react';
+import {
+	useAdminRegion,
+	useAdminRegions,
+	useAdminVariants,
+} from 'medusa-react';
 import { FC, useMemo, useState } from 'react';
 import { useAdminCreateSupplierOrders } from '../../hooks';
+import useSupplierTime from '../../hooks/use-supplier-time';
 import OrderPDF, { generatePdfBlob } from './order-pdf';
 import ProductTotalForm from './product-total/product-total-form';
 import ProductForm from './product/product-form';
@@ -70,13 +74,24 @@ const SupplierOrdersModal: FC<Props> = ({
 	const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
 		null
 	);
-
 	const [itemQuantities, setItemQuantities] = useState<ItemQuantity[]>([]);
 	const [itemPrices, setItemPrices] = useState<ItemPrice[]>([]);
 	const [showPDF, setShowPDF] = useState(false);
 	const [pdfOrder, setPdfOrder] = useState<pdfOrderRes | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const createSupplierOrder = useAdminCreateSupplierOrders();
+	const { regions } = useAdminRegions();
+	const [regionId, setRegionId] = useState<string | null>(null);
+
+	const { region } = useAdminRegion(regionId || '');
+
+	// supplier date time picker
+	const {
+		supplierDates,
+		handleSettlementDateChange,
+		handleProductionDateChange,
+		updateDatesFromSupplier,
+	} = useSupplierTime();
 
 	const { user: selectedAdmin } = useUser();
 
@@ -113,15 +128,8 @@ const SupplierOrdersModal: FC<Props> = ({
 
 	const onSaveOrder = async () => {
 		const payload = createPayload();
-		const estimated_production_time = dayjs().add(
-			payload?.supplier?.estimated_production_time || 0,
-			'day'
-		);
-
-		const settlement_time = dayjs().add(
-			payload?.supplier?.settlement_time || 0,
-			'day'
-		);
+		const productionDate = supplierDates.productionDate?.toDate();
+		const settlementDate = supplierDates.settlementDate?.toDate();
 
 		const supplierOrdersDraft: pdfOrderRes = {
 			lineItems: payload?.lineItems || [],
@@ -130,11 +138,11 @@ const SupplierOrdersModal: FC<Props> = ({
 			userId: payload?.user?.id || '',
 			user: payload?.user as any,
 			email: payload?.user?.email || '',
-			estimated_production_time: estimated_production_time.toDate(),
-			settlement_time: settlement_time.toDate(),
-			countryCode: 'vn',
+			estimated_production_time: productionDate || new Date(),
+			settlement_time: settlementDate || new Date(),
+			countryCode: region?.countries[0].iso_2 || 'vn',
 		};
-		
+
 		setPdfOrder(supplierOrdersDraft);
 		setShowPDF(true);
 	};
@@ -159,25 +167,15 @@ const SupplierOrdersModal: FC<Props> = ({
 
 			const pdfUrl = (uploadRes.data as any).uploads[0].url;
 
-			// Create order with url
-			const estimated_production_time = dayjs().add(
-				pdfOrder?.supplier?.estimated_production_time || 0,
-				'day'
-			);
-
-			const settlement_time = dayjs().add(
-				pdfOrder?.supplier?.settlement_time || 0,
-				'day'
-			);
 			const orderPayload: SupplierOrdersReq = {
 				lineItems: pdfOrder?.lineItems || [],
 				supplierId: pdfOrder?.supplier?.id || '',
 				userId: pdfOrder?.user?.id || '',
 				email: pdfOrder?.user?.email || '',
-				estimated_production_time: estimated_production_time.toDate(),
-				settlement_time: settlement_time.toDate(),
-				countryCode: 'vn',
-				// document_url: 'https://dob-ecommerce.s3.ap-southeast-1.amazonaws.com/purchase-order-1726625514689.pdf',
+				estimated_production_time:
+					supplierDates.productionDate?.toDate() || new Date(),
+				settlement_time: supplierDates.settlementDate?.toDate() || new Date(),
+				countryCode: region?.countries[0]?.iso_2 || 'vn',
 				document_url: pdfUrl,
 			};
 
@@ -185,7 +183,7 @@ const SupplierOrdersModal: FC<Props> = ({
 
 			message.success('Đơn hàng đã đặt và gửi cho nhà cung cấp thành công!');
 			setShowPDF(false);
-			// handleCancel();
+			handleCancel();
 		} catch (error) {
 			console.error('Error submitting order:', error);
 			message.error('Đơn đặt đơn đặt thất bại! Vui lòng thử lại.');
@@ -207,6 +205,7 @@ const SupplierOrdersModal: FC<Props> = ({
 						setSelectedProducts([]);
 						setItemQuantities([]);
 						setItemPrices([]);
+						setRegionId(null);
 					}}
 				>
 					Quay lại
@@ -222,11 +221,12 @@ const SupplierOrdersModal: FC<Props> = ({
 		}
 		return [];
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentStep, selectedProducts, selectedSupplier]);
+	}, [currentStep, selectedProducts, selectedSupplier, supplierDates]);
 
 	// handle supplier form
-	const handleSupplierForm = (supplier: Supplier) => {
+	const handleSupplierForm = (supplier: Supplier | null) => {
 		setSelectedSupplier(supplier);
+		updateDatesFromSupplier(supplier);
 	};
 
 	return (
@@ -253,6 +253,9 @@ const SupplierOrdersModal: FC<Props> = ({
 						setItemQuantities={setItemQuantities}
 						itemPrices={itemPrices}
 						setItemPrices={setItemPrices}
+						regions={regions}
+						regionId={regionId}
+						setRegionId={setRegionId}
 					/>
 				)}
 				{currentStep === 1 && (
@@ -261,12 +264,18 @@ const SupplierOrdersModal: FC<Props> = ({
 						itemQuantities={itemQuantities}
 						itemPrices={itemPrices}
 						setCurrentStep={setCurrentStep}
+						regionId={regionId}
 					/>
 				)}
 				{currentStep === 2 && (
 					<SupplierForm
 						suppliers={suppliers as Supplier[]}
-						onFinish={handleSupplierForm}
+						selectedSupplier={selectedSupplier}
+						setSelectedSupplier={handleSupplierForm}
+						supplierDates={supplierDates}
+						handleSettlementDateChange={handleSettlementDateChange}
+						handleProductionDateChange={handleProductionDateChange}
+						updateDatesFromSupplier={updateDatesFromSupplier}
 					/>
 				)}
 			</Modal>
@@ -292,7 +301,7 @@ const SupplierOrdersModal: FC<Props> = ({
 					]}
 				>
 					<PDFViewer width="100%" height="600px">
-						<OrderPDF order={pdfOrder} variants={variants} />
+						<OrderPDF order={pdfOrder} variants={variants} region={region} />
 					</PDFViewer>
 				</Modal>
 			)}

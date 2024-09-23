@@ -1,21 +1,34 @@
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import DatePicker from '@/components/Input/DatePicker';
 import { Modal } from '@/components/Modal';
 import { Table } from '@/components/Table';
 import { Supplier } from '@/types/supplier';
 import { ColumnsType } from 'antd/es/table';
+import dayjs, { Dayjs } from 'dayjs';
 import { FC, useState } from 'react';
 
 type SupplierInfoProps = {
 	suppliers: Supplier[];
 	selectedSupplier: Supplier | null;
 	setSelectedSupplier: (supplier: Supplier | null) => void;
+	supplierDates: {
+		settlementDate: Dayjs | null;
+		productionDate: Dayjs | null;
+	};
+	handleSettlementDateChange: (date: Dayjs | null) => void;
+	handleProductionDateChange: (date: Dayjs | null) => void;
+	updateDatesFromSupplier: (supplier: Supplier | null) => void;
 };
 
 const SupplierInfo: FC<SupplierInfoProps> = ({
 	suppliers,
 	selectedSupplier,
 	setSelectedSupplier,
+	supplierDates,
+	handleSettlementDateChange,
+	handleProductionDateChange,
+	updateDatesFromSupplier,
 }) => {
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 	const [isModalVisible, setIsModalVisible] = useState(false);
@@ -24,6 +37,7 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 		setSelectedRowKeys([]);
 		setIsModalVisible(true);
 		setSelectedSupplier(null);
+		updateDatesFromSupplier(null);
 	};
 
 	const columns: ColumnsType<Supplier> = [
@@ -40,6 +54,7 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 	];
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
+		// select rowkey = select supplier id
 		setSelectedRowKeys(selectedRowKeys);
 		const selected = suppliers.find(
 			(supplier) => supplier.id === selectedRowKeys[0]
@@ -68,12 +83,26 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 						<strong>Địa chi:</strong> {selectedSupplier.address}
 					</p>
 					<p>
-						<strong>Ngày sản xuất dự kiến:</strong>{' '}
-						{selectedSupplier.estimated_production_time} ngày
+						<strong>Số ngày sản xuất dự kiến:</strong>{' '}
+						<DatePicker
+							format="DD-MM-YYYY"
+							minDate={dayjs()}
+							defaultValue={supplierDates.productionDate}
+							placeholder="Chọn ngày bắt đầu"
+							className="w-[180px]"
+							onChange={handleProductionDateChange}
+						/>
 					</p>
 					<p>
-						<strong>Ngày thanh toán dự kiến:</strong>{' '}
-						{selectedSupplier.settlement_time} ngày
+						<strong>Số ngày thanh toán dự kiến:</strong>{' '}
+						<DatePicker
+							format="DD-MM-YYYY"
+							minDate={dayjs()}
+							defaultValue={supplierDates.settlementDate}
+							placeholder="Chọn ngày bắt đầu"
+							className="w-[180px]"
+							onChange={handleSettlementDateChange}
+						/>
 					</p>
 					{/* Option to change supplier */}
 					<Button onClick={openModal}>Đổi nhà cung cấp</Button>

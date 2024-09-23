@@ -1,11 +1,12 @@
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
+import { Select } from '@/components/Select';
 import { Table } from '@/components/Table';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ProductModal } from '@/modules/products/components/products-modal';
-import { Product } from '@medusajs/medusa';
+import { Product, Region } from '@medusajs/medusa';
 import { Col, Row, message } from 'antd';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
@@ -27,9 +28,11 @@ type ProductFormProps = {
 	itemPrices: ItemPrice[];
 	setItemQuantities: React.Dispatch<React.SetStateAction<ItemQuantity[]>>;
 	setItemPrices: React.Dispatch<React.SetStateAction<ItemPrice[]>>;
+	regions: Region[] | undefined;
+	regionId: string | null;
+	setRegionId: (regionId: string) => void;
 };
 const PAGE_SIZE = 10;
-
 
 const ProductForm: FC<ProductFormProps> = ({
 	selectedProducts,
@@ -40,6 +43,9 @@ const ProductForm: FC<ProductFormProps> = ({
 	itemPrices,
 	setItemQuantities,
 	setItemPrices,
+	regions,
+	regionId,
+	setRegionId,
 }) => {
 	const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
 	const [searchValue, setSearchValue] = useState<string>('');
@@ -62,6 +68,41 @@ const ProductForm: FC<ProductFormProps> = ({
 		setItemPrices((prevPrices) =>
 			prevPrices.filter((item) => !deselectedProducts.includes(item.variantId))
 		);
+
+		// Add default quantities and prices for newly selected products
+		selectedRowKeys.forEach((productId) => {
+			// Check if this product already has a quantity or price set
+			const existingQuantity = itemQuantities.find(
+				(item) => item.variantId === productId
+			);
+			const existingPrice = itemPrices.find(
+				(item) => item.variantId === productId
+			);
+
+			// Find the selected product variant to get its default price
+			const selectedVariant = variants?.find(
+				(variant) => variant.id === productId
+			);
+
+			if (!existingQuantity) {
+				// Set default quantity to 1 if not already present
+				setItemQuantities((prevQuantities) => [
+					...prevQuantities,
+					{ variantId: productId as string, quantity: 1 },
+				]);
+			}
+
+			if (!existingPrice && selectedVariant) {
+				// Set the default price from the variant data if not already present
+				setItemPrices((prevPrices) => [
+					...prevPrices,
+					{
+						variantId: productId as string,
+						unit_price: (selectedVariant as any).supplier_price || 0,
+					},
+				]);
+			}
+		});
 
 		// Update selected products
 		setSelectedProducts(selectedRowKeys as string[]);
@@ -115,7 +156,7 @@ const ProductForm: FC<ProductFormProps> = ({
 		});
 	};
 
-	// set item prices 
+	// set item prices
 	const handlePriceChange = (value: number | null, variantId: string) => {
 		setItemPrices((prevPrices) => {
 			const existingItemIndex = prevPrices.findIndex(
@@ -153,7 +194,7 @@ const ProductForm: FC<ProductFormProps> = ({
 			message.error('Phải chọn ít nhất một sản phẩm');
 			return;
 		}
-	
+
 		// Check if itemQuantities and itemPrices have entries for all selected products
 		if (
 			itemQuantities.length !== selectedProducts.length ||
@@ -167,22 +208,27 @@ const ProductForm: FC<ProductFormProps> = ({
 			message.error('Phải nhập số lượng và giá cho tất cả sản phẩm đã chọn');
 			return;
 		}
-	
+
 		// Check if all quantities are greater than 0
 		if (!itemQuantities.every((item) => item.quantity > 0)) {
 			message.error('Số lượng sản phẩm phải lớn hơn 0');
 			return;
 		}
-	
+
 		// Check if all prices are greater than 1000
 		if (!itemPrices.every((item) => item.unit_price >= 1000)) {
 			message.error('Giá sản phẩm phải lớn hơn 1000 đồng');
 			return;
 		}
-	
+
+		// Check the selected region is checked
+		if (!regionId) {
+			message.error('Vui lòng chọn khu vực');
+			return;
+		}
+
 		setCurrentStep(1);
 	};
-	
 
 	const handleCloseModal = () => {
 		setCurrentProduct(null);
@@ -221,13 +267,25 @@ const ProductForm: FC<ProductFormProps> = ({
 					/>
 				)}
 			</Col>
-			<Col span={24}>
+			<Col span={18}>
 				<Input
 					placeholder="Nhập tên sản phẩm"
 					className="w-full text-xs"
 					size="small"
 					prefix={<Search size={16} />}
 					onChange={handleChangeDebounce}
+				/>
+			</Col>
+			<Col span={6}>
+				<Select
+					placeholder="Chọn khu vực"
+					onChange={(value) => setRegionId(value)}
+					options={regions?.map((region) => ({
+						label: region.name,
+						value: region.id,
+					}))}
+					defaultValue={regionId}
+					className="w-full"
 				/>
 			</Col>
 			<Col span={24} id="table-product">

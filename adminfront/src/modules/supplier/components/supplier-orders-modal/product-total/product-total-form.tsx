@@ -3,7 +3,7 @@ import { Flex } from '@/components/Flex';
 import { Table } from '@/components/Table';
 import { Text, Title } from '@/components/Typography';
 import { Col, Row } from 'antd';
-import { useAdminVariants } from 'medusa-react';
+import { useAdminRegion, useAdminVariants } from 'medusa-react';
 import { FC, useMemo } from 'react';
 import { ItemPrice, ItemQuantity } from '..';
 import productTotalColumns from './product-total-columns';
@@ -13,6 +13,7 @@ type Props = {
 	itemQuantities: ItemQuantity[];
 	itemPrices: ItemPrice[];
 	setCurrentStep: (step: number) => void;
+	regionId: string | null;
 };
 
 /**
@@ -28,11 +29,15 @@ const ProductTotalForm: FC<Props> = ({
 	itemQuantities,
 	itemPrices,
 	setCurrentStep,
+	regionId,
 }) => {
 	const { variants } = useAdminVariants({
 		id: selectedProducts,
 		limit: 100,
 	});
+
+	const { region } = useAdminRegion(regionId || '');
+
 	const filterVariants = selectedProducts?.map((id) => {
 		return variants?.find((variant) => variant.id === id);
 	});
@@ -40,6 +45,7 @@ const ProductTotalForm: FC<Props> = ({
 	const columns = useMemo(
 		() =>
 			productTotalColumns({
+				region,
 				itemQuantities,
 				itemPrices,
 			}),
