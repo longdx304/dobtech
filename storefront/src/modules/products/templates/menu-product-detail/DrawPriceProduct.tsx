@@ -113,7 +113,7 @@ const DrawPriceProduct: FC<Props> = ({
 		>
 			<Row>
 				<Col span={24}>
-					{product?.variants?.length > 1 && (
+					{product?.variants?.length >= 1 && (
 						<div className="flex flex-col">
 							{(product?.options || []).map((option) => {
 								return (
