@@ -102,9 +102,11 @@ const AddVariantModal: FC<Props> = ({
 		try {
 			const payload:
 				| AdminPostProductsProductVariantsReq
-				| AdminPostProductsProductVariantsVariantReq = createAddPayload(values);
+				| AdminPostProductsProductVariantsVariantReq = createAddPayload(
+				values,
+				variant
+			);
 			// Update variant
-
 			if (typeVariant === 'UPDATE' && variant) {
 				await updateVariant.mutateAsync(
 					{ ...payload, variant_id: variant.id },
@@ -180,7 +182,8 @@ const AddVariantModal: FC<Props> = ({
 export default AddVariantModal;
 
 const createAddPayload = (
-	data: VariantFormType
+	data: VariantFormType,
+	variant?: ProductVariant & { supplier_price?: number }
 ):
 	| (AdminPostProductsProductVariantsReq & { supplier_price?: number })
 	| (AdminPostProductsProductVariantsVariantReq & {
@@ -198,8 +201,8 @@ const createAddPayload = (
 					value: option.value[0],
 				} as any)
 		),
-		prices: [],
-		inventory_quantity: data?.inventory_quantity ?? 0,
+		// prices: [],
+		// inventory_quantity: data?.inventory_quantity ?? 0,
 		supplier_price: +persistedPrice('vnd', data?.supplier_price ?? 0),
 	};
 };
