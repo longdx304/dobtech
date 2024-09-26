@@ -42,11 +42,12 @@ function getItem(
 }
 
 // Item dropdown user
-const itemDropdown: any = [
-	{
-		label: 'Đăng xuất',
-		icon: <LogOut />,
-	},
+const itemDropdown: MenuProps['items'] = [
+  {
+    key: 'logout',  
+    label: 'Đăng xuất',
+    icon: <LogOut />,
+  },
 ];
 
 // Item menu overview
