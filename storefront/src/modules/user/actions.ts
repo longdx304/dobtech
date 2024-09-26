@@ -197,7 +197,6 @@ export async function updateCustomerShippingAddress(
 	addressId: string,
 	value: AddressProps
 ) {
-	console.log('value action', value);
 	const address = {
 		first_name: value.firstName,
 		last_name: value.lastName,
@@ -208,7 +207,7 @@ export async function updateCustomerShippingAddress(
 		province: value.province,
 		postal_code: value.postalCode,
 		country_code: value.countryCode,
-		metadata: value.metadata 
+		metadata: value.metadata,
 	} as StorePostCustomersCustomerAddressesAddressReq;
 
 	try {

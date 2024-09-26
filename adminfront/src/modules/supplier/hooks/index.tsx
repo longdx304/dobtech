@@ -72,11 +72,11 @@ export const useAdminUpdateSupplier = (id: string) => {
 	);
 };
 
-export const useAdminDeleteSupplier = (id: string) => {
+export const useAdminDeleteSupplier = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		async () => {
+		async (id: string) => {
 			const response = await api.supplier.delete(id);
 			return response.data;
 		},

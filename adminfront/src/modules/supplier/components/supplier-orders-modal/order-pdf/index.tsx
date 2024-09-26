@@ -3,6 +3,7 @@
 import { formatDate } from '@/utils/get-relative-time';
 import {
 	Document,
+	Font,
 	Page,
 	pdf,
 	StyleSheet,
@@ -11,12 +12,19 @@ import {
 } from '@react-pdf/renderer';
 import { FC } from 'react';
 import { pdfOrderRes } from '..';
+import { Region } from '@medusajs/medusa';
+
+// Register fonts that supports Vietnamese characters
+Font.register({
+	family: 'Roboto',
+	src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf',
+});
 
 // Styles for PDF
 const styles = StyleSheet.create({
 	page: {
 		padding: 30,
-		fontFamily: 'Helvetica',
+		fontFamily: 'Roboto',
 	},
 	header: {
 		flexDirection: 'row',
@@ -50,6 +58,7 @@ const styles = StyleSheet.create({
 		fontSize: 10,
 		color: '#555',
 		marginBottom: 3,
+		fontWeight: 'bold',
 	},
 	text: {
 		fontSize: 12,
@@ -93,9 +102,10 @@ const styles = StyleSheet.create({
 interface OrderPDFProps {
 	order: pdfOrderRes;
 	variants: any;
+	region?: Region;
 }
 
-const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants }) => {
+const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants, region }) => {
 	const total = order.lineItems.reduce(
 		(sum, item) => sum + item.quantity * (item.unit_price || 0),
 		0
@@ -151,20 +161,6 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants }) => {
 							</Text>
 						</View>
 					</View>
-					{/* <View style={styles.row}>
-						<View style={styles.column}>
-							<Text style={styles.label}>Estimated Production Time</Text>
-							<Text style={styles.text}>
-								{formatDate(order.estimated_production_time)}
-							</Text>
-						</View>
-						<View style={styles.column}>
-							<Text style={styles.label}>Settlement Time</Text>
-							<Text style={styles.text}>
-								{formatDate(order.settlement_time)}
-							</Text>
-						</View>
-					</View> */}
 				</View>
 
 				<View style={styles.section}>
@@ -193,13 +189,11 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants }) => {
 								</Text>
 								<Text style={styles.tableCell}>{item.quantity}</Text>
 								<Text style={styles.tableCell}>
-									{item.unit_price?.toLocaleString('vi-VN')} VND
+									{item.unit_price?.toLocaleString()} {region?.currency.symbol}
 								</Text>
 								<Text style={styles.tableCell}>
-									{(item.quantity * (item.unit_price || 0)).toLocaleString(
-										'vi-VN'
-									)}{' '}
-									VND
+									{(item.quantity * (item.unit_price || 0)).toLocaleString()}{' '}
+									{region?.currency.symbol}
 								</Text>
 							</View>
 						);
@@ -207,7 +201,8 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants }) => {
 					<View style={styles.total}>
 						<Text style={styles.totalLabel}>Total:</Text>
 						<Text style={styles.totalAmount}>
-							{total.toLocaleString('vi-VN')} VND
+							{total.toLocaleString()}
+							{region?.currency.symbol}
 						</Text>
 					</View>
 				</View>
@@ -220,10 +215,7 @@ export const OrderPDF: FC<OrderPDFProps> = (props) => {
 	return <OrderPDFDocument {...props} />;
 };
 
-export const generatePdfBlob = async (
-	order: pdfOrderRes,
-	variants: any
-) => {
+export const generatePdfBlob = async (order: pdfOrderRes, variants: any) => {
 	const blob = await pdf(
 		<OrderPDFDocument order={order} variants={variants} />
 	).toBlob();

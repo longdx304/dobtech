@@ -6,7 +6,7 @@ import {
 	ProductCategory,
 	ProductCollection,
 } from '@medusajs/medusa';
-import { Form, message, type FormProps, type CollapseProps } from 'antd';
+import { Form, message, type CollapseProps, type FormProps } from 'antd';
 import { Minus, Plus } from 'lucide-react';
 import { useAdminCreateProduct } from 'medusa-react';
 import { useRouter } from 'next/navigation';
@@ -17,8 +17,11 @@ import { Flex } from '@/components/Flex';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
+import { getErrorMessage } from '@/lib/utils';
 import { FormImage } from '@/types/common';
 import { NewProductForm, ProductStatus } from '@/types/products';
+import { ERoutes } from '@/types/routes';
+import { persistedPrice } from '@/utils/prices';
 import {
 	AttributeForm,
 	GeneralForm,
@@ -27,9 +30,6 @@ import {
 	ThumbnailForm,
 } from './components';
 import { AddVariant } from './components/variant-form';
-import { getErrorMessage } from '@/lib/utils';
-import { ERoutes } from '@/types/routes';
-import { persistedPrice } from '@/utils/prices';
 
 interface Props {
 	type?: string;
@@ -61,14 +61,12 @@ export default function ProductModal({
 
 	// handle form submit
 	const onFinish: FormProps<NewProductForm>['onFinish'] = async (values) => {
-		console.log('values:', values);
 		// Payload
 		const payload = createPayload(
 			values,
 			true,
 			isFeatureEnabled('sales_channels')
 		);
-		console.log('payload:', payload);
 
 		// Prepped images thumbnail
 		if (values.thumbnail?.length) {
