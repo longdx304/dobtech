@@ -133,7 +133,7 @@ export default function ProductActions({
 					)}
 				</div>
 
-				<Button
+				{/* <Button
 					onClick={handleAddToCart}
 					disabled={
 						!inStock || !variant || !!disabled || isAdding || !options || !price
@@ -147,7 +147,7 @@ export default function ProductActions({
 						: !inStock
 						? 'Hàng đã hết'
 						: 'Thêm vào giỏ hàng'}
-				</Button>
+				</Button> */}
 			</div>
 		</>
 	);
