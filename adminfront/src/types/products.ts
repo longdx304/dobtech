@@ -61,33 +61,33 @@ export interface IProductRequest {
 }
 
 export type GeneralFormType = {
-  title: string;
-  subtitle?: string | null;
-  handle?: string;
-  material?: string | null;
-  description?: string | null;
+	title: string;
+	subtitle?: string | null;
+	handle?: string;
+	material?: string | null;
+	description?: string | null;
 	discounted: boolean;
-}
+};
 
 export type Option = {
-  value: string;
-  label: string;
-}
+	value: string;
+	label: string;
+};
 
 export type OrganizeFormType = {
-  type?: Option | null;
-  collection?: Option | null;
-  tags?: string[] | null;
-  categories?: string[] | null;
-}
+	type?: Option | null;
+	collection?: Option | null;
+	tags?: string[] | null;
+	categories?: string[] | null;
+};
 
 export type OptionsFormType = {
 	title: string;
 	values: string[];
-}
+};
 export type VariantFormType = {
 	title: string;
-	options: { value: string, option_id?: string }[];
+	options: { value: string; option_id?: string }[];
 	manage_inventory?: boolean;
 	allow_backorder?: boolean;
 	sku?: string;
@@ -103,20 +103,24 @@ export type VariantFormType = {
 	hs_code?: string;
 	origin_country?: string;
 	supplier_price?: number;
-}
+	prices?: {
+		amount?: number;
+		currency_code?: string;
+	}[];
+};
 
 export type DimensionsFormType = {
-  length?: number | null;
-  width?: number | null;
-  height?: number | null;
-  weight?: number | null;
-}
+	length?: number | null;
+	width?: number | null;
+	height?: number | null;
+	weight?: number | null;
+};
 
 export type CustomsFormType = {
-  mid_code?: string | null;
-  hs_code?: string | null;
-  origin_country?: Option | null;
-}
+	mid_code?: string | null;
+	hs_code?: string | null;
+	origin_country?: Option | null;
+};
 
 export type FormImage = {
 	id: string;
@@ -125,26 +129,31 @@ export type FormImage = {
   size?: number;
   nativeFile?: File;
 	selected?: boolean;
-}
+};
 
 export type ThumbnailFormType = FormImage[];
 
 export type MediaFormType = FormImage[];
 
 export type NewProductForm = {
-  general: GeneralFormType;
-  organize: OrganizeFormType;
+	general: GeneralFormType;
+	organize: OrganizeFormType;
 	options: OptionsFormType[];
-  variants: VariantFormType[];
-  dimensions: DimensionsFormType;
-  customs: CustomsFormType;
-  thumbnail: ThumbnailFormType;
-  media: MediaFormType;
-}
+	variants: VariantFormType[];
+	defaultPrice?: {
+		amount?: number;
+		supplier_price?: number;
+		currency_code?: string;
+	};
+	dimensions: DimensionsFormType;
+	customs: CustomsFormType;
+	thumbnail: ThumbnailFormType;
+	media: MediaFormType;
+};
 
 export enum ProductStatus {
-  DRAFT = "draft",
-  PROPOSED = "proposed",
-  PUBLISHED = "published",
-  REJECTED = "rejected",
+	DRAFT = 'draft',
+	PROPOSED = 'proposed',
+	PUBLISHED = 'published',
+	REJECTED = 'rejected',
 }
