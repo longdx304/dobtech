@@ -23,6 +23,7 @@ const variantsColumns = ({
 	{
 		title: 'SKU',
 		dataIndex: 'sku',
+		width: 120,
 		key: 'sku',
 	},
 	{
@@ -42,6 +43,14 @@ const variantsColumns = ({
 		render: (_: any) => {
 			return formatAmountWithSymbol({ amount: _, currency: 'vnd' });
 		},
+	},
+	{
+		title: 'Định lượng đôi',
+		dataIndex: 'allowed_quantities',
+		key: 'allowed_quantities',
+		render: (_: any) => {
+			return _
+		}
 	},
 	{
 		title: '',

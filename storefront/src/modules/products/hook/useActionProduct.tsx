@@ -110,13 +110,29 @@ const useActionProduct = ({ product }: Props) => {
 		}
 	}, [variants, variant]);
 
+	
+	// get the allowed quantities of the selected variant
+	const allowedQuantities = useMemo(() => {
+		if (variant) {
+			return (variant as any)?.allowed_quantities;
+		}
+		return 6;
+	}, [variant]);
+
+	// Initialize the quantity when allowedQuantities change
+	useEffect(() => {
+		if (allowedQuantities) {
+			setQuantity(allowedQuantities);  // Set initial quantity to allowedQuantities
+		}
+	}, [allowedQuantities]);
+
 	const handleAddNumber = () => {
-		setQuantity(quantity + 1);
+		setQuantity(quantity + allowedQuantities);
 	};
 
 	const handleSubtractNumber = () => {
-		if (quantity > 1) {
-			setQuantity(quantity - 1);
+		if (quantity > allowedQuantities) {
+			setQuantity(quantity - allowedQuantities); 
 		}
 	};
 
