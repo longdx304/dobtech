@@ -260,7 +260,6 @@ const createPayload = (
 			barcode: v?.barcode || undefined,
 			manage_inventory: v?.manage_inventory || true,
 			allow_backorder: v?.allow_backorder || false,
-			prices: [],
 			// prices: getVariantPrices(v.prices),
 			width: v?.width || undefined,
 			length: v?.length || undefined,
@@ -270,6 +269,13 @@ const createPayload = (
 			mid_code: v?.mid_code || undefined,
 			origin_country: v?.origin_country || undefined,
 			supplier_price: +persistedPrice('vnd', v?.supplier_price ?? 0),
+			prices: v?.prices?.map((price) => ({
+				amount: +persistedPrice(
+					price?.currency_code ?? 'vnd',
+					price?.amount ?? 0
+				),
+				currency_code: price.currency_code,
+			})) as any,
 		})),
 		// Dimensions
 		width: data?.dimensions?.width || undefined,
