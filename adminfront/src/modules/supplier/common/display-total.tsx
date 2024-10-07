@@ -62,7 +62,7 @@ export const DisplayTotalAmount = ({
 			</div>
 			{variant === 'regular' && (
 				<div className="font-normal text-gray-500">
-					{currency.toUpperCase()}
+					{currency?.toUpperCase()}
 				</div>
 			)}
 		</div>

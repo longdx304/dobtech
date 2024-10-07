@@ -795,5 +795,20 @@ export default {
 			const path = `/admin/supplier-order/${id}`;
 			return medusaRequest('GET', path);
 		},
+
+		updateLineItem(id, data) {
+			const path = `/admin/supplier-order/${id}`;
+			return medusaRequest('PUT', path, data);
+		},
+
+		delete(id) {
+			const path = `/admin/supplier-order/${id}`;
+			return medusaRequest('DELETE', path);
+		},
+
+		deleteLineItem(supplierOrderId, lineItemId) {
+      const path = `/admin/supplier-order/${supplierOrderId}`;
+      return medusaRequest('DELETE', path, { lineItemId });
+    },
 	},
 };

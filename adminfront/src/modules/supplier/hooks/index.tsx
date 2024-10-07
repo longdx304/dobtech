@@ -1,4 +1,8 @@
-import { SupplierListResponse, SupplierOrderListRes } from '@/types/supplier';
+import {
+	SupplierListResponse,
+	SupplierOrder,
+	SupplierOrderListRes,
+} from '@/types/supplier';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../../services/api';
 
@@ -120,13 +124,50 @@ export const useAdminCreateSupplierOrders = () => {
 	);
 };
 
-export const useAdminSupplierOrdersById = (id: string, options = {}) => {
-	return useQuery(
-		['admin-supplier-orders', id],
-		async () => {
+export function useAdminSupplierOrder(id: string) {
+	return useQuery({
+		queryKey: ['admin-supplier-order', id],
+		queryFn: async () => {
 			const response = await api.suplierOrders.retrieve(id);
 			return response.data;
 		},
-		options
+	});
+}
+
+export function useAdminSupplierOrderUpdateLineItem(id: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async ({ ...data }: any) => {
+			const response = await api.suplierOrders.updateLineItem(id, data);
+			return response.data;
+		},
+		{
+			onSuccess: (data: any) => {
+				queryClient.invalidateQueries(['admin-supplier-order', data.id]);
+			},
+		}
 	);
-};
+}
+
+export function useAdminSupplierOrderEditDeleteLineItem() {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async ({ supplierOrderId, lineItemId }: any) => {
+			const response = await api.suplierOrders.deleteLineItem(
+				supplierOrderId,
+				lineItemId
+			);
+			return response.data;
+		},
+		{
+			onSuccess: (_, { supplierOrderId }) => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}

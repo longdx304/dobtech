@@ -1,3 +1,4 @@
+import { Cart, User } from '@medusajs/medusa';
 
 export interface Supplier {
 	id: string;
@@ -37,6 +38,18 @@ export interface SupplierOrdersReq {
 	metadata?: Record<string, unknown>;
 }
 
+export interface UpdateLineItem {
+	variantId: string;
+	quantity: number;
+	unit_price?: number;
+}
+
+export interface UpdateLineItemSupplierOrderReq {
+	cartId: string;
+	lineItems: UpdateLineItem[];
+	metadata?: Record<string, any>;
+}
+
 export interface SupplierOrders {
 	id: string;
 	display_id: number;
@@ -63,3 +76,25 @@ export interface SupplierOrderListRes {
 	limit: number;
 }
 
+export interface SupplierOrder {
+	id: string;
+	cart_id: string;
+	cart: Cart;
+	display_id: number;
+	supplier_id: string;
+	supplier: Supplier;
+	documents: any[];
+	user_id: string;
+	user: User;
+	status: string;
+	payment_status: string;
+	fulfillment_status: string;
+	estimated_production_time: string;
+	settlement_time: string;
+	tax_rate: number;
+	metadata: Record<string, any>;
+	no_notification?: boolean;
+	created_at: string;
+	updated_at: string;
+	canceled_at?: string | null;
+}
