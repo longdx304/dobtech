@@ -7,7 +7,7 @@ import Medusa from '@/services/api';
 import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PDFViewer } from '@react-pdf/renderer';
-import { message } from 'antd';
+import { message, Spin } from 'antd';
 import {
 	useAdminRegion,
 	useAdminRegions,
@@ -299,12 +299,16 @@ const SupplierOrdersModal: FC<Props> = ({
 							Tạo đơn đặt hàng
 						</Button>,
 					]}
+				loading={isSubmitting}
 				>
 					<PDFViewer width="100%" height="600px">
 						<OrderPDF order={pdfOrder} variants={variants} region={region} />
 					</PDFViewer>
 				</Modal>
 			)}
+
+			{/* show loading when submitting pdf */}
+			<Spin spinning={isSubmitting} />
 		</>
 	);
 };

@@ -10,18 +10,26 @@ import { useMemo } from 'react';
 import OrderLine from './order-line';
 import { useSupplierOrderEdit } from '../edit-supplier-order-modal/context';
 import { DisplayTotal } from '@/modules/supplier/common';
+import { SupplierOrder } from '@/types/supplier';
 
 type Props = {
-	order: any | undefined;
+	supplierOrder: SupplierOrder | undefined;
 	isLoading: boolean;
 	reservations: ReservationItemDTO[];
 	refetch?: () => void;
 };
 
-const Summary = ({ order, isLoading, reservations = [], refetch }: Props) => {
+const Summary = ({
+	supplierOrder,
+	isLoading,
+	reservations = [],
+	refetch,
+}: Props) => {
 	const { showModal } = useSupplierOrderEdit();
 
-	const { cart, refetch: refetchCart } = useGetCart(order?.cart?.id ?? null);
+	const { cart, refetch: refetchCart } = useGetCart(
+		supplierOrder?.cart?.id as string
+	);
 
 	const reservationItemsMap = useMemo(() => {
 		if (!reservations?.length) {
@@ -56,7 +64,7 @@ const Summary = ({ order, isLoading, reservations = [], refetch }: Props) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	if (!order) {
+	if (!supplierOrder) {
 		return (
 			<Card loading={isLoading}>
 				<Empty description="Chưa có đơn hàng" />
@@ -64,7 +72,9 @@ const Summary = ({ order, isLoading, reservations = [], refetch }: Props) => {
 		);
 	}
 
-	const isAllocatable = !['canceled', 'archived'].includes(order.status);
+	const isAllocatable = !['canceled', 'archived'].includes(
+		supplierOrder.status
+	);
 
 	return (
 		<Card loading={isLoading} className="px-4">
@@ -79,10 +89,10 @@ const Summary = ({ order, isLoading, reservations = [], refetch }: Props) => {
 					<OrderLine
 						key={item.id}
 						item={item}
-						currencyCode={cart.region.currency_code}
+						currencyCode={cart?.region.currency_code}
 						reservations={reservationItemsMap[item.id]}
 						isAllocatable={isAllocatable}
-						paymentStt={order.status}
+						paymentStt={supplierOrder?.payment_status}
 						refetch={refetchCart}
 					/>
 				))}

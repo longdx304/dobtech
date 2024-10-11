@@ -1,5 +1,11 @@
 'use client';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import {
+	useAdminCreateSupplierOrderEdit,
+	useAdminSupplierOrderEdits,
+} from '@/modules/supplier/hooks/supplier-order-edits';
+import { SupplierOrderEdit } from '@/types/supplier';
+import { message } from 'antd';
 
 import React, { PropsWithChildren, useContext, useState } from 'react';
 
@@ -9,6 +15,7 @@ type SupplierOrderEditContextType = {
 	isModalVisible: boolean;
 	activeOrderEditId?: string | undefined;
 	setActiveOrderEditId: (id: string | undefined) => void;
+	supplierOrderEdits?: SupplierOrderEdit[];
 };
 
 const defaultSupplierOrderEditContext: SupplierOrderEditContextType = {
@@ -17,17 +24,20 @@ const defaultSupplierOrderEditContext: SupplierOrderEditContextType = {
 	isModalVisible: false,
 	activeOrderEditId: undefined,
 	setActiveOrderEditId: () => {},
+	supplierOrderEdits: undefined,
 };
 
 const SupplierOrderEditContext = React.createContext(
 	defaultSupplierOrderEditContext
 );
 
-type SupplierOrderEditProviderProps = PropsWithChildren<{ orderId: string }>;
+type SupplierOrderEditProviderProps = PropsWithChildren<{
+	supplierOrderId: string;
+}>;
 
 export const SupplierOrderEditProvider = ({
 	children,
-	orderId,
+	supplierOrderId,
 }: SupplierOrderEditProviderProps) => {
 	const {
 		state: isModalVisible,
@@ -39,10 +49,27 @@ export const SupplierOrderEditProvider = ({
 		string | undefined
 	>(undefined);
 
+	const { data } = useAdminSupplierOrderEdits({
+		supplier_order_id: supplierOrderId,
+		// limit: count, // TODO
+	});
+
+	const { mutateAsync: createOrderEdit } = useAdminCreateSupplierOrderEdit();
+
 	const handleOpenModal = async () => {
-		setActiveOrderEditId(orderId);
+		await createOrderEdit({ supplier_order_id: supplierOrderId })
+			.then(({ order_edit }) => {
+				console.log('order_edit handle open', order_edit);
+				setActiveOrderEditId(order_edit.id);
+			})
+			.catch(() => {
+				message.error('Đã có một đơn hãng đang hoạt động trên đơn hãng không');
+				hideModal();
+			});
 		onOpen();
 	};
+
+
 
 	return (
 		<SupplierOrderEditContext.Provider
@@ -52,6 +79,7 @@ export const SupplierOrderEditProvider = ({
 				isModalVisible,
 				activeOrderEditId,
 				setActiveOrderEditId,
+				supplierOrderEdits: data?.order_edits,
 			}}
 		>
 			{children}

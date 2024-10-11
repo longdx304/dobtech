@@ -18,38 +18,54 @@ import { useGetCart } from 'medusa-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSupplierOrderEdit } from './context';
 import SupplierOrderEditLine from './supplier-order-edit-line';
+import {
+	useAdminDeleteSupplierOrderEdit,
+	useAdminUpdateSupplierOrderEdit,
+} from '@/modules/supplier/hooks/supplier-order-edits';
 
 type SupplierOrderEditModalContainerProps = {
-	order: any;
+	supplierOrder: SupplierOrder | null;
 };
 
 const SupplierOrderEditModalContainer = (
 	props: SupplierOrderEditModalContainerProps
 ) => {
-	const { order } = props;
-	const { cart: supplierCartEdit, refetch } = useGetCart(
-		order?.cart?.id ?? null
+	const { supplierOrder } = props;
+	const { cart: supplierCart, refetch } = useGetCart(
+		supplierOrder?.cart?.id ?? null
 	);
 
-	const { isModalVisible, hideModal, activeOrderEditId, setActiveOrderEditId } =
-		useSupplierOrderEdit();
+	const {
+		isModalVisible,
+		hideModal,
+		orderEdits,
+		supplierOrderEdits,
+		activeOrderEditId,
+		setActiveOrderEditId,
+	} = useSupplierOrderEdit();
+
+	const supplierOrderEdit = supplierOrderEdits?.find(
+		(oe) => oe.id === activeOrderEditId
+	);
 
 	const onClose = () => {
 		hideModal();
 	};
 
-	console.log('supplierCartEdit', supplierCartEdit);
+	if (!supplierOrderEdit) {
+		return null;
+	}
+
 	return (
 		<SupplierOrderEditModal
-			orderEditId={order?.id}
 			state={isModalVisible}
 			close={onClose}
-			currentSubtotal={supplierCartEdit?.subtotal}
-			regionId={supplierCartEdit?.region_id}
-			customerId={order?.user?.id}
-			currencyCode={supplierCartEdit?.region?.currency_code}
-			paidTotal={supplierCartEdit?.total}
-			orderEdit={supplierCartEdit}
+			supplierOrderEdit={supplierOrderEdit}
+			currentSubtotal={supplierCart?.subtotal}
+			regionId={supplierCart?.region_id}
+			customerId={supplierOrder?.user?.id}
+			currencyCode={supplierCart?.region?.currency_code}
+			paidTotal={supplierCart?.total}
 			refetch={refetch}
 		/>
 	);
@@ -61,7 +77,7 @@ type SupplierOrderEditModalProps = {
 	state: boolean;
 	close: () => void;
 	orderEditId: string;
-	orderEdit: any;
+	supplierOrderEdit: any;
 	currencyCode?: string;
 	regionId?: string;
 	customerId?: string;
@@ -75,7 +91,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 		state,
 		close,
 		orderEditId,
-		orderEdit,
+		supplierOrderEdit,
 		currencyCode,
 		regionId,
 		customerId,
@@ -97,7 +113,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 	const [itemQuantities, setItemQuantities] = useState<ItemQuantity[]>([]);
 	const [itemPrices, setItemPrices] = useState<ItemPrice[]>([]);
 
-	const showTotals = currentSubtotal !== orderEdit?.items?.subtotal;
+	// const showTotals = currentSubtotal !== orderEdit?.items?.subtotal;
 	// const hasChanges = !!orderEdit?.changes?.length;
 
 	// const {
@@ -105,12 +121,12 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 	// 	isLoading: isRequestingConfirmation,
 	// } = useAdminRequestOrderEditConfirmation(orderEdit.id);
 
-	// const { mutateAsync: updateOrderEdit, isLoading: isUpdating } =
-	// 	useAdminUpdateOrderEdit(orderEdit.id);
+	const { mutateAsync: updateOrderEdit, isLoading: isUpdating } =
+		useAdminUpdateSupplierOrderEdit(supplierOrderEdit?.id);
 
-	// const { mutateAsync: deleteOrderEdit } = useAdminDeleteOrderEdit(
-	// 	orderEdit.id
-	// );
+	const { mutateAsync: deleteOrderEdit } = useAdminDeleteSupplierOrderEdit(
+		supplierOrderEdit?.id
+	);
 
 	// const { mutateAsync: addLineItem, isLoading: loadingAddLineItem } =
 	// 	useAdminOrderEditAddLineItem(orderEdit.id);
@@ -134,7 +150,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 
 	const onCancel = async () => {
 		// NOTE: has to be this order of ops
-		// await deleteOrderEdit();
+		await deleteOrderEdit();
 		close();
 	};
 
@@ -164,9 +180,6 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 		const supplierOrderReq: UpdateLineItemSupplierOrderReq = {
 			cartId: orderEdit?.id,
 			lineItems,
-			metadata: {
-				change: 'item_add',
-			},
 		};
 
 		try {
@@ -193,7 +206,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 		setShowFilter((s) => !s);
 	};
 
-	let displayItems = orderEdit?.items?.sort(
+	let displayItems = supplierOrderEdit?.items?.sort(
 		// @ts-ignore
 		(a, b) => new Date(a.created_at) - new Date(b.created_at)
 	);
@@ -210,8 +223,8 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 		<Modal
 			open={state}
 			handleOk={onSave}
-			// isLoading={isUpdating || isRequestingConfirmation}
-			// disabled={isUpdating || isRequestingConfirmation || !hasChanges}
+			isLoading={isUpdating}
+			disabled={isUpdating}
 			handleCancel={onCancel}
 			width={800}
 		>
@@ -225,7 +238,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 			</Flex>
 			<div className="flex flex-col mt-4">
 				{/* ITEMS */}
-				{displayItems?.map((oi) => (
+				{/* {displayItems?.map((oi) => (
 					<SupplierOrderEditLine
 						orderEditId={orderEditId}
 						key={oi.id}
@@ -235,11 +248,11 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 						currencyCode={currencyCode}
 						refetch={refetch}
 					/>
-				))}
+				))} */}
 				{/* TOTALS */}
-				{showTotals && (
+				{/* {showTotals && (
 					<TotalsSection currencyCode={currencyCode} amountPaid={paidTotal} />
-				)}
+				)} */}
 			</div>
 			<AddProductVariant
 				title="Thêm biến thể sản phẩm"

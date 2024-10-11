@@ -27,12 +27,14 @@ export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 			cart: supplierOrder?.cart,
 			payment_status: supplierOrder?.payment_status,
 			tax_rate: supplierOrder?.tax_rate,
+			items: supplierOrder?.items,
 		};
 	}, [supplierOrder]);
 
 	const refetchOrder = () => {
 		refetch();
 	};
+
 	return (
 		<Row gutter={[16, 16]} className="mb-12">
 			<Col span={24}>
@@ -41,7 +43,7 @@ export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 			<Col xs={24} lg={14} className="flex flex-col gap-y-4">
 				<Information order={order!} isLoading={isLoading} />
 				<Summary
-					order={order!}
+					supplierOrder={supplierOrder!}
 					isLoading={isLoading}
 					reservations={[]}
 					refetch={refetchOrder}
@@ -59,7 +61,7 @@ export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 				/> */}
 			</Col>
 			{/* open the edit modal: add & update line item */}
-			{order && <SupplierOrderEditModalContainer order={order} />}
+			{order && <SupplierOrderEditModalContainer supplierOrder={order} />}
 		</Row>
 	);
 }

@@ -1,4 +1,4 @@
-import { Cart, User } from '@medusajs/medusa';
+import { Cart, LineItem, OrderEdit, User } from '@medusajs/medusa';
 
 export interface Supplier {
 	id: string;
@@ -91,10 +91,15 @@ export interface SupplierOrder {
 	fulfillment_status: string;
 	estimated_production_time: string;
 	settlement_time: string;
+	items: LineItem[];
 	tax_rate: number;
 	metadata: Record<string, any>;
 	no_notification?: boolean;
 	created_at: string;
 	updated_at: string;
 	canceled_at?: string | null;
+}
+
+export interface SupplierOrderEdit extends OrderEdit {
+	supplier_order_id?: string;
 }

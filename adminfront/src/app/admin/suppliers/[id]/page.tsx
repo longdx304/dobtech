@@ -16,7 +16,7 @@ interface Props {
 export default async function SupplierOrderDetailPage({ params }: Props) {
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
-			<SupplierOrderEditProvider orderId={params.id!}>
+			<SupplierOrderEditProvider supplierOrderId={params.id!}>
 				<SupplierOrdersDetail id={params.id} />
 			</SupplierOrderEditProvider>
 		</Flex>
