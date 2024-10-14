@@ -2,15 +2,14 @@ import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Title } from '@/components/Typography';
+import { DisplayTotal } from '@/modules/supplier/common';
+import { SupplierOrder } from '@/types/supplier';
 import { ReservationItemDTO } from '@medusajs/types';
 import { Divider, Empty } from 'antd';
 import { Pencil } from 'lucide-react';
-import { useGetCart } from 'medusa-react';
 import { useMemo } from 'react';
-import OrderLine from './order-line';
 import { useSupplierOrderEdit } from '../edit-supplier-order-modal/context';
-import { DisplayTotal } from '@/modules/supplier/common';
-import { SupplierOrder } from '@/types/supplier';
+import OrderLine from './order-line';
 
 type Props = {
 	supplierOrder: SupplierOrder | undefined;
@@ -26,10 +25,6 @@ const Summary = ({
 	refetch,
 }: Props) => {
 	const { showModal } = useSupplierOrderEdit();
-
-	const { cart, refetch: refetchCart } = useGetCart(
-		supplierOrder?.cart?.id as string
-	);
 
 	const reservationItemsMap = useMemo(() => {
 		if (!reservations?.length) {
@@ -85,40 +80,40 @@ const Summary = ({
 				</Flex>
 			</div>
 			<div>
-				{cart?.items?.map((item: any, i: number) => (
+				{supplierOrder?.items?.map((item: any, i: number) => (
 					<OrderLine
 						key={item.id}
 						item={item}
-						currencyCode={cart?.region.currency_code}
+						currencyCode={'vnd'}
 						reservations={reservationItemsMap[item.id]}
 						isAllocatable={isAllocatable}
 						paymentStt={supplierOrder?.payment_status}
-						refetch={refetchCart}
+						refetch={refetch}
 					/>
 				))}
 				<Divider className="my-2" />
-				<DisplayTotal
-					currency={cart?.region.currency_code}
-					totalAmount={cart?.subtotal}
+				{/* <DisplayTotal
+					currency={'vnd'}
+					totalAmount={1000}
 					totalTitle={'Tạm tính'}
 				/>
 
 				<DisplayTotal
-					currency={cart?.region.currency_code}
-					totalAmount={cart?.shipping_total}
+					currency={'vnd'}
+					totalAmount={0}
 					totalTitle={'Vận chuyển'}
 				/>
 				<DisplayTotal
-					currency={cart?.region.currency_code}
-					totalAmount={cart?.tax_total}
+					currency={'vnd'}
+					totalAmount={0}
 					totalTitle={'Thuế'}
 				/>
 				<DisplayTotal
 					variant={'large'}
-					currency={cart?.region.currency_code}
-					totalAmount={cart?.total}
+					currency={'vnd'}
+					totalAmount={1000}
 					totalTitle={'Tổng cộng'}
-				/>
+				/> */}
 			</div>
 		</Card>
 	);

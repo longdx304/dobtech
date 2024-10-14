@@ -1,7 +1,4 @@
-import {
-	SupplierListResponse,
-	SupplierOrderListRes
-} from '@/types/supplier';
+import { SupplierListResponse, SupplierOrderListRes } from '@/types/supplier';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../../services/api';
 
@@ -128,7 +125,7 @@ export function useAdminSupplierOrder(id: string) {
 		queryKey: ['admin-supplier-order', id],
 		queryFn: async () => {
 			const response = await api.suplierOrders.retrieve(id);
-			return response.data;
+			return response.data as unknown as any;
 		},
 	});
 }
@@ -144,28 +141,6 @@ export function useAdminSupplierOrderUpdateLineItem(id: string) {
 		{
 			onSuccess: (data: any) => {
 				queryClient.invalidateQueries(['admin-supplier-order', data.id]);
-			},
-		}
-	);
-}
-
-export function useAdminSupplierOrderEditDeleteLineItem() {
-	const queryClient = useQueryClient();
-
-	return useMutation(
-		async ({ supplierOrderId, lineItemId }: any) => {
-			const response = await api.suplierOrders.deleteLineItem(
-				supplierOrderId,
-				lineItemId
-			);
-			return response.data;
-		},
-		{
-			onSuccess: (_, { supplierOrderId }) => {
-				queryClient.invalidateQueries([
-					'admin-supplier-order',
-					supplierOrderId,
-				]);
 			},
 		}
 	);

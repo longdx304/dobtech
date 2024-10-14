@@ -38,17 +38,18 @@ export interface SupplierOrdersReq {
 	metadata?: Record<string, unknown>;
 }
 
-export interface UpdateLineItem {
-	variantId: string;
+export interface AddOrderEditLineItemInput {
+	variant_id: string;
 	quantity: number;
 	unit_price?: number;
-}
-
-export interface UpdateLineItemSupplierOrderReq {
-	cartId: string;
-	lineItems: UpdateLineItem[];
 	metadata?: Record<string, any>;
 }
+
+// export interface UpdateLineItemSupplierOrderReq {
+// 	cartId: string;
+// 	lineItems: UpdateLineItem[];
+// 	metadata?: Record<string, any>;
+// }
 
 export interface SupplierOrders {
 	id: string;

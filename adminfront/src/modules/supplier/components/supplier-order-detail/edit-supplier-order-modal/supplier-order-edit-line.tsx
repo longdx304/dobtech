@@ -1,64 +1,81 @@
 import { ActionAbles } from '@/components/Dropdown';
+import { InputNumber } from '@/components/Input';
 import { getErrorMessage } from '@/lib/utils';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
+import { useAdminSupplierOrderUpdateLineItem } from '@/modules/supplier/hooks';
 import {
+	useAdminDeleteSOrderEditItemChange,
+	useAdminSupplierOrderEditAddLineItem,
 	useAdminSupplierOrderEditDeleteLineItem,
-	useAdminSupplierOrderUpdateLineItem,
-} from '@/modules/supplier/hooks';
-import { UpdateLineItemSupplierOrderReq } from '@/types/supplier';
+	useAdminSupplierOrderEditUpdateLineItem,
+} from '@/modules/supplier/hooks/supplier-order-edits';
 import { formatAmountWithSymbol } from '@/utils/prices';
-import { LineItem } from '@medusajs/medusa';
+import { LineItem, OrderItemChange, ProductVariant } from '@medusajs/medusa';
 import { message, Modal } from 'antd';
 import clsx from 'clsx';
-import {
-	CircleAlert,
-	CopyPlus,
-	Minus,
-	Plus,
-	Trash2
-} from 'lucide-react';
+import { CircleAlert, CopyPlus, Minus, Plus, Trash2 } from 'lucide-react';
 import { useAdminOrderEditUpdateLineItem } from 'medusa-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 type SupplierOrderEditLineProps = {
-	orderEditId: string;
 	item: LineItem;
+	customerId: string;
+	regionId: string;
 	currencyCode: string;
-	refetch: () => void;
+	change?: OrderItemChange;
 };
 
 let isLoading = false;
 const SupplierOrderEditLine = ({
-	orderEditId,
 	item,
 	currencyCode,
-
-	refetch,
+	change,
+	customerId,
+	regionId,
 }: SupplierOrderEditLineProps) => {
-	const isNew = item?.metadata?.change === 'item_add';
-	// const isModified = change?.type === 'item_update';
-	const isLocked = item.quantity === 1;
-	const [changeQuantity, setChangeQuantity] = useState<number>(0);
+	const isNew = change?.type === 'item_add';
+	const isModified = change?.type === 'item_update';
+	const isLocked = !!item.fulfilled_quantity;
 
-	// const { mutateAsync: addLineItem, isLoading: loadingAddLineItem } =
-	// 	useAdminOrderEditAddLineItem(item.order_edit_id!);
+	const [isLoading, setIsLoading] = useState(false);
+	const [quantity, setQuantity] = useState(item.quantity);
 
 	const { mutateAsync: addLineItem, isLoading: loadingAddLineItem } =
-		useAdminSupplierOrderUpdateLineItem(orderEditId);
+		useAdminSupplierOrderEditAddLineItem(item.order_edit_id!);
 
-	// const { mutateAsync: removeItem } = useAdminSupplierOrderEditDeleteLineItem();
-	const deleteLineItem = useAdminSupplierOrderEditDeleteLineItem();
-
-	const { mutateAsync: updateItem } = useAdminOrderEditUpdateLineItem(
+	const { mutateAsync: removeItem } = useAdminSupplierOrderEditDeleteLineItem(
 		item.order_edit_id!,
 		item.id
 	);
 
+	const { mutateAsync: updateItem } = useAdminSupplierOrderEditUpdateLineItem(
+		item.order_edit_id!,
+		item.id
+	);
+
+	const { mutateAsync: undoChange } = useAdminDeleteSOrderEditItemChange(
+		item.order_edit_id!,
+		change?.id as string
+	);
 
 	const onQuantityUpdate = async (newQuantity: number) => {
-		console.log('newQuantity', newQuantity);
-		
+		if (isLoading) {
+			return;
+		}
+
+		setIsLoading(true);
+
+		try {
+			await updateItem({ quantity: newQuantity });
+			setQuantity(newQuantity);
+			message.success('Cập nhật số lượng sản phẩm thành công');
+		} catch (error) {
+			message.error('Cập nhật thất bại');
+			console.error('Error updating quantity:', error);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const onDuplicate = async () => {
@@ -67,71 +84,34 @@ const SupplierOrderEditLine = ({
 			return;
 		}
 
-		const supplierOrderReq: UpdateLineItemSupplierOrderReq = {
-			cartId: item.cart_id,
-			lineItems: [
-				{
-					variantId: item.variant_id as string,
-					quantity: item.quantity,
-					unit_price: item.unit_price,
-				},
-			],
-			metadata: {
-				change: 'item_add',
-			},
-		};
-
 		try {
-			await addLineItem(supplierOrderReq, {
-				onSuccess: () => {
-					message.success('Sản phẩm được sao chép thành công');
-					refetch(); // Ensure cart is refetched
-				},
-				onError: (error) => {
-					message.error(getErrorMessage(error)); // Display detailed error message
-				},
+			await addLineItem({
+				variant_id: item.variant_id as string,
+				quantity: item.quantity,
+				unit_price: item.unit_price,
 			});
 		} catch (e) {
 			message.error('Không thể sao chép sản phẩm');
 		}
 	};
 
-
 	const onRemove = async () => {
-		Modal.confirm({
-			title: 'Bạn có muốn xoá sản phẩm này?',
-			content:
-				'Sản phẩm sẽ bị xoá khỏi hệ thống này. Bạn chắc chắn muốn xoá chứ?',
-			icon: (
-				<CircleAlert
-					style={{ width: 32, height: 24 }}
-					className="mr-2"
-					color="#E7B008"
-				/>
-			),
-			okType: 'danger',
-			okText: 'Đồng ý',
-			cancelText: 'Huỷ',
-			async onOk() {
-				deleteLineItem.mutateAsync(
-					{
-						supplierOrderId: orderEditId,
-						lineItemId: item.id,
-					},
-					{
-						onSuccess: () => {
-							message.success('Sản phẩm đã bị xóa');
-							refetch();
-							return;
-						},
-						onError: () => {
-							message.error('Không thể xóa sản phẩm');
-							return;
-						},
-					}
-				);
-			},
-		});
+		try {
+			if (change) {
+				if (change.type === 'item_add') {
+					await undoChange();
+				}
+				if (change.type === 'item_update') {
+					await undoChange();
+					await removeItem();
+				}
+			} else {
+				await removeItem();
+			}
+			message.success('Sản phẩm đã bị xóa');
+		} catch (e) {
+			message.error('Không thể xóa sản phẩm');
+		}
 	};
 
 	const actions = [
@@ -176,11 +156,11 @@ const SupplierOrderEditLine = ({
 							</div>
 						)}
 
-						{/* {isModified && (
+						{isModified && (
 							<div className="text-xs bg-orange-100 rounded-md mr-2 flex h-[24px] w-[68px] flex-shrink-0 items-center justify-center text-orange-500">
 								{'Đã sửa đổi'}
 							</div>
-						)} */}
+						)}
 					</div>
 					{item?.variant && (
 						<span className="font-normal text-gray-500 truncate">
@@ -199,31 +179,16 @@ const SupplierOrderEditLine = ({
 								'pointer-events-none': isLocked,
 							})}
 						>
-							<Minus
+							<InputNumber
+								addonBefore={<div>Số lượng</div>}
+								placeholder="Thay đổi số lượng"
+								size="small"
 								className={clsx('cursor-pointer text-gray-400', {
 									'pointer-events-none': isLoading,
 								})}
-								onClick={() =>
-									item.quantity > 1 && onQuantityUpdate(item.quantity - 1)
-								}
-								size={18}
-							/>
-							<span
-								className={clsx(
-									'min-w-[20px] px-0 sm:px-2 text-center text-gray-900',
-									{
-										'!text-gray-400': isLocked,
-									}
-								)}
-							>
-								{item.quantity}
-							</span>
-							<Plus
-								className={clsx('cursor-pointer text-gray-400', {
-									'pointer-events-none': isLoading,
-								})}
-								onClick={() => onQuantityUpdate(item.quantity + 1)}
-								size={18}
+								value={quantity}
+								onChange={(value) => onQuantityUpdate(Number(value))}
+								disabled={isLocked || isLoading}
 							/>
 						</div>
 						<div

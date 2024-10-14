@@ -17,19 +17,7 @@ export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 	const { data, isLoading, refetch } = useAdminSupplierOrder(id);
 	const supplierOrder = (data as any)?.supplierOrder as SupplierOrder;
 
-	const order = useMemo(() => {
-		return {
-			id: supplierOrder?.id,
-			display_id: supplierOrder?.display_id,
-			status: supplierOrder?.status,
-			user: supplierOrder?.user,
-			supplier: supplierOrder?.supplier,
-			cart: supplierOrder?.cart,
-			payment_status: supplierOrder?.payment_status,
-			tax_rate: supplierOrder?.tax_rate,
-			items: supplierOrder?.items,
-		};
-	}, [supplierOrder]);
+	
 
 	const refetchOrder = () => {
 		refetch();
@@ -41,9 +29,9 @@ export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 				<BackToOrders />
 			</Col>
 			<Col xs={24} lg={14} className="flex flex-col gap-y-4">
-				<Information order={order!} isLoading={isLoading} />
+				<Information supplierOrder={supplierOrder!} isLoading={isLoading} />
 				<Summary
-					supplierOrder={supplierOrder!}
+					supplierOrder={supplierOrder}
 					isLoading={isLoading}
 					reservations={[]}
 					refetch={refetchOrder}
@@ -61,7 +49,9 @@ export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 				/> */}
 			</Col>
 			{/* open the edit modal: add & update line item */}
-			{order && <SupplierOrderEditModalContainer supplierOrder={order} />}
+			{data?.supplierOrder && (
+				<SupplierOrderEditModalContainer supplierOrder={data?.supplierOrder} />
+			)}
 		</Row>
 	);
 }

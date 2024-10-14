@@ -26,11 +26,12 @@ const OrderLine = ({
 	refetch,
 }: OrderLineProps) => {
 	const { state, onClose, onOpen } = useToggleState();
+
 	return (
 		<div className="hover:bg-gray-50 rounded-md mx-[-5px] mb-1 flex h-[64px] justify-between px-[5px] cursor-pointer">
 			<div className="flex justify-center items-center space-x-4">
 				<div className="rounded-sm flex h-[48px] w-[36px] overflow-hidden">
-					{item.thumbnail ? (
+					{item?.thumbnail ? (
 						<Image
 							src={item.thumbnail}
 							height={48}
@@ -48,9 +49,7 @@ const OrderLine = ({
 					</span>
 					{item?.variant && (
 						<span className="font-normal text-gray-500 truncate">
-							{`${item.variant.title}${
-								item.variant.sku ? ` (${item.variant.sku})` : ''
-							}`}
+							{`${item.variant.title}`}
 						</span>
 					)}
 				</div>
@@ -62,7 +61,8 @@ const OrderLine = ({
 							<Pencil size={12} onClick={onOpen} />
 						)}
 						{formatAmountWithSymbol({
-							amount: (item?.total ?? 0) / item?.quantity,
+							amount: item?.unit_price ?? 0,
+							// amount: (item?.total ?? 0) / item?.quantity,
 							currency: currencyCode,
 							tax: [],
 						})}
@@ -70,7 +70,8 @@ const OrderLine = ({
 					<div className="font-normal text-gray-500">x {item.quantity}</div>
 					<div className="font-normal text-gray-900 min-w-[55px] text-right">
 						{formatAmountWithSymbol({
-							amount: item.total ?? 0,
+							amount: item.unit_price ?? 0,
+							// amount: item.total ?? 0,
 							currency: currencyCode,
 							tax: [],
 						})}
