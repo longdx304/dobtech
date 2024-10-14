@@ -7,7 +7,8 @@ import { Col, Row } from 'antd';
 import { useMemo } from 'react';
 import SupplierOrderEditModalContainer from '../../components/supplier-order-detail/edit-supplier-order-modal';
 import { useAdminSupplierOrder } from '../../hooks';
-import Timeline from '../../components/supplier-order-detail/timeline';
+import Documents from '../../components/supplier-order-detail/documents';
+// import Timeline from '../../components/supplier-order-detail/timeline';
 
 interface Props {
 	id: string;
@@ -48,6 +49,8 @@ export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 					reservations={[]}
 					refetch={refetchOrder}
 				/>
+				<Documents order={supplierOrder} isLoading={isLoading} />
+
 				{/* <Payment order={order} isLoading={isLoading} refetch={refetchOrder} />
 				<CustomerInfo order={order} isLoading={isLoading} /> */}
 			</Col>

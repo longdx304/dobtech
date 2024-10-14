@@ -76,6 +76,15 @@ export interface SupplierOrderListRes {
 	limit: number;
 }
 
+export interface SupplierOrderDocument {
+	id: string;
+	document_url: string;
+	supplier_order_id: string;
+	created_at: Date;
+	updated_at: Date;
+	metadata: Record<string, any>;
+}
+
 export interface SupplierOrder {
 	id: string;
 	cart_id: string;
@@ -83,7 +92,7 @@ export interface SupplierOrder {
 	display_id: number;
 	supplier_id: string;
 	supplier: Supplier;
-	documents: any[];
+	documents: SupplierOrderDocument[];
 	user_id: string;
 	user: User;
 	status: string;
@@ -102,4 +111,8 @@ export interface SupplierOrder {
 
 export interface SupplierOrderEdit extends OrderEdit {
 	supplier_order_id?: string;
+}
+
+export interface SupplierOrderDocumentRes {
+	documents: string | string[];
 }

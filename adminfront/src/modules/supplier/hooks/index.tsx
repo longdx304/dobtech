@@ -1,6 +1,7 @@
 import {
 	SupplierListResponse,
-	SupplierOrderListRes
+	SupplierOrderDocumentRes,
+	SupplierOrderListRes,
 } from '@/types/supplier';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../../services/api';
@@ -162,6 +163,50 @@ export function useAdminSupplierOrderEditDeleteLineItem() {
 		},
 		{
 			onSuccess: (_, { supplierOrderId }) => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}
+
+export function useAdminSupplierOrderCreateDocument(supplierOrderId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async ({ documents }: SupplierOrderDocumentRes) => {
+			const response = await api.suplierOrders.createDocument(
+				supplierOrderId,
+				documents
+			);
+			return response.data;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}
+
+export function useAdminSupplierOrderDeleteDocument(supplierOrderId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async ({ documentId }: { documentId: string }) => {
+			const response = await api.suplierOrders.deleteDocument(
+				supplierOrderId,
+				documentId
+			);
+			return response.data;
+		},
+		{
+			onSuccess: () => {
 				queryClient.invalidateQueries([
 					'admin-supplier-order',
 					supplierOrderId,

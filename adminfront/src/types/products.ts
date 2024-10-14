@@ -119,6 +119,7 @@ export type CustomsFormType = {
 }
 
 export type FormImage = {
+	id: string;
   url: string;
   name?: string;
   size?: number;

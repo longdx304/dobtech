@@ -810,6 +810,16 @@ export default {
 			const path = `/admin/supplier-order/${supplierOrderId}`;
 			return medusaRequest('DELETE', path, { lineItemId });
 		},
+
+		createDocument(supplierOrderId, documents) {
+			const path = `/admin/supplier-order/${supplierOrderId}/document`;
+			return medusaRequest('POST', path, documents);
+		},
+
+		deleteDocument(supplierOrderId, documentId) {
+			const path = `/admin/supplier-order/${supplierOrderId}/document/${documentId}`;
+			return medusaRequest('DELETE', path);
+		},
 	},
 
 	supplierOrderEdits: {
