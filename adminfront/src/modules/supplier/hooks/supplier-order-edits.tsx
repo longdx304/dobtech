@@ -16,7 +16,7 @@ export const useAdminSupplierOrderEdits = (query: Query = {}) => {
 		['admin-supplier-order-edits', query],
 		async () => {
 			const response = await api.supplierOrderEdits.list(query);
-			return response.data as unknown as any;
+			return response.data as any;
 		},
 		{
 			keepPreviousData: true,
@@ -101,12 +101,19 @@ export const useAdminSupplierOrderEditAddLineItem = (id: string) => {
 	);
 };
 
-export const useAdminSupplierOrderEditUpdateLineItem = (id: string, lineItemId: string) => {
+export const useAdminSupplierOrderEditUpdateLineItem = (
+	id: string,
+	lineItemId: string
+) => {
 	const queryClient = useQueryClient();
 
 	return useMutation(
 		async (data: any) => {
-			const response = await api.supplierOrderEdits.updateLineItem(id, lineItemId, data);
+			const response = await api.supplierOrderEdits.updateLineItem(
+				id,
+				lineItemId,
+				data
+			);
 			return response.data as unknown as any;
 		},
 		{
@@ -115,7 +122,7 @@ export const useAdminSupplierOrderEditUpdateLineItem = (id: string, lineItemId: 
 			},
 		}
 	);
-}
+};
 
 export const useAdminSupplierOrderEditDeleteLineItem = (
 	id: string,
@@ -153,14 +160,20 @@ export const useAdminRequestSOrderEditConfirmation = (id: string) => {
 			},
 		}
 	);
-}
+};
 
-export const useAdminDeleteSOrderEditItemChange = (id: string, itemChangeId: string) => {
+export const useAdminDeleteSOrderEditItemChange = (
+	id: string,
+	itemChangeId: string
+) => {
 	const queryClient = useQueryClient();
 
 	return useMutation(
 		async () => {
-			const response = await api.supplierOrderEdits.deleteItemChange(id, itemChangeId);
+			const response = await api.supplierOrderEdits.deleteItemChange(
+				id,
+				itemChangeId
+			);
 			return response.data as unknown as any;
 		},
 		{
@@ -169,4 +182,4 @@ export const useAdminDeleteSOrderEditItemChange = (id: string, itemChangeId: str
 			},
 		}
 	);
-}
+};

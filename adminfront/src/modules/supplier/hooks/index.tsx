@@ -49,7 +49,7 @@ export const useAdminSupplier = (id: string, options = {}) => {
 		['admin-supplier', id],
 		async () => {
 			const response = await api.supplier.retrieve(id);
-			return response.data;
+			return response.data as unknown as any;
 		},
 		options
 	);
@@ -125,7 +125,7 @@ export function useAdminSupplierOrder(id: string) {
 		queryKey: ['admin-supplier-order', id],
 		queryFn: async () => {
 			const response = await api.suplierOrders.retrieve(id);
-			return response.data as unknown as any;
+			return (response.data as any).supplierOrder;
 		},
 	});
 }

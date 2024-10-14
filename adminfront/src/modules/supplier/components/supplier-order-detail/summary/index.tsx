@@ -84,7 +84,7 @@ const Summary = ({
 					<OrderLine
 						key={item.id}
 						item={item}
-						currencyCode={'vnd'}
+						currencyCode={supplierOrder.currency_code}
 						reservations={reservationItemsMap[item.id]}
 						isAllocatable={isAllocatable}
 						paymentStt={supplierOrder?.payment_status}
@@ -92,28 +92,23 @@ const Summary = ({
 					/>
 				))}
 				<Divider className="my-2" />
-				{/* <DisplayTotal
-					currency={'vnd'}
-					totalAmount={1000}
+				<DisplayTotal
+					currency={supplierOrder.currency_code}
+					totalAmount={supplierOrder.subtotal}
 					totalTitle={'Tạm tính'}
 				/>
 
 				<DisplayTotal
-					currency={'vnd'}
-					totalAmount={0}
-					totalTitle={'Vận chuyển'}
-				/>
-				<DisplayTotal
-					currency={'vnd'}
-					totalAmount={0}
+					currency={supplierOrder.currency_code}
+					totalAmount={supplierOrder.tax_total}
 					totalTitle={'Thuế'}
 				/>
 				<DisplayTotal
 					variant={'large'}
-					currency={'vnd'}
-					totalAmount={1000}
+					currency={supplierOrder.currency_code}
+					totalAmount={supplierOrder.total}
 					totalTitle={'Tổng cộng'}
-				/> */}
+				/>
 			</div>
 		</Card>
 	);

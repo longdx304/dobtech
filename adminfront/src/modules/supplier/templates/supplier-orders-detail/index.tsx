@@ -8,19 +8,19 @@ import { useMemo } from 'react';
 import SupplierOrderEditModalContainer from '../../components/supplier-order-detail/edit-supplier-order-modal';
 import { useAdminSupplierOrder } from '../../hooks';
 import Timeline from '../../components/supplier-order-detail/timeline';
+import { useBuildTimeline } from '@/modules/orders/hooks/use-build-timeline';
 
 interface Props {
 	id: string;
 }
 
 export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
-	const { data, isLoading, refetch } = useAdminSupplierOrder(id);
-	const supplierOrder = (data as any)?.supplierOrder as SupplierOrder;
-
-	
+	const { data: supplierOrder, isLoading, refetch } = useAdminSupplierOrder(id);
+	const { events, refetch: refetchTimeline } = useBuildTimeline(id);
 
 	const refetchOrder = () => {
 		refetch();
+		refetchTimeline();
 	};
 
 	return (
@@ -36,21 +36,21 @@ export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 					reservations={[]}
 					refetch={refetchOrder}
 				/>
-				{/* <Payment order={order} isLoading={isLoading} refetch={refetchOrder} />
-				<CustomerInfo order={order} isLoading={isLoading} /> */}
+				{/* <Payment order={order} isLoading={isLoading} refetch={refetchOrder} /> */}
+				{/* <CustomerInfo order={order} isLoading={isLoading} /> */}
 			</Col>
 			<Col xs={24} lg={10}>
-				{/* <Timeline
-					orderId={order?.id}
+				<Timeline
+					orderId={supplierOrder?.id}
 					isLoading={isLoading}
 					events={events}
 					refetchOrder={refetch}
 					refetch={refetchTimeline}
-				/> */}
+				/>
 			</Col>
 			{/* open the edit modal: add & update line item */}
-			{data?.supplierOrder && (
-				<SupplierOrderEditModalContainer supplierOrder={data?.supplierOrder} />
+			{supplierOrder && (
+				<SupplierOrderEditModalContainer supplierOrder={supplierOrder} />
 			)}
 		</Row>
 	);
