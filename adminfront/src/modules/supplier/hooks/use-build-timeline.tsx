@@ -1,7 +1,6 @@
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import {
-	useAdminSupplier,
-	useAdminSupplierOrder,
+	useAdminSupplierOrder
 } from '@/modules/supplier/hooks';
 import {
 	ClaimOrder,
@@ -11,7 +10,6 @@ import {
 	Return,
 	Swap,
 } from '@medusajs/medusa';
-import _ from 'lodash';
 import { useAdminNotes, useAdminNotifications, useGetCart } from 'medusa-react';
 import { useMemo } from 'react';
 import useOrdersExpandParam from '../components/supplier-order-detail/utils/use-admin-expand-parameter';

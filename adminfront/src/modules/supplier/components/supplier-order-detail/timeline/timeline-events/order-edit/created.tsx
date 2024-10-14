@@ -7,7 +7,6 @@ import { getErrorMessage } from '@/lib/utils';
 import { OrderEditEvent } from '@/modules/orders/hooks/use-build-timeline';
 import { message, Popconfirm } from 'antd';
 
-// import TwoStepDelete from "../../../atoms/two-step-delete"
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
@@ -19,7 +18,6 @@ import {
 } from '@/modules/supplier/hooks/supplier-order-edits';
 import { ByLine } from '.';
 import EventContainer from '../event-container';
-import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
 
 type EditCreatedProps = {
 	event: OrderEditEvent;
