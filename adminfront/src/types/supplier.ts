@@ -31,24 +31,27 @@ export interface SupplierOrdersReq {
 	supplierId: string;
 	userId: string;
 	email: string;
+	region_id: string;
 	countryCode: string;
+	currency_code: string;
 	estimated_production_time: Date;
 	settlement_time: Date;
 	document_url: string;
 	metadata?: Record<string, unknown>;
 }
 
-export interface UpdateLineItem {
-	variantId: string;
+export interface AddOrderEditLineItemInput {
+	variant_id: string;
 	quantity: number;
 	unit_price?: number;
-}
-
-export interface UpdateLineItemSupplierOrderReq {
-	cartId: string;
-	lineItems: UpdateLineItem[];
 	metadata?: Record<string, any>;
 }
+
+// export interface UpdateLineItemSupplierOrderReq {
+// 	cartId: string;
+// 	lineItems: UpdateLineItem[];
+// 	metadata?: Record<string, any>;
+// }
 
 export interface SupplierOrders {
 	id: string;
@@ -94,6 +97,8 @@ export interface SupplierOrder {
 	supplier: Supplier;
 	documents: SupplierOrderDocument[];
 	user_id: string;
+	currency_code: string;
+	region_id: string;
 	user: User;
 	status: string;
 	payment_status: string;
@@ -103,6 +108,9 @@ export interface SupplierOrder {
 	items: LineItem[];
 	tax_rate: number;
 	metadata: Record<string, any>;
+	subtotal: number;
+	total: number;
+	tax_total: number;
 	no_notification?: boolean;
 	created_at: string;
 	updated_at: string;

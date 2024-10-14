@@ -12,6 +12,7 @@ import { useAdminSupplierOrderUpdateLineItem } from '@/modules/supplier/hooks';
 import {
 	UpdateLineItem,
 	UpdateLineItemSupplierOrderReq,
+	AddOrderEditLineItemInput,
 } from '@/types/supplier';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { useGetCart } from 'medusa-react';
@@ -20,8 +21,11 @@ import { useSupplierOrderEdit } from './context';
 import SupplierOrderEditLine from './supplier-order-edit-line';
 import {
 	useAdminDeleteSupplierOrderEdit,
+	useAdminRequestSOrderEditConfirmation,
+	useAdminSupplierOrderEditAddLineItem,
 	useAdminUpdateSupplierOrderEdit,
 } from '@/modules/supplier/hooks/supplier-order-edits';
+import { Input } from '@/components/Input';
 
 type SupplierOrderEditModalContainerProps = {
 	supplierOrder: SupplierOrder | null;
@@ -31,9 +35,6 @@ const SupplierOrderEditModalContainer = (
 	props: SupplierOrderEditModalContainerProps
 ) => {
 	const { supplierOrder } = props;
-	const { cart: supplierCart, refetch } = useGetCart(
-		supplierOrder?.cart?.id ?? null
-	);
 
 	const {
 		isModalVisible,
@@ -61,12 +62,11 @@ const SupplierOrderEditModalContainer = (
 			state={isModalVisible}
 			close={onClose}
 			supplierOrderEdit={supplierOrderEdit}
-			currentSubtotal={supplierCart?.subtotal}
-			regionId={supplierCart?.region_id}
+			currentSubtotal={1000}
+			regionId={supplierOrder?.cart?.region_id}
 			customerId={supplierOrder?.user?.id}
-			currencyCode={supplierCart?.region?.currency_code}
-			paidTotal={supplierCart?.total}
-			refetch={refetch}
+			currencyCode={'vnd'}
+			paidTotal={1000}
 		/>
 	);
 };
@@ -76,28 +76,24 @@ export default SupplierOrderEditModalContainer;
 type SupplierOrderEditModalProps = {
 	state: boolean;
 	close: () => void;
-	orderEditId: string;
-	supplierOrderEdit: any;
+	supplierOrderEdit: SupplierOrderEdit;
 	currencyCode?: string;
 	regionId?: string;
 	customerId?: string;
 	currentSubtotal?: number;
 	paidTotal?: number;
-	refetch: () => void;
 };
 
 const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 	const {
 		state,
 		close,
-		orderEditId,
 		supplierOrderEdit,
 		currencyCode,
 		regionId,
 		customerId,
 		currentSubtotal,
 		paidTotal,
-		refetch,
 	} = props;
 
 	const {
@@ -113,13 +109,13 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 	const [itemQuantities, setItemQuantities] = useState<ItemQuantity[]>([]);
 	const [itemPrices, setItemPrices] = useState<ItemPrice[]>([]);
 
-	// const showTotals = currentSubtotal !== orderEdit?.items?.subtotal;
-	// const hasChanges = !!orderEdit?.changes?.length;
+	const showTotals = currentSubtotal !== 1000;
+	const hasChanges = !!supplierOrderEdit?.changes?.length;
 
-	// const {
-	// 	mutateAsync: requestConfirmation,
-	// 	isLoading: isRequestingConfirmation,
-	// } = useAdminRequestOrderEditConfirmation(orderEdit.id);
+	const {
+		mutateAsync: requestConfirmation,
+		isLoading: isRequestingConfirmation,
+	} = useAdminRequestSOrderEditConfirmation(supplierOrderEdit?.id);
 
 	const { mutateAsync: updateOrderEdit, isLoading: isUpdating } =
 		useAdminUpdateSupplierOrderEdit(supplierOrderEdit?.id);
@@ -128,18 +124,15 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 		supplierOrderEdit?.id
 	);
 
-	// const { mutateAsync: addLineItem, isLoading: loadingAddLineItem } =
-	// 	useAdminOrderEditAddLineItem(orderEdit.id);
-
 	const { mutateAsync: addLineItem, isLoading: loadingAddLineItem } =
-		useAdminSupplierOrderUpdateLineItem(orderEditId);
+		useAdminSupplierOrderEditAddLineItem(supplierOrderEdit?.id);
 
 	const onSave = async () => {
 		try {
-			// await requestConfirmation();
-			// if (note) {
-			// 	await updateOrderEdit({ internal_note: note });
-			// }
+			await requestConfirmation();
+			if (note) {
+				await updateOrderEdit({ internal_note: note });
+			}
 
 			message.success('Đặt chỉnh sửa đơn hàng như đã yêu cầu');
 		} catch (e: any) {
@@ -161,55 +154,46 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 	}, [showFilter]);
 
 	const onAddVariants = async (selectedVariants: ProductVariant['id']) => {
-		// Create the selectedItem array by merging quantities and prices
 		// Creating the lineItems array by merging quantities and prices
-		const lineItems: UpdateLineItem[] = selectedVariants.map((variantId) => {
-			const quantityData = itemQuantities.find(
-				(item) => item.variantId === variantId
-			);
-			const priceData = itemPrices.find((item) => item.variantId === variantId);
+		const lineItems: AddOrderEditLineItemInput[] = selectedVariants.map(
+			(variantId) => {
+				const quantityData = itemQuantities.find(
+					(item) => item.variantId === variantId
+				);
+				const priceData = itemPrices.find(
+					(item) => item.variantId === variantId
+				);
 
-			return {
-				variantId,
-				quantity: quantityData?.quantity || 0, // Default to 0 if not found
-				unit_price: priceData?.unit_price || 0, // Default to 0 if not found
-			};
-		});
-
-		// Building the final UpdateLineItemSupplierOrderReq object
-		const supplierOrderReq: UpdateLineItemSupplierOrderReq = {
-			cartId: orderEdit?.id,
-			lineItems,
-		};
+				return {
+					variant_id: variantId,
+					quantity: quantityData?.quantity || 0,
+					unit_price: priceData?.unit_price || 0,
+				};
+			}
+		);
 
 		try {
-			await addLineItem(supplierOrderReq, {
-				onSuccess: () => {
-					message.success('Cập nhật danh mục sản phẩm thành công');
+			const promises = lineItems.map((lineItem) =>
+				addLineItem({
+					variant_id: lineItem.variant_id,
+					quantity: lineItem.quantity,
+					unit_price: lineItem.unit_price,
+				})
+			);
 
-					// Refetch the cart to get updated data
-					refetch();
-				},
-				onError: (error) => {
-					message.error(getErrorMessage(error));
-				},
-			});
+			await Promise.all(promises);
+			message.success('Thêm biến thể sản phẩm thành công');
 		} catch (e: any) {
+			console.log('Error:', e);
 			message.error('Có lỗi xảy ra');
 		}
 	};
 
-	const hideFilter = () => {
-		if (showFilter) {
-			setFilterTerm('');
-		}
-		setShowFilter((s) => !s);
-	};
-
-	let displayItems = supplierOrderEdit?.items?.sort(
-		// @ts-ignore
-		(a, b) => new Date(a.created_at) - new Date(b.created_at)
-	);
+	let displayItems =
+		supplierOrderEdit?.items?.sort(
+			// @ts-ignore
+			(a, b) => new Date(a.created_at) - new Date(b.created_at)
+		) || [];
 
 	if (filterTerm) {
 		displayItems = displayItems.filter(
@@ -223,8 +207,8 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 		<Modal
 			open={state}
 			handleOk={onSave}
-			isLoading={isUpdating}
-			disabled={isUpdating}
+			isLoading={isUpdating || isRequestingConfirmation}
+			disabled={isUpdating || isRequestingConfirmation || !hasChanges}
 			handleCancel={onCancel}
 			width={800}
 		>
@@ -238,21 +222,39 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 			</Flex>
 			<div className="flex flex-col mt-4">
 				{/* ITEMS */}
-				{/* {displayItems?.map((oi) => (
+				{displayItems?.map((oi) => (
 					<SupplierOrderEditLine
-						orderEditId={orderEditId}
 						key={oi.id}
 						item={oi}
 						customerId={customerId}
 						regionId={regionId}
 						currencyCode={currencyCode}
-						refetch={refetch}
+						change={
+							supplierOrderEdit?.changes?.find(
+								(change) =>
+									change.line_item_id === oi.id ||
+									change.original_line_item_id === oi.id
+							) || undefined
+						}
 					/>
-				))} */}
+				))}
 				{/* TOTALS */}
-				{/* {showTotals && (
+				{showTotals && (
 					<TotalsSection currencyCode={currencyCode} amountPaid={paidTotal} />
-				)} */}
+				)}
+
+				{/* NOTE */}
+				{hasChanges && (
+					<div className="flex items-center justify-between">
+						<span className="text-gray-500">{'Ghi chú'}</span>
+						<Input
+							className="max-w-[455px]"
+							placeholder="Thêm ghi chú"
+							onChange={(value: any) => setNote(value)}
+							value={note}
+						/>
+					</div>
+				)}
 			</div>
 			<AddProductVariant
 				title="Thêm biến thể sản phẩm"

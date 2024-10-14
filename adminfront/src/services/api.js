@@ -850,5 +850,31 @@ export default {
 			const path = `/admin/supplier-order-edits/${id}`;
 			return medusaRequest('DELETE', path);
 		},
+
+		requestConfirmation(id) {
+			const path = `/admin/supplier-order-edits/${id}/request`;
+			return medusaRequest('POST', path);
+		},
+
+		// crud in line item
+		addLineItem(id, data) {
+			const path = `/admin/supplier-order-edits/${id}/items`;
+			return medusaRequest('POST', path, data);
+		},
+
+		updateLineItem(id, lineItemId, data) {
+			const path = `/admin/supplier-order-edits/${id}/items/${lineItemId}`;
+			return medusaRequest('POST', path, data);
+		},
+
+		deleteLineItem(id, lineItemId) {
+			const path = `/admin/supplier-order-edits/${id}/items/${lineItemId}`;
+			return medusaRequest('DELETE', path);
+		},
+
+		deleteItemChange(id, lineItemId) {
+			const path = `/admin/supplier-order-edits/${id}/changes/${lineItemId}`;
+			return medusaRequest('DELETE', path);
+		},
 	},
 };
