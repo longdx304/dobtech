@@ -18,7 +18,6 @@ import {
 } from '@/modules/supplier/hooks/supplier-order-edits';
 import { ByLine } from '.';
 import EventContainer from '../event-container';
-
 type EditCreatedProps = {
 	event: OrderEditEvent;
 };
@@ -257,6 +256,7 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 	quantity = Math.abs(quantity);
 
 	const lineItem = isAdd ? change.line_item : change.original_line_item;
+	console.log('lineItem', lineItem);
 
 	return (
 		<div className="gap-x-4 flex">

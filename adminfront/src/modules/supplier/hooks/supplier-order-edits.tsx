@@ -120,6 +120,38 @@ export const useAdminConfirmSupplierOrderEdit = (id: string) => {
 	);
 };
 
+export const useAdminCancelSupplierOrderEdit = (id: string) => {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async () => {
+			const response = await api.supplierOrderEdits.cancel(id);
+			return response.data as unknown as any;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries(['admin-supplier-order-edits']);
+			},
+		}
+	);
+};
+
+export const useAdminConfirmSupplierOrderEdit = (id: string) => {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async () => {
+			const response = await api.supplierOrderEdits.confirm(id);
+			return response.data as unknown as any;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries(['admin-supplier-order-edits']);
+			},
+		}
+	);
+};
+
 export const useAdminSupplierOrderEditAddLineItem = (id: string) => {
 	const queryClient = useQueryClient();
 
