@@ -1,10 +1,5 @@
 import { LineItem, OrderEdit, OrderItemChange } from '@medusajs/medusa';
-import {
-	useAdminCancelOrderEdit,
-	useAdminConfirmOrderEdit,
-	useAdminDeleteOrderEdit,
-	useAdminUser,
-} from 'medusa-react';
+import { useAdminUser } from 'medusa-react';
 import React, { useContext } from 'react';
 import { SquarePen } from 'lucide-react';
 
@@ -19,6 +14,11 @@ import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import EventContainer from '../event-container';
 import { ByLine } from '.';
 import { useOrderEdit } from '@/modules/orders/components/orders/edit-order-modal/context';
+import {
+	useAdminCancelSupplierOrderEdit,
+	useAdminConfirmSupplierOrderEdit,
+	useAdminDeleteSupplierOrderEdit,
+} from '@/modules/supplier/hooks/supplier-order-edits';
 
 type EditCreatedProps = {
 	event: OrderEditEvent;
@@ -44,14 +44,7 @@ const getInfo = (edit: OrderEdit): { type: string; user_id: string } => {
 };
 
 const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
-	const {
-		isModalVisible,
-		showModal,
-		hideModal,
-		orderEdits,
-		activeOrderEditId,
-		setActiveOrderEditId,
-	} = useOrderEdit();
+	const { isModalVisible, showModal, setActiveOrderEditId } = useOrderEdit();
 
 	const orderEdit = event.edit;
 
@@ -65,9 +58,9 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 
 	const { user } = useAdminUser(user_id);
 
-	const deleteOrderEdit = useAdminDeleteOrderEdit(orderEdit.id);
-	const cancelOrderEdit = useAdminCancelOrderEdit(orderEdit.id);
-	const confirmOrderEdit = useAdminConfirmOrderEdit(orderEdit.id);
+	const deleteOrderEdit = useAdminDeleteSupplierOrderEdit(orderEdit.id);
+	const cancelOrderEdit = useAdminCancelSupplierOrderEdit(orderEdit.id);
+	const confirmOrderEdit = useAdminConfirmSupplierOrderEdit(orderEdit.id);
 
 	const onDeleteOrderEditClicked = () => {
 		deleteOrderEdit.mutateAsync(undefined, {
@@ -265,6 +258,7 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 	quantity = Math.abs(quantity);
 
 	const lineItem = isAdd ? change.line_item : change.original_line_item;
+	console.log('lineItem', lineItem);
 
 	return (
 		<div className="gap-x-4 flex">
@@ -286,8 +280,8 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 					)}
 				</span>
 				<span className="font-normal text-gray-500 flex">
-					{`${lineItem?.variant.title}${
-						lineItem?.variant.sku ? ` (${lineItem.variant.sku})` : ''
+					{`${lineItem?.variant?.title}${
+						lineItem?.variant?.sku ? ` (${lineItem.variant?.sku})` : ''
 					}`}
 				</span>
 			</div>

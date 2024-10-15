@@ -856,6 +856,16 @@ export default {
 			return medusaRequest('POST', path);
 		},
 
+		cancel(id) {
+			const path = `/admin/supplier-order-edits/${id}/cancel`;
+			return medusaRequest('POST', path);
+		},
+
+		confirm(id) {
+			const path = `/admin/supplier-order-edits/${id}/confirm`;
+			return medusaRequest('POST', path);
+		},
+
 		// crud in line item
 		addLineItem(id, data) {
 			const path = `/admin/supplier-order-edits/${id}/items`;

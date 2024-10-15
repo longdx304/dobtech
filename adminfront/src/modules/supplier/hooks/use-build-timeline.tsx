@@ -1,6 +1,8 @@
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
-import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
-import { useAdminSupplier } from '@/modules/supplier/hooks';
+import {
+	useAdminSupplier,
+	useAdminSupplierOrder,
+} from '@/modules/supplier/hooks';
 import {
 	ClaimOrder,
 	Order,
@@ -166,20 +168,11 @@ export interface NotificationEvent extends TimelineEvent {
 export const useBuildTimeline = (supplierOrderId: string) => {
 	const { orderRelations } = useOrdersExpandParam();
 
-	// const {
-	// 	supplierOrder,
-	// 	refetch,
-	// 	isLoading: isOrderLoading,
-	// } = useAdminOrder(supplierOrderId, {
-	// 	expand: orderRelations,
-	// });
 	const {
 		data: supplierOrder,
 		refetch,
 		isLoading: isOrderLoading,
-	} = useAdminSupplier(supplierOrderId, {
-		expand: orderRelations,
-	});
+	} = useAdminSupplierOrder(supplierOrderId);
 
 	const { cart, isLoading: isCartLoading } = useGetCart(
 		supplierOrder?.cart_id ?? '',
@@ -187,9 +180,6 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			enabled: !!supplierOrder,
 		}
 	);
-
-	// const { order_edits: edits, isLoading: isOrderEditsLoading } =
-	// 	useAdminOrderEdits({ order_id: orderId });
 
 	const { data, isLoading: isOrderEditsLoading } = useAdminSupplierOrderEdits({
 		supplier_order_id: supplierOrderId,
@@ -207,8 +197,6 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 	const { notifications } = useAdminNotifications({
 		resource_id: supplierOrderId,
 	});
-
-	const { getLocationNameById } = useStockLocations();
 
 	const events: TimelineEvent[] | undefined = useMemo(() => {
 		if (!supplierOrder) {
@@ -354,34 +342,6 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 		// 	}
 		// }
 
-		for (const event of supplierOrder.fulfillments) {
-			events.push({
-				id: event.id,
-				time: event.created_at,
-				type: 'fulfilled',
-				items: event.items.map((item: any) =>
-					getFulfilmentItem(allItems, data.edits, item)
-				),
-				noNotification: event.no_notification,
-				orderId: supplierOrder.id,
-				locationName: getLocationNameById(event.location_id),
-			} as ItemsFulfilledEvent);
-
-			if (event.shipped_at) {
-				events.push({
-					id: event.id,
-					time: event.shipped_at,
-					type: 'shipped',
-					items: event.items.map((item: any) =>
-						getFulfilmentItem(allItems, data.edits, item)
-					),
-					noNotification: event.no_notification,
-					orderId: supplierOrder.id,
-					locationName: getLocationNameById(event.location_id),
-				} as ItemsShippedEvent);
-			}
-		}
-
 		if (notifications) {
 			for (const notification of notifications) {
 				events.push({
@@ -413,7 +373,7 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		supplierOrder,
-		data.edits,
+		data?.edits,
 		notes,
 		notifications,
 		isFeatureEnabled,

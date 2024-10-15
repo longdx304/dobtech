@@ -1,6 +1,5 @@
 import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
-import { Title } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
 import { PricePayload } from '@/types/price';
 import { MoneyAmount, Product } from '@medusajs/medusa';

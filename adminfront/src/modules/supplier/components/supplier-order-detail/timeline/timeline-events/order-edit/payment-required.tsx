@@ -1,60 +1,63 @@
-import { useAdminOrder, useAdminOrderEdits } from "medusa-react"
-import React from "react"
+import { useAdminOrder, useAdminOrderEdits } from 'medusa-react';
+import React from 'react';
 
-import { PaymentRequiredEvent } from "@/modules/orders/hooks/use-build-timeline";
-import { formatAmountWithSymbol } from "@/utils/prices"
-import { Button } from "@/components/Button";
-import { Flex } from "@/components/Flex";
-import EventContainer, { EventIconColor } from "../event-container"
+import { PaymentRequiredEvent } from '@/modules/orders/hooks/use-build-timeline';
+import { formatAmountWithSymbol } from '@/utils/prices';
+import { Button } from '@/components/Button';
+import { Flex } from '@/components/Flex';
+import EventContainer, { EventIconColor } from '../event-container';
 import { CircleAlert } from 'lucide-react';
+import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
 
 type RequestedProps = {
-  event: PaymentRequiredEvent
-}
+	event: PaymentRequiredEvent;
+};
 
 const PaymentRequired: React.FC<RequestedProps> = ({ event }) => {
-  const { order_edits: edits } = useAdminOrderEdits({ order_id: event.orderId })
-  const { order } = useAdminOrder(event.orderId)
+	const { order_edits: edits } = useAdminOrderEdits({
+		order_id: event.orderId,
+	});
+	const { data: order } = useAdminSupplierOrder(event.orderId);
 
-  const requestedEditDifferenceDue =
-    edits?.find((e) => e.status === "requested")?.difference_due || 0
+	const requestedEditDifferenceDue =
+		edits?.find((e) => e.status === 'requested')?.difference_due || 0;
 
-  if (!order || !edits) {
-    return null
-  }
+	if (!order || !edits) {
+		return null;
+	}
 
-  const amount = requestedEditDifferenceDue
-    ? order.total - order.paid_total + requestedEditDifferenceDue
-    : order.refunded_total - order.paid_total
+	const amount = requestedEditDifferenceDue
+		? order.total - order.paid_total + requestedEditDifferenceDue
+		: order.refunded_total - order.paid_total;
 
-  if (amount <= 0) {
-    return null
-  }
+	if (amount <= 0) {
+		return null;
+	}
 
-  const onCopyPaymentLinkClicked = () => {
-    console.log("TODO")
-  }
+	const onCopyPaymentLinkClicked = () => {
+		console.log('TODO');
+	};
 
-  const onMarkAsPaidClicked = () => {
-    console.log("TODO")
-  }
+	const onMarkAsPaidClicked = () => {
+		console.log('TODO');
+	};
 
-  return (
-    <EventContainer
-      title={"Yêu cầu khách hàng thanh toán"}
-      icon={<CircleAlert size={20} />}
-      iconColor={EventIconColor.VIOLET}
-      time={event.time}
-      isFirst={event.first}
-      midNode={
-        <span className="font-normal text-gray-500">
-          {formatAmountWithSymbol({
-            amount,
-            currency: event.currency_code,
-          })}
-        </span>
-      }
-    >
+	return (
+		<EventContainer
+			title={'Yêu cầu khách hàng thanh toán'}
+			icon={<CircleAlert size={20} />}
+			iconColor={EventIconColor.VIOLET}
+			time={event.time}
+			isFirst={event.first}
+			midNode={
+				<span className="font-normal text-gray-500">
+					{formatAmountWithSymbol({
+						amount,
+						currency: event.currency_code,
+					})}
+				</span>
+			}
+		>
 			<Flex vertical gap="small">
 				<Button
 					size="small"
@@ -73,8 +76,8 @@ const PaymentRequired: React.FC<RequestedProps> = ({ event }) => {
 					Đánh dấu là đã trả tiền
 				</Button>
 			</Flex>
-    </EventContainer>
-  )
-}
+		</EventContainer>
+	);
+};
 
-export default PaymentRequired
+export default PaymentRequired;
