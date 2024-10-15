@@ -88,7 +88,7 @@ const Documents = ({ order, isLoading }: Props) => {
 										href={doc.document_url}
 										target="_blank"
 										rel="noopener noreferrer"
-										className="text-gray-500 text-sm text-nowrap hover:text-blue-600"
+										className="text-gray-500 text-sm text-nowrap group-hover:text-blue-600"
 									>
 										{getFileName(doc.document_url)}
 									</Link>
