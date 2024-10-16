@@ -820,6 +820,11 @@ export default {
 			const path = `/admin/supplier-order/${supplierOrderId}/document/${documentId}`;
 			return medusaRequest('DELETE', path);
 		},
+
+		capturePayment(id) {
+			const path = `/admin/supplier-order/${id}/capture`;
+			return medusaRequest('POST', path);
+		},
 	},
 
 	supplierOrderEdits: {

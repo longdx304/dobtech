@@ -215,3 +215,22 @@ export function useAdminSupplierOrderDeleteDocument(supplierOrderId: string) {
 		}
 	);
 }
+
+export function useAdminSupplierOrderCapturePayment(supplierOrderId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async () => {
+			const response = await api.suplierOrders.capturePayment(supplierOrderId);
+			return response.data as unknown as any;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}

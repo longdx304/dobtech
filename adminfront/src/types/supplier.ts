@@ -1,4 +1,11 @@
-import { Cart, LineItem, OrderEdit, User } from '@medusajs/medusa';
+import {
+	Cart,
+	LineItem,
+	Order,
+	OrderEdit,
+	Payment,
+	User,
+} from '@medusajs/medusa';
 
 export interface Supplier {
 	id: string;
@@ -102,6 +109,7 @@ export interface SupplierOrder {
 	user: User;
 	status: string;
 	payment_status: string;
+	payments?: Payment[];
 	fulfillment_status: string;
 	estimated_production_time: string;
 	settlement_time: string;
@@ -111,6 +119,7 @@ export interface SupplierOrder {
 	subtotal: number;
 	total: number;
 	tax_total: number;
+	paid_total: number;
 	no_notification?: boolean;
 	created_at: string;
 	updated_at: string;

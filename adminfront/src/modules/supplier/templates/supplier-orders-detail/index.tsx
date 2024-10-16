@@ -3,11 +3,12 @@ import BackToOrders from '@/modules/supplier/components/supplier-order-detail/ba
 import Information from '@/modules/supplier/components/supplier-order-detail/information';
 import Summary from '@/modules/supplier/components/supplier-order-detail/summary';
 import { Col, Row } from 'antd';
-import SupplierOrderEditModalContainer from '../../components/supplier-order-detail/edit-supplier-order-modal';
-import { useAdminSupplierOrder } from '../../hooks';
 import Documents from '../../components/supplier-order-detail/documents';
+import SupplierOrderEditModalContainer from '../../components/supplier-order-detail/edit-supplier-order-modal';
 import Timeline from '../../components/supplier-order-detail/timeline';
+import { useAdminSupplierOrder } from '../../hooks';
 import { useBuildTimeline } from '../../hooks/use-build-timeline';
+import Payment from '../../components/supplier-order-detail/payment';
 
 interface Props {
 	id: string;
@@ -38,9 +39,11 @@ export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 				/>
 				<Documents order={supplierOrder} isLoading={isLoading} />
 
-				{/* <Payment order={order} isLoading={isLoading} refetch={refetchOrder} />
-				<CustomerInfo order={order} isLoading={isLoading} /> */}
-				{/* <Payment order={order} isLoading={isLoading} refetch={refetchOrder} /> */}
+				<Payment
+					supplierOrder={supplierOrder}
+					isLoading={isLoading}
+					refetch={refetchOrder}
+				/>
 				{/* <CustomerInfo order={order} isLoading={isLoading} /> */}
 			</Col>
 			<Col xs={24} lg={10}>
