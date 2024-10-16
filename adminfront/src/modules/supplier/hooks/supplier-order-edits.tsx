@@ -80,6 +80,7 @@ export const useAdminDeleteSupplierOrderEdit = (id: string) => {
 		{
 			onSuccess: () => {
 				queryClient.invalidateQueries(['admin-supplier-order-edits']);
+				queryClient.invalidateQueries(['admin-supplier-order']);
 			},
 		}
 	);
@@ -96,6 +97,7 @@ export const useAdminCancelSupplierOrderEdit = (id: string) => {
 		{
 			onSuccess: () => {
 				queryClient.invalidateQueries(['admin-supplier-order-edits']);
+				queryClient.invalidateQueries(['admin-supplier-order']);
 			},
 		}
 	);
@@ -112,6 +114,7 @@ export const useAdminConfirmSupplierOrderEdit = (id: string) => {
 		{
 			onSuccess: () => {
 				queryClient.invalidateQueries(['admin-supplier-order-edits']);
+				queryClient.invalidateQueries(['admin-supplier-order']);
 			},
 		}
 	);

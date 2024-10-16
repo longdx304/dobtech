@@ -62,9 +62,6 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 	const deleteOrderEdit = useAdminDeleteSupplierOrderEdit(orderEdit.id);
 	const cancelOrderEdit = useAdminCancelSupplierOrderEdit(orderEdit.id);
 	const confirmOrderEdit = useAdminConfirmSupplierOrderEdit(orderEdit.id);
-	// const updatedSupplierOrder = useAdminSupplierOrder(
-	// 	(orderEdit as any)?.supplier_order_id
-	// );
 
 	const onDeleteOrderEditClicked = () => {
 		deleteOrderEdit.mutateAsync(undefined, {
@@ -92,8 +89,6 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 		await confirmOrderEdit.mutateAsync(undefined, {
 			onSuccess: () => {
 				message.success('Xác nhận chỉnh sửa đơn hàng thành công');
-
-				// updatedSupplierOrder.refetch();
 			},
 			onError: (err) => {
 				message.error(getErrorMessage(err));
