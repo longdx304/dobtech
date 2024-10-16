@@ -1,6 +1,9 @@
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
 import { Title } from '@/components/Typography';
+import { getErrorMessage } from '@/lib/utils';
 import {
 	ItemsShippedEvent,
 	OrderEditEvent,
@@ -9,11 +12,16 @@ import {
 	PaymentRequiredEvent,
 	TimelineEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
-import { Order, Region } from '@medusajs/medusa';
+import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
+import { NoteEvent } from '@/modules/supplier/hooks/use-build-timeline';
+import { SupplierOrder } from '@/types/supplier';
+import { Region } from '@medusajs/medusa';
 import { Empty, message } from 'antd';
 import { SendHorizontal } from 'lucide-react';
+import { useAdminCreateNote } from 'medusa-react';
 import { ChangeEvent, useState } from 'react';
 import ItemsShipped from './timeline-events/items-shipped';
+import Note from './timeline-events/note';
 import OrderCanceled from './timeline-events/order-canceled';
 import EditCanceled from './timeline-events/order-edit/canceled';
 import ChangedPrice from './timeline-events/order-edit/changed-price';
@@ -23,16 +31,9 @@ import EditDeclined from './timeline-events/order-edit/declined';
 import PaymentRequired from './timeline-events/order-edit/payment-required';
 import EditRequested from './timeline-events/order-edit/requested';
 import OrderPlaced from './timeline-events/order-placed';
-import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
-import { Input } from '@/components/Input';
-import { Button } from '@/components/Button';
-import { useAdminCreateNote } from 'medusa-react';
-import { getErrorMessage } from '@/lib/utils';
-import Note from './timeline-events/note';
-import { NoteEvent } from '@/modules/supplier/hooks/use-build-timeline';
 
 type Props = {
-	orderId: Order['id'] | undefined;
+	orderId: SupplierOrder['id'] | undefined;
 	isLoading: boolean;
 	refetchOrder: () => void;
 	events: TimelineEvent[] | undefined;
@@ -46,9 +47,7 @@ const Timeline = ({
 	events,
 	refetch,
 }: Props) => {
-	console.log('orderId:', orderId);
 	const createNote = useAdminCreateNote();
-	const [showRequestReturn, setShowRequestReturn] = useState<boolean>(false);
 	const [inputValue, setInputValue] = useState<string>('');
 
 	const { data: order, isLoading: isOrderLoading } = useAdminSupplierOrder(

@@ -14,7 +14,7 @@ type OrderLineProps = {
 	reservations?: ReservationItemDTO[];
 	isAllocatable?: boolean;
 	paymentStt?: string;
-	refetch?: () => void;
+	refetch: () => void;
 };
 
 const OrderLine = ({
@@ -61,8 +61,8 @@ const OrderLine = ({
 							<Pencil size={12} onClick={onOpen} />
 						)}
 						{formatAmountWithSymbol({
-							amount: item?.unit_price ?? 0,
-							// amount: (item?.total ?? 0) / item?.quantity,
+							// amount: item?.unit_price ?? 0,
+							amount: (item?.subtotal ?? 0) / item?.quantity,
 							currency: currencyCode,
 							tax: [],
 						})}
@@ -70,8 +70,8 @@ const OrderLine = ({
 					<div className="font-normal text-gray-500">x {item.quantity}</div>
 					<div className="font-normal text-gray-900 min-w-[55px] text-right">
 						{formatAmountWithSymbol({
-							amount: item.unit_price ?? 0,
-							// amount: item.total ?? 0,
+							// amount: item.unit_price ?? 0,
+							amount: item.subtotal ?? 0,
 							currency: currencyCode,
 							tax: [],
 						})}

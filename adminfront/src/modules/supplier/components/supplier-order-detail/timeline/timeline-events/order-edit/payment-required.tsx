@@ -1,13 +1,13 @@
-import { useAdminOrder, useAdminOrderEdits } from 'medusa-react';
+import { useAdminOrderEdits } from 'medusa-react';
 import React from 'react';
 
-import { PaymentRequiredEvent } from '@/modules/orders/hooks/use-build-timeline';
-import { formatAmountWithSymbol } from '@/utils/prices';
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
-import EventContainer, { EventIconColor } from '../event-container';
-import { CircleAlert } from 'lucide-react';
+import { PaymentRequiredEvent } from '@/modules/orders/hooks/use-build-timeline';
 import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
+import { formatAmountWithSymbol } from '@/utils/prices';
+import { CircleAlert } from 'lucide-react';
+import EventContainer, { EventIconColor } from '../event-container';
 
 type RequestedProps = {
 	event: PaymentRequiredEvent;
@@ -19,16 +19,14 @@ const PaymentRequired: React.FC<RequestedProps> = ({ event }) => {
 	});
 	const { data: order } = useAdminSupplierOrder(event.orderId);
 
-	const requestedEditDifferenceDue =
-		edits?.find((e) => e.status === 'requested')?.difference_due || 0;
-
 	if (!order || !edits) {
 		return null;
 	}
 
-	const amount = requestedEditDifferenceDue
-		? order.total - order.paid_total + requestedEditDifferenceDue
-		: order.refunded_total - order.paid_total;
+	// const amount = requestedEditDifferenceDue
+	// 	? order.total - order.paid_total + requestedEditDifferenceDue
+	// 	: order.refunded_total - order.paid_total;
+	const amount = order.paid_total;
 
 	if (amount <= 0) {
 		return null;

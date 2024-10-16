@@ -8,24 +8,19 @@ import AddProductVariant from '@/modules/supplier/common/add-product-variant';
 import { ProductVariant } from '@medusajs/medusa';
 import { message } from 'antd';
 
-import { useAdminSupplierOrderUpdateLineItem } from '@/modules/supplier/hooks';
-import {
-	UpdateLineItem,
-	UpdateLineItemSupplierOrderReq,
-	AddOrderEditLineItemInput,
-} from '@/types/supplier';
-import { formatAmountWithSymbol } from '@/utils/prices';
-import { useGetCart } from 'medusa-react';
-import { useEffect, useRef, useState } from 'react';
-import { useSupplierOrderEdit } from './context';
-import SupplierOrderEditLine from './supplier-order-edit-line';
+import { Input } from '@/components/Input';
 import {
 	useAdminDeleteSupplierOrderEdit,
 	useAdminRequestSOrderEditConfirmation,
 	useAdminSupplierOrderEditAddLineItem,
 	useAdminUpdateSupplierOrderEdit,
 } from '@/modules/supplier/hooks/supplier-order-edits';
-import { Input } from '@/components/Input';
+import { AddOrderEditLineItemInput } from '@/types/supplier';
+import { formatAmountWithSymbol } from '@/utils/prices';
+import { useEffect, useRef, useState } from 'react';
+import { useSupplierOrderEdit } from './context';
+import SupplierOrderEditLine from './supplier-order-edit-line';
+import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
 
 type SupplierOrderEditModalContainerProps = {
 	supplierOrder: SupplierOrder | null;
@@ -56,6 +51,8 @@ const SupplierOrderEditModalContainer = (
 	if (!supplierOrderEdit) {
 		return null;
 	}
+
+	console.log('supplierOrderEdits', supplierOrderEdits);
 
 	return (
 		<SupplierOrderEditModal
@@ -133,7 +130,6 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 			if (note) {
 				await updateOrderEdit({ internal_note: note });
 			}
-
 			message.success('Đặt chỉnh sửa đơn hàng như đã yêu cầu');
 		} catch (e: any) {
 			message.error('Yêu cầu xác nhận thất bại');
@@ -202,6 +198,8 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 				i.variant?.sku.toLowerCase().includes(filterTerm)
 		);
 	}
+
+	console.log('supplierOrderEdit', supplierOrderEdit);
 
 	return (
 		<Modal

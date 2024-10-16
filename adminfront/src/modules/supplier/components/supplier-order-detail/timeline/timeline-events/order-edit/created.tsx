@@ -1,24 +1,25 @@
 import { LineItem, OrderEdit, OrderItemChange } from '@medusajs/medusa';
-import { useAdminUser } from 'medusa-react';
-import React, { useContext } from 'react';
 import { SquarePen } from 'lucide-react';
+import { useAdminUser } from 'medusa-react';
+import React from 'react';
 
-import { OrderEditEvent } from '@/modules/orders/hooks/use-build-timeline';
 import { getErrorMessage } from '@/lib/utils';
-import { Modal, message, Popconfirm } from 'antd';
+import { OrderEditEvent } from '@/modules/orders/hooks/use-build-timeline';
+import { message, Popconfirm } from 'antd';
 
 // import TwoStepDelete from "../../../atoms/two-step-delete"
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
-import EventContainer from '../event-container';
-import { ByLine } from '.';
 import { useOrderEdit } from '@/modules/orders/components/orders/edit-order-modal/context';
 import {
 	useAdminCancelSupplierOrderEdit,
 	useAdminConfirmSupplierOrderEdit,
 	useAdminDeleteSupplierOrderEdit,
 } from '@/modules/supplier/hooks/supplier-order-edits';
+import { ByLine } from '.';
+import EventContainer from '../event-container';
+import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
 
 type EditCreatedProps = {
 	event: OrderEditEvent;
@@ -61,6 +62,9 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 	const deleteOrderEdit = useAdminDeleteSupplierOrderEdit(orderEdit.id);
 	const cancelOrderEdit = useAdminCancelSupplierOrderEdit(orderEdit.id);
 	const confirmOrderEdit = useAdminConfirmSupplierOrderEdit(orderEdit.id);
+	// const updatedSupplierOrder = useAdminSupplierOrder(
+	// 	(orderEdit as any)?.supplier_order_id
+	// );
 
 	const onDeleteOrderEditClicked = () => {
 		deleteOrderEdit.mutateAsync(undefined, {
@@ -88,6 +92,8 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 		await confirmOrderEdit.mutateAsync(undefined, {
 			onSuccess: () => {
 				message.success('Xác nhận chỉnh sửa đơn hàng thành công');
+
+				// updatedSupplierOrder.refetch();
 			},
 			onError: (err) => {
 				message.error(getErrorMessage(err));
@@ -258,7 +264,6 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 	quantity = Math.abs(quantity);
 
 	const lineItem = isAdd ? change.line_item : change.original_line_item;
-	console.log('lineItem', lineItem);
 
 	return (
 		<div className="gap-x-4 flex">

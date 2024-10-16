@@ -49,7 +49,7 @@ export const SupplierOrderEditProvider = ({
 		string | undefined
 	>(undefined);
 
-	const { data, refetch } = useAdminSupplierOrderEdits({
+	const { data } = useAdminSupplierOrderEdits({
 		supplier_order_id: supplierOrderId,
 		// limit: count, // TODO
 	});
@@ -59,7 +59,6 @@ export const SupplierOrderEditProvider = ({
 	const handleOpenModal = async () => {
 		await createOrderEdit({ supplier_order_id: supplierOrderId })
 			.then(({ order_edit }) => {
-				console.log('order_edit handle open', order_edit);
 				setActiveOrderEditId(order_edit.id);
 			})
 			.catch(() => {
@@ -77,7 +76,7 @@ export const SupplierOrderEditProvider = ({
 				isModalVisible,
 				activeOrderEditId,
 				setActiveOrderEditId,
-				supplierOrderEdits: data?.order_edits,
+				supplierOrderEdits: data?.edits,
 			}}
 		>
 			{children}
