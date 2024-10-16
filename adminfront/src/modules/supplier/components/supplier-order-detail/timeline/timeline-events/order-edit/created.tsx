@@ -86,6 +86,8 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 		await confirmOrderEdit.mutateAsync(undefined, {
 			onSuccess: () => {
 				message.success('Xác nhận chỉnh sửa đơn hàng thành công');
+
+				// updatedSupplierOrder.refetch();
 			},
 			onError: (err) => {
 				message.error(getErrorMessage(err));
@@ -256,7 +258,6 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 	quantity = Math.abs(quantity);
 
 	const lineItem = isAdd ? change.line_item : change.original_line_item;
-	console.log('lineItem', lineItem);
 
 	return (
 		<div className="gap-x-4 flex">

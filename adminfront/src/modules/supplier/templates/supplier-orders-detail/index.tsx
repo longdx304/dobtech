@@ -17,7 +17,6 @@ interface Props {
 export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 	const { data: supplierOrder, isLoading, refetch } = useAdminSupplierOrder(id);
 	const { events, refetch: refetchTimeline } = useBuildTimeline(id);
-	console.log('events:', events);
 
 	const refetchOrder = () => {
 		refetch();

@@ -49,7 +49,7 @@ export const SupplierOrderEditProvider = ({
 		string | undefined
 	>(undefined);
 
-	const { data, refetch } = useAdminSupplierOrderEdits({
+	const { data } = useAdminSupplierOrderEdits({
 		supplier_order_id: supplierOrderId,
 		// limit: count, // TODO
 	});
