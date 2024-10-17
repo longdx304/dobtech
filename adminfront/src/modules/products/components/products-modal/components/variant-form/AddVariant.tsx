@@ -63,6 +63,15 @@ const AddVariant: FC<Props> = ({ form }) => {
 					<Col xs={24} sm={8}>
 						<Form.Item
 							labelCol={{ span: 24 }}
+							name={'allowed_quantity'}
+							label="Định lượng đôi mặc định:"
+						>
+							<InputNumber min={1} allowClear placeholder="6" />
+						</Form.Item>
+					</Col>
+					<Col xs={24} sm={8}>
+						<Form.Item
+							labelCol={{ span: 24 }}
 							name={['defaultPrice', 'amount']}
 							label="Tiền bán mặc định:"
 						>
@@ -238,10 +247,12 @@ const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant }) => {
 	const { state, onOpen, onClose } = useToggleState(false);
 	const variants = Form.useWatch('variants', form) || undefined;
 	const defaultPrice = Form.useWatch('defaultPrice', form) || undefined;
+	const allowed_quantity = Form.useWatch('allowed_quantity', form) || undefined;
 
 	const onOpenModal = (add: any) => {
 		add({
 			supplier_price: defaultPrice?.supplier_price,
+			allowed_quantity: allowed_quantity,
 			prices: [
 				{
 					amount: defaultPrice?.amount,
