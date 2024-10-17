@@ -2,13 +2,11 @@
 import { Card } from '@/components/Card';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { Customer } from '@medusajs/medusa';
-import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import EmptyCartMessage from '../components/empty-cart-message';
 
-const ItemsTemplate = dynamic(() => import('./items'));
-const Summary = dynamic(() => import('./summary'));
-
+import ItemsTemplate from './items';
+import Summary from './summary';
 
 const Overview = ({
 	cart,

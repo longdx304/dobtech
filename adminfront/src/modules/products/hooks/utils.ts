@@ -6,7 +6,7 @@ import { MoneyAmount, Product } from '@medusajs/medusa';
 export function getAllProductPricesCurrencies(product: Product) {
 	const currencyMap: Record<string, true> = {};
 
-	product.variants!.forEach((variant: any) => {
+	product?.variants!.forEach((variant: any) => {
 		variant.prices!.forEach((price: any) => {
 			if (
 				price.price_list_id ||
@@ -29,7 +29,7 @@ export function getAllProductPricesCurrencies(product: Product) {
 export function getAllProductPricesRegions(product: Product) {
 	const regionMap: Record<string, true> = {};
 
-	product.variants!.forEach((variant) => {
+	product?.variants!.forEach((variant) => {
 		variant.prices!.forEach((price: any) => {
 			if (
 				price.price_list_id ||

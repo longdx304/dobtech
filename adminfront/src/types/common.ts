@@ -6,6 +6,7 @@ export type TResponse<T> = {
 };
 
 export type FormImage = {
+	id: string;
   url: string;
   name?: string;
   size?: number;

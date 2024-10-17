@@ -79,7 +79,7 @@ export const extractOptionPrice = (price: number, region: Region) => {
  * @return {number}
  */
 export function getDecimalDigits(currency: string) {
-  const divisionDigits = currencies[currency.toUpperCase()].decimal_digits
+  const divisionDigits = currencies[currency?.toUpperCase()]?.decimal_digits
   return Math.pow(10, divisionDigits)
 }
 
@@ -97,11 +97,11 @@ export const stringDisplayPrice = ({ amount, currencyCode }: {
   }
 
   const display = displayAmount(currencyCode, amount)
-  return `${display} ${currencyCode.toUpperCase()}`
+  return `${display} ${currencyCode?.toUpperCase()}`
 }
 
 export const getNativeSymbol = (currencyCode: string) => {
-  return currencies[currencyCode.toUpperCase()].symbol_native
+  return currencies[currencyCode?.toUpperCase()]?.symbol_native
 }
 
 type FormatMoneyProps = {
@@ -120,21 +120,21 @@ export function formatAmountWithSymbol({
   let locale = "en-US"
 
   // We need this to display 'Kr' instead of 'DKK'
-  if (currency.toLowerCase() === "dkk") {
+  if (currency?.toLowerCase() === "dkk") {
     locale = "da-DK"
   }
-	if (currency.toLowerCase() === "vnd") {
+	if (currency?.toLowerCase() === "vnd") {
 		locale = "vi-VN"
 	}
 
-  digits = digits ?? currencies[currency.toUpperCase()].decimal_digits
+  digits = digits ?? currencies[currency?.toUpperCase()]?.decimal_digits
 
   const normalizedAmount = normalizeAmount(currency, amount)
 
   const taxRate =
     tax instanceof Array ? tax.reduce((acc, curr) => acc + curr.rate, 0) : tax
 
-  return new Intl.NumberFormat(locale, {
+  return currency && new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     minimumFractionDigits: digits,
@@ -145,14 +145,14 @@ export const extractNormalizedAmount = (
   amounts: Omit<MoneyAmount, "beforeInsert">[],
   order: Omit<Order, "beforeInsert">
 ) => {
-  let amount = amounts.find((ma) => ma.region_id === order.region_id)
+  let amount = amounts?.find((ma) => ma?.region_id === order?.region_id)
 
   if (!amount) {
-    amount = amounts.find((ma) => ma.currency_code === order.currency_code)
+    amount = amounts?.find((ma) => ma?.currency_code === order?.currency_code)
   }
 
   if (amount) {
-    return normalizeAmount(order.currency_code, amount.amount)
+    return normalizeAmount(order?.currency_code, amount.amount)
   }
 
   return 0

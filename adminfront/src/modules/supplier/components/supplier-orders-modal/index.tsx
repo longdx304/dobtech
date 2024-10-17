@@ -7,7 +7,7 @@ import Medusa from '@/services/api';
 import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PDFViewer } from '@react-pdf/renderer';
-import { message } from 'antd';
+import { message, Spin } from 'antd';
 import {
 	useAdminRegion,
 	useAdminRegions,
@@ -163,9 +163,11 @@ const SupplierOrdersModal: FC<Props> = ({
 			});
 
 			// Upload pdf to s3 using Medusa uploads API
-			const uploadRes = await Medusa.uploads.create([file]);
+			// const uploadRes = await Medusa.uploads.create([file]);
 
-			const pdfUrl = (uploadRes.data as any).uploads[0].url;
+			// const pdfUrl = (uploadRes.data as any).uploads[0].url;
+			const pdfUrl =
+				'https://dob-ecommerce.s3.ap-southeast-1.amazonaws.com/purchase-order-1728871955540.pdf';
 
 			const orderPayload: SupplierOrdersReq = {
 				lineItems: pdfOrder?.lineItems || [],
@@ -176,6 +178,8 @@ const SupplierOrdersModal: FC<Props> = ({
 					supplierDates.productionDate?.toDate() || new Date(),
 				settlement_time: supplierDates.settlementDate?.toDate() || new Date(),
 				countryCode: region?.countries[0]?.iso_2 || 'vn',
+				region_id: region?.id || '',
+				currency_code: region?.currency_code || 'vnd',
 				document_url: pdfUrl,
 			};
 
@@ -191,6 +195,8 @@ const SupplierOrdersModal: FC<Props> = ({
 			setIsSubmitting(false);
 		}
 	};
+
+	console.log('region', region);
 
 	// footer
 	const footer = useMemo(() => {
@@ -299,12 +305,16 @@ const SupplierOrdersModal: FC<Props> = ({
 							Tạo đơn đặt hàng
 						</Button>,
 					]}
+					loading={isSubmitting}
 				>
 					<PDFViewer width="100%" height="600px">
 						<OrderPDF order={pdfOrder} variants={variants} region={region} />
 					</PDFViewer>
 				</Modal>
 			)}
+
+			{/* show loading when submitting pdf */}
+			<Spin spinning={isSubmitting} />
 		</>
 	);
 };

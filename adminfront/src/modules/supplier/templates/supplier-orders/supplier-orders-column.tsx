@@ -29,10 +29,10 @@ const decideFulfillmentStt = (status: any) => {
 };
 const supplierOrdersColumn = ({ supplier }: Props) => [
 	{
-		title: 'Đơn hàng',
+		title: 'STT',
 		dataIndex: 'display_id',
 		key: 'display_id',
-		width: 120,
+		width: 60,
 		fixed: 'left',
 		className: 'text-xs',
 		render: (_: SupplierOrders['display_id']) => {
@@ -46,18 +46,38 @@ const supplierOrdersColumn = ({ supplier }: Props) => [
 		width: 150,
 		className: 'text-xs',
 		render: (_: SupplierOrders['id'], record: SupplierOrders) => {
-			const supplierName = supplier?.find((item) => item.id === _)?.supplier_name;
+			const supplierName = supplier?.find(
+				(item) => item.id === _
+			)?.supplier_name;
 
 			return supplierName || '-';
 		},
 	},
 	{
-		title: 'Trạng thái thanh toán',
+		title: 'Thanh toán',
 		dataIndex: 'fulfillment_status',
 		key: 'fulfillment_status',
 		className: 'text-xs',
 		render: (_: SupplierOrders['fulfillment_status']) => {
 			return decideFulfillmentStt(_);
+		},
+	},
+	{
+		title: 'Ngày hoàn thành',
+		dataIndex: 'estimated_production_time',
+		key: 'estimated_production_time',
+		className: 'text-xs',
+		render: (_: SupplierOrders['estimated_production_time']) => {
+			return dayjs(_).format('DD/MM/YYYY');
+		},
+	},
+	{
+		title: 'Ngày thanh toán',
+		dataIndex: 'settlement_time',
+		key: 'settlement_time',
+		className: 'text-xs',
+		render: (_: SupplierOrders['settlement_time']) => {
+			return dayjs(_).format('DD/MM/YYYY');
 		},
 	},
 	{
@@ -67,7 +87,7 @@ const supplierOrdersColumn = ({ supplier }: Props) => [
 		className: 'text-xs',
 		render: (_: SupplierOrders['created_at']) => {
 			return dayjs(_).format('DD/MM/YYYY');
-		}
+		},
 	},
 ];
 

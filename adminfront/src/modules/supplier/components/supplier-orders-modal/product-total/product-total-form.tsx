@@ -96,7 +96,8 @@ const ProductTotalForm: FC<Props> = ({
 						pagination={false}
 					/>
 					<Text strong className="mt-4">
-						Tổng tiền: {totalPrice.toLocaleString()} VND
+						Tổng tiền: {totalPrice.toLocaleString()}
+						{region?.currency.symbol}
 					</Text>
 				</Flex>
 			</Col>

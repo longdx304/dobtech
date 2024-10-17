@@ -123,10 +123,11 @@ export type CustomsFormType = {
 };
 
 export type FormImage = {
-	url: string;
-	name?: string;
-	size?: number;
-	nativeFile?: File;
+	id: string;
+  url: string;
+  name?: string;
+  size?: number;
+  nativeFile?: File;
 	selected?: boolean;
 };
 

@@ -795,5 +795,101 @@ export default {
 			const path = `/admin/supplier-order/${id}`;
 			return medusaRequest('GET', path);
 		},
+
+		updateLineItem(id, data) {
+			const path = `/admin/supplier-order/${id}`;
+			return medusaRequest('PUT', path, data);
+		},
+
+		delete(id) {
+			const path = `/admin/supplier-order/${id}`;
+			return medusaRequest('DELETE', path);
+		},
+
+		deleteLineItem(supplierOrderId, lineItemId) {
+			const path = `/admin/supplier-order/${supplierOrderId}`;
+			return medusaRequest('DELETE', path, { lineItemId });
+		},
+
+		createDocument(supplierOrderId, documents) {
+			const path = `/admin/supplier-order/${supplierOrderId}/document`;
+			return medusaRequest('POST', path, documents);
+		},
+
+		deleteDocument(supplierOrderId, documentId) {
+			const path = `/admin/supplier-order/${supplierOrderId}/document/${documentId}`;
+			return medusaRequest('DELETE', path);
+		},
+
+		capturePayment(id) {
+			const path = `/admin/supplier-order/${id}/capture`;
+			return medusaRequest('POST', path);
+		},
+	},
+
+	supplierOrderEdits: {
+		list(search = {}) {
+			const params = Object.keys(search)
+				.map((k) => `${k}=${search[k]}`)
+				.join('&');
+			const path = `/admin/supplier-order-edits${params && `?${params}`}`;
+			return medusaRequest('GET', path);
+		},
+
+		create(data) {
+			const path = `/admin/supplier-order-edits`;
+			return medusaRequest('POST', path, data);
+		},
+
+		retrieve(id) {
+			const path = `/admin/supplier-order-edits/${id}`;
+			return medusaRequest('GET', path);
+		},
+
+		update(id, data) {
+			const path = `/admin/supplier-order-edits/${id}`;
+			return medusaRequest('PUT', path, data);
+		},
+
+		delete(id) {
+			const path = `/admin/supplier-order-edits/${id}`;
+			return medusaRequest('DELETE', path);
+		},
+
+		requestConfirmation(id) {
+			const path = `/admin/supplier-order-edits/${id}/request`;
+			return medusaRequest('POST', path);
+		},
+
+		cancel(id) {
+			const path = `/admin/supplier-order-edits/${id}/cancel`;
+			return medusaRequest('POST', path);
+		},
+
+		confirm(id) {
+			const path = `/admin/supplier-order-edits/${id}/confirm`;
+			return medusaRequest('POST', path);
+		},
+
+		// crud in line item
+		addLineItem(id, data) {
+			const path = `/admin/supplier-order-edits/${id}/items`;
+			return medusaRequest('POST', path, data);
+		},
+
+		updateLineItem(id, lineItemId, data) {
+			const path = `/admin/supplier-order-edits/${id}/items/${lineItemId}`;
+			return medusaRequest('POST', path, data);
+		},
+
+		deleteLineItem(id, lineItemId) {
+			const path = `/admin/supplier-order-edits/${id}/items/${lineItemId}`;
+			return medusaRequest('DELETE', path);
+		},
+
+		deleteItemChange(id, lineItemId) {
+			const path = `/admin/supplier-order-edits/${id}/changes/${lineItemId}`;
+			return medusaRequest('DELETE', path);
+		},
 	},
 };
