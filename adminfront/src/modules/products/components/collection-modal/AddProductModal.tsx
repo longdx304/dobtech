@@ -140,7 +140,7 @@ const AddProductModal: FC<Props> = ({
 					preserveSelectedRowKeys: true,
 				}}
 				loading={isLoading || isRefetching}
-				columns={columns}
+				columns={columns as any}
 				rowKey="id"
 				dataSource={products || []}
 				pagination={{

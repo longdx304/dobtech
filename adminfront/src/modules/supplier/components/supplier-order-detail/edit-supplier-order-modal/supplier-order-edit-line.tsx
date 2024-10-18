@@ -1,8 +1,7 @@
 import { ActionAbles } from '@/components/Dropdown';
 import { InputNumber } from '@/components/Input';
-import { getErrorMessage } from '@/lib/utils';
+import { Popconfirm } from '@/components/Popconfirm';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
-import { useAdminSupplierOrderUpdateLineItem } from '@/modules/supplier/hooks';
 import {
 	useAdminDeleteSOrderEditItemChange,
 	useAdminSupplierOrderEditAddLineItem,
@@ -10,13 +9,13 @@ import {
 	useAdminSupplierOrderEditUpdateLineItem,
 } from '@/modules/supplier/hooks/supplier-order-edits';
 import { formatAmountWithSymbol } from '@/utils/prices';
-import { LineItem, OrderItemChange, ProductVariant } from '@medusajs/medusa';
+import { LineItem, OrderItemChange } from '@medusajs/medusa';
 import { message, Modal } from 'antd';
 import clsx from 'clsx';
-import { CircleAlert, CopyPlus, Minus, Plus, Trash2 } from 'lucide-react';
+import { CopyPlus, Pencil, Trash2 } from 'lucide-react';
 import { useAdminOrderEditUpdateLineItem } from 'medusa-react';
 import Image from 'next/image';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 type SupplierOrderEditLineProps = {
 	item: LineItem;
@@ -40,6 +39,7 @@ const SupplierOrderEditLine = ({
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [quantity, setQuantity] = useState(item.quantity);
+	const [unitPrice, setUnitPrice] = useState<number>(item.unit_price);
 
 	const { mutateAsync: addLineItem, isLoading: loadingAddLineItem } =
 		useAdminSupplierOrderEditAddLineItem(item.order_edit_id!);
@@ -49,10 +49,8 @@ const SupplierOrderEditLine = ({
 		item.id
 	);
 
-	const { mutateAsync: updateItem } = useAdminSupplierOrderEditUpdateLineItem(
-		item.order_edit_id!,
-		item.id
-	);
+	const { mutateAsync: updateItem, isLoading: updateItemLoading } =
+		useAdminSupplierOrderEditUpdateLineItem(item.order_edit_id!, item.id);
 
 	const { mutateAsync: undoChange } = useAdminDeleteSOrderEditItemChange(
 		item.order_edit_id!,
@@ -75,6 +73,21 @@ const SupplierOrderEditLine = ({
 			console.error('Error updating quantity:', error);
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	const onUnitPriceUpdate = async () => {
+		if (isLoading) {
+			return;
+		}
+
+		try {
+			await updateItem({ unit_price: unitPrice });
+			setUnitPrice(unitPrice);
+			message.success('Cập nhật giá tiền thành công');
+		} catch (error) {
+			message.error('Cập nhật thất bại');
+			console.error('Error updating quantity:', error);
 		}
 	};
 
@@ -173,17 +186,16 @@ const SupplierOrderEditLine = ({
 			</div>
 			<div className="flex items-center">
 				<div className="flex h-full items-center gap-2 sm:gap-6">
-					<div className="flex flex-col sm:flex-row gap-2 items-end sm:gap-6">
+					<div className="flex flex-row flex-wrap gap-4 items-center sm:gap-6">
 						<div
-							className={clsx('flex flex-grow-0 items-center text-gray-400', {
+							className={clsx('flex flex-grow-0 items-centere text-gray-400', {
 								'pointer-events-none': isLocked,
 							})}
 						>
 							<InputNumber
-								addonBefore={<div>Số lượng</div>}
 								placeholder="Thay đổi số lượng"
-								size="small"
-								className={clsx('cursor-pointer text-gray-400', {
+								// size="small"
+								className={clsx('cursor-pointer text-gray-400 w-[80px]', {
 									'pointer-events-none': isLoading,
 								})}
 								value={quantity}
@@ -191,21 +203,67 @@ const SupplierOrderEditLine = ({
 								disabled={isLocked || isLoading}
 							/>
 						</div>
-						<div
-							className={clsx('space-x-2 flex text-sm', {
-								'pointer-events-none !text-gray-400': isLocked,
-							})}
-						>
+						<div className="flex sm:flex-row flex-col items-end">
 							<div
-								className={clsx('min-w-[60px] text-right text-gray-900', {
+								className={clsx(
+									'space-x-2 flex items-center text-end text-sm',
+									{
+										'pointer-events-none !text-gray-400': isLocked,
+									}
+								)}
+							>
+								<Popconfirm
+									title="Chỉnh sửa giá"
+									description={
+										<InputNumber
+											placeholder="Thay đổi số lượng"
+											className={clsx(
+												'cursor-pointer text-gray-400 my-2 w-[130px]',
+												{
+													'pointer-events-none': isLoading,
+												}
+											)}
+											value={unitPrice}
+											onChange={(value) => setUnitPrice(Number(value))}
+											disabled={isLocked || isLoading}
+										/>
+									}
+									isLoading={updateItemLoading}
+									handleOk={onUnitPriceUpdate}
+									handleCancel={() => {}}
+									icon={null}
+								>
+									<Pencil size={16} />
+								</Popconfirm>
+								<div
+									className={clsx('text-gray-900', {
+										'pointer-events-none !text-gray-400': isLocked,
+									})}
+								>
+									{formatAmountWithSymbol({
+										amount: item.unit_price,
+										currency: currencyCode,
+										tax: item.includes_tax ? 0 : item.tax_lines,
+									})}
+								</div>
+							</div>
+							<div
+								className={clsx('space-x-2 flex text-sm', {
 									'pointer-events-none !text-gray-400': isLocked,
 								})}
 							>
-								{formatAmountWithSymbol({
-									amount: item.unit_price * item.quantity,
-									currency: currencyCode,
-									tax: item.includes_tax ? 0 : item.tax_lines,
-								})}
+								<div
+									className={clsx('min-w-[60px] text-right text-gray-900', {
+										'pointer-events-none !text-gray-400': isLocked,
+									})}
+								>
+									{' = ' +
+										formatAmountWithSymbol({
+											amount: item.unit_price * item.quantity,
+											currency: currencyCode,
+											tax: item.includes_tax ? 0 : item.tax_lines,
+										})}
+								</div>
 							</div>
 						</div>
 					</div>

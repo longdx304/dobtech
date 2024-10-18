@@ -120,7 +120,7 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 				<Table
 					rowKey="id"
 					dataSource={suppliers}
-					columns={columns}
+					columns={columns as any}
 					pagination={{ pageSize: 5 }}
 					rowSelection={{
 						type: 'radio',
