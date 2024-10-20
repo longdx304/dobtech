@@ -12,6 +12,7 @@ import { Modal as AntdModal, Divider, Empty, MenuProps, message } from 'antd';
 import dayjs from 'dayjs';
 import { Check, CornerDownLeft, CornerDownRight } from 'lucide-react';
 import CaptureModal from './capture-modal';
+import RefundModal from './refund-modal';
 
 type Props = {
 	supplierOrder: SupplierOrder | undefined;
@@ -20,7 +21,9 @@ type Props = {
 };
 
 const Payment = ({ supplierOrder, isLoading, refetch }: Props) => {
-	const capturePayment = useAdminSupplierOrderCapturePayment(supplierOrder?.id! || '');
+	const capturePayment = useAdminSupplierOrderCapturePayment(
+		supplierOrder?.id! || ''
+	);
 	const { state, onOpen, onClose } = useToggleState(false);
 	const {
 		state: stateCapture,
@@ -72,7 +75,7 @@ const Payment = ({ supplierOrder, isLoading, refetch }: Props) => {
 				label: 'Thu tiền',
 				key: 'capture',
 				icon: <CornerDownRight size={16} />,
-				onClick: confirmCapture,
+				onClick: openCapture,
 			});
 			break;
 		}
@@ -201,26 +204,19 @@ const Payment = ({ supplierOrder, isLoading, refetch }: Props) => {
 						)}
 					</div>
 				))}
-				{payment_status !== 'awaiting' && (
-					<div className="flex justify-between text-xs">
-						<div className="font-semibold text-grey-90">
-							{'Số tiền thanh toán'}
-						</div>
-						<div className="flex">
-							<div className="font-semibold text-gray-900 mr-3">
-								{formatAmountWithSymbol({
-									amount: supplierOrder.paid_total,
-									currency: supplierOrder.currency_code,
-								})}
-							</div>
-							<div className="font-regular text-gray-500">
-								{supplierOrder.currency_code.toUpperCase()}
-							</div>
-						</div>
-					</div>
-				)}
 			</div>
+			{/* Refund modal */}
+			{state && (
+				<RefundModal
+					state={state}
+					handleOk={handleOkRefund}
+					handleCancel={onClose}
+					supplierOrder={supplierOrder}
+					refetch={refetch}
+				/>
+			)}
 
+			{/* Capture modal */}
 			{stateCapture && (
 				<CaptureModal
 					state={stateCapture}
@@ -278,14 +274,6 @@ const PaymentStatus = ({
 			return (
 				<StatusIndicator
 					title="Yêu cầu thanh toán"
-					variant="danger"
-					className="font-normal"
-				/>
-			);
-		case 'not_paid':
-			return (
-				<StatusIndicator
-					title="Chưa thanh toán"
 					variant="danger"
 					className="font-normal"
 				/>
