@@ -71,7 +71,6 @@ const Summary = ({
 		supplierOrder.status
 	);
 
-	console.log('supplierOrder', supplierOrder?.items.length);
 	return (
 		<Card loading={isLoading} className="px-4">
 			<div>

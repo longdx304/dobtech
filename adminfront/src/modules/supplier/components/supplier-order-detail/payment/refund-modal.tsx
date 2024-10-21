@@ -3,9 +3,10 @@ import { SubmitModal } from '@/components/Modal';
 import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
+import { useAdminSupplierRefundPayment } from '@/modules/supplier/hooks';
 import { currencies } from '@/types/currencies';
+import { SupplierOrder } from '@/types/supplier';
 import { normalizeAmount, persistedPrice } from '@/utils/prices';
-import { Order } from '@medusajs/medusa';
 import { Form, message } from 'antd';
 import { useAdminRefundPayment } from 'medusa-react';
 import { useEffect, useMemo } from 'react';
@@ -14,7 +15,7 @@ interface Props {
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
-	order: Order;
+	supplierOrder: SupplierOrder;
 	initialAmount?: number;
 	initialReason?: string;
 	refetch: () => void;
@@ -39,22 +40,23 @@ const RefundModal = ({
 	state,
 	handleOk,
 	handleCancel,
-	order,
+	supplierOrder,
 	initialAmount = 1000,
 	initialReason = 'discount',
 	refetch,
 }: Props) => {
 	const [form] = Form.useForm();
-	const { mutateAsync, isLoading } = useAdminRefundPayment(order.id);
+	const { mutateAsync, isLoading } = useAdminSupplierRefundPayment(supplierOrder.id);
 
 	const refundable = useMemo(() => {
-		return order.paid_total - order.refunded_total;
-	}, [order]);
+		return supplierOrder.paid_total - 1000;
+		// return supplierOrder.paid_total - supplierOrder.refunded_total;
+	}, [supplierOrder]);
 
 	useEffect(() => {
 		if (initialAmount || initialReason) {
 			form.setFieldsValue({
-				amount: normalizeAmount(order.currency_code, initialAmount),
+				amount: normalizeAmount(supplierOrder.currency_code, initialAmount),
 				reason: initialReason || 'discount',
 			});
 		}
@@ -64,7 +66,7 @@ const RefundModal = ({
 	const onFinish = async (values: RefundMenuFormData) => {
 		await mutateAsync(
 			{
-				amount: persistedPrice(order.currency_code, values.amount),
+				amount: persistedPrice(supplierOrder.currency_code, values.amount),
 				reason: values.reason,
 				no_notification: true,
 				note: values?.note ?? '',
@@ -108,7 +110,7 @@ const RefundModal = ({
 						className="w-[100px]"
 					>
 						<Input
-							defaultValue={order.currency_code.toUpperCase()}
+							defaultValue={supplierOrder.currency_code.toUpperCase()}
 							className="w-[100px]"
 							disabled
 						/>
@@ -122,30 +124,19 @@ const RefundModal = ({
 								required: true,
 								message: 'Vui lòng nhập số tiền hoàn trả',
 							},
-							// () => ({
-							// 	validator(_, value) {
-							// 		if (!value) {
-							// 			return Promise.reject();
-							// 		}
-							// 		if (value > refundable) {
-							// 			return Promise.reject("Số tiền hoàn trả không thể lớn hơn số tiền cần thành toán");
-							// 		}
-							// 		return Promise.resolve();
-							// 	},
-							// }),
 						]}
 					>
 						<InputNumber
-							max={+normalizeAmount(order.currency_code, refundable)}
+							max={+normalizeAmount(supplierOrder.currency_code, refundable)}
 							min={
 								initialAmount
-									? +normalizeAmount(order.currency_code, initialAmount)
+									? +normalizeAmount(supplierOrder.currency_code, initialAmount)
 									: 1
 							}
 							allowClear
 							prefix={
 								<span className="text-gray-500">
-									{getCurrencyInfo(order?.currency_code)?.symbol_native}
+									{getCurrencyInfo(supplierOrder?.currency_code)?.symbol_native}
 								</span>
 							}
 						/>

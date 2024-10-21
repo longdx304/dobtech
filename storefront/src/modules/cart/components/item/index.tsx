@@ -22,6 +22,7 @@ const Item = ({ item, region, type = 'full', cartId }: ItemProps) => {
 	const [updating, setUpdating] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const { updateCartItem } = useCart();
+	const allowed_quantities = (item?.variant as any)?.allowed_quantities || 6;
 
 	const changeQuantity = async (quantity: number) => {
 		setError(null);
@@ -75,6 +76,7 @@ const Item = ({ item, region, type = 'full', cartId }: ItemProps) => {
 							<CartItemSelect
 								quantity={item.quantity}
 								onChange={changeQuantity}
+								allowed_quantities={allowed_quantities}
 							/>
 
 							<DeleteButton
@@ -98,6 +100,7 @@ const Item = ({ item, region, type = 'full', cartId }: ItemProps) => {
 							<CartItemSelect
 								quantity={item.quantity}
 								onChange={changeQuantity}
+								allowed_quantities={allowed_quantities}
 							/>
 						</div>
 					</div>

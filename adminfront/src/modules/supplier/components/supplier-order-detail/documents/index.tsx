@@ -38,11 +38,9 @@ const Documents = ({ order, isLoading }: Props) => {
 								documentId: docId,
 							});
 							message.success('Xoá tài liệu thành công');
-							console.log('first');
 						},
 						onError: (error: any) => {
-							console.log('error', error);
-							// message.error(getErrorMessage(error));
+							message.error(getErrorMessage(error));
 						},
 					}
 				);

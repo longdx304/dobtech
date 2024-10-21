@@ -41,6 +41,7 @@ export default function ProductActions({
 		price,
 		inStock,
 		inventoryQuantity,
+		allowedQuantities,
 		quantity,
 		handleAddNumber,
 		handleSubtractNumber,
@@ -61,17 +62,21 @@ export default function ProductActions({
 		if (isEmpty(variant) && !variant) return null;
 		setIsAdding(true);
 
-		await addToCart({
-			variantId: variant.id ?? '',
-			quantity: quantity,
-			countryCode,
-		});
-		refreshCart();
-		message.success('Sản phẩm được thêm vào giỏ hàng');
-
+		if (quantity > 0) {
+			await addToCart({
+				variantId: variant.id ?? '',
+				quantity: quantity,
+				countryCode,
+			});
+			refreshCart();
+			message.success('Sản phẩm được thêm vào giỏ hàng');
+		}
 		setIsAdding(false);
 		handleCancel();
 	};
+
+	// the condition for adding quantity to cart
+	const isAllowedQuantity = quantity % allowedQuantities === 0 && quantity > 0;
 
 	return (
 		<>
@@ -136,7 +141,13 @@ export default function ProductActions({
 				<Button
 					onClick={handleAddToCart}
 					disabled={
-						!inStock || !variant || !!disabled || isAdding || !options || !price
+						!inStock ||
+						!variant ||
+						!!disabled ||
+						isAdding ||
+						!options ||
+						!price ||
+						!isAllowedQuantity
 					}
 					className="max-w-[200px]"
 					isLoading={isAdding}

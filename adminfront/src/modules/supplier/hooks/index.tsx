@@ -234,3 +234,23 @@ export function useAdminSupplierOrderCapturePayment(supplierOrderId: string) {
 		}
 	);
 }
+
+
+export function useAdminSupplierRefundPayment(supplierOrderId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async (data: any) => {
+			const response = await api.suplierOrders.refundPayment(supplierOrderId, data);
+			return response.data as unknown as any;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}

@@ -52,8 +52,6 @@ const SupplierOrderEditModalContainer = (
 		return null;
 	}
 
-	console.log('supplierOrderEdits', supplierOrderEdits);
-
 	return (
 		<SupplierOrderEditModal
 			state={isModalVisible}
@@ -199,8 +197,6 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 		);
 	}
 
-	console.log('supplierOrderEdit', supplierOrderEdit);
-
 	return (
 		<Modal
 			open={state}
@@ -267,6 +263,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 				itemPrices={itemPrices}
 				setItemQuantities={setItemQuantities}
 				setItemPrices={setItemPrices}
+				variantsDisabled={supplierOrderEdit.items.map((i) => i.variant.id)}
 			/>
 		</Modal>
 	);

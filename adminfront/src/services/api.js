@@ -525,6 +525,11 @@ export default {
 			const path = `/admin/payments/${paymentId}/capture-payment`;
 			return medusaRequest('POST', path, payload);
 		},
+
+		captureSupplierPayment(paymentId, payload) {
+			const path = `/admin/payments/${paymentId}/capture-supplier-payment`;
+			return medusaRequest('POST', path, payload);
+		}
 	},
 
 	shippingOptions: {
@@ -824,6 +829,11 @@ export default {
 		capturePayment(id) {
 			const path = `/admin/supplier-order/${id}/capture`;
 			return medusaRequest('POST', path);
+		},
+
+		refundPayment(id, data) {
+			const path = `/admin/supplier-order/${id}/refund`;
+			return medusaRequest('POST', path, data);
 		},
 	},
 

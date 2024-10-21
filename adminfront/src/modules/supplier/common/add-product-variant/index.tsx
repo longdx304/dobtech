@@ -30,6 +30,7 @@ type AddProductVariantProps = {
 	itemPrices?: ItemPrice[];
 	setItemQuantities?: React.Dispatch<React.SetStateAction<ItemQuantity[]>>;
 	setItemPrices?: React.Dispatch<React.SetStateAction<ItemPrice[]>>;
+	variantsDisabled?: string[];
 };
 
 const PAGE_SIZE = 10;
@@ -44,6 +45,7 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 		itemQuantities,
 		setItemQuantities,
 		setItemPrices,
+		variantsDisabled,
 	} = props;
 	const [selectedVariantIds, setSelectedVariantIds] = useState<string[]>([]);
 	const [selectedVariants, setSelectedVariants] = useState<ProductVariant[]>(
@@ -241,8 +243,12 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 				rowSelection={{
 					type: isReplace ? 'radio' : 'checkbox',
 					selectedRowKeys: selectedVariantIds,
-					onChange: handleRowSelectionChange,
+					onChange: handleRowSelectionChange as any,
 					preserveSelectedRowKeys: true,
+					getCheckboxProps: (record: any) => ({
+						disabled:
+							variantsDisabled?.findIndex((c) => c === record.id) !== -1,
+					}),
 				}}
 				loading={isLoading}
 				columns={columns as any}

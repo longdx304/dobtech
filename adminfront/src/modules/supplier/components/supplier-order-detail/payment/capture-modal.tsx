@@ -61,7 +61,7 @@ const CaptureModal = ({
 		const { amount } = values;
 
 		await Medusa.payments
-			.capturePayment(payment.id, {
+			.captureSupplierPayment(payment.id, {
 				paid_total: persistedPrice(supplierOrder.currency_code, amount),
 			})
 			.then(async () => {
