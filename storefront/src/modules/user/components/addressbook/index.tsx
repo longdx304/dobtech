@@ -2,14 +2,12 @@
 
 import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
 import { Region } from '@medusajs/medusa';
-import dynamic from 'next/dynamic';
+import AddressBookDesktop from './AddressBookDesktop';
+import AddressBookMobile from './AddressBookMobile';
 
 type AddressBookProps = {
 	region: Region;
 };
-
-const AddressBookDesktop = dynamic(() => import('./AddressBookDesktop'));
-const AddressBookMobile = dynamic(() => import('./AddressBookMobile'));
 
 const AddressBook = ({ region }: AddressBookProps) => {
 	const isDesktop = useIsDesktop();

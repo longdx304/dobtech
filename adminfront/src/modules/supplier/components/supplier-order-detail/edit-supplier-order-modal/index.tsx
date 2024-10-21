@@ -52,8 +52,6 @@ const SupplierOrderEditModalContainer = (
 		return null;
 	}
 
-	console.log('supplierOrderEdits', supplierOrderEdits);
-
 	return (
 		<SupplierOrderEditModal
 			state={isModalVisible}
@@ -198,8 +196,6 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 				i.variant?.sku.toLowerCase().includes(filterTerm)
 		);
 	}
-
-	console.log('supplierOrderEdit', supplierOrderEdit);
 
 	return (
 		<Modal

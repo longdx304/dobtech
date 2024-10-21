@@ -12,11 +12,10 @@ import '../../app/globals.css';
 
 import StyleComponentsRegistry from '@/lib/providers/antd-provider';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import dynamic from 'next/dynamic';
 import HomepageSkeleton from './skeleton';
 
-const Header = dynamic(() => import('@/modules/common/components/header'));
-const Menu = dynamic(() => import('@/modules/common/components/menu'));
+import Header from '@/modules/common/components/header';
+import Menu from '@/modules/common/components/menu';
 
 export const metadata: Metadata = {
 	title: 'CHAMDEP VN | Giày dép nam nữ trẻ em',

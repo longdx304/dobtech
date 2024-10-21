@@ -11,14 +11,10 @@ import {
 } from '@/modules/user/actions';
 import { Region } from '@/types/medusa';
 import { Address, Customer } from '@medusajs/medusa';
-import { Form, FormProps, message } from 'antd';
+import { Divider, Form, FormProps, message } from 'antd';
 import { isEmpty } from 'lodash-es';
-import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react';
-
-const Divider = dynamic(() => import('antd/es/divider'), { ssr: false });
-
-const SelectedAddress = React.lazy(() => import('./SelectedAddress'));
+import { useEffect, useState } from 'react';
+import SelectedAddress from './SelectedAddress';
 
 type Props = {
 	customer: Omit<Customer, 'password_hash'> | null;

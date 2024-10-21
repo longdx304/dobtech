@@ -1,35 +1,9 @@
-import { Cart, Customer, Region } from '@medusajs/medusa';
-import { PricedShippingOption } from '@medusajs/medusa/dist/types/pricing';
 import Addresses from '@/modules/checkout/components/addresses';
 import ItemsPreview from '@/modules/checkout/components/items-preview';
 import PaymentOptions from '@/modules/checkout/components/payment-options';
 import ShippingOptions from '@/modules/checkout/components/shipping-options';
-
-// const Addresses = dynamic(
-// 	() => import('@/modules/checkout/components/addresses'),
-// 	{
-// 		ssr: false,
-// 	}
-// );
-// const ItemsPreview = dynamic(
-// 	() => import('@/modules/checkout/components/items-preview'),
-// 	{
-// 		ssr: false,
-// 	}
-// );
-// const PaymentOptions = dynamic(
-// 	() => import('@/modules/checkout/components/payment-options'),
-// 	{
-// 		ssr: false,
-// 	}
-// );
-// const ShippingOptions = dynamic(
-// 	() => import('@/modules/checkout/components/shipping-options'),
-// 	{
-// 		ssr: false,
-// 	}
-// );
-
+import { Cart, Customer, Region } from '@medusajs/medusa';
+import { PricedShippingOption } from '@medusajs/medusa/dist/types/pricing';
 
 type Props = {
 	cart: Omit<Cart, 'refunded_total' | 'refundable_amount'>;

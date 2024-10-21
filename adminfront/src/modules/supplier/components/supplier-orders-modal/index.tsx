@@ -196,7 +196,6 @@ const SupplierOrdersModal: FC<Props> = ({
 		}
 	};
 
-	console.log('region', region);
 
 	// footer
 	const footer = useMemo(() => {

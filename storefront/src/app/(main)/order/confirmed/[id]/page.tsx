@@ -4,12 +4,16 @@ import { LineItem, Order } from '@medusajs/medusa';
 import { Metadata } from 'next';
 
 import { deletePaymentSession } from '@/actions/checkout';
+import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import OrderSkeleton from './skeleton';
 
-const OrderCompletedTemplate = lazy(
-	() => import('@/modules/order/templates/order-completed-template')
+const OrderCompletedTemplate = dynamic(
+	() => import('@/modules/order/templates/order-completed-template'),
+	{
+		loading: () => <OrderSkeleton />,
+	}
 );
 
 type Props = {

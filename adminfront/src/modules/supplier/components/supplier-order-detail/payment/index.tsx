@@ -116,7 +116,6 @@ const Payment = ({ supplierOrder, isLoading, refetch }: Props) => {
 		onClose();
 	};
 
-	console.log('supplierOrder', supplierOrder);
 	return (
 		<Card loading={isLoading} className="px-4">
 			<div>
