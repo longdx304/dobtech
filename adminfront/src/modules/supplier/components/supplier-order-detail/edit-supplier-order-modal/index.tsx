@@ -263,6 +263,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 				itemPrices={itemPrices}
 				setItemQuantities={setItemQuantities}
 				setItemPrices={setItemPrices}
+				variantsDisabled={supplierOrderEdit.items.map((i) => i.variant.id)}
 			/>
 		</Modal>
 	);

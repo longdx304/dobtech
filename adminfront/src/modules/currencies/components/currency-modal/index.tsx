@@ -116,7 +116,7 @@ const CurrencyModal: FC<Props> = ({
 						type: 'radio',
 						selectedRowKeys: selectedRowKeys,
 						onChange: handleRowSelectionChange,
-						getCheckboxProps: (record: Currency) => ({
+						getCheckboxProps: (record: any) => ({
 							disabled:
 								currentCurrencies?.findIndex((c) => c.code === record.code) !==
 								-1,
