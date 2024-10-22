@@ -2,10 +2,11 @@ import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Text, Title } from '@/components/Typography';
+import { getErrorMessage } from '@/lib/utils';
 import StatusIndicator from '@/modules/common/components/status-indicator';
+import { useAdminCancelSupplierOrder } from '@/modules/supplier/hooks';
 import { SupplierOrder } from '@/types/supplier';
-import { Order } from '@medusajs/medusa';
-import { Empty } from 'antd';
+import { Empty, message, Modal as AntdModal } from 'antd';
 import dayjs from 'dayjs';
 import { Ban } from 'lucide-react';
 
@@ -15,24 +16,24 @@ type Props = {
 };
 
 const Information = ({ supplierOrder, isLoading }: Props) => {
-	// const cancelOrder = useAdminCancelOrder(order?.id!);
+	const cancelOrder = useAdminCancelSupplierOrder(supplierOrder?.id!);
 
-	// const handleCancelOrder = () => {
-	// 	AntdModal.confirm({
-	// 		title: 'Xác nhận huỷ đơn hàng',
-	// 		content: 'Bạn có chắc chắn muốn huỷ đơn hàng này?',
-	// 		onOk: async () => {
-	// 			await cancelOrder.mutateAsync(undefined, {
-	// 				onSuccess: () => {
-	// 					message.success('Huỷ đơn hàng thành công');
-	// 				},
-	// 				onError: (error: any) => {
-	// 					message.error(getErrorMessage(error));
-	// 				},
-	// 			});
-	// 		},
-	// 	});
-	// };
+	const handleCancelOrder = () => {
+		AntdModal.confirm({
+			title: 'Xác nhận huỷ đơn hàng',
+			content: 'Bạn có chắc chắn muốn huỷ đơn hàng này?',
+			onOk: async () => {
+				await cancelOrder.mutateAsync(undefined, {
+					onSuccess: () => {
+						message.success('Huỷ đơn hàng thành công');
+					},
+					onError: (error: any) => {
+						message.error(getErrorMessage(error));
+					},
+				});
+			},
+		});
+	};
 
 	const actions = [
 		{
@@ -40,8 +41,7 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 			key: 'cancel',
 			icon: <Ban />,
 			danger: true,
-			onClick: () => {},
-			// onClick: handleCancelOrder,
+			onClick: handleCancelOrder,
 		},
 	];
 
@@ -82,7 +82,7 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 
 export default Information;
 
-const OrderStatus = ({ status }: { status: Order['status'] }) => {
+const OrderStatus = ({ status }: { status: SupplierOrder['status'] }) => {
 	switch (status) {
 		case 'completed':
 			return (
