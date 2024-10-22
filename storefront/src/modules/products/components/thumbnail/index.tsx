@@ -1,40 +1,63 @@
-'use client';
+import { Flex } from '@/components/Flex';
 import { cn } from '@/lib/utils';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import Image from 'next/image';
-import { FC } from 'react';
 
-interface Props {
+interface ThumbnailProps {
 	thumbnail?: string | null;
-	className?: string;
 	size?: 'small' | 'medium' | 'large' | 'full' | 'square';
+	isFeatured?: boolean;
+	className?: string;
+	'data-testid'?: string;
 }
 
-const Thumbnail: FC<Props> = ({ thumbnail, size, className }) => {
-
+const Thumbnail = ({
+	thumbnail,
+	size = 'small',
+	isFeatured,
+	className,
+	'data-testid': dataTestid,
+}: ThumbnailProps) => {
+	
 	return (
-		<div
+		<Flex
 			className={cn(
-				'relative w-full overflow-hidden aspect-[3/4] rounded',
-				className
+				'relative w-full overflow-hidden bg-ui-bg-subtle shadow-elevation-card-rest rounded-large group-hover:shadow-elevation-card-hover transition-shadow ease-in-out duration-150',
+				className,
+				{
+					'aspect-[11/14]': isFeatured,
+					'aspect-[9/16]': !isFeatured && size !== 'square',
+					'aspect-[3/4]': size === 'small',
+					'aspect-[1/1]': size === 'square',
+					'w-[290px]': size === 'medium',
+					'w-[440px]': size === 'large',
+					'w-full': size === 'full',
+				}
 			)}
+			data-testid={dataTestid}
 		>
-			{thumbnail ? (
-				<Image
-					src={thumbnail}
-					alt="Product Thumbnail"
-					className="absolute inset-0 object-cover object-center group-hover:scale-110 transition-all"
-					draggable={false}
-					sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
-					quality={75}
-					fill
-					priority
-				/>
-			) : (
-				<div className="w-full h-full absolute inset-0 flex items-center justify-center bg-slate-200 group-hover:scale-110 transition-all">
-					<PlaceholderImage size={size} color="#64748b" />
-				</div>
-			)}
+			<ImageOrPlaceholder image={thumbnail} size={size} />
+		</Flex>
+	);
+};
+
+const ImageOrPlaceholder = ({
+	image,
+	size,
+}: Pick<ThumbnailProps, 'size'> & { image?: string | null }) => {
+	return image ? (
+		<Image
+			src={image}
+			alt="Thumbnail"
+			className="absolute inset-0 object-cover object-center group-hover:scale-110 transition-all"
+			draggable={false}
+			quality={50}
+			sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
+			fill
+		/>
+	) : (
+		<div className="w-full h-full absolute inset-0 flex items-center justify-center">
+			<PlaceholderImage size={size === 'small' ? 16 : 24} />
 		</div>
 	);
 };
