@@ -7,24 +7,14 @@ type Props = {
 
 const decideFulfillmentStt = (status: any) => {
 	switch (status) {
-		case 'not_fulfilled':
-			return 'Chưa hoàn thành';
-		case 'partially_fulfilled':
-			return 'Hoàn thành một phần';
-		case 'fulfilled':
-			return 'Đã hoàn thành';
-		case 'partially_shipped':
-			return 'Gửi hàng một phần';
-		case 'shipped':
-			return 'Đã gửi hàng';
-		case 'partially_returned':
-			return 'Trả lại một phần';
-		case 'returned':
-			return 'Đã trả lại';
+		case 'pending':
+			return 'Chờ thanh toán';
+		case 'completed':
+			return 'Đã thanh toán';
 		case 'canceled':
-			return 'Đã hủy';
-		case 'requires_action':
-			return 'Yêu cầu xử lý';
+			return 'Đã huỷ';
+		default:
+			return 'Xem xét';
 	}
 };
 const supplierOrdersColumn = ({ supplier }: Props) => [
@@ -55,10 +45,10 @@ const supplierOrdersColumn = ({ supplier }: Props) => [
 	},
 	{
 		title: 'Thanh toán',
-		dataIndex: 'fulfillment_status',
-		key: 'fulfillment_status',
+		dataIndex: 'status',
+		key: 'status',
 		className: 'text-xs',
-		render: (_: SupplierOrders['fulfillment_status']) => {
+		render: (_: SupplierOrders['status']) => {
 			return decideFulfillmentStt(_);
 		},
 	},

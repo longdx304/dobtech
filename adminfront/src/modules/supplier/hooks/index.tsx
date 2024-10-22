@@ -216,6 +216,24 @@ export function useAdminSupplierOrderDeleteDocument(supplierOrderId: string) {
 	);
 }
 
+export function useAdminCancelSupplierOrder(supplierOrderId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async () => {
+			const response = await api.suplierOrders.cancel(supplierOrderId);
+			return response.data as unknown as any;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}
 export function useAdminSupplierOrderCapturePayment(supplierOrderId: string) {
 	const queryClient = useQueryClient();
 
