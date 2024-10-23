@@ -43,14 +43,12 @@ const nextConfig = withStoreConfig({
 	experimental: {
 		optimizePackageImports: ['lucide-react', 'lodash', 'antd'],
 	},
-	serverExternalPackages: ['playwright'],
 	staticPageGenerationTimeout: 1000,
 	productionBrowserSourceMaps: true,
 	reactStrictMode: true,
 	optimizeFonts: true,
 	compress: true,
 	swcMinify: true,
-	postcss: true,
 	transpilePackages: [
 		'@ant-design',
 		'@rc-component',
@@ -99,6 +97,12 @@ const nextConfig = withStoreConfig({
 				hostname: 'dob-ecommerce.s3.ap-southeast-1.amazonaws.com',
 				port: '',
 				pathname: '/product/**',
+			},
+			{
+				protocol: 'https',
+				hostname: 'dob-ecommerce.s3.ap-southeast-1.amazonaws.com',
+				port: '',
+				pathname: '/**',
 			},
 		],
 	},

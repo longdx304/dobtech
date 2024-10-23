@@ -1,13 +1,16 @@
-import React, { Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import React from 'react';
 
-import SkeletonRelatedProducts from '@/modules/skeletons/templates/skeleton-related-products';
-import ProductTabs from '@/modules/products/components/product-tabs';
 import ImageGallery from '@/modules/products/components/image-gallery';
 import ProductActions from '@/modules/products/components/product-actions';
+import ProductTabs from '@/modules/products/components/product-tabs';
+import SkeletonRelatedProducts from '@/modules/skeletons/templates/skeleton-related-products';
 
 const RelatedProducts = dynamic(
-	() => import('@/modules/products/components/related-products')
+	() => import('@/modules/products/components/related-products'),
+	{
+		loading: () => <SkeletonRelatedProducts />,
+	}
 );
 
 type ProductTemplateProps = {
@@ -36,9 +39,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 				className="my-16 small:my-32"
 				data-testid="related-products-container"
 			>
-				<Suspense fallback={<SkeletonRelatedProducts />}>
-					<RelatedProducts handle={handle} countryCode={countryCode} />
-				</Suspense>
+				<RelatedProducts handle={handle} countryCode={countryCode} />
 			</div>
 		</div>
 	);
