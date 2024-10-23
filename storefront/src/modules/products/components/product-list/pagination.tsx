@@ -1,7 +1,7 @@
 'use client';
 import { Pagination as AntPagination } from '@/components/Pagination';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import React, { Suspense } from 'react';
+import React, {Suspense} from 'react';
 
 interface PaginationProps {
 	total: number;
@@ -20,7 +20,14 @@ const Pagination: React.FC<PaginationProps> = ({
 
 	const handlePageChange = (page: number) => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
+		if (page === 1) {
+			newSearchParams.delete('page');
+			router.push(`${pathname}?${newSearchParams}`);
+			return;
+		}
+
 		newSearchParams.set('page', page.toString());
+
 		router.push(`${pathname}?${newSearchParams}`);
 	};
 

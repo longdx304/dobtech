@@ -3,7 +3,7 @@ import { Skeleton } from 'antd';
 import { Image } from 'lucide-react';
 import { Flex } from '@/components/Flex';
 
-export default function HomepageSkeleton() {
+export default function ProductsSkeletonTemplate() {
 	const skeletonArray = Array.from({ length: 24 });
 	return (
 		<main className="w-full pb-20">
