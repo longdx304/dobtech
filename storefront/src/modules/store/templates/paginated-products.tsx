@@ -61,7 +61,6 @@ export default async function PaginatedProducts({
 	return (
 		<>
 			{products?.length > 0 && (
-				// <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 sm:grid-cols-2 w-full gap-x-6 gap-y-6">
 				<div className="grid xl:grid-cols-6 lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 sm:grid-cols-2 w-full gap-x-3 gap-y-3 lg:gap-x-4 lg:gap-y-4">
 					{products?.map((product) => (
 						<ProductPreview key={product.id} data={product} region={region} />

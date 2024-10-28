@@ -1,9 +1,7 @@
 'use client';
 import { useCart } from '@/lib/providers/cart/cart-provider';
-import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
 import { useEffect } from 'react';
-import OverviewDesktop from './OverviewDesktop';
-import OverviewMobile from './OverviewMobile';
+import ItemGroup from './item-group';
 
 const OverviewPreview = () => {
 	const { refreshCart } = useCart();
@@ -13,8 +11,11 @@ const OverviewPreview = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const isDesktop = useIsDesktop();
-	return isDesktop ? <OverviewDesktop /> : <OverviewMobile />;
+	return (
+		<div>
+			<ItemGroup />
+		</div>
+	);
 };
 
 export default OverviewPreview;

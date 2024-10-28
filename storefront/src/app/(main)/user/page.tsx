@@ -1,7 +1,8 @@
+import { getCustomer } from '@/actions/customer';
+import Overview from '@/modules/user/components/overview';
+import LoginTemplate from '@/modules/user/templates/login-template';
 import { Metadata } from 'next';
-import dynamic from 'next/dynamic';
-
-const Overview = dynamic(() => import('@/modules/user/components/overview'));
+import { LOGIN_VIEW } from '@/types/auth';
 
 export const metadata: Metadata = {
 	title: 'CHAMDEP VN | Trang cá nhân',
@@ -9,5 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default async function UserPage() {
-	return <Overview />;
+	const customer = await getCustomer().catch(() => null);
+
+	return customer ? (
+		<Overview />
+	) : (
+		<LoginTemplate initialView={LOGIN_VIEW.SIGN_IN} />
+	);
 }

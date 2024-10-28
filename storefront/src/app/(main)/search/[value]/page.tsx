@@ -1,39 +1,78 @@
 import { Metadata } from 'next';
-
+import { Suspense } from 'react';
 import ProductList from '@/modules/products/components/product-list';
 import RefinementList from '@/modules/store/components/refinement-list';
 import { SortOptions } from '@/modules/store/components/refinement-list/sort-products';
+import HeaderWrapMobile from '@/modules/common/components/header/HeaderWrapMobile';
+import { TTreeCategories } from '@/types/productCategory';
+import { cache } from 'react';
+import { listCategories } from '@/actions/productCategory';
+import { Spin } from 'antd';
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Tìm kiếm',
-	description: 'Tìm kiếm sản phẩm',
+  title: 'CHAMDEP VN | Tìm kiếm',
+  description: 'Tìm kiếm sản phẩm',
 };
+
+// Loading component for Suspense
+const LoadingFallback = () => (
+  <div className="w-full min-h-[400px] flex items-center justify-center">
+    <Spin size="large" />
+  </div>
+);
 
 type Params = {
-	params: { value: string };
-	searchParams: { page?: string };
+  params: { value: string };
+  searchParams: { page?: string };
 };
 
-const PAGE_SIZE = 20;
-export default async function SearchPage({ params, searchParams }: Params) {
-	const searchValue = decodeURIComponent(params?.value || '');
-	const page = searchParams.page ? parseInt(searchParams.page) : 1;
+const fetchCategories = cache(async () => await listCategories());
 
-	const queryParams = {
-		q: searchValue,
-		limit: PAGE_SIZE,
-		offset: (page - 1) * PAGE_SIZE,
-	};
+export default async function SearchValue({ params, searchParams }: Params) {
+  const searchValue = decodeURIComponent(params?.value || '');
+  const page = searchParams.page ? parseInt(searchParams.page) : 1;
 
-	
+  // Get categories
+  const categories = await fetchCategories();
 
-	return (
-		<div className="w-full box-border container pt-[4rem] lg:pt-[6rem]">
-			<RefinementList
-				sortBy={searchValue as SortOptions}
-				data-testid="sort-by-container"
-			/>
-			<ProductList page={page} />
-		</div>
-	);
+  // Get ancestors of categories
+  const getAncestors = (category: any) => {
+    const convertedCategory: {
+      id: string;
+      label: string;
+      key: string;
+      metadata?: Record<string, string>;
+      children?: any[];
+    } = {
+      id: category.id,
+      label: category.name,
+      key: category.handle,
+      metadata: category.metadata,
+    };
+
+    if (category.category_children && category.category_children.length > 0) {
+      convertedCategory.children = category.category_children.map(
+        (child: any) => getAncestors(child)
+      );
+    }
+
+    return convertedCategory;
+  };
+
+  // Format categories
+  const formatCategories: TTreeCategories[] | null =
+    categories?.map((category: any) => getAncestors(category)) || null;
+
+  return (
+    <div className="w-full box-border container lg:pt-[6rem]">
+      <HeaderWrapMobile categories={formatCategories} />
+      <RefinementList
+        sortBy={searchValue as SortOptions}
+        data-testid="sort-by-container"
+      />
+      <Suspense fallback={<LoadingFallback />}>
+        <ProductList page={page} searchValue={searchValue} />
+      </Suspense>
+    </div>
+  );
 }

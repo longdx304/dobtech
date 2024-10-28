@@ -10,15 +10,13 @@ import { isEmpty } from 'lodash-es';
 
 type Props = {};
 
-const PAGE_SIZE = 10;
-
 const hotSearches = ['Dép', 'Giày'];
 const RecentSearch: FC<Props> = ({}) => {
 	const { getItem, removeItem } = useLocalStorage('recentSearches');
 	const router = useRouter();
 
 	const handleClick = (value: string) => {
-		router.push(`/search/${value}`);
+		router.push(`/search/keyword=${value}`);
 	};
 
 	return (
