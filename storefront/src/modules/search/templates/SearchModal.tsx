@@ -25,7 +25,7 @@ export default function SearchModal({}: SearchModalProps) {
 		} else {
 			setItem([value]);
 		}
-		router.push(`/search/${value}`);
+		router.push(`/search/keyword=${value}`);
 	};
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {

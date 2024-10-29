@@ -14,6 +14,7 @@ import { useAdminNotes, useAdminNotifications, useGetCart } from 'medusa-react';
 import { useMemo } from 'react';
 import useOrdersExpandParam from '../components/supplier-order-detail/utils/use-admin-expand-parameter';
 import { useAdminSupplierOrderEdits } from './supplier-order-edits';
+import { isArray } from 'lodash';
 
 export interface TimelineEvent {
 	id: string;
@@ -312,6 +313,19 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			}
 		}
 
+		for (const event of supplierOrder.refunds) {
+			events.push({
+				amount: event.amount,
+				currencyCode: supplierOrder.currency_code,
+				id: event.id,
+				note: event.note,
+				reason: event.reason,
+				time: event.created_at,
+				type: 'refund',
+				refund: event,
+			} as RefundEvent);
+		}
+
 		if ((supplierOrder.metadata?.timeline as any[])?.length) {
 			for (const event of supplierOrder.metadata.timeline as any[]) {
 				events.push({
@@ -324,21 +338,21 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			}
 		}
 
-		// for (const payment of order.payments) {
-		// 	const paidData = payment.data?.paid;
-		// 	if (_.isArray(paidData) && paidData.length > 0) {
-		// 		for (const paid of paidData) {
-		// 			events.push({
-		// 				id: `${payment.created_at}-paid`,
-		// 				time: paid.created_at,
-		// 				type: 'paid',
-		// 				orderId: order.id,
-		// 				amount: paid.amount,
-		// 				currencyCode: order.currency_code,
-		// 			} as PaidEvent);
-		// 		}
-		// 	}
-		// }
+		for (const payment of supplierOrder.payments) {
+			const paidData = payment.data?.paid;
+			if (isArray(paidData) && paidData.length > 0) {
+				for (const paid of paidData) {
+					events.push({
+						id: `${payment.created_at}-paid`,
+						time: paid.created_at,
+						type: 'paid',
+						orderId: supplierOrder.id,
+						amount: paid.amount,
+						currencyCode: supplierOrder.currency_code,
+					} as PaidEvent);
+				}
+			}
+		}
 
 		if (notifications) {
 			for (const notification of notifications) {

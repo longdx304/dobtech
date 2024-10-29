@@ -1,8 +1,5 @@
-import dynamic from 'next/dynamic';
+import ProductList from '@/modules/products/components/product-list';
 import OverviewPreview from './preview';
-const ProductList = dynamic(
-	() => import('@/modules/products/components/product-list')
-);
 
 const Overview = () => {
 	return (

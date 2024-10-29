@@ -35,7 +35,7 @@ const SuggestSearch: FC<Props> = ({ searchValue, onClick }) => {
 		} else {
 			setItem([value]);
 		}
-		router.push(`/search/${value}`);
+		router.push(`/search/keyword=${value}`);
 	};
 
 	return (

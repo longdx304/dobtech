@@ -13,7 +13,11 @@ import {
 	TimelineEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
 import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
-import { NoteEvent } from '@/modules/supplier/hooks/use-build-timeline';
+import {
+	NoteEvent,
+	PaidEvent,
+	RefundEvent,
+} from '@/modules/supplier/hooks/use-build-timeline';
 import { SupplierOrder } from '@/types/supplier';
 import { Region } from '@medusajs/medusa';
 import { Empty, message } from 'antd';
@@ -31,6 +35,8 @@ import EditDeclined from './timeline-events/order-edit/declined';
 import PaymentRequired from './timeline-events/order-edit/payment-required';
 import EditRequested from './timeline-events/order-edit/requested';
 import OrderPlaced from './timeline-events/order-placed';
+import Refund from './timeline-events/refund';
+import Paid from './timeline-events/paid';
 
 type Props = {
 	orderId: SupplierOrder['id'] | undefined;
@@ -40,13 +46,7 @@ type Props = {
 	refetch: () => void;
 };
 
-const Timeline = ({
-	orderId,
-	isLoading,
-	refetchOrder,
-	events,
-	refetch,
-}: Props) => {
+const Timeline = ({ orderId, isLoading, events }: Props) => {
 	const createNote = useAdminCreateNote();
 	const [inputValue, setInputValue] = useState<string>('');
 
@@ -121,11 +121,7 @@ const Timeline = ({
 				</Flex>
 				<div className="flex flex-col text-xs pt-4">
 					{events?.map((event, i) => {
-						return (
-							<div key={i}>
-								{switchOnType(event, refetch, refetchOrder, order?.region)}
-							</div>
-						);
+						return <div key={i}>{switchOnType(event, order?.region)}</div>;
 					})}
 				</div>
 			</div>
@@ -135,13 +131,10 @@ const Timeline = ({
 
 export default Timeline;
 
-function switchOnType(
-	event: TimelineEvent,
-	refetch: () => void,
-	refetchOrder: () => void,
-	region: Region | undefined
-) {
+function switchOnType(event: TimelineEvent, region: Region | undefined) {
 	switch (event.type) {
+		case 'refund':
+			return <Refund event={event as RefundEvent} />;
 		case 'placed':
 			return <OrderPlaced event={event as OrderPlacedEvent} />;
 		case 'note':
@@ -150,8 +143,6 @@ function switchOnType(
 			return <ItemsShipped event={event as ItemsShippedEvent} />;
 		case 'canceled':
 			return <OrderCanceled event={event as TimelineEvent} />;
-		// case "notification":
-		//   return <Notification event={event as NotificationEvent} />
 		case 'edit-created':
 			return <EditCreated event={event as OrderEditEvent} />;
 		case 'edit-canceled':
@@ -166,6 +157,8 @@ function switchOnType(
 			return <PaymentRequired event={event as PaymentRequiredEvent} />;
 		case 'change-price':
 			return <ChangedPrice event={event as any} region={region} />;
+		case 'paid':
+			return <Paid event={event as PaidEvent} />;
 		default:
 			return null;
 	}
