@@ -2,20 +2,20 @@
 import { Card } from '@/components/Card';
 import { Tabs } from '@/components/Tabs';
 import { type TabsProps } from 'antd';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { FC } from 'react';
-import DraftOrderList from '../../draft-orders/templates/draft-orders';
-import OrderList from './orders';
+
+import { useRouter, useSearchParams } from 'next/navigation';
+import OrderList from '../orders/templates/orders';
+import DraftOrderList from './templates/draft-orders';
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
 
-const ManageOrders: FC<Props> = ({}) => {
+const ManageDraftOrders: FC<Props> = ({}) => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const query = searchParams.get('tab') || 'orders';
-	console.log('query', query);
+	const query = searchParams.get('tab') || 'draft-orders';
 
 	const itemsTab: TabsProps['items'] = [
 		{
@@ -42,4 +42,4 @@ const ManageOrders: FC<Props> = ({}) => {
 	);
 };
 
-export default ManageOrders;
+export default ManageDraftOrders;

@@ -4,31 +4,35 @@ import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { ERoutes } from '@/types/routes';
 import _ from 'lodash';
-import { Search } from 'lucide-react';
-import { useAdminOrders } from 'medusa-react';
+import { Plus, Search } from 'lucide-react';
+import { useAdminDraftOrders } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
-import orderColumns from './order-column';
+import draftOrderColumns from './draft-order-column';
+import { FloatButton } from '@/components/Button';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import DraftOrderModal from '../../components/draft-order-modal';
+import NewDraftOrderFormProvider from '../../hooks/use-new-draft-form';
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
-const defaultQueryProps = {
-	expand: 'customer,shipping_address',
-	fields:
-		'id,status,display_id,created_at,email,fulfillment_status,payment_status,total,currency_code',
-};
 
-const OrderList: FC<Props> = () => {
+const DraftOrderList: FC<Props> = () => {
 	const router = useRouter();
 
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
 
-	const { orders, isLoading, count } = useAdminOrders(
+	const {
+		state: stateDraftOrdersModal,
+		onOpen: openDraftOrdersModal,
+		onClose: closeDraftOrdersModal,
+	} = useToggleState(false);
+
+	const { draft_orders, isLoading, count } = useAdminDraftOrders(
 		{
-			...(defaultQueryProps as any),
 			q: searchValue || undefined,
 			offset,
 			limit: DEFAULT_PAGE_SIZE,
@@ -52,12 +56,20 @@ const OrderList: FC<Props> = () => {
 	};
 
 	const columns = useMemo(() => {
-		return orderColumns({});
+		return draftOrderColumns({});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [orders]);
+	}, [draft_orders]);
 
 	const handleRowClick = (record: any) => {
-		router.push(`${ERoutes.ORDERS}/${record.id}`);
+		router.push(`${ERoutes.DRAFT_ORDERS}/${record.id}`);
+	};
+
+	const handleCreateDraftOrder = () => {
+		openDraftOrdersModal();
+	};
+
+	const handleCancelDraftOrder = () => {
+		closeDraftOrdersModal();
 	};
 
 	return (
@@ -75,7 +87,7 @@ const OrderList: FC<Props> = () => {
 			<Table
 				loading={isLoading}
 				columns={columns as any}
-				dataSource={orders ?? []}
+				dataSource={draft_orders ?? []}
 				rowKey="id"
 				scroll={{ x: 700 }}
 				onRow={(record) => ({
@@ -91,8 +103,24 @@ const OrderList: FC<Props> = () => {
 						`${range[0]}-${range[1]} trong ${total} đơn hàng`,
 				}}
 			/>
+			<FloatButton
+				className="absolute"
+				icon={<Plus color="white" size={20} strokeWidth={2} />}
+				type="primary"
+				onClick={handleCreateDraftOrder}
+				data-testid="btnCreateSupplier"
+			/>
+			{stateDraftOrdersModal && (
+				<NewDraftOrderFormProvider>
+					<DraftOrderModal
+						state={stateDraftOrdersModal}
+						handleOk={handleCancelDraftOrder}
+						handleCancel={handleCancelDraftOrder}
+					/>
+				</NewDraftOrderFormProvider>
+			)}
 		</div>
 	);
 };
 
-export default OrderList;
+export default DraftOrderList;
