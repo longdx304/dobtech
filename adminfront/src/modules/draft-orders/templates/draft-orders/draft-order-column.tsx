@@ -46,7 +46,7 @@ const draftOrderColumns = ({}: Props) => [
 		// width: 150,
 		className: 'text-xs',
 		render: (_: any, record: DraftOrder) => {
-			const customerEmail = record.order?.email;
+			const customerEmail = record.cart?.email;
 			return customerEmail || '-';
 		},
 	},

@@ -1,18 +1,18 @@
 'use client';
+import { FloatButton } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
+import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ERoutes } from '@/types/routes';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
 import { useAdminDraftOrders } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
-import draftOrderColumns from './draft-order-column';
-import { FloatButton } from '@/components/Button';
-import useToggleState from '@/lib/hooks/use-toggle-state';
 import DraftOrderModal from '../../components/draft-order-modal';
 import NewDraftOrderFormProvider from '../../hooks/use-new-draft-form';
+import draftOrderColumns from './draft-order-column';
 
 type Props = {};
 
@@ -76,7 +76,6 @@ const DraftOrderList: FC<Props> = () => {
 		<div className="w-full">
 			<Flex align="center" justify="flex-end" className="pb-4">
 				<Input
-					// size="small"
 					placeholder="Tìm kiếm đơn hàng..."
 					name="search"
 					prefix={<Search size={16} />}

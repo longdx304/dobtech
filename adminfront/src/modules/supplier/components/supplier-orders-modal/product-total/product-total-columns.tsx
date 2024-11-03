@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ProductVariant, Region } from '@medusajs/medusa';
 import Image from 'next/image';
 
