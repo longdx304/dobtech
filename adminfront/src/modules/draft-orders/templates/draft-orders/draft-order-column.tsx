@@ -1,9 +1,14 @@
-import { formatNumber } from '@/lib/utils';
+import { ActionAbles } from '@/components/Dropdown';
 import StatusDot from '@/modules/common/components/status-indicator';
-import { DraftOrder, Order } from '@medusajs/medusa';
+import { DraftOrder } from '@medusajs/medusa';
+import { MenuProps } from 'antd';
 import dayjs from 'dayjs';
+import { FolderSync, Trash2 } from 'lucide-react';
 
-type Props = {};
+type Props = {
+	handleTransferToOrder: (id: string) => void;
+	handleDeleteDraftOrder: (id: string) => void;
+};
 
 const decidePaymentStatus = (status: any) => {
 	switch (status) {
@@ -16,7 +21,10 @@ const decidePaymentStatus = (status: any) => {
 	}
 };
 
-const draftOrderColumns = ({}: Props) => [
+const draftOrderColumns = ({
+	handleTransferToOrder,
+	handleDeleteDraftOrder,
+}: Props) => [
 	{
 		title: 'Bản nháp',
 		dataIndex: 'display_id',
@@ -67,8 +75,42 @@ const draftOrderColumns = ({}: Props) => [
 		key: 'created_at',
 		// width: 150,
 		className: 'text-xs',
-		render: (_: Order['created_at']) => {
+		render: (_: DraftOrder['created_at']) => {
 			return dayjs(_).format('DD/MM/YYYY');
+		},
+	},
+	{
+		title: '',
+		key: 'action',
+		width: 40,
+		fixed: 'right',
+		className: 'text-xs',
+		align: 'center',
+		render: (_: any, record: DraftOrder) => {
+			const items: MenuProps['items'] = [
+				{
+					key: 'transfer',
+					label: 'Chuyển qua đơn hàng',
+					icon: <FolderSync size={20} />,
+				},
+				{
+					key: 'delete',
+					label: 'Xoá',
+					icon: <Trash2 size={20} />,
+					danger: true,
+				},
+			];
+
+			const handleMenuClick: MenuProps['onClick'] = (e) => {
+				e.domEvent.stopPropagation();
+				if (e.key === 'transfer') {
+					handleTransferToOrder(record.id);
+				} else if (e.key === 'delete') {
+					handleDeleteDraftOrder(record.id);
+				}
+			};
+
+			return <ActionAbles actions={items} onMenuClick={handleMenuClick} />;
 		},
 	},
 ];

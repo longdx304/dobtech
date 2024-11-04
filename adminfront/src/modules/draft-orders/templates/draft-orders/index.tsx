@@ -4,13 +4,16 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import { getErrorMessage } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
+import { message, Modal as AntdModal } from 'antd';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
-import { useAdminDraftOrders } from 'medusa-react';
+import { useAdminDeleteDraftOrder, useAdminDraftOrders } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import DraftOrderModal from '../../components/draft-order-modal';
+import { useAdminDraftOrderTransferOrder } from '../../hooks';
 import NewDraftOrderFormProvider from '../../hooks/use-new-draft-form';
 import draftOrderColumns from './draft-order-column';
 
@@ -24,6 +27,15 @@ const DraftOrderList: FC<Props> = () => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
+	const [currentDraftOrderId, setCurrentDraftOrderId] = useState<string | null>(
+		null
+	);
+
+	// Mutations api
+	const transferOrder = useAdminDraftOrderTransferOrder(
+		currentDraftOrderId ?? ''
+	);
+	const cancelOrder = useAdminDeleteDraftOrder(currentDraftOrderId ?? '');
 
 	const {
 		state: stateDraftOrdersModal,
@@ -55,8 +67,42 @@ const DraftOrderList: FC<Props> = () => {
 		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
+	const handleTransferToOrder = async (id: string) => {
+		try {
+			setCurrentDraftOrderId(id);
+			await transferOrder.mutateAsync();
+			message.success('Chuyển đơn hàng thành công');
+		} catch (error) {
+			message.error('Có lỗi xảy ra khi chuyển đơn hàng');
+			console.error('Error transferring order:', error);
+		} finally {
+			setCurrentDraftOrderId(null);
+		}
+	};
+
+	const handleDeleteDraftOrder = (id: string) => {
+		setCurrentDraftOrderId(id);
+		AntdModal.confirm({
+			title: 'Xác nhận huỷ đơn hàng',
+			content: 'Bạn có chắc chắn muốn huỷ đơn hàng này?',
+			onOk: async () => {
+				await cancelOrder.mutateAsync(undefined, {
+					onSuccess: () => {
+						message.success('Huỷ đơn hàng thành công');
+					},
+					onError: (error: any) => {
+						message.error(getErrorMessage(error));
+					},
+				});
+			},
+		});
+	};
+
 	const columns = useMemo(() => {
-		return draftOrderColumns({});
+		return draftOrderColumns({
+			handleTransferToOrder,
+			handleDeleteDraftOrder,
+		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [draft_orders]);
 
