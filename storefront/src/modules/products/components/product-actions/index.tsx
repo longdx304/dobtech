@@ -23,7 +23,7 @@ type ProductActionsProps = {
 export type PriceType = {
 	calculated_price: string;
 	original_price?: string;
-	price_type?: 'sale' | 'default';
+	price_type?: 'sale' | 'default' | 'override';
 	percentage_diff?: string;
 	original_price_incl_tax?: string;
 	calculated_price_incl_tax?: string;

@@ -53,10 +53,7 @@ const PriceForm: FC<Props> = ({
 				variants.forEach((variant: any) => {
 					variant.pricesFormat = variant.prices.reduce(
 						(acc: Record<string, number>, price: any) => {
-							if (
-								(priceListId && price?.price_list_id === priceListId) ||
-								(!priceListId && !price?.price_list_id)
-							) {
+							if (!price?.price_list_id) {
 								acc[price.currency_code] = price.amount;
 								return acc;
 							}
@@ -201,9 +198,6 @@ const PriceForm: FC<Props> = ({
 							<table className="w-full">
 								<tbody>
 									{product?.variants?.map((variant) => {
-										let count = 0;
-
-										// const setPrices = get
 										return (
 											<tr
 												key={variant.id}
@@ -211,7 +205,11 @@ const PriceForm: FC<Props> = ({
 											>
 												<td>{variant.title}</td>
 												<td>{variant?.sku ?? '-'}</td>
-												<td className="text-right">{`${count} giá`}</td>
+												<td className="text-right">{`${
+													Object.keys(variant?.pricesFormatEdit || {}).filter(
+														(key) => !key.includes('_id')
+													).length ?? 0
+												} giá`}</td>
 											</tr>
 										);
 									})}
