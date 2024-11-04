@@ -32,7 +32,6 @@
 		"next-themes": "^0.3.0",
 		"react": "^18",
 		"react-dom": "^18",
-		"react-hook-form": "^7.51.2",
 		"react-nestable": "^3.0.2",
 		"react-pdf": "^9.1.0",
 		"tailwind-merge": "^2.2.2",
