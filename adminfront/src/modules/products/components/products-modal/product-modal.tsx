@@ -74,6 +74,8 @@ export default function ProductModal({
 			try {
 				preppedImages = await prepareImages(values.thumbnail, []);
 			} catch (error) {
+				console.log('error:', error);
+				console.log('getErrorMessage thumbnail', getErrorMessage(error));
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
 				messageApi.open({
 					type: 'error',
@@ -91,6 +93,8 @@ export default function ProductModal({
 				preppedImages = await prepareImages(values.media, []);
 			} catch (error) {
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
+				console.log('getErrorMessage media', getErrorMessage(error));
+
 				messageApi.open({
 					type: 'error',
 					content: errorMsg,
@@ -101,6 +105,7 @@ export default function ProductModal({
 			payload.images = urls;
 		}
 
+		console.log('payload', payload);
 		await mutateAsync(payload, {
 			onSuccess: ({ product }) => {
 				messageApi.open({

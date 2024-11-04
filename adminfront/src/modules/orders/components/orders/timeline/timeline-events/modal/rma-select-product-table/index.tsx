@@ -170,7 +170,7 @@ const RMASelectProductTable: React.FC<RMASelectProductTableProps> = ({
 				selectedRowKeys: selectedVariants,
 				onChange: handleRowSelectionChange,
 				preserveSelectedRowKeys: true,
-				onSelect: handleReturnToggle,
+				onSelect: handleReturnToggle as any,
 			}}
 			// loading={isLoading}
 			columns={columns as any}

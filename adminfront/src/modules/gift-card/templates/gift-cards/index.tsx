@@ -124,7 +124,7 @@ const GiftCardList = () => {
 					rowKey="id"
 					scroll={{ x: 700 }}
 					onRow={(record) => ({
-						onClick: () => handleRowClick(record),
+						onClick: () => handleRowClick(record as any),
 						className: 'cursor-pointer',
 					})}
 					pagination={{
