@@ -119,7 +119,7 @@ const CategoryModal: React.FC<Props> = ({
 		let preppedImages: FormImage[] = [];
 		if (values.thumbnail && values.thumbnail.length > 0) {
 			try {
-				preppedImages = await prepareImages(values.thumbnail, []);
+				preppedImages = await prepareImages(values.thumbnail, null);
 			} catch (error) {
 				message.error('Đã xảy ra lỗi khi tải hình ảnh lên.');
 				return;

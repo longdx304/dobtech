@@ -51,7 +51,7 @@ const UploadModal = ({ state, handleCancel, orderId }: Props) => {
 	const handleOk = async () => {
 		if (!files.length) handleCancel();
 		try {
-			const preppedItem = await prepareImages(files, []);
+			const preppedItem = await prepareImages(files, null);
 			const urls = preppedItem.map((item) => item.url);
 			await createDocument.mutateAsync({ documents: urls });
 			setFiles([]);
