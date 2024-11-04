@@ -42,16 +42,16 @@ export const prepareImages = async (
 	const resultImages = [...existingImages, ...uploadedImgs];
 
 	// Make delete image
-	if (oldImagesUrls?.length) {
-		const newImagesUrls = resultImages?.map((img) => img.url) || [];
-		const toDelete = oldImagesUrls.filter(
-			(url) => !newImagesUrls.includes(url)
-		);
+	// if (oldImagesUrls?.length) {
+	// 	const newImagesUrls = resultImages?.map((img) => img.url) || [];
+	// 	const toDelete = oldImagesUrls.filter(
+	// 		(url) => !newImagesUrls.includes(url)
+	// 	);
 
-		if (toDelete?.length) {
-			await deleteImages(toDelete);
-		}
-	}
+	// 	if (toDelete?.length) {
+	// 		await deleteImages(toDelete);
+	// 	}
+	// }
 
 	return resultImages;
 };
