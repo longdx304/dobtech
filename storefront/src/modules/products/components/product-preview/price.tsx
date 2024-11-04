@@ -77,6 +77,10 @@ const PreviewPrice: FC<Props> = ({ price, productHandle, product, region }) => {
 							-{price.percentage_diff}%
 						</Text>
 					</Flex>
+				) : price.price_type === 'override' ? (
+					<Text className="text-[16px] font-semibold">
+						{formatPrice(price.calculated_price_incl_tax as string)}
+					</Text>
 				) : (
 					<Text className="text-[16px] font-semibold">
 						{formatPrice(price.original_price_incl_tax as string)}
