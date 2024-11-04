@@ -9,17 +9,22 @@ import { Divider } from 'antd';
 import { Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import LoginTemplate from '../../templates/login-template';
+import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
+import { ERoutes } from '@/types/routes';
 
 const ItemGroup = () => {
 	const { state, onOpen, onClose } = useToggleState(false);
 	const router = useRouter();
 	const { customer } = useCustomer();
+	const isDesktop = useIsDesktop();
 
 	const handleLoginClick = () => {
-		if (!customer) {
+		if (!customer && !isDesktop) {
 			onOpen();
-		}
+		} 
 	};
+
+	console.log('customer', customer);
 
 	const onCloseDrawer = () => {
 		router.refresh();
@@ -46,7 +51,7 @@ const ItemGroup = () => {
 					<Settings
 						size={24}
 						className="block lg:hidden"
-						onClick={() => router.push('/user/setting')}
+						onClick={() => router.push(ERoutes.USER_SETTING)}
 					/>
 				</Flex>
 			</Flex>

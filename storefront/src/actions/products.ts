@@ -44,7 +44,7 @@ export const getProductsList = cache(async function ({
 				region_id: region.id,
 				...queryParams,
 			},
-			{ next: { tags: ['products'] } }
+			{ next: { tags: ['products'], revalidate: 3600, cache: 'force-cache' } }
 		)
 		.then((res) => res)
 		.catch((err) => {

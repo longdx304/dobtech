@@ -201,8 +201,7 @@ const createAddPayload = (
 					value: option.value[0],
 				} as any)
 		),
-		// prices: [],
 		// inventory_quantity: data?.inventory_quantity ?? 0,
 		supplier_price: +persistedPrice('vnd', data?.supplier_price ?? 0),
-	};
+	} as any;
 };

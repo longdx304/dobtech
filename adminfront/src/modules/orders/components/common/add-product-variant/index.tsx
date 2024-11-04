@@ -65,7 +65,7 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 	};
 
 	const handleRowSelectionChange = (
-		selectedRowKeys: React.Key[],
+		selectedRowKeys: React.Key[] | string[],
 		selectedRows: ProductVariant[]
 	) => {
 		setSelectedVariantIds(selectedRowKeys as string[]);
@@ -167,9 +167,9 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 				rowSelection={{
 					type: isReplace ? 'radio' : 'checkbox',
 					selectedRowKeys: selectedVariantIds,
-					onChange: handleRowSelectionChange,
+					onChange: handleRowSelectionChange as any,
 					preserveSelectedRowKeys: true,
-					getCheckboxProps: (record: ProductVariant) => ({
+					getCheckboxProps: (record: any) => ({
 						disabled: handleDisable(record),
 					}),
 				}}

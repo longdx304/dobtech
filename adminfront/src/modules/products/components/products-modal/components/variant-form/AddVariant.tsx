@@ -4,18 +4,20 @@ import { FC, useMemo } from 'react';
 
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
-import { Input } from '@/components/Input';
+import { Input, InputNumber } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { TooltipIcon } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import AddVariantModal from './AddVariantModal';
+import { useStoreData } from '@/modules/regions/components/region-modal/use-store-data';
 
 interface Props {
 	form: any;
 }
 
 const AddVariant: FC<Props> = ({ form }) => {
+	const { currencyOptions } = useStoreData();
 	const options = Form.useWatch('options', form) || undefined;
 
 	/**
@@ -37,6 +39,56 @@ const AddVariant: FC<Props> = ({ form }) => {
 
 	return (
 		<Row gutter={[16, 8]}>
+			<Col span={24}>
+				<Flex vertical>
+					<span className="text-gray-500">
+						{'Thêm giá tiền bán và nhập hàng mặc định.'}
+					</span>
+					<span className="text-gray-500">
+						{
+							'Cung cấp cho khách hàng khách hàng giá tiền bán và cung cấp cho quản lý giá tiền nhập hàng.'
+						}
+					</span>
+				</Flex>
+				<Row gutter={[16, 8]}>
+					<Col xs={24} sm={8}>
+						<Form.Item
+							labelCol={{ span: 24 }}
+							name={['defaultPrice', 'currency_code']}
+							label="Tiền tệ:"
+						>
+							<Select placeholder="Chọn tiền tệ" options={currencyOptions} />
+						</Form.Item>
+					</Col>
+					<Col xs={24} sm={8}>
+						<Form.Item
+							labelCol={{ span: 24 }}
+							name={'allowed_quantity'}
+							label="Định lượng đôi mặc định:"
+						>
+							<InputNumber min={1} allowClear placeholder="6" />
+						</Form.Item>
+					</Col>
+					<Col xs={24} sm={8}>
+						<Form.Item
+							labelCol={{ span: 24 }}
+							name={['defaultPrice', 'amount']}
+							label="Tiền bán mặc định:"
+						>
+							<InputNumber min={1} allowClear placeholder="30,000" />
+						</Form.Item>
+					</Col>
+					<Col xs={24} sm={8}>
+						<Form.Item
+							labelCol={{ span: 24 }}
+							name={['defaultPrice', 'supplier_price']}
+							label="Tiền nhập mặc định:"
+						>
+							<InputNumber min={1} allowClear placeholder="30,000" />
+						</Form.Item>
+					</Col>
+				</Row>
+			</Col>
 			<Col span={24}>
 				<Flex vertical>
 					<span className="text-gray-500">
@@ -194,9 +246,20 @@ type AddVersionProps = {
 const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant }) => {
 	const { state, onOpen, onClose } = useToggleState(false);
 	const variants = Form.useWatch('variants', form) || undefined;
+	const defaultPrice = Form.useWatch('defaultPrice', form) || undefined;
+	const allowed_quantity = Form.useWatch('allowed_quantity', form) || undefined;
 
 	const onOpenModal = (add: any) => {
-		add();
+		add({
+			supplier_price: defaultPrice?.supplier_price,
+			allowed_quantity: allowed_quantity,
+			prices: [
+				{
+					amount: defaultPrice?.amount,
+					currency_code: defaultPrice?.currency_code,
+				},
+			],
+		});
 		onOpen();
 	};
 

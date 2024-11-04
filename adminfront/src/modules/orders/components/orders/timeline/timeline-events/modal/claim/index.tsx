@@ -518,7 +518,7 @@ const SummaryLineItem = ({
 							? extractPrice(item?.prices, order, item.quantity)
 							: formatAmountWithSymbol({
 									amount:
-										(item.total / item.original_quantity) * item.quantity ?? 0,
+										(item.total / item.original_quantity) * item.quantity || 0,
 									currency: currencyCode,
 									tax: [],
 							  })}

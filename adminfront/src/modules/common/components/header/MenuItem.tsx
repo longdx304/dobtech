@@ -16,7 +16,7 @@ import {
 	User as UserIcon,
 	Users,
 	UsersRound,
-	Warehouse
+	Warehouse,
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -43,11 +43,11 @@ function getItem(
 
 // Item dropdown user
 const itemDropdown: MenuProps['items'] = [
-  {
-    key: 'logout',  
-    label: 'Đăng xuất',
-    icon: <LogOut />,
-  },
+	{
+		key: 'logout',
+		label: 'Đăng xuất',
+		icon: <LogOut />,
+	},
 ];
 
 // Item menu overview
@@ -68,7 +68,7 @@ const itemsAdmin: MenuProps['items'] = [
 	getItem('Giảm giá', 'discounts', <SquarePercent />),
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
-		getItem('Tiền tệ', 'currency', <BadgeDollarSign />),
+		getItem('Tiền tệ', 'currencies', <BadgeDollarSign />),
 		getItem('Lý do trả hàng', 'return-reasons', <Undo2 />),
 	]),
 ];
@@ -136,4 +136,5 @@ export const menuRoutes: Record<string, string> = {
 	'return-reasons': ERoutes.RETURN_REASONS,
 	discounts: ERoutes.DISCOUNTS,
 	suppliers: ERoutes.SUPPLIERS,
+	currencies: ERoutes.CURRENCIES,
 };

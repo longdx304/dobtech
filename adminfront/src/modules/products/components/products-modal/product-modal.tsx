@@ -74,6 +74,8 @@ export default function ProductModal({
 			try {
 				preppedImages = await prepareImages(values.thumbnail, []);
 			} catch (error) {
+				console.log('error:', error);
+				console.log('getErrorMessage thumbnail', getErrorMessage(error));
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
 				messageApi.open({
 					type: 'error',
@@ -91,6 +93,8 @@ export default function ProductModal({
 				preppedImages = await prepareImages(values.media, []);
 			} catch (error) {
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
+				console.log('getErrorMessage media', getErrorMessage(error));
+
 				messageApi.open({
 					type: 'error',
 					content: errorMsg,
@@ -101,6 +105,7 @@ export default function ProductModal({
 			payload.images = urls;
 		}
 
+		console.log('payload', payload);
 		await mutateAsync(payload, {
 			onSuccess: ({ product }) => {
 				messageApi.open({
@@ -260,7 +265,6 @@ const createPayload = (
 			barcode: v?.barcode || undefined,
 			manage_inventory: v?.manage_inventory || true,
 			allow_backorder: v?.allow_backorder || false,
-			prices: [],
 			// prices: getVariantPrices(v.prices),
 			width: v?.width || undefined,
 			length: v?.length || undefined,
@@ -270,6 +274,13 @@ const createPayload = (
 			mid_code: v?.mid_code || undefined,
 			origin_country: v?.origin_country || undefined,
 			supplier_price: +persistedPrice('vnd', v?.supplier_price ?? 0),
+			prices: v?.prices?.map((price) => ({
+				amount: +persistedPrice(
+					price?.currency_code ?? 'vnd',
+					price?.amount ?? 0
+				),
+				currency_code: price.currency_code,
+			})) as any,
 		})),
 		// Dimensions
 		width: data?.dimensions?.width || undefined,

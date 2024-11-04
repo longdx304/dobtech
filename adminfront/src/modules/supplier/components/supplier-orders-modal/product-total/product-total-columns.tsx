@@ -74,14 +74,10 @@ const productTotalColumns = ({ itemQuantities, itemPrices, region }: Props) => [
 			const price = itemPrice ? itemPrice?.unit_price : 0;
 
 			return (
-				(
-					<Text className="text-xs">
-						{price?.toLocaleString()}
-						{region?.currency.symbol}
-					</Text>
-				) || <Text className="text-xs">0{region?.currency.symbol}</Text> || (
-					<Text className="text-xs">{price || 0}</Text>
-				)
+				<Text className="text-xs">
+					{price?.toLocaleString()}
+					{region?.currency.symbol}
+				</Text>
 			);
 		},
 	},

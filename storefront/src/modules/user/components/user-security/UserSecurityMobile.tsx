@@ -1,6 +1,7 @@
 import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import LocalizedClientLink from '@/modules/common/components/localized-client-link';
+import { ERoutes } from '@/types/routes';
 import { List } from 'antd';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -24,7 +25,7 @@ const UserSecurityMobile = ({ data }: Props) => {
 					style={{ borderBottom: '11px solid #f6f6f6' }}
 					className="pb-2"
 				>
-					<div className="flex" onClick={() => router.back()}>
+					<div className="flex" onClick={() => router.push(`/${ERoutes.USER_SETTING}`)}>
 						<ChevronLeft size={24} className="text-[#767676] pl-[12px]" />
 					</div>
 					<Text className="font-bold text-center">

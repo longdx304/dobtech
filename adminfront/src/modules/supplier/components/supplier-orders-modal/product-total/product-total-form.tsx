@@ -90,13 +90,16 @@ const ProductTotalForm: FC<Props> = ({
 				<Flex className="flex-col" gap={12}>
 					<Table
 						columns={columns as any}
-						dataSource={filterVariants ?? []}
+						dataSource={filterVariants.filter(
+							(variant) => variant !== undefined
+						)}
 						rowKey="id"
 						scroll={{ x: 700 }}
 						pagination={false}
 					/>
 					<Text strong className="mt-4">
-						Tổng tiền: {totalPrice.toLocaleString()} VND
+						Tổng tiền: {totalPrice.toLocaleString()}
+						{region?.currency.symbol}
 					</Text>
 				</Flex>
 			</Col>
