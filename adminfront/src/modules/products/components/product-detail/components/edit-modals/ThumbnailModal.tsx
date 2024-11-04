@@ -67,6 +67,7 @@ const ThumbnailModal: FC<Props> = ({
 					product?.thumbnail || '',
 				]);
 			} catch (error) {
+				console.log('error:', error);
 				messageApi.error('Đã xảy ra lỗi khi tải hình ảnh lên.');
 				return;
 			}

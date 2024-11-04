@@ -1,3 +1,11 @@
+import {
+	Cart,
+	LineItem,
+	Order,
+	OrderEdit,
+	Payment,
+	User,
+} from '@medusajs/medusa';
 
 export interface Supplier {
 	id: string;
@@ -30,12 +38,27 @@ export interface SupplierOrdersReq {
 	supplierId: string;
 	userId: string;
 	email: string;
+	region_id: string;
 	countryCode: string;
+	currency_code: string;
 	estimated_production_time: Date;
 	settlement_time: Date;
 	document_url: string;
 	metadata?: Record<string, unknown>;
 }
+
+export interface AddOrderEditLineItemInput {
+	variant_id: string;
+	quantity: number;
+	unit_price?: number;
+	metadata?: Record<string, any>;
+}
+
+// export interface UpdateLineItemSupplierOrderReq {
+// 	cartId: string;
+// 	lineItems: UpdateLineItem[];
+// 	metadata?: Record<string, any>;
+// }
 
 export interface SupplierOrders {
 	id: string;
@@ -63,3 +86,50 @@ export interface SupplierOrderListRes {
 	limit: number;
 }
 
+export interface SupplierOrderDocument {
+	id: string;
+	document_url: string;
+	supplier_order_id: string;
+	created_at: Date;
+	updated_at: Date;
+	metadata: Record<string, any>;
+}
+
+export interface SupplierOrder {
+	id: string;
+	cart_id: string;
+	cart: Cart;
+	display_id: number;
+	supplier_id: string;
+	supplier: Supplier;
+	documents: SupplierOrderDocument[];
+	user_id: string;
+	currency_code: string;
+	region_id: string;
+	user: User;
+	status: string;
+	payment_status: string;
+	payments?: Payment[];
+	fulfillment_status: string;
+	estimated_production_time: string;
+	settlement_time: string;
+	items: LineItem[];
+	tax_rate: number;
+	metadata: Record<string, any>;
+	subtotal: number;
+	total: number;
+	tax_total: number;
+	paid_total: number;
+	no_notification?: boolean;
+	created_at: string;
+	updated_at: string;
+	canceled_at?: string | null;
+}
+
+export interface SupplierOrderEdit extends OrderEdit {
+	supplier_order_id?: string;
+}
+
+export interface SupplierOrderDocumentRes {
+	documents: string | string[];
+}

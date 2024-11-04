@@ -2,10 +2,9 @@
 import { useCustomer } from '@/lib/providers/user/user-provider';
 import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
 import { ERoutes } from '@/types/routes';
-import dynamic from 'next/dynamic';
+import UserSecurityDesktop from './UserSecurityDesktop';
+import UserSecurityMobile from './UserSecurityMobile';
 
-const UserSecurityDesktop = dynamic(() => import('./UserSecurityDesktop'));
-const UserSecurityMobile = dynamic(() => import('./UserSecurityMobile'));
 const UserSecurity = () => {
 	const { customer } = useCustomer();
 	const isDesktop = useIsDesktop();

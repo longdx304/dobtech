@@ -1,10 +1,11 @@
 import { Metadata } from 'next';
-import React, { Suspense } from 'react';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 import CheckoutSkeleton from './skeleton';
 
-const CheckoutTemplate = React.lazy(
-	() => import('@/modules/checkout/templates')
-);
+const CheckoutTemplate = dynamic(() => import('@/modules/checkout/templates'), {
+	loading: () => <CheckoutSkeleton />,
+});
 
 export const metadata: Metadata = {
 	title: 'CHAMDEP VN | Thanh toán',

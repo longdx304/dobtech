@@ -1,4 +1,8 @@
-import { SupplierListResponse, SupplierOrderListRes } from '@/types/supplier';
+import {
+	SupplierListResponse,
+	SupplierOrderDocumentRes,
+	SupplierOrderListRes,
+} from '@/types/supplier';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../../services/api';
 
@@ -49,7 +53,7 @@ export const useAdminSupplier = (id: string, options = {}) => {
 		['admin-supplier', id],
 		async () => {
 			const response = await api.supplier.retrieve(id);
-			return response.data;
+			return response.data as unknown as any;
 		},
 		options
 	);
@@ -120,13 +124,151 @@ export const useAdminCreateSupplierOrders = () => {
 	);
 };
 
-export const useAdminSupplierOrdersById = (id: string, options = {}) => {
-	return useQuery(
-		['admin-supplier-orders', id],
-		async () => {
+export function useAdminSupplierOrder(id: string) {
+	return useQuery({
+		queryKey: ['admin-supplier-order', id],
+		queryFn: async () => {
 			const response = await api.suplierOrders.retrieve(id);
+			return (response.data as any).supplierOrder;
+		},
+	});
+}
+
+export function useAdminSupplierOrderUpdateLineItem(id: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async ({ ...data }: any) => {
+			const response = await api.suplierOrders.updateLineItem(id, data);
 			return response.data;
 		},
-		options
+		{
+			onSuccess: (data: any) => {
+				queryClient.invalidateQueries(['admin-supplier-order', data.id]);
+			},
+		}
 	);
-};
+}
+
+export function useAdminSupplierOrderEditDeleteLineItem() {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async ({ supplierOrderId, lineItemId }: any) => {
+			const response = await api.suplierOrders.deleteLineItem(
+				supplierOrderId,
+				lineItemId
+			);
+			return response.data;
+		},
+		{
+			onSuccess: (_, { supplierOrderId }) => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}
+
+export function useAdminSupplierOrderCreateDocument(supplierOrderId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async ({ documents }: SupplierOrderDocumentRes) => {
+			const response = await api.suplierOrders.createDocument(
+				supplierOrderId,
+				documents
+			);
+			return response.data;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}
+
+export function useAdminSupplierOrderDeleteDocument(supplierOrderId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async ({ documentId }: { documentId: string }) => {
+			const response = await api.suplierOrders.deleteDocument(
+				supplierOrderId,
+				documentId
+			);
+			return response.data;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}
+
+export function useAdminCancelSupplierOrder(supplierOrderId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async () => {
+			const response = await api.suplierOrders.cancel(supplierOrderId);
+			return response.data as unknown as any;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}
+export function useAdminSupplierOrderCapturePayment(supplierOrderId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async () => {
+			const response = await api.suplierOrders.capturePayment(supplierOrderId);
+			return response.data as unknown as any;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}
+
+
+export function useAdminSupplierRefundPayment(supplierOrderId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		async (data: any) => {
+			const response = await api.suplierOrders.refundPayment(supplierOrderId, data);
+			return response.data as unknown as any;
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries([
+					'admin-supplier-order',
+					supplierOrderId,
+				]);
+			},
+		}
+	);
+}

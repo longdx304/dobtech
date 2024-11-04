@@ -1,8 +1,11 @@
 import { Metadata } from 'next';
 import React, { Suspense } from 'react';
 import CartSkeleton from './skeleton';
+import dynamic from 'next/dynamic';
 
-const CartTemplate = React.lazy(() => import('@/modules/cart/templates'));
+const CartTemplate = dynamic(() => import('@/modules/cart/templates'), {
+	loading: () => <CartSkeleton />,
+});
 
 export const metadata: Metadata = {
 	title: 'CHAMDEP VN | Giỏ hàng',
@@ -13,10 +16,8 @@ export default async function Cart() {
 	return (
 		<div className="w-full pt-[6rem] lg:pt-[4rem]">
 			<Suspense fallback={<CartSkeleton />}>
-				<CartTemplate	/>
+				<CartTemplate />
 			</Suspense>
 		</div>
 	);
 }
-
-

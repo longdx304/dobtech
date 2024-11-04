@@ -1,4 +1,4 @@
-import ProductList from '@/modules/products/components/product-list';
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import HomepageSkeleton from './skeleton';
 
@@ -7,6 +7,12 @@ interface Props {
 		page?: string;
 	};
 }
+const ProductList = dynamic(
+	() => import('@/modules/products/components/product-list'),
+	{
+		loading: () => <HomepageSkeleton />,
+	}
+);
 
 export default async function Home({ searchParams }: Props) {
 	const page = searchParams.page ? parseInt(searchParams.page) : 1;
@@ -14,7 +20,6 @@ export default async function Home({ searchParams }: Props) {
 	return (
 		<main className="w-full container box-border pt-[6rem] lg:pt-[8rem]">
 			<Suspense key={page} fallback={<HomepageSkeleton />}>
-				{/* <ProductBanner /> */}
 				<ProductList page={page} />
 			</Suspense>
 		</main>

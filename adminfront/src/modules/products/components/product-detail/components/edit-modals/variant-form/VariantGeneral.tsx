@@ -39,6 +39,18 @@ const VariantGeneral: FC<Props> = ({ form, options }) => {
 					<InputNumber className="w-full" placeholder="0" min={0} allowClear />
 				</Form.Item>
 			</Col>
+
+			<Col xs={24} sm={12}>
+				<Form.Item
+					labelCol={{ span: 24 }}
+					name="allowed_quantities"
+					label="Số lượng cho phép"
+					className="mb-2"
+				>
+					<InputNumber className="w-full" placeholder="0" min={0} allowClear />
+				</Form.Item>
+			</Col>
+
 			<Col span={24}>
 				<TooltipIcon
 					title="Các tùy chọn được sử dụng để xác định màu sắc, kích thước, vv của biến thể."

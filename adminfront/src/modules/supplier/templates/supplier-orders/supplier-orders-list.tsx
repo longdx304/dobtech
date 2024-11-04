@@ -11,6 +11,8 @@ import { ChangeEvent, FC, useMemo, useState } from 'react';
 import SupplierOrdersModal from '../../components/supplier-orders-modal';
 import { useAdminSupplierOrders, useAdminSuppliers } from '../../hooks';
 import supplierOrdersColumn from './supplier-orders-column';
+import { useRouter } from 'next/navigation';
+import { ERoutes } from '@/types/routes';
 
 type Props = {};
 
@@ -23,6 +25,7 @@ const SupplierOrdersList: FC<Props> = () => {
 		onClose: closeSupplierOrdersModal,
 	} = useToggleState(false);
 
+	const router = useRouter();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
@@ -75,6 +78,10 @@ const SupplierOrdersList: FC<Props> = () => {
 		setCurrentSupplierOrders(null);
 	};
 
+	const handleRowClick = (record: any) => {
+		router.push(`${ERoutes.SUPPLIERS}/${record.id}`);
+	};
+
 	return (
 		<div className="w-full">
 			<Flex align="center" justify="flex-start" className="">
@@ -94,6 +101,10 @@ const SupplierOrdersList: FC<Props> = () => {
 				columns={(columns as any) ?? []}
 				dataSource={dataSupplierOrders?.supplierOrder ?? []}
 				rowKey="id"
+				onRow={(record) => ({
+					onClick: () => handleRowClick(record),
+					className: 'cursor-pointer',
+				})}
 				scroll={{ x: 700 }}
 				pagination={{
 					total: dataSupplierOrders?.count ?? 0,

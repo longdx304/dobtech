@@ -2,10 +2,8 @@
 
 import useIsDesktop from '@/modules/common/hooks/useIsDesktop';
 import { Order } from '@medusajs/medusa';
-import dynamic from 'next/dynamic';
-
-const OrderOverviewMobile = dynamic(() => import('./OrderOverviewMobile'));
-const OrderOverviewDesktop = dynamic(() => import('./OrderOverviewDesktop'));
+import OrderOverviewDesktop from './OrderOverviewDesktop';
+import OrderOverviewMobile from './OrderOverviewMobile';
 
 const OrderOverview = ({ orders }: { orders: Order[] }) => {
 	const isDesktop = useIsDesktop();

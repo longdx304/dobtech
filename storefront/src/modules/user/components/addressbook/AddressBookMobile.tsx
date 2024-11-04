@@ -4,11 +4,11 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
+import AddressForm from '@/modules/common/components/address-form';
 import { Region } from '@/types/medusa';
 import { Address } from '@medusajs/medusa';
 import { message, Modal, Switch } from 'antd';
 import { ChevronLeft, Plus, Trash2 } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -17,10 +17,7 @@ import {
 	updateCustomerShippingAddress,
 } from '../../actions';
 
-const AddressForm = dynamic(
-	() => import('@/modules/common/components/address-form'),
-	{ ssr: false }
-);
+
 type Props = {
 	region: Region;
 };

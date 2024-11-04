@@ -6,6 +6,7 @@ import { Input, InputNumber } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { TooltipIcon } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
+import { useStoreData } from '@/modules/regions/components/region-modal/use-store-data';
 
 type Props = {
 	form: any;
@@ -14,6 +15,8 @@ type Props = {
 
 const VariantGeneral: FC<Props> = ({ form, field }) => {
 	const options = Form.useWatch('options', form) || undefined;
+	const { currencyOptions } = useStoreData();
+
 	return (
 		<Row gutter={[16, 0]} className="w-full text-gray-500">
 			<Col span={24}>
@@ -38,6 +41,26 @@ const VariantGeneral: FC<Props> = ({ form, field }) => {
 			<Col xs={24} sm={12}>
 				<Form.Item
 					labelCol={{ span: 24 }}
+					name={[field.name, 'prices', 0, 'currency_code']}
+					label="Tiền tệ"
+					className="mb-2"
+				>
+					<Select placeholder="Chọn tiền tệ" options={currencyOptions} />
+				</Form.Item>
+			</Col>
+			<Col xs={24} sm={12}>
+				<Form.Item
+					labelCol={{ span: 24 }}
+					name={[field.name, 'prices', 0, 'amount']}
+					label="Giá bán hàng"
+					className="mb-2"
+				>
+					<InputNumber className="w-full" placeholder="0" min={0} allowClear />
+				</Form.Item>
+			</Col>
+			<Col xs={24} sm={12}>
+				<Form.Item
+					labelCol={{ span: 24 }}
 					name={[field.name, 'supplier_price']}
 					label="Giá nhập hàng"
 					className="mb-2"
@@ -45,6 +68,18 @@ const VariantGeneral: FC<Props> = ({ form, field }) => {
 					<InputNumber className="w-full" placeholder="0" min={0} allowClear />
 				</Form.Item>
 			</Col>
+
+			<Col xs={24} sm={12}>
+				<Form.Item
+					labelCol={{ span: 24 }}
+					name={[field.name, 'allowed_quantity']}
+					label="Định lượng đôi"
+					className="mb-2"
+				>
+					<InputNumber className="w-full" placeholder="0" min={6} allowClear />
+				</Form.Item>
+			</Col>
+
 			<Col span={24}>
 				<TooltipIcon
 					title="Các tùy chọn được sử dụng để xác định màu sắc, kích thước, vv của biến thể."

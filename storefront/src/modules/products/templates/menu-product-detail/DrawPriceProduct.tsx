@@ -42,6 +42,7 @@ const DrawPriceProduct: FC<Props> = ({
 		inStock,
 		inventoryQuantity,
 		quantity,
+		allowedQuantities,
 		handleAddNumber,
 		handleSubtractNumber,
 		handleInputChange,
@@ -89,8 +90,9 @@ const DrawPriceProduct: FC<Props> = ({
 	);
 
 	const buttonText = !inStock ? 'Hàng đã hết' : 'Thêm vào giỏ hàng';
-  
-	const footer = (
+	const isAllowedQuantity = quantity % allowedQuantities === 0 && quantity > 0;
+
+	const footer =
 		// <Button
 		// 	onClick={handleAddToCart}
 		// 	disabled={!inStock || !variant || !!disabled || isAdding}
@@ -100,8 +102,7 @@ const DrawPriceProduct: FC<Props> = ({
 		// >
 		// 	{!variant ? 'Thêm vào giỏ hàng' : buttonText}
 		// </Button>
-		null
-	);
+		null;
 	return (
 		<Drawer
 			placement="bottom"

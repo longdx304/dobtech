@@ -3,19 +3,15 @@ import { Flex } from '@/components/Flex';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCustomer } from '@/lib/providers/user/user-provider';
+import AddressForm from '@/modules/common/components/address-form';
 import { Address, Region } from '@medusajs/medusa';
 import { Col, List, message, Modal, Row } from 'antd';
-import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import {
 	deleteCustomerShippingAddress,
 	updateCustomerShippingAddress,
 } from '../../actions';
 
-const AddressForm = dynamic(
-	() => import('@/modules/common/components/address-form'),
-	{ ssr: false }
-);
 type Props = {
 	region: Region;
 };

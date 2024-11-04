@@ -6,16 +6,13 @@ import { Modal } from '@/components/Modal';
 import { Text } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useCart } from '@/lib/providers/cart/cart-provider';
+import AddressForm from '@/modules/common/components/address-form';
 import { Address, Cart, Customer, Region } from '@medusajs/medusa';
 import { ChevronRight } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { setAddresses } from '../../actions';
 import AddressSelect from '../address-select';
 import ShippingAddress from '../shipping-address';
-const AddressForm = dynamic(
-	() => import('@/modules/common/components/address-form')
-);
 
 const countryCode = 'vn';
 

@@ -1,4 +1,5 @@
 import { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
+import { message } from 'antd';
 import { isEmpty, isEqual } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -110,18 +111,38 @@ const useActionProduct = ({ product }: Props) => {
 		}
 	}, [variants, variant]);
 
+	// get the allowed quantities of the selected variant
+	const allowedQuantities = useMemo(() => {
+		if (variant) {
+			return (variant as any)?.allowed_quantities;
+		}
+		return 6;
+	}, [variant]);
+
+	// Initialize the quantity when allowedQuantities change
+	useEffect(() => {
+		if (allowedQuantities) {
+			setQuantity(allowedQuantities); // Set initial quantity to allowedQuantities
+		}
+	}, [allowedQuantities]);
+
 	const handleAddNumber = () => {
-		setQuantity(quantity + 1);
+		setQuantity(quantity + allowedQuantities);
 	};
 
 	const handleSubtractNumber = () => {
-		if (quantity > 1) {
-			setQuantity(quantity - 1);
+		if (quantity > allowedQuantities) {
+			setQuantity(quantity - allowedQuantities);
 		}
 	};
 
 	const handleInputChange = (value: number) => {
-		setQuantity(value);
+		if (value % allowedQuantities === 0) {
+			setQuantity(value);
+		} else {
+			message.warning(`Số lượng phải là bội số của ${allowedQuantities}.`);
+			setQuantity(value);
+		}
 	};
 
 	return {
@@ -131,6 +152,7 @@ const useActionProduct = ({ product }: Props) => {
 		price,
 		inventoryQuantity,
 		updateOptions,
+		allowedQuantities,
 		quantity,
 		handleAddNumber,
 		handleSubtractNumber,
