@@ -161,7 +161,7 @@ const ManageProductModal: FC<Props> = ({
 			</Flex>
 			<Table
 				loading={isLoading || isRefetching}
-				columns={columnsTable}
+				columns={columnsTable as any}
 				dataSource={products || []}
 				rowKey="id"
 				pagination={{

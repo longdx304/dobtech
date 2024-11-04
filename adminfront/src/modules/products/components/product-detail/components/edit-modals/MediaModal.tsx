@@ -36,7 +36,7 @@ const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 						url: image.url,
 						name: `Hình ảnh ${index + 1}`,
 						selected: false,
-					}))
+				  }))
 				: [],
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -93,7 +93,7 @@ const MediaModal: FC<Props> = ({ product, state, handleOk, handleCancel }) => {
 			let preppedImages: FormImage[] = [];
 			try {
 				const currentImagesUrls =
-					product?.images?.map((image) => image.url) || null;
+					product?.images?.map((image) => image.url) ?? null;
 				preppedImages = await prepareImages(values.media, currentImagesUrls);
 			} catch (error) {
 				messageApi.error('Đã xảy ra lỗi khi tải hình ảnh lên.');

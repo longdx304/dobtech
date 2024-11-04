@@ -105,7 +105,7 @@ const CurrencyList: FC<Props> = () => {
 				rowSelection={{
 					type: 'radio',
 					selectedRowKeys: [store?.default_currency_code ?? 'usd'],
-					getCheckboxProps: (record: Currency) => ({
+					getCheckboxProps: () => ({
 						disabled: true,
 					}),
 				}}

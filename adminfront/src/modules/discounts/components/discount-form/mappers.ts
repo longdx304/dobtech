@@ -51,7 +51,7 @@ export const formValuesToCreateDiscountMapper = (
 		},
 		is_dynamic: values.is_dynamic,
 		ends_at: values.ends_at ?? undefined,
-		regions: [values.regions as string] ?? [],
+		regions: [(values?.regions as string) || ''],
 		starts_at: values.starts_at,
 		usage_limit:
 			values.usage_limit && values.usage_limit > 0
