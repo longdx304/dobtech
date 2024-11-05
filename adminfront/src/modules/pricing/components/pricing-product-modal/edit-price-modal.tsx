@@ -163,6 +163,7 @@ const EditPriceModal: FC<Props> = ({
 				productForm={productForm}
 				productsData={productsData}
 				setProductsData={setProductsData}
+				priceListId={priceListId}
 			/>
 		</Modal>
 	);

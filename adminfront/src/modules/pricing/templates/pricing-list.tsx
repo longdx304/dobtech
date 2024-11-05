@@ -175,6 +175,7 @@ const PricingList: FC<Props> = ({}) => {
 				handleOk={onClosePricing}
 				handleCancel={onClosePricing}
 			/>
+			{/* Chỉnh sửa thông tin price list */}
 			{currentPricing && statePriceDetail && (
 				<PriceDetailModal
 					state={statePriceDetail}
@@ -183,6 +184,7 @@ const PricingList: FC<Props> = ({}) => {
 					priceList={currentPricing}
 				/>
 			)}
+			{/* Danh sách sản phẩm */}
 			{currentPricing && statePriceList && (
 				<PriceProductModal
 					state={statePriceList}

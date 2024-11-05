@@ -26,3 +26,9 @@
 * feat: manage supplier
 * feat: add supplier price for product
 * feat: manage supplier order
+
+## 0.0.4 (2024-10-22)
+
+* fix: Update timeline action refund & paid supplier order detail
+* feat: Admin create order for customer
+* feat: Create private price for customer when admin update price at order detail

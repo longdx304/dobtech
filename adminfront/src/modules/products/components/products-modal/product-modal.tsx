@@ -72,7 +72,7 @@ export default function ProductModal({
 		if (values.thumbnail?.length) {
 			let preppedImages: FormImage[] = [];
 			try {
-				preppedImages = await prepareImages(values.thumbnail, []);
+				preppedImages = await prepareImages(values.thumbnail, null);
 			} catch (error) {
 				console.log('error:', error);
 				console.log('getErrorMessage thumbnail', getErrorMessage(error));
@@ -90,7 +90,7 @@ export default function ProductModal({
 		if (values.media?.length) {
 			let preppedImages: FormImage[] = [];
 			try {
-				preppedImages = await prepareImages(values.media, []);
+				preppedImages = await prepareImages(values.media, null);
 			} catch (error) {
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
 				console.log('getErrorMessage media', getErrorMessage(error));
