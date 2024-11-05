@@ -54,13 +54,16 @@ const productsColumns = ({ variantInventoryCell, currencyCode }: Props) => [
 		dataIndex: 'original_price_incl_tax',
 		className: 'text-xs',
 		width: 250,
-		render: (_: ProductVariant['original_price_incl_tax'], record: ProductVariant) => {
+		render: (
+			_: ProductVariant['original_price_incl_tax'],
+			record: ProductVariant
+		) => {
 			// const _render = variantInventoryCell(record);
 			if (!_) {
-				return '-'
+				return '-';
 			}
 
-			const showOriginal =_ !== "default"
+			const showOriginal = _ !== 'default';
 			return (
 				<div className="flex items-center justify-start gap-2">
 					<div className="flex flex-col items-end">
@@ -74,15 +77,12 @@ const productsColumns = ({ variantInventoryCell, currencyCode }: Props) => [
 						)}
 						<span>
 							{formatAmountWithSymbol({
-								amount: record.calculated_price_incl_tax ,
+								amount: record.calculated_price_incl_tax,
 								currency: currencyCode,
 							})}
 						</span>
 					</div>
-					<span className="text-gray-400">
-						{" "}
-						{currencyCode.toUpperCase()}
-					</span>
+					<span className="text-gray-400"> {currencyCode.toUpperCase()}</span>
 				</div>
 			);
 		},

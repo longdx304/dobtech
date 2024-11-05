@@ -330,7 +330,7 @@ const SummaryLineItem = ({
 					<div className="font-normal text-gray-500">x {item.quantity}</div>
 					<div className="font-normal text-gray-900 min-w-[55px] text-right">
 						{formatAmountWithSymbol({
-							amount: item.price * item.quantity,
+							amount: item.price * item.quantity || 0,
 							currency: currencyCode,
 							tax: [],
 						})}

@@ -1,5 +1,5 @@
 import { Flex } from '@/components/Flex';
-import ManageOrders from '@/modules/orders/templates/manage-orders';
+import ManageDraftOrders from '@/modules/draft-orders/manage-draft-orders';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 
@@ -10,11 +10,11 @@ export const metadata: Metadata = {
 
 interface Props {}
 
-export default async function Orders({}: Props) {
+export default async function DraftOrders({}: Props) {
 	return (
 		<Suspense>
 			<Flex vertical gap="middle" className="h-full w-full">
-				<ManageOrders />
+				<ManageDraftOrders />
 			</Flex>
 		</Suspense>
 	);
