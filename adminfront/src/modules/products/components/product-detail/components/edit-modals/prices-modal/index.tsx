@@ -1,8 +1,8 @@
-import { Form, message } from 'antd';
+import { message } from 'antd';
 import { useRef, useState } from 'react';
-import { MoneyAmount, Product } from '@medusajs/medusa';
+import { MoneyAmount, Product, Region } from '@medusajs/medusa';
 import _ from 'lodash';
-import { useAdminUpdateVariant } from 'medusa-react';
+import { useAdminRegions, useAdminUpdateVariant } from 'medusa-react';
 
 import { Flex } from '@/components/Flex';
 import { Modal } from '@/components/Modal';
@@ -10,6 +10,7 @@ import { Title } from '@/components/Typography';
 import usePrices from '@/modules/products/components/manage-product/hooks/usePrices';
 import EditPricesActions from './EditPricesAction';
 import EditPricesTable from './EditPricesTable';
+import { persistedPrice } from '@/utils/prices';
 
 type Props = {
 	product?: Product;
@@ -20,7 +21,6 @@ type Props = {
 
 const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 	const editedPrices = useRef<any>([]);
-	const [form] = Form.useForm();
 	const { mutateAsync, isLoading } = useAdminUpdateVariant(product?.id || '');
 	const [messageApi, contextHolder] = message.useMessage();
 
@@ -31,6 +31,7 @@ const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 		toggleRegion,
 		storeRegions,
 	} = usePrices(product!);
+
 	const [isCancel, setIsCancel] = useState<boolean>(false);
 
 	const onFinish = async () => {
@@ -48,20 +49,32 @@ const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 					variant?.prices?.find(
 						(item: any) => item.currency_code === priceKey
 					) || {};
+				const tax_rate = storeRegions
+					? storeRegions.find((item: Region) => item.currency_code === priceKey)
+							?.tax_rate
+					: 0;
 				// Check if price is not empty
 				if (!_.isEmpty(findPrice)) {
 					// Check if price is different from current price
 					if (variant.pricesFormat[priceKey] !== findPrice.amount) {
 						pricesPayload.push({
 							...findPrice,
-							amount: variant.pricesFormat[priceKey],
+							amount: persistedPrice(
+								priceKey,
+								variant.pricesFormat[priceKey],
+								tax_rate
+							),
 						});
 					}
 				} else {
 					// If price is empty
 					pricesPayload.push({
 						currency_code: priceKey,
-						amount: variant.pricesFormat[priceKey],
+						amount: persistedPrice(
+							priceKey,
+							variant.pricesFormat[priceKey],
+							tax_rate
+						),
 					});
 				}
 			});
