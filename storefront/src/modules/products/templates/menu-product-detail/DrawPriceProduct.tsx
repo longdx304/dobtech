@@ -92,17 +92,17 @@ const DrawPriceProduct: FC<Props> = ({
 	const buttonText = !inStock ? 'Hàng đã hết' : 'Thêm vào giỏ hàng';
 	const isAllowedQuantity = quantity % allowedQuantities === 0 && quantity > 0;
 
-	const footer =
-		// <Button
-		// 	onClick={handleAddToCart}
-		// 	disabled={!inStock || !variant || !!disabled || isAdding}
-		// 	className="w-full h-10 rounded-[4px] mb-2"
-		// 	isLoading={isAdding}
-		// 	data-testid="add-product-button"
-		// >
-		// 	{!variant ? 'Thêm vào giỏ hàng' : buttonText}
-		// </Button>
-		null;
+	const footer = (
+		<Button
+			onClick={handleAddToCart}
+			disabled={!inStock || !variant || !!disabled || isAdding}
+			className="w-full h-10 rounded-[4px] mb-2"
+			isLoading={isAdding}
+			data-testid="add-product-button"
+		>
+			{!variant ? 'Thêm vào giỏ hàng' : buttonText}
+		</Button>
+	);
 	return (
 		<Drawer
 			placement="bottom"
