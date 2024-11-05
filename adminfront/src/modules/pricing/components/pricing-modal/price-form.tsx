@@ -197,7 +197,7 @@ const PriceForm: FC<Props> = ({
 							</div>
 							<table className="w-full">
 								<tbody>
-									{product?.variants?.map((variant) => {
+									{product?.variants?.map((variant: any) => {
 										return (
 											<tr
 												key={variant.id}
