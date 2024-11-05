@@ -6,7 +6,7 @@ import { Table } from '@/components/Table';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
-import { message, Modal as AntdModal } from 'antd';
+import { Modal as AntdModal, message } from 'antd';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
 import { useAdminDeleteDraftOrder, useAdminDraftOrders } from 'medusa-react';
@@ -71,6 +71,7 @@ const DraftOrderList: FC<Props> = () => {
 		try {
 			setCurrentDraftOrderId(id);
 			await transferOrder.mutateAsync();
+
 			message.success('Chuyển đơn hàng thành công');
 		} catch (error) {
 			message.error('Có lỗi xảy ra khi chuyển đơn hàng');
