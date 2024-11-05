@@ -2,16 +2,16 @@ import {
 	StepModal,
 	StepModalProvider,
 } from '@/lib/providers/stepped-modal-provider';
-import { Form, message, notification } from 'antd';
+import { getErrorMessage } from '@/lib/utils';
+import { message } from 'antd';
 import { useAdminCreateDraftOrder } from 'medusa-react';
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
+import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 import Items from '../new/items';
 import SelectRegion from '../new/select-region';
 import SelectShipping from '../new/select-shipping';
 import ShippingDetails from '../new/shipping-details';
 import Summary from '../new/summary';
-import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
-import { getErrorMessage } from '@/lib/utils';
 
 type Props = {
 	state: boolean;
@@ -83,7 +83,7 @@ const DraftOrderModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 			<StepModal
 				open={state}
 				onCancel={handleCancel}
-				title="Create Draft Order"
+				title="Tạo bản nháp đơn hàng"
 				steps={steps}
 				onFinish={handleFinish}
 			/>

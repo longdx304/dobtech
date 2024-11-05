@@ -38,10 +38,10 @@ const SelectRegion = () => {
 		<div className="flex min-h-[705px] flex-col">
 			<Form.Item
 				name="region"
-				label="Region"
+				label="Quốc gia"
 				rules={[{ required: true, message: 'Please select a region' }]}
 			>
-				<Select placeholder="Select a region" onChange={handleRegionChange}>
+				<Select placeholder="Chọn quốc gia" onChange={handleRegionChange}>
 					{regionOptions.map((option) => {
 						return (
 							<Option key={option.value} value={option.value}>

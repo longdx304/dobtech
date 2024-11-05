@@ -9,13 +9,10 @@ import OrderList from './orders';
 
 type Props = {};
 
-const DEFAULT_PAGE_SIZE = 10;
-
 const ManageOrders: FC<Props> = ({}) => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const query = searchParams.get('tab') || 'orders';
-	console.log('query', query);
 
 	const itemsTab: TabsProps['items'] = [
 		{
@@ -25,7 +22,7 @@ const ManageOrders: FC<Props> = ({}) => {
 		},
 		{
 			key: 'draft-orders',
-			label: 'Drafts',
+			label: 'Bản nháp',
 			children: <DraftOrderList />,
 		},
 	];

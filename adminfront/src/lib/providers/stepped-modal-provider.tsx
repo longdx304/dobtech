@@ -170,6 +170,7 @@ export const StepModal: React.FC<StepModalProps> = ({
 				</Button>,
 			]}
 			width={800}
+			centered
 		>
 			<div className="mb-6">
 				<Steps
@@ -177,7 +178,13 @@ export const StepModal: React.FC<StepModalProps> = ({
 					items={steps.map((step) => ({ title: step.title }))}
 				/>
 			</div>
-			<div className={clsx('transition-all duration-200', 'min-h-[200px] p-4')}>
+			<div
+				className={clsx('transition-all duration-200', 'min-h-[200px] p-4')}
+				style={{
+					maxHeight: '600px',
+					overflowY: 'auto',
+				}}
+			>
 				{steps[SteppedContext.currentStep].content}
 			</div>
 		</Modal>

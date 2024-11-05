@@ -2,15 +2,15 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { useStepModal } from '@/lib/providers/stepped-modal-provider';
+import { extractUnitPrice } from '@/utils/prices';
 import { ProductVariant, Region } from '@medusajs/medusa';
+import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import _ from 'lodash';
 import { Search } from 'lucide-react';
 import { useAdminVariants } from 'medusa-react';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 import productsColumns from './product-columns';
-import { extractUnitPrice } from '@/utils/prices';
-import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 
 const PAGE_SIZE = 10;
 
@@ -25,6 +25,7 @@ export interface VariantPrice {
 	currency_code: string;
 	isCustom: boolean;
 }
+
 const Items = () => {
 	const [selectedVariantIds, setSelectedVariantIds] = useState<string[]>([]);
 	const [selectedVariants, setSelectedVariants] = useState<ProductVariant[]>(

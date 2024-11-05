@@ -80,9 +80,9 @@ const draftOrderColumns = ({
 		},
 	},
 	{
-		title: '',
+		title: 'Action',
 		key: 'action',
-		width: 40,
+		width: 80,
 		fixed: 'right',
 		className: 'text-xs',
 		align: 'center',

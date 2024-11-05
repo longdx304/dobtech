@@ -1,10 +1,7 @@
-import { Button } from '@/components/Button';
-import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { useStepModal } from '@/lib/providers/stepped-modal-provider';
 import { extractOptionPrice } from '@/utils/prices';
 import { Alert, Form, Spin } from 'antd';
-import { TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 
@@ -45,9 +42,9 @@ const SelectShipping = () => {
 	return (
 		<div className="min-h-[705px]">
 			<h3 className="inter-base-semibold">
-				Shipping method{' '}
+				Phương thức vận chuyển{' '}
 				<span className="inter-base-regular text-grey-50">
-					(To {region?.name})
+					(tại {region?.name})
 				</span>
 			</h3>
 
@@ -63,14 +60,14 @@ const SelectShipping = () => {
 				) : (
 					<Form form={form} layout="vertical">
 						<Form.Item
-							label="Choose a shipping method"
+							label="Chọn phương thức vận chuyển thích hợp"
 							name="shipping_option"
 							rules={[
 								{ required: true, message: 'Please select a shipping method' },
 							]}
 						>
 							<Select
-								placeholder="Select a shipping method"
+								placeholder="Vui lý chọn phương thức vận chuyển"
 								options={
 									shippingOptions?.map((so) => ({
 										value: so.id,

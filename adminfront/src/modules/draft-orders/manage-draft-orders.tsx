@@ -10,8 +10,6 @@ import DraftOrderList from './templates/draft-orders';
 
 type Props = {};
 
-const DEFAULT_PAGE_SIZE = 10;
-
 const ManageDraftOrders: FC<Props> = ({}) => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -25,7 +23,7 @@ const ManageDraftOrders: FC<Props> = ({}) => {
 		},
 		{
 			key: 'draft-orders',
-			label: 'Drafts',
+			label: 'Bản nháp',
 			children: <DraftOrderList />,
 		},
 	];

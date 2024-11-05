@@ -24,6 +24,7 @@ const ShippingDetails = () => {
 	} = useNewDraftOrderForm();
 
 	const customerId = Form.useWatch('customer_id', form);
+	const shippingAddressId = Form.useWatch('shipping_address_id', form);
 	const { customers, isLoading } = useAdminCustomers();
 
 	useEffect(() => {
@@ -105,6 +106,12 @@ const ShippingDetails = () => {
 			return;
 		}
 
+		// If an existing address is selected via radio button
+		if (shippingAddressId && validAddresses.length && !addNew) {
+			enableNext();
+			return;
+		}
+
 		if (shippingAddress && !isNullishObject(shippingAddress)) {
 			if (
 				!shippingAddress.first_name ||
@@ -120,24 +127,31 @@ const ShippingDetails = () => {
 			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [shippingAddress, email]);
+	}, [shippingAddress, email, shippingAddressId, validAddresses, addNew]);
 
 	useEffect(() => {
-		// reset shipping address info when a different customer is selected
-		// or when "Create new" is clicked
-		form.setFieldValue('shipping_address', {
-			first_name: '',
-			last_name: '',
-			phone: '',
-			address_1: '',
-			address_2: '',
-			city: '',
-			country_code: null,
-			province: '',
-			postal_code: '',
-		});
+		if (customerId && !addNew && validAddresses.length > 0) {
+			// If there are existing addresses, select the first one by default
+			const firstAddress = validAddresses[0];
+			onSelectExistingAddress(firstAddress.id);
+		} else {
+			// Reset shipping address info when a different customer is selected
+			// or when "Create new" is clicked
+			form.setFieldValue('shipping_address', {
+				first_name: '',
+				last_name: '',
+				phone: '',
+				address_1: '',
+				address_2: '',
+				city: '',
+				country_code: null,
+				province: '',
+				postal_code: '',
+			});
+			form.setFieldValue('shipping_address_id', null);
+		}
 		// eslint-disable-next-line
-	}, [customerId, addNew]);
+	}, [customerId, addNew, validAddresses]);
 
 	useEffect(() => {
 		setAddNew(false);
@@ -152,6 +166,7 @@ const ShippingDetails = () => {
 						options={customerOptions}
 						onChange={(val) => onCustomerSelect(val)}
 						value={customerId || null}
+						placeholder="Tìm khách hàng có sẵn"
 					/>
 				</Form.Item>
 
