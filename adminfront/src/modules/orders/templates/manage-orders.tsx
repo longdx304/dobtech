@@ -3,7 +3,7 @@ import { Card } from '@/components/Card';
 import { Tabs } from '@/components/Tabs';
 import { type TabsProps } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FC } from 'react';
+import { FC, Suspense } from 'react';
 import DraftOrderList from '../../draft-orders/templates/draft-orders';
 import OrderList from './orders';
 

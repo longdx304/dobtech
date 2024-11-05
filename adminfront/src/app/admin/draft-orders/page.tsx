@@ -1,6 +1,7 @@
 import { Flex } from '@/components/Flex';
 import ManageDraftOrders from '@/modules/draft-orders/manage-draft-orders';
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
 	title: 'Quản lý đơn hàng',
@@ -9,11 +10,12 @@ export const metadata: Metadata = {
 
 interface Props {}
 
-export default async function Orders({}: Props) {
+export default async function DraftOrders({}: Props) {
 	return (
-		<Flex vertical gap="middle" className="h-full w-full">
-			<ManageDraftOrders />
-		</Flex>
+		<Suspense>
+			<Flex vertical gap="middle" className="h-full w-full">
+				<ManageDraftOrders />
+			</Flex>
+		</Suspense>
 	);
 }
-
