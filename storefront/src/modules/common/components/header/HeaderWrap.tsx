@@ -23,7 +23,7 @@ const HeaderWrap: FC<Props> = ({}) => {
 						width={125}
 						height={48}
 						alt="Dob Icon"
-						className='w-full h-full object-contain'
+						className="w-full h-full object-contain"
 						priority
 					/>
 				</LocalizedClientLink>
@@ -36,7 +36,7 @@ const HeaderWrap: FC<Props> = ({}) => {
 				<SearchProduct />
 
 				{/* Cart */}
-				{/* <CartButton /> */}
+				<CartButton />
 
 				{/* User Information */}
 				<UserInformation data-testid="nav-account-link" />
