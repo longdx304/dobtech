@@ -161,7 +161,7 @@ const AddVariantModal: FC<Props> = ({
 		>
 			{contextHolder}
 			<Title level={3} className="text-center">
-				{!variant ? 'Tạo phiên bản' : 'Chỉnh sửa phiên bản'}
+				{!variant ? 'Thêm phiên bản' : 'Chỉnh sửa phiên bản'}
 			</Title>
 			<Form form={form} onFinish={onFinish} className="pt-3">
 				<Collapse

@@ -60,6 +60,8 @@ export interface PaymentRequiredEvent extends TimelineEvent {
 
 export interface OrderEditEvent extends TimelineEvent {
 	edit: OrderEdit;
+	taxRate?: number;
+	currency_code: string;
 }
 
 export interface OrderEditRequestedEvent extends OrderEditEvent {
@@ -244,6 +246,8 @@ export const useBuildTimeline = (orderId: string) => {
 					orderId: order.id,
 					type: 'edit-created',
 					edit: edit,
+					currency_code: order.currency_code,
+					taxRate: order.tax_rate ?? 0,
 				} as OrderEditEvent);
 
 				if (edit.requested_at) {
