@@ -147,7 +147,7 @@ const VariantsInfo: FC<Props> = ({ product, loadingProduct }) => {
 								product?.variants?.length || 0
 							})`}</Text>
 							<Table
-								scroll={{ x: 400 }}
+								scroll={{ x: 300 }}
 								columns={columns as any}
 								dataSource={product?.variants ?? []}
 								rowKey="id"

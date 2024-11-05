@@ -29,6 +29,7 @@ export const prepareImages = async (
 	images: FormImage[],
 	oldImagesUrls: string[] | null
 ) => {
+	console.log('oldImagesUrls:', oldImagesUrls);
 	const { uploadImages, existingImages } = splitImages(images);
 
 	let uploadedImgs: FormImage[] = [];
@@ -67,10 +68,14 @@ export const deleteImages = async (fileKeys: string[] | string) => {
 		payload = { fileKey };
 	}
 	if (Array.isArray(fileKeys)) {
-		const fileKey = fileKeys.map((url) =>
-			new URL(url).pathname.split('/').pop()
-		);
-		payload = { fileKey };
+		const fileKey = fileKeys
+			.map((url) => {
+				if (typeof url === 'string')
+					return new URL(url).pathname.split('/').pop();
+				return null;
+			})
+			.filter(Boolean);
+		payload = { fileKey: fileKey };
 	}
 
 	await Medusa.uploads.delete(payload);

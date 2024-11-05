@@ -1,19 +1,29 @@
 import { LineItem, OrderItemChange, ProductVariant } from '@medusajs/medusa';
 import clsx from 'clsx';
-import { message, Divider } from 'antd';
+import { message } from 'antd';
 import {
 	useAdminDeleteOrderEditItemChange,
 	useAdminOrderEditAddLineItem,
 	useAdminOrderEditDeleteLineItem,
 	useAdminOrderEditUpdateLineItem,
 } from 'medusa-react';
-import { RefreshCcw, CopyPlus, Trash2, Minus, Plus } from 'lucide-react';
+import {
+	RefreshCcw,
+	CopyPlus,
+	Trash2,
+	Minus,
+	Plus,
+	Pencil,
+} from 'lucide-react';
 import Image from 'next/image';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
-import { formatAmountWithSymbol } from '@/utils/prices';
+import { formatAmountWithSymbol, persistedPrice } from '@/utils/prices';
 import { ActionAbles } from '@/components/Dropdown';
 import AddProductVariant from '../../common/add-product-variant';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import { Popconfirm } from '@/components/Popconfirm';
+import { InputNumber } from '@/components/Input';
+import { useState } from 'react';
 
 type OrderEditLineProps = {
 	item: LineItem;
@@ -36,6 +46,7 @@ const OrderEditLine = ({
 		onOpen: openReplaceProduct,
 		onClose: closeReplaceProduct,
 	} = useToggleState(false);
+	const [unitPrice, setUnitPrice] = useState<number>(item.unit_price);
 
 	const isNew = change?.type === 'item_add';
 	const isModified = change?.type === 'item_update';
@@ -115,6 +126,26 @@ const OrderEditLine = ({
 			message.success('Sản phẩm đã được thêm');
 		} catch (e) {
 			message.error('Không thể thay sản phẩm');
+		}
+	};
+
+	const onUnitPriceUpdate = async () => {
+		if (isLoading) {
+			return;
+		}
+		isLoading = true;
+		try {
+			await updateItem({
+				quantity: item.quantity,
+				unit_price: unitPrice,
+			} as any);
+			setUnitPrice(unitPrice);
+			message.success('Cập nhật giá tiền thành công');
+		} catch (error) {
+			message.error('Cập nhật thất bại');
+			console.error('Error updating quantity:', error);
+		} finally {
+			isLoading = false;
 		}
 	};
 
@@ -216,21 +247,68 @@ const OrderEditLine = ({
 								size={18}
 							/>
 						</div>
-						<div
-							className={clsx('space-x-2 flex text-sm', {
-								'pointer-events-none !text-gray-400': isLocked,
-							})}
-						>
+						{/* Display price */}
+						<div className="flex sm:flex-row flex-col items-end">
 							<div
-								className={clsx('min-w-[60px] text-right text-gray-900', {
+								className={clsx(
+									'space-x-2 flex items-center text-end text-sm',
+									{
+										'pointer-events-none !text-gray-400': isLocked,
+									}
+								)}
+							>
+								<Popconfirm
+									title="Chỉnh sửa giá"
+									description={
+										<InputNumber
+											placeholder="Thay đổi số lượng"
+											className={clsx(
+												'cursor-pointer text-gray-400 my-2 w-[130px]',
+												{
+													'pointer-events-none': isLoading,
+												}
+											)}
+											value={unitPrice}
+											onChange={(value) => setUnitPrice(Number(value))}
+											disabled={isLocked || isLoading}
+										/>
+									}
+									isLoading={isLoading}
+									handleOk={onUnitPriceUpdate}
+									handleCancel={() => {}}
+									icon={null}
+								>
+									<Pencil size={16} />
+								</Popconfirm>
+								<div
+									className={clsx('text-gray-900', {
+										'pointer-events-none !text-gray-400': isLocked,
+									})}
+								>
+									{formatAmountWithSymbol({
+										amount: item.unit_price,
+										currency: currencyCode,
+										tax: item.includes_tax ? 0 : item.tax_lines,
+									})}
+								</div>
+							</div>
+							<div
+								className={clsx('space-x-2 flex text-sm', {
 									'pointer-events-none !text-gray-400': isLocked,
 								})}
 							>
-								{formatAmountWithSymbol({
-									amount: item.unit_price * item.quantity,
-									currency: currencyCode,
-									tax: item.includes_tax ? 0 : item.tax_lines,
-								})}
+								<div
+									className={clsx('min-w-[60px] text-right text-gray-900', {
+										'pointer-events-none !text-gray-400': isLocked,
+									})}
+								>
+									{' = ' +
+										formatAmountWithSymbol({
+											amount: item.unit_price * item.quantity,
+											currency: currencyCode,
+											tax: item.includes_tax ? 0 : item.tax_lines,
+										})}
+								</div>
 							</div>
 						</div>
 					</div>

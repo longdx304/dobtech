@@ -161,7 +161,7 @@ const PriceProductModal: FC<Props> = ({
 			handleOk={handleOk}
 			handleCancel={handleCancel}
 			width={800}
-			>
+		>
 			<div id="action-product">
 				<Title level={3}>Danh sách sản phẩm</Title>
 				<Flex
@@ -196,7 +196,7 @@ const PriceProductModal: FC<Props> = ({
 							`${range[0]}-${range[1]} trong ${total} sản phẩm`,
 					}}
 				/>
-				</div>
+			</div>
 
 			<ProductModal
 				state={stateProduct}
@@ -205,14 +205,18 @@ const PriceProductModal: FC<Props> = ({
 				productIds={allProducts?.map((p) => p.id as string) || []}
 				priceListId={id}
 			/>
-			<EditPricesModal
-				state={stateEditPrices}
-				handleOk={onCloseEditPrices}
-				handleCancel={onCloseEditPrices}
-				priceListId={id}
-				productIds={products?.map((p) => p.id as string) || []}
-			/>
-			{currentProduct && (
+			{/* Chỉnh sửa giá tiền tất cả sản phẩm */}
+			{stateEditPrices && (
+				<EditPricesModal
+					state={stateEditPrices}
+					handleOk={onCloseEditPrices}
+					handleCancel={onCloseEditPrices}
+					priceListId={id}
+					productIds={products?.map((p) => p.id as string) || []}
+				/>
+			)}
+			{/* Chỉnh sửa giá tiền từng sản phẩm */}
+			{stateEditPrice && currentProduct && (
 				<EditPriceModal
 					state={stateEditPrice}
 					handleOk={onCloseEditPrice}

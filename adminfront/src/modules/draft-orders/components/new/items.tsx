@@ -263,7 +263,7 @@ const Items = () => {
 			<Table
 				rowSelection={{
 					selectedRowKeys: selectedVariantIds,
-					onChange: handleRowSelectionChange,
+					onChange: handleRowSelectionChange as any,
 					preserveSelectedRowKeys: true,
 				}}
 				loading={isLoading}

@@ -18,6 +18,7 @@ const variantsColumns = ({
 	{
 		title: 'Tiêu đề',
 		dataIndex: 'title',
+		width: 100,
 		key: 'title',
 	},
 	{
@@ -27,18 +28,15 @@ const variantsColumns = ({
 		key: 'sku',
 	},
 	{
-		title: 'EAN',
-		dataIndex: 'ean',
-		key: 'ean',
-	},
-	{
 		title: 'Tồn kho',
 		dataIndex: 'inventory_quantity',
+		width: 100,
 		key: 'inventory_quantity',
 	},
 	{
 		title: 'Giá nhập hàng',
 		dataIndex: 'supplier_price',
+		width: 120,
 		key: 'supplier_price',
 		render: (_: any) => {
 			return formatAmountWithSymbol({ amount: _, currency: 'vnd' });
@@ -47,10 +45,11 @@ const variantsColumns = ({
 	{
 		title: 'Định lượng đôi',
 		dataIndex: 'allowed_quantities',
+		width: 100,
 		key: 'allowed_quantities',
 		render: (_: any) => {
-			return _
-		}
+			return _;
+		},
 	},
 	{
 		title: '',

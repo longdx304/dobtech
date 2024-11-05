@@ -36,7 +36,7 @@ const HeaderWrap: FC<Props> = ({}) => {
 				<SearchProduct />
 
 				{/* Cart */}
-				<CartButton />
+				{/* <CartButton /> */}
 
 				{/* User Information */}
 				<UserInformation data-testid="nav-account-link" />
