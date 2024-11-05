@@ -49,32 +49,20 @@ const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 					variant?.prices?.find(
 						(item: any) => item.currency_code === priceKey
 					) || {};
-				const tax_rate = storeRegions
-					? storeRegions.find((item: Region) => item.currency_code === priceKey)
-							?.tax_rate
-					: 0;
 				// Check if price is not empty
 				if (!_.isEmpty(findPrice)) {
 					// Check if price is different from current price
 					if (variant.pricesFormat[priceKey] !== findPrice.amount) {
 						pricesPayload.push({
 							...findPrice,
-							amount: persistedPrice(
-								priceKey,
-								variant.pricesFormat[priceKey],
-								tax_rate
-							),
+							amount: persistedPrice(priceKey, variant.pricesFormat[priceKey]),
 						});
 					}
 				} else {
 					// If price is empty
 					pricesPayload.push({
 						currency_code: priceKey,
-						amount: persistedPrice(
-							priceKey,
-							variant.pricesFormat[priceKey],
-							tax_rate
-						),
+						amount: persistedPrice(priceKey, variant.pricesFormat[priceKey]),
 					});
 				}
 			});
