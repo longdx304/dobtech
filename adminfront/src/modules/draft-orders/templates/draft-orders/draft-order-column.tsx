@@ -15,7 +15,7 @@ const decidePaymentStatus = (status: any) => {
 		case 'open':
 			return <StatusDot variant="default" title={'Đang xử lý'} />;
 		case 'completed':
-			return <StatusDot variant="success" title={'Đã thanh toán'} />;
+			return <StatusDot variant="success" title={'Hoàn thành bản nháp'} />;
 		default:
 			return <StatusDot variant="primary" title={'N/A'} />;
 	}
@@ -59,7 +59,7 @@ const draftOrderColumns = ({
 		},
 	},
 	{
-		title: 'Trạng thái thanh toán',
+		title: 'Trạng thái',
 		dataIndex: 'status',
 		key: 'status',
 		width: 150,
