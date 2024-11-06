@@ -4,6 +4,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { Table } from '@/components/Table';
 import PricesColumn from './prices-column';
 import { EditableCell, EditableRow } from './prices-components';
+import { normalizeAmount } from '@/utils/prices';
 
 type Props = {
 	product: Product;
@@ -90,7 +91,16 @@ const EditPricesTable: FC<Props> = ({
 		variants.forEach((variant: any) => {
 			variant.pricesFormat = variant.prices.reduce(
 				(acc: Record<string, number>, price: any) => {
-					acc[price.currency_code] = price.amount;
+					const taxRate = storeRegions
+						? storeRegions.find(
+								(item: Region) => item.currency_code === price.currency_code
+						  )?.tax_rate
+						: 0;
+					acc[price.currency_code] = normalizeAmount(
+						price.currency_code,
+						price.amount,
+						taxRate
+					);
 					return acc;
 				},
 				{}

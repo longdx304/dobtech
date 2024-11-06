@@ -5,10 +5,11 @@ import {
 	Product,
 	ProductCategory,
 	ProductCollection,
+	Region,
 } from '@medusajs/medusa';
 import { Form, message, type CollapseProps, type FormProps } from 'antd';
 import { Minus, Plus } from 'lucide-react';
-import { useAdminCreateProduct } from 'medusa-react';
+import { useAdminCreateProduct, useAdminRegions } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 
 import { prepareImages } from '@/actions/images';
@@ -53,6 +54,7 @@ export default function ProductModal({
 	const router = useRouter();
 	const { isFeatureEnabled } = useFeatureFlag();
 	const { mutateAsync, isLoading } = useAdminCreateProduct();
+	const { regions } = useAdminRegions({ limit: 100 });
 
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
@@ -61,21 +63,28 @@ export default function ProductModal({
 
 	// handle form submit
 	const onFinish: FormProps<NewProductForm>['onFinish'] = async (values) => {
+		console.log('values:', values);
+		const currencyCode = values.defaultPrice?.currency_code ?? 'vnd';
+		const taxRate = regions
+			? regions.find((region: Region) => region.currency_code === currencyCode)
+					?.tax_rate
+			: 0;
 		// Payload
 		const payload = createPayload(
 			values,
 			true,
-			isFeatureEnabled('sales_channels')
+			isFeatureEnabled('sales_channels'),
+			taxRate
 		);
+		console.log('payload:', payload);
 
+		// return;
 		// Prepped images thumbnail
 		if (values.thumbnail?.length) {
 			let preppedImages: FormImage[] = [];
 			try {
 				preppedImages = await prepareImages(values.thumbnail, null);
 			} catch (error) {
-				console.log('error:', error);
-				console.log('getErrorMessage thumbnail', getErrorMessage(error));
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
 				messageApi.open({
 					type: 'error',
@@ -93,7 +102,6 @@ export default function ProductModal({
 				preppedImages = await prepareImages(values.media, null);
 			} catch (error) {
 				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
-				console.log('getErrorMessage media', getErrorMessage(error));
 
 				messageApi.open({
 					type: 'error',
@@ -105,7 +113,6 @@ export default function ProductModal({
 			payload.images = urls;
 		}
 
-		console.log('payload', payload);
 		await mutateAsync(payload, {
 			onSuccess: ({ product }) => {
 				messageApi.open({
@@ -220,7 +227,8 @@ export default function ProductModal({
 const createPayload = (
 	data: NewProductForm,
 	publish = true,
-	salesChannelsEnabled = false
+	salesChannelsEnabled = false,
+	taxRate = 0
 ): AdminPostProductsReq => {
 	const payload: AdminPostProductsReq = {
 		// General
@@ -265,7 +273,6 @@ const createPayload = (
 			barcode: v?.barcode || undefined,
 			manage_inventory: v?.manage_inventory || true,
 			allow_backorder: v?.allow_backorder || false,
-			// prices: getVariantPrices(v.prices),
 			width: v?.width || undefined,
 			length: v?.length || undefined,
 			height: v?.height || undefined,
@@ -277,7 +284,8 @@ const createPayload = (
 			prices: v?.prices?.map((price) => ({
 				amount: +persistedPrice(
 					price?.currency_code ?? 'vnd',
-					price?.amount ?? 0
+					price?.amount ?? 0,
+					taxRate
 				),
 				currency_code: price.currency_code,
 			})) as any,
