@@ -104,25 +104,44 @@ const ImportModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 	 */
 	const processUpload = async (file: File) => {
 		try {
-			const res = await adminUploadFile(file as any);
-			const _fileKey = res.uploads[0].key;
-			setFileKey(_fileKey as any);
-			const batchJob = await createBatchJob({
-				dry_run: true,
-				context: { fileKey: _fileKey },
-				type: 'product-import',
-			});
-			resetInterval();
-			setBatchJobId(batchJob.batch_job.id as any);
+			// Read the XLSX file
+			const reader = new FileReader();
+			reader.onload = async (e) => {
+				const data = new Uint8Array(e.target?.result as ArrayBuffer);
+				const workbook = XLSX.read(data, { type: 'array' });
+				// Assume we want to process the first sheet
+				const firstSheetName = workbook.SheetNames[0];
+				const worksheet = workbook.Sheets[firstSheetName];
+				// Convert the worksheet to CSV with UTF-8 encoding and ; delimiter
+				const csv = XLSX.utils.sheet_to_csv(worksheet, {
+					FS: ';',
+				});
+				// Create a new File object with the CSV data
+				const csvFile = new File([csv], file.name.replace('.xlsx', '.csv'), {
+					type: 'text/csv;charset=utf-8',
+				});
+				// Upload the CSV file
+				const res = await adminUploadFile(csvFile as any);
+				const _fileKey = res.uploads[0].key;
+				setFileKey(_fileKey as any);
+				// Create batch job
+				const batchJob = await createBatchJob({
+					dry_run: true,
+					context: { fileKey: _fileKey },
+					type: 'product-import',
+				});
+				resetInterval();
+				setBatchJobId(batchJob.batch_job.id as any);
+			};
+			reader.readAsArrayBuffer(file);
 		} catch (e) {
 			message.error('Nhập file thất bại.');
-
 			if (fileKey) {
 				await deleteFile({ file_key: fileKey });
 			}
 		}
 	};
-	
+
 	const onUpload = async (file: any) => {
 		setUploadFile(file);
 		await processUpload(file);
