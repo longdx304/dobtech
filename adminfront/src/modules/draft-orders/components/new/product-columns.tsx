@@ -209,7 +209,7 @@ const productsColumns = ({
 			key: 'prices',
 			dataIndex: 'prices',
 			className: 'text-xs',
-			width: 250,
+			// width: 250,
 			render: (_: ProductVariant['prices'], record: ProductVariant) => {
 				return (
 					<EditablePrice
@@ -220,6 +220,19 @@ const productsColumns = ({
 						isVariantSelected={isVariantSelected}
 					/>
 				);
+			},
+		},
+		{
+			title: 'Còn hàng',
+			key: 'inventory_quantity',
+			dataIndex: 'inventory_quantity',
+			className: 'text-xs',
+			// width: 100,
+			render: (
+				_: ProductVariant['inventory_quantity'],
+				record: ProductVariant
+			) => {
+				return _;
 			},
 		},
 	];

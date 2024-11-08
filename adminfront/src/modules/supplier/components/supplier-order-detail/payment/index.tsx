@@ -203,6 +203,24 @@ const Payment = ({ supplierOrder, isLoading, refetch }: Props) => {
 						)}
 					</div>
 				))}
+				{payment_status !== 'awaiting' && (
+					<div className="flex justify-between text-xs">
+						<div className="font-semibold text-grey-90">
+							{'Số tiền đã thanh toán'}
+						</div>
+						<div className="flex">
+							<div className="font-semibold text-gray-900 mr-3">
+								{formatAmountWithSymbol({
+									amount: supplierOrder.paid_total - supplierOrder.refunded_total,
+									currency: supplierOrder.currency_code,
+								})}
+							</div>
+							<div className="font-regular text-gray-500">
+								{supplierOrder.currency_code.toUpperCase()}
+							</div>
+						</div>
+					</div>
+				)}
 			</div>
 			{/* Refund modal */}
 			{state && (

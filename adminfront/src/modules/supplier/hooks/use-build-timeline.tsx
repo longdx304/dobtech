@@ -1,7 +1,5 @@
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
-import {
-	useAdminSupplierOrder
-} from '@/modules/supplier/hooks';
+import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
 import {
 	ClaimOrder,
 	Order,
@@ -206,8 +204,6 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			return undefined;
 		}
 
-		let allItems = [...supplierOrder.items];
-
 		const events: TimelineEvent[] = [];
 
 		events.push({
@@ -226,7 +222,7 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			currency_code: supplierOrder.currency_code,
 		} as PaymentRequiredEvent);
 		if (isFeatureEnabled('order_editing')) {
-			for (const edit of data.edits || []) {
+			for (const edit of data?.edits || []) {
 				events.push({
 					id: edit.id,
 					time: edit.created_at,
@@ -313,7 +309,7 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			}
 		}
 
-		for (const event of supplierOrder.refunds) {
+		for (const event of supplierOrder?.refunds as any[]) {
 			events.push({
 				amount: event.amount,
 				currencyCode: supplierOrder.currency_code,
@@ -425,48 +421,4 @@ function findOriginalItemId(edits: any, originalId: any) {
 	}
 
 	return currentId;
-}
-
-function getReturnItems(allItems: any, edits: any, item: any) {
-	let id = item.item_id;
-	if (edits) {
-		id = findOriginalItemId(edits, id);
-	}
-
-	const line = allItems.find((li: any) => li.id === id);
-
-	if (!line) {
-		return;
-	}
-
-	return {
-		title: line.title,
-		quantity: item.quantity,
-		requestedQuantity: item.requested_quantity,
-		receivedQuantity: item.received_quantity,
-		variant: {
-			title: line?.variant?.title || '-',
-		},
-		thumbnail: line.thumbnail,
-	};
-}
-
-function getFulfilmentItem(allItems: any, edits: any, item: any) {
-	let id = item.item_id;
-	if (edits) {
-		id = findOriginalItemId(edits, id);
-	}
-
-	const line = allItems.find((line: any) => line.id === id);
-
-	if (!line) {
-		return;
-	}
-
-	return {
-		title: line.title,
-		quantity: item.quantity,
-		thumbnail: line.thumbnail,
-		variant: { title: line?.variant?.title || '-' },
-	};
 }

@@ -1,10 +1,10 @@
+import React, { useEffect } from 'react';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
 import { Option } from '@/types/shared';
-import { Col, Divider, Form, Row } from 'antd';
-import React from 'react';
+import { Col, Divider, Form, Row, Checkbox } from 'antd';
 
 export type AddressPayload = {
 	first_name: string;
@@ -38,13 +38,41 @@ const AddressForm = ({
 	type,
 	noTitle = false,
 }: AddressFormProps) => {
+	const [sameAsShipping, setSameAsShipping] = React.useState(true);
+
+	// Watch for changes in shipping address fields
+	const shippingAddress = Form.useWatch(['shipping_address'], form);
+
+	// Update billing address when shipping address changes and sameAsShipping is true
+	useEffect(() => {
+		if (sameAsShipping && shippingAddress) {
+			form.setFieldsValue({
+				billing_address: {
+					...shippingAddress,
+				},
+			});
+		}
+	}, [shippingAddress, sameAsShipping, form]);
+
+	const handleSameAsShippingChange = (checked: boolean) => {
+		setSameAsShipping(checked);
+		if (checked) {
+			// Update billing address with current shipping address values
+			form.setFieldsValue({
+				billing_address: {
+					...form.getFieldValue('shipping_address'),
+				},
+			});
+		}
+	};
+
 	return (
 		<Form
 			form={form}
 			layout="vertical"
 			initialValues={{ country_code: countryOptions[0]?.value }}
 		>
-			{type === AddressType.SHIPPING || type === AddressType.BILLING ? (
+			{type === AddressType.SHIPPING && (
 				<>
 					<Title level={2}>Chung</Title>
 					<Divider />
@@ -78,10 +106,7 @@ const AddressForm = ({
 								label="Công ty"
 								name={['shipping_address', 'company']}
 								rules={[
-									{
-										required: true,
-										message: 'Vui lòng nhập tên doanh nghiệp',
-									},
+									{ required: true, message: 'Vui lòng nhập tên doanh nghiệp' },
 								]}
 							>
 								<Input placeholder="Công ty" className="rounded-none" />
@@ -106,7 +131,7 @@ const AddressForm = ({
 						</Col>
 					</Row>
 				</>
-			) : null}
+			)}
 
 			<Divider />
 
@@ -120,26 +145,52 @@ const AddressForm = ({
 				</Title>
 			)}
 
+			{type === AddressType.SHIPPING && (
+				<Form.Item>
+					<Checkbox
+						checked={sameAsShipping}
+						onChange={(e) => handleSameAsShippingChange(e.target.checked)}
+						disabled
+					>
+						Địa chỉ thanh toán giống địa chỉ giao hàng
+					</Checkbox>
+				</Form.Item>
+			)}
+
 			<Row gutter={16}>
 				<Col xs={24} md={12}>
 					<Form.Item
 						label="Địa chỉ"
-						name={['shipping_address', 'address_1']}
+						name={[
+							type === AddressType.SHIPPING
+								? 'shipping_address'
+								: 'billing_address',
+							'address_1',
+						]}
 						rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
 					>
 						<Input
 							placeholder="Địa chỉ đường phố, căn hộ, Suite, Đơn vị, v.v."
 							className="rounded-none"
+							disabled={type === AddressType.BILLING && sameAsShipping}
 						/>
 					</Form.Item>
 				</Col>
 				<Col xs={24} md={12}>
 					<Form.Item
 						label="Khu vực"
-						name={['shipping_address', 'address_2']}
+						name={[
+							type === AddressType.SHIPPING
+								? 'shipping_address'
+								: 'billing_address',
+							'address_2',
+						]}
 						rules={[{ required: true, message: 'Vui lòng chọn khu vực' }]}
 					>
-						<Input placeholder="Chọn khu vực" />
+						<Input
+							placeholder="Chọn khu vực"
+							disabled={type === AddressType.BILLING && sameAsShipping}
+						/>
 					</Form.Item>
 				</Col>
 			</Row>
@@ -148,19 +199,36 @@ const AddressForm = ({
 				<Col xs={24} md={12}>
 					<Form.Item
 						label="Mã bưu điện"
-						name={['shipping_address', 'postal_code']}
+						name={[
+							type === AddressType.SHIPPING
+								? 'shipping_address'
+								: 'billing_address',
+							'postal_code',
+						]}
 						rules={[{ required: true, message: 'Vui lòng chọn mã bưu điện' }]}
 					>
-						<Input placeholder="Chọn mã bưu điện" className="rounded-none" />
+						<Input
+							placeholder="Chọn mã bưu điện"
+							className="rounded-none"
+							disabled={type === AddressType.BILLING && sameAsShipping}
+						/>
 					</Form.Item>
 				</Col>
 				<Col xs={24} md={12}>
 					<Form.Item
 						label="Quận/Huyện"
-						name={['shipping_address', 'city']}
+						name={[
+							type === AddressType.SHIPPING
+								? 'shipping_address'
+								: 'billing_address',
+							'city',
+						]}
 						rules={[{ required: true, message: 'Vui lòng chọn quận/huyện' }]}
 					>
-						<Input placeholder="Chọn quận/huyện" />
+						<Input
+							placeholder="Chọn quận/huyện"
+							disabled={type === AddressType.BILLING && sameAsShipping}
+						/>
 					</Form.Item>
 				</Col>
 			</Row>
@@ -169,21 +237,39 @@ const AddressForm = ({
 				<Col xs={24} md={12}>
 					<Form.Item
 						label="Tỉnh/Thành phố"
-						name={['shipping_address', 'province']}
+						name={[
+							type === AddressType.SHIPPING
+								? 'shipping_address'
+								: 'billing_address',
+							'province',
+						]}
 						rules={[
 							{ required: true, message: 'Vui lòng chọn tỉnh/thành phố' },
 						]}
 					>
-						<Input placeholder="Chọn tỉnh/thành phố" />
+						<Input
+							placeholder="Chọn tỉnh/thành phố"
+							disabled={type === AddressType.BILLING && sameAsShipping}
+						/>
 					</Form.Item>
 				</Col>
 				<Col xs={24} md={12}>
 					<Form.Item
 						label="Quốc gia"
-						name={['shipping_address', 'country_code']}
+						name={[
+							type === AddressType.SHIPPING
+								? 'shipping_address'
+								: 'billing_address',
+							'country_code',
+						]}
 						required
 					>
-						<Select options={countryOptions} placeholder="Chọn quốc gia" />
+						<Select
+							options={countryOptions}
+							labelInValue
+							placeholder="Chọn quốc gia"
+							disabled={type === AddressType.BILLING && sameAsShipping}
+						/>
 					</Form.Item>
 				</Col>
 			</Row>

@@ -120,6 +120,7 @@ export interface SupplierOrder {
 	total: number;
 	tax_total: number;
 	paid_total: number;
+	refunded_total: number;
 	no_notification?: boolean;
 	created_at: string;
 	updated_at: string;

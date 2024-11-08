@@ -81,49 +81,7 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 	);
 
 	const variantInventoryCell = (record: ProductVariant) => {
-		// const { getLocationNameById } = useStockLocations();
-		// const { variant, isLoading } = useAdminVariantsInventory(record.id);
-		// console.log('variant', variant)
-
-		// 	if (isLoading) {
-		// 		return <LoaderCircle className="animate-spin" />
-		// 	}
-		// 	if (!isLoading && !variant?.inventory?.length) {
-		// 		return <div className="">{record.inventory_quantity}</div>
-		// 	}
-
-		// 	const { inventory } = variant
-
-		// 	const total = inventory[0].location_levels.reduce(
-		// 		(sum: number, location_level: InventoryLevelDTO) =>
-		// 			(sum += location_level.stocked_quantity),
-		// 		0
-		// 	)
-
-		// const LocationTooltip = (
-		// 	<>
-		// 		{inventory[0].location_levels.map(
-		// 			(location_level: InventoryLevelDTO) => (
-		// 				<div key={location_level.id} className="font-normal">
-		// 					<span className="font-semibold">
-		// 						{location_level.stocked_quantity}
-		// 					</span>
-		// 						{`Tại ${location: getLocationNameById(location_level.location_id)}`}
-		// 				</div>
-		// 			)
-		// 		)}
-		// 	</>
-		// );
-
-		return (
-			<></>
-			// <Tooltip title={'LocationTooltip'}>
-			// 	<div className="">
-			// 		{total} in {inventory[0].location_levels.length}{" "}
-			// 		{_.pluralize("location", inventory[0].location_levels.length)}
-			// 	</div>
-			// </Tooltip>
-		);
+		return <></>;
 	};
 
 	const columns = productsColumns({ variantInventoryCell, currencyCode });

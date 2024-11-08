@@ -28,9 +28,9 @@ const DraftOrderModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 
 	const steps = [
 		{ title: '', content: <SelectRegion /> },
+		{ title: '', content: <ShippingDetails /> },
 		{ title: '', content: <Items /> },
 		{ title: '', content: <SelectShipping /> },
-		{ title: '', content: <ShippingDetails /> },
 		{ title: '', content: <Summary /> },
 	];
 

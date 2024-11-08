@@ -6,17 +6,21 @@ import { Option } from '@/types/products';
 import isNullishObject from '@/utils/is-nullish-object';
 import { isValidEmail } from '@/utils/is-valid-email';
 import mapAddressToForm from '@/utils/map-address-to-form';
+import { Customer } from '@medusajs/medusa';
 import { Form, Radio } from 'antd';
-import { LockIcon } from 'lucide-react';
+import { LockIcon, PlusIcon } from 'lucide-react';
 import { useAdminCustomer, useAdminCustomers } from 'medusa-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
+import CreateCustomerModal from '../create-customer-modal';
 import AddressForm, { AddressType } from './address-form';
 
 const ShippingDetails = () => {
 	const [addNew, setAddNew] = useState(false);
 	const { disableNext, enableNext } = useStepModal();
 	const [customerOptions, setCustomerOptions] = useState<Option[]>([]);
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+	const [sameAsShipping, setSameAsShipping] = useState(true);
 
 	const {
 		context: { validCountries },
@@ -130,26 +134,20 @@ const ShippingDetails = () => {
 	}, [shippingAddress, email, shippingAddressId, validAddresses, addNew]);
 
 	useEffect(() => {
-		if (customerId && !addNew && validAddresses.length > 0) {
-			// If there are existing addresses, select the first one by default
-			const firstAddress = validAddresses[0];
-			onSelectExistingAddress(firstAddress.id);
-		} else {
-			// Reset shipping address info when a different customer is selected
-			// or when "Create new" is clicked
-			form.setFieldValue('shipping_address', {
-				first_name: '',
-				last_name: '',
-				phone: '',
-				address_1: '',
-				address_2: '',
-				city: '',
-				country_code: null,
-				province: '',
-				postal_code: '',
-			});
-			form.setFieldValue('shipping_address_id', null);
-		}
+		// Reset shipping address info when a different customer is selected
+		// or when "Create new" is clicked
+		form.setFieldValue('shipping_address', {
+			first_name: '',
+			last_name: '',
+			phone: '',
+			address_1: '',
+			address_2: '',
+			city: '',
+			country_code: null,
+			province: '',
+			postal_code: '',
+		});
+		form.setFieldValue('shipping_address_id', null);
 		// eslint-disable-next-line
 	}, [customerId, addNew, validAddresses]);
 
@@ -157,18 +155,43 @@ const ShippingDetails = () => {
 		setAddNew(false);
 	}, [customerId]);
 
+	// Add this handler function
+	const handleCustomerCreated = (newCustomer: Customer) => {
+		setCustomerOptions((prev) => [
+			...prev,
+			{
+				label: `${newCustomer.first_name} ${newCustomer.last_name} (${newCustomer.email})`,
+				value: newCustomer.id,
+			},
+		]);
+
+		// Select the newly created customer
+		onCustomerSelect(newCustomer.id);
+	};
+
 	return (
 		<div className="flex min-h-[705px] flex-col gap-y-8">
 			<Form form={form} layout="vertical">
-				<Form.Item name={'customer_id'} label="Tìm khách hàng có sẵn">
-					<Select
-						showSearch
-						options={customerOptions}
-						onChange={(val) => onCustomerSelect(val)}
-						value={customerId || null}
-						placeholder="Tìm khách hàng có sẵn"
-					/>
-				</Form.Item>
+				<div className="flex gap-x-2 items-center">
+					<Form.Item
+						name={'customer_id'}
+						label="Tìm khách hàng có sẵn"
+						className="flex-1"
+					>
+						<Select
+							showSearch
+							options={customerOptions}
+							onChange={(val) => onCustomerSelect(val)}
+							value={customerId || null}
+							placeholder="Tìm khách hàng có sẵn"
+						/>
+					</Form.Item>
+					<div className="flex items-end">
+						<Button type="primary" onClick={() => setIsCreateModalOpen(true)}>
+							<PlusIcon size={20} />
+						</Button>
+					</div>
+				</div>
 
 				<Form.Item label="Email" name="email">
 					<Input
@@ -211,6 +234,14 @@ const ShippingDetails = () => {
 							countryOptions={validCountries}
 							type={AddressType.SHIPPING}
 						/>
+
+						{!sameAsShipping && (
+							<AddressForm
+								form={form}
+								countryOptions={validCountries}
+								type={AddressType.BILLING}
+							/>
+						)}
 					</div>
 				)}
 			</Form>
@@ -219,6 +250,16 @@ const ShippingDetails = () => {
 			<Form.Item name="shipping_address" hidden>
 				<Input type="hidden" />
 			</Form.Item>
+
+			<Form.Item name="billing_address" hidden>
+				<Input type="hidden" />
+			</Form.Item>
+
+			<CreateCustomerModal
+				visible={isCreateModalOpen}
+				onClose={() => setIsCreateModalOpen(false)}
+				onCustomerCreated={handleCustomerCreated}
+			/>
 		</div>
 	);
 };
