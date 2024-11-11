@@ -609,6 +609,7 @@ export const useBuildTimeline = (orderId: string) => {
 	return {
 		events,
 		refetch,
+		isLoading: isOrderLoading || isCartLoading || isOrderEditsLoading,
 	};
 };
 

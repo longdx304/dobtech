@@ -22,6 +22,7 @@ import { formatAmountWithSymbol } from '@/utils/prices';
 
 type EditCreatedProps = {
 	event: OrderEditEvent;
+	refetchOrder: () => void;
 };
 
 enum OrderEditItemChangeType {
@@ -43,7 +44,7 @@ const getInfo = (edit: OrderEdit): { type: string; user_id: string } => {
 	};
 };
 
-const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
+const EditCreated: React.FC<EditCreatedProps> = ({ event, refetchOrder }) => {
 	const { isModalVisible, showModal, setActiveOrderEditId } = useOrderEdit();
 
 	const orderEdit = event.edit;
@@ -88,6 +89,7 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 		await confirmOrderEdit.mutateAsync(undefined, {
 			onSuccess: () => {
 				message.success('Xác nhận chỉnh sửa đơn hàng thành công');
+				refetchOrder();
 			},
 			onError: (err) => {
 				message.error(getErrorMessage(err));

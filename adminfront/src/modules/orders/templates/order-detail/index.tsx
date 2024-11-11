@@ -18,7 +18,11 @@ interface Props {
 
 export default function OrderDetail({ id }: Readonly<Props>) {
 	const { order, isLoading, refetch } = useAdminOrder(id);
-	const { events, refetch: refetchTimeline } = useBuildTimeline(id);
+	const {
+		events,
+		refetch: refetchTimeline,
+		isLoading: isLoadingTimeline,
+	} = useBuildTimeline(id);
 
 	const refetchOrder = () => {
 		refetch();
@@ -42,13 +46,15 @@ export default function OrderDetail({ id }: Readonly<Props>) {
 				<CustomerInfo order={order} isLoading={isLoading} />
 			</Col>
 			<Col xs={24} lg={10}>
-				<Timeline
-					orderId={order?.id}
-					isLoading={isLoading}
-					events={events}
-					refetchOrder={refetch}
-					refetch={refetchTimeline}
-				/>
+				{order?.id && (
+					<Timeline
+						orderId={order.id}
+						isLoading={isLoading || isLoadingTimeline}
+						events={events}
+						refetchOrder={refetch}
+						refetch={refetchTimeline}
+					/>
+				)}
 			</Col>
 			{order && <OrderEditModalContainer order={order} />}
 		</Row>
