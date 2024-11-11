@@ -1,6 +1,10 @@
 import { Title } from '@/components/Typography';
 import { SteppedContext } from '@/lib/providers/stepped-modal-provider';
-import { displayAmount, extractOptionPrice } from '@/utils/prices';
+import {
+	displayAmount,
+	extractOptionPrice,
+	formatAmountWithSymbol,
+} from '@/utils/prices';
 import { Avatar, Button, Table } from 'antd';
 import {
 	useAdminGetDiscountByCode,
@@ -92,12 +96,16 @@ const Summary = () => {
 			align: 'right',
 		},
 		{
-			title: 'Giá (chưa thuế)',
+			title: 'Đơn giá',
 			dataIndex: 'unit_price',
 			key: 'unit_price',
 			align: 'right',
-			render: (price: any) =>
-				regionObj && displayAmount(regionObj.currency_code, price),
+			render: (price: any) => {
+				return formatAmountWithSymbol({
+					currency: regionObj?.currency_code as string,
+					amount: price,
+				});
+			},
 		},
 	];
 
@@ -113,96 +121,16 @@ const Summary = () => {
 
 	return (
 		<div className="min-h-[705px]">
-			<SummarySection title="Sản phẩm" editIndex={1}>
+			<SummarySection title="Sản phẩm" editIndex={2}>
 				<Table
 					dataSource={items}
 					columns={itemColumns as any}
 					pagination={false}
 					rowKey="id"
 				/>
-
-				{/* {!showAddDiscount && !discount?.rule && (
-					<div className="flex justify-end mt-4">
-						<Button
-							icon={<PlusOutlined />}
-							onClick={() => setShowAddDiscount(true)}
-						>
-							Thêm mã giảm giá
-						</Button>
-					</div>
-				)}
-
-				{showAddDiscount && !discount?.rule && (
-					<div className="mt-4">
-						<div className="flex items-center gap-2">
-							<Input
-								placeholder="SUMMER10"
-								value={code}
-								onChange={(e) => setCode(e.target.value)}
-								onFocus={() => setDiscError(undefined)}
-							/>
-							<Button
-								icon={<CloseOutlined />}
-								onClick={() => setShowAddDiscount(false)}
-							/>
-						</div>
-						<div className="flex justify-between items-center mt-4">
-							{discError && <span className="text-red-500">{discError}</span>}
-							<Button
-								icon={<PlusOutlined />}
-								loading={isFetching}
-								onClick={handleAddDiscount}
-							>
-								Thêm mã giảm giá
-							</Button>
-						</div>
-					</div>
-				)} */}
-
-				{/* {discount && regionObj && (
-					<Card className="mt-4">
-						<div className="flex justify-between items-center mb-4">
-							<span>
-								Giảm giá
-								<span className="text-gray-500 ml-1">
-									(Mã: {discount.code})
-								</span>
-							</span>
-							<CloseOutlined
-								onClick={onDiscountRemove}
-								className="cursor-pointer"
-							/>
-						</div>
-						<div className="flex">
-							<div className="border-r pr-6">
-								<span className="text-gray-500">Loại</span>
-								<span>
-									{discount.rule.type === 'fixed'
-										? 'Cố định'
-										: discount.rule.type === 'percentage'
-										? 'Phần trăm'
-										: 'Miễn phí vận chuyển'}
-								</span>
-							</div>
-							{discount.rule.type !== 'free_shipping' && (
-								<div className="pl-6">
-									<span className="text-gray-500">Giá trị</span>
-									<span>
-										{discount.rule.type === 'fixed'
-											? `${displayAmount(
-													regionObj.currency_code,
-													discount.rule.value
-											  )} ${regionObj.currency_code.toUpperCase()}`
-											: `${discount.rule.value}%`}
-									</span>
-								</div>
-							)}
-						</div>
-					</Card>
-				)} */}
 			</SummarySection>
 
-			<SummarySection title="Khách hàng" editIndex={3}>
+			<SummarySection title="Khách hàng" editIndex={1}>
 				<div className="flex items-center">
 					<Avatar className="mr-3" style={{ backgroundColor: '#87d068' }}>
 						{shipping?.first_name?.[0] || email?.[0]?.toUpperCase()}
@@ -212,7 +140,7 @@ const Summary = () => {
 			</SummarySection>
 
 			{selectedShippingOption && (
-				<SummarySection title="Chi tiết vận chuyển" editIndex={2}>
+				<SummarySection title="Chi tiết vận chuyển" editIndex={3}>
 					<div className="grid grid-cols-2 gap-6">
 						{shipping && (
 							<div className="border-r pr-6">
@@ -227,7 +155,7 @@ const Summary = () => {
 							<div>
 								<div className="text-gray-500">Phương thức vận chuyển</div>
 								<div>
-									{selectedShippingOption.name} -
+									{selectedShippingOption.name} - {''}
 									{customShippingPrice && regionObj ? (
 										<span>
 											<span className="text-gray-400 line-through mr-2">
@@ -253,7 +181,7 @@ const Summary = () => {
 			)}
 
 			{billing && (
-				<SummarySection title="Chi tiết thanh toán" editIndex={3}>
+				<SummarySection title="Chi tiết thanh toán" editIndex={1}>
 					<div className="text-gray-500">Địa chỉ</div>
 					<div>
 						{billing.address_1}, {billing.address_2}

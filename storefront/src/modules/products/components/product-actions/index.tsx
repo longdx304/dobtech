@@ -131,7 +131,7 @@ export default function ProductActions({
 									onChange={handleInputChange as any}
 								/>
 
-								<span>{`${inventoryQuantity ?? 0} sản phẩm có sẵn`}</span>
+								{/* <span>{`${inventoryQuantity ?? 0} sản phẩm có sẵn`}</span> */}
 							</div>
 							<Divider />
 						</div>

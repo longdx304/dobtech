@@ -39,7 +39,7 @@ const Items = () => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const {
-		context: { region, setItems, items },
+		context: { region, setItems },
 		form,
 	} = useNewDraftOrderForm();
 	const { enableNext, disableNext } = useStepModal();
@@ -48,6 +48,8 @@ const Items = () => {
 		q: searchValue,
 		limit: PAGE_SIZE,
 		offset: (currentPage - 1) * PAGE_SIZE,
+		region_id: region?.id,
+		customer_id: form.getFieldValue('customer_id'),
 	});
 
 	const { variants: newVariants = [] } = useAdminVariants({
@@ -57,7 +59,7 @@ const Items = () => {
 
 	// Get priced variant by id
 	const getPricedVariant = (variantId: string) => {
-		return newVariants?.find((variant) => variant.id === variantId);
+		return variants?.find((v) => v.id === variantId);
 	};
 
 	const handleRowSelectionChange = (
@@ -160,17 +162,26 @@ const Items = () => {
 	// Get default price for a variant
 	const getDefaultPrice = (variantId: string) => {
 		const variant = variants?.find((v) => v.id === variantId);
-		const defaultPrice = variant?.prices?.[0];
 
-		return defaultPrice
-			? {
-					amount: defaultPrice.amount,
-					currency_code: defaultPrice.currency_code,
-			  }
-			: {
-					amount: 0,
-					currency_code: region?.currency_code || 'vnd',
-			  };
+		if (!variant) {
+			return {
+				amount: 0,
+				currency_code: region?.currency_code || 'vnd',
+			};
+		}
+
+		// If calculated_price_type is override or sale, use calculated_price
+		// Otherwise use original_price
+		const priceAmount =
+			variant.calculated_price_type === 'override' ||
+			variant.calculated_price_type === 'sale'
+				? variant.calculated_price
+				: variant.original_price;
+
+		return {
+			amount: priceAmount ?? 0,
+			currency_code: region?.currency_code || 'vnd',
+		};
 	};
 
 	// Get price for a variant (custom or default)
@@ -245,6 +256,12 @@ const Items = () => {
 			selectedVariantIds.includes(variantId),
 	});
 
+	const handleDisable = (record: any) => {
+		if (record?.inventory_quantity || record?.original_price_incl_tax) {
+			return false;
+		}
+		return true;
+	};
 	return (
 		<>
 			<Flex
@@ -265,6 +282,9 @@ const Items = () => {
 					selectedRowKeys: selectedVariantIds,
 					onChange: handleRowSelectionChange as any,
 					preserveSelectedRowKeys: true,
+					getCheckboxProps: (record: any) => ({
+						disabled: handleDisable(record),
+					}),
 				}}
 				loading={isLoading}
 				columns={columns as any}
