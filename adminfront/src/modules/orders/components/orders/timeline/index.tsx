@@ -45,7 +45,7 @@ import Paid from './timeline-events/paid';
 import ChangedPrice from './timeline-events/order-edit/changed-price';
 
 type Props = {
-	orderId: Order['id'] | undefined;
+	orderId: Order['id'];
 	isLoading: boolean;
 	refetchOrder: () => void;
 	events: TimelineEvent[] | undefined;
@@ -64,9 +64,15 @@ const Timeline = ({
 	const [showRequestReturn, setShowRequestReturn] = useState<boolean>(false);
 	const [showCreateSwap, setShowCreateSwap] = useState<boolean>(false);
 	const [showRegisterClaim, setShowRegisterClaim] = useState<boolean>(false);
-	const { order, isLoading: isOrderLoading } = useAdminOrder(orderId!, {
-		expand: orderRelations,
-	});
+	const { order, isLoading: isOrderLoading } = useAdminOrder(
+		orderId,
+		{
+			expand: orderRelations,
+		},
+		{
+			enabled: showRequestReturn || showCreateSwap || showRegisterClaim,
+		}
+	);
 
 	const actions = [
 		{
@@ -195,7 +201,12 @@ function switchOnType(
 		case 'paid':
 			return <Paid event={event as PaidEvent} />;
 		case 'edit-created':
-			return <EditCreated event={event as OrderEditEvent} />;
+			return (
+				<EditCreated
+					event={event as OrderEditEvent}
+					refetchOrder={refetchOrder}
+				/>
+			);
 		case 'edit-canceled':
 			return <EditCanceled event={event as OrderEditEvent} />;
 		case 'edit-declined':

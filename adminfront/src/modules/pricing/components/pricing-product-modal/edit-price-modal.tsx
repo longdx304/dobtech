@@ -43,7 +43,9 @@ const EditPriceModal: FC<Props> = ({
 				products?.map((product: Product) => {
 					const variants = product.variants.map((variant: any) => {
 						const pricesPayload: Partial<MoneyAmount>[] = [];
-						const priceKeys = Object.keys(variant?.pricesFormatEdit);
+						const priceKeys = Object.keys(variant?.pricesFormatEdit).filter(
+							(key) => !key.includes('_id')
+						);
 						priceKeys.forEach((priceKey) => {
 							if (variant.pricesFormatEdit[priceKey]) {
 								pricesPayload.push({
