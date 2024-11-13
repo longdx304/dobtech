@@ -44,7 +44,7 @@ const TransferOrdersModal: FC<TransferOrdersModalProps> = ({
 	});
 	const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
 
-	const updateOrder = useAdminUpdateOrder(order.id);
+	const updateOrder = useAdminUpdateOrder(order?.id!);
 
 	const { customer, isLoading: isLoadingCustomer } = useAdminCustomer(
 		selectedCustomer ?? ''

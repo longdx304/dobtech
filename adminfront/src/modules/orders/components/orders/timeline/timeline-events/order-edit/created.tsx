@@ -19,6 +19,7 @@ import EventContainer from '../event-container';
 import { ByLine } from '.';
 import { useOrderEdit } from '@/modules/orders/components/orders/edit-order-modal/context';
 import { formatAmountWithSymbol } from '@/utils/prices';
+import { Tooltip } from '@/components/Tooltip';
 
 type EditCreatedProps = {
 	event: OrderEditEvent;
@@ -292,6 +293,9 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 	quantity = Math.abs(quantity);
 
 	const lineItem = isAdd ? change.line_item : change.original_line_item;
+	const tooltipContent = `${lineItem?.title} - ${lineItem?.variant?.title} (${
+		lineItem?.variant?.sku || ''
+	})`;
 
 	return (
 		<div className="gap-x-4 flex items-center justify-between">
@@ -304,20 +308,24 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 						<PlaceholderImage />
 					)}
 				</div>
-				<div className="flex flex-col">
-					<span className="font-medium text-gray-900">
-						{!isUpdated && quantity > 1 && <>{`${quantity} x `}</>}{' '}
-						{lineItem?.title} &nbsp;
-						{lineItem?.variant?.sku && (
-							<span className="text-xs">{lineItem?.variant?.sku}</span>
-						)}
-					</span>
-					<span className="font-normal text-gray-500 flex">
-						{`${lineItem?.variant.title}${
-							lineItem?.variant.sku ? ` (${lineItem.variant.sku})` : ''
-						}`}
-					</span>
-				</div>
+				<Tooltip title={tooltipContent}>
+					<div className="flex flex-col max-w-[185px]">
+						<span className="font-medium text-gray-900 truncate">
+							{!isUpdated && quantity > 1 && <>{`${quantity} x `}</>}{' '}
+							{lineItem?.title} &nbsp;
+							{lineItem?.variant?.sku && (
+								<span className="text-xs truncate">
+									{lineItem?.variant?.sku}
+								</span>
+							)}
+						</span>
+						<span className="font-normal text-gray-500 flex truncate max-w-[185px]">
+							{`${lineItem?.variant.title}${
+								lineItem?.variant.sku ? ` (${lineItem.variant.sku})` : ''
+							}`}
+						</span>
+					</div>
+				</Tooltip>
 			</div>
 			{isUpdated && (
 				<div className="flex flex-col">

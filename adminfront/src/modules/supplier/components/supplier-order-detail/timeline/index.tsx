@@ -39,7 +39,7 @@ import Refund from './timeline-events/refund';
 import Paid from './timeline-events/paid';
 
 type Props = {
-	orderId: SupplierOrder['id'] | undefined;
+	orderId: SupplierOrder['id'];
 	isLoading: boolean;
 	refetchOrder: () => void;
 	events: TimelineEvent[] | undefined;
@@ -51,7 +51,7 @@ const Timeline = ({ orderId, isLoading, events }: Props) => {
 	const [inputValue, setInputValue] = useState<string>('');
 
 	const { data: order, isLoading: isOrderLoading } = useAdminSupplierOrder(
-		orderId!
+		orderId,
 	);
 
 	if (!events?.length) {
