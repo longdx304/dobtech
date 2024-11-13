@@ -4,6 +4,7 @@ import { ReservationItemDTO } from '@medusajs/types';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import Image from 'next/image';
+import { Tooltip } from '@/components/Tooltip';
 
 type OrderLineProps = {
 	item: LineItem;
@@ -15,6 +16,9 @@ type OrderLineProps = {
 };
 
 const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
+	const tooltipContent = `${item?.title} - ${item?.variant?.title} (${
+		item?.variant?.sku || ''
+	})`;
 	return (
 		<div className="hover:bg-gray-50 rounded-md mx-[-5px] mb-1 flex h-[64px] justify-between px-[5px] cursor-pointer">
 			<div className="flex justify-center items-center space-x-4">
@@ -31,18 +35,20 @@ const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
 						<PlaceholderImage />
 					)}
 				</div>
-				<div className="flex max-w-[185px] flex-col justify-center text-[12px]">
-					<span className="font-normal text-gray-900 truncate">
-						{item.title}
-					</span>
-					{item?.variant && (
-						<span className="font-normal text-gray-500 truncate">
-							{`${item.variant.title}${
-								item.variant.sku ? ` (${item.variant.sku})` : ''
-							}`}
+				<Tooltip title={tooltipContent}>
+					<div className="flex max-w-[185px] flex-col justify-center text-[12px]">
+						<span className="font-normal text-gray-900 truncate">
+							{item.title}
 						</span>
-					)}
-				</div>
+						{item?.variant && (
+							<span className="font-normal text-gray-500 truncate">
+								{`${item.variant.title}${
+									item.variant.sku ? ` (${item.variant.sku})` : ''
+								}`}
+							</span>
+						)}
+					</div>
+				</Tooltip>
 			</div>
 			<div className="flex items-center">
 				<div className="space-x-2 lg:space-x-4 2xl:space-x-6 mr-1 flex text-[12px]">
