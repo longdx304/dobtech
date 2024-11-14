@@ -10,18 +10,18 @@ import {
 	OrderEditRequestedEvent,
 	OrderPlacedEvent,
 	PaymentRequiredEvent,
-	TimelineEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
 import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
 import {
 	NoteEvent,
 	PaidEvent,
 	RefundEvent,
+	TimelineEvent,
 } from '@/modules/supplier/hooks/use-build-timeline';
-import { SupplierOrder } from '@/types/supplier';
+import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
 import { Region } from '@medusajs/medusa';
-import { Empty, message } from 'antd';
-import { SendHorizontal } from 'lucide-react';
+import { Empty, MenuProps, message } from 'antd';
+import { PackageCheck, PackageX, SendHorizontal } from 'lucide-react';
 import { useAdminCreateNote } from 'medusa-react';
 import { ChangeEvent, useState } from 'react';
 import ItemsShipped from './timeline-events/items-shipped';
@@ -37,6 +37,9 @@ import EditRequested from './timeline-events/order-edit/requested';
 import OrderPlaced from './timeline-events/order-placed';
 import Refund from './timeline-events/refund';
 import Paid from './timeline-events/paid';
+import { ActionAbles } from '@/components/Dropdown';
+import { useMarkAsFulfilledMutation } from '@/lib/hooks/api/supplier-order';
+import Fulfillment from './timeline-events/fulfillment';
 
 type Props = {
 	orderId: SupplierOrder['id'];
@@ -49,10 +52,10 @@ type Props = {
 const Timeline = ({ orderId, isLoading, events }: Props) => {
 	const createNote = useAdminCreateNote();
 	const [inputValue, setInputValue] = useState<string>('');
+	const changeSttFulfilled = useMarkAsFulfilledMutation(orderId);
 
-	const { data: order, isLoading: isOrderLoading } = useAdminSupplierOrder(
-		orderId,
-	);
+	const { data: order, isLoading: isOrderLoading } =
+		useAdminSupplierOrder(orderId);
 
 	if (!events?.length) {
 		return (
@@ -88,6 +91,52 @@ const Timeline = ({ orderId, isLoading, events }: Props) => {
 		setInputValue('');
 	};
 
+	const handleMarkAsFulfilled = () => {
+		changeSttFulfilled.mutateAsync(
+			{
+				status: FulfillSupplierOrderStt.DELIVERED,
+			},
+			{
+				onSuccess: () => {
+					message.success('Đã đánh dấu nhận hàng thành công');
+				},
+				onError: (error: any) => {
+					message.error(getErrorMessage(error));
+				},
+			}
+		);
+	};
+	const handleCancelAsFulfilled = () => {
+		changeSttFulfilled.mutateAsync(
+			{
+				status: FulfillSupplierOrderStt.REJECTED,
+			},
+			{
+				onSuccess: () => {
+					message.success('Đã đánh dấu huỷ nhận hàng thành công');
+				},
+				onError: (error: any) => {
+					message.error(getErrorMessage(error));
+				},
+			}
+		);
+	};
+
+	const actions: MenuProps['items'] = [
+		{
+			key: 'mark_as_fulfilled',
+			label: 'Đánh dấu đã nhận hàng',
+			icon: <PackageCheck size={18} />,
+			onClick: handleMarkAsFulfilled,
+		},
+		{
+			key: 'cancel_as_fulfilled',
+			label: 'Đánh dấu huỷ nhận hàng',
+			icon: <PackageX size={18} />,
+			danger: true,
+			onClick: handleCancelAsFulfilled,
+		},
+	];
 	return (
 		<Card
 			loading={isLoading || isOrderLoading}
@@ -97,7 +146,7 @@ const Timeline = ({ orderId, isLoading, events }: Props) => {
 				<Flex align="center" justify="space-between" className="pb-4">
 					<Title level={4}>{`Dòng thời gian`}</Title>
 					<div className="flex justify-end items-center gap-4">
-						{/* <ActionAbles actions={actions} /> */}
+						<ActionAbles actions={actions} />
 					</div>
 				</Flex>
 				<Flex
@@ -159,6 +208,10 @@ function switchOnType(event: TimelineEvent, region: Region | undefined) {
 			return <ChangedPrice event={event as any} region={region} />;
 		case 'paid':
 			return <Paid event={event as PaidEvent} />;
+		case 'fulfillment-delivered':
+		case 'fulfillment-inventoried':
+		case 'fulfillment-rejected':
+			return <Fulfillment event={event as TimelineEvent} />;
 		default:
 			return null;
 	}

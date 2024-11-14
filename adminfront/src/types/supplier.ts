@@ -125,6 +125,10 @@ export interface SupplierOrder {
 	created_at: string;
 	updated_at: string;
 	canceled_at?: string | null;
+	fullfillment_status?: FulfillSupplierOrderStt;
+	delivered_at?: string;
+	inventoried_at?: string;
+	rejected_at?: string;
 }
 
 export interface SupplierOrderEdit extends OrderEdit {
@@ -134,3 +138,15 @@ export interface SupplierOrderEdit extends OrderEdit {
 export interface SupplierOrderDocumentRes {
 	documents: string | string[];
 }
+
+
+export enum FulfillSupplierOrderStt {
+	DELIVERED = 'delivered',
+	INVENTORIED = 'inventoried',
+	REJECTED = 'rejected',
+}
+
+export type MarkAsFulfilledReq = {
+	status: FulfillSupplierOrderStt;
+};
+export type MarkAsFulfilledRes = any;
