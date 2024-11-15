@@ -17,6 +17,8 @@ export enum ERoutes {
 	SUPPLIERS = '/admin/suppliers',
 	GIFT_CARDS = '/admin/gift-cards',
 	CURRENCIES = '/admin/currencies',
+	WAREHOUSE_STOCKED = '/admin/warehouse/stocked',
+	WAREHOUSE_RETRIEVED = '/admin/warehouse/retrieved',
 }
 
 export interface TRouteConfig {

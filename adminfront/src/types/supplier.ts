@@ -110,7 +110,7 @@ export interface SupplierOrder {
 	status: string;
 	payment_status: string;
 	payments?: Payment[];
-	fulfillment_status: string;
+	fulfillment_status: FulfillSupplierOrderStt;
 	estimated_production_time: string;
 	settlement_time: string;
 	items: LineItem[];
@@ -125,7 +125,6 @@ export interface SupplierOrder {
 	created_at: string;
 	updated_at: string;
 	canceled_at?: string | null;
-	fullfillment_status?: FulfillSupplierOrderStt;
 	delivered_at?: string;
 	inventoried_at?: string;
 	rejected_at?: string;
