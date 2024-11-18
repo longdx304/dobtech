@@ -68,7 +68,7 @@ export interface SupplierOrders {
 	cart_id: string;
 	status: string;
 	payment_status: string;
-	fulfillment_status: string;
+	fulfillment_status: FulfillSupplierOrderStt;
 	estimated_production_time: string;
 	settlement_time: string;
 	tax_rate: number;
