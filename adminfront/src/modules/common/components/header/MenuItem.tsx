@@ -2,6 +2,7 @@ import type { MenuProps } from 'antd';
 import { Flex } from 'antd';
 import {
 	BadgeDollarSign,
+	Boxes,
 	CalendarRange,
 	CircleDollarSign,
 	ClipboardPenLine,
@@ -78,6 +79,7 @@ const itemsAdmin: MenuProps['items'] = [
 	getItem('Giảm giá', 'discounts', <SquarePercent />),
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
+		getItem('Đơn vị hàng', 'item-unit', <Boxes />),
 		getItem('Tiền tệ', 'currencies', <BadgeDollarSign />),
 		getItem('Lý do trả hàng', 'return-reasons', <Undo2 />),
 	]),
@@ -169,4 +171,5 @@ export const menuRoutes: Record<string, string> = {
 	currencies: ERoutes.CURRENCIES,
 	'warehouse-inbound': ERoutes.WAREHOUSE_INBOUND,
 	'warehouse-outbound': ERoutes.WAREHOUSE_OUTBOUND,
+	'item-unit': ERoutes.ITEM_UNIT,
 };
