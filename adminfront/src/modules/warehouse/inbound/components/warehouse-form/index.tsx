@@ -27,6 +27,7 @@ type ValueType =
 const WarehouseForm = ({ warehouse, variantId }: WarehouseFormProps) => {
 	const [searchValue, setSearchValue] = useState<string | null>(null);
 
+	const fetching = true;
 	// Debounce fetcher
 	const debounceFetcher = debounce((value: string) => {
 		setSearchValue(value);
@@ -148,7 +149,8 @@ const WarehouseItem = ({ item }: { item: any }) => {
 				<Button
 					className="w-[24px] h-[24px] rounded-full"
 					color="primary"
-					variant="outlined"
+					// variant="outlined"
+					type="default"
 					icon={<Plus size={16} />}
 				/>
 			</Popconfirm>
