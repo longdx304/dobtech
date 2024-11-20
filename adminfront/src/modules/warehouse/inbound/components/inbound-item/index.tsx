@@ -4,6 +4,7 @@ import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
+import dayjs from 'dayjs';
 import { Check, Clock } from 'lucide-react';
 
 type InboundItemProps = {
@@ -36,6 +37,12 @@ const InboundItem: React.FC<InboundItemProps> = ({
 			<Flex gap={4} className="py-2" align="center">
 				<Text className="text-[14px] text-gray-500">Mã đơn hàng:</Text>
 				<Text className="text-lg font-semibold">{`#${item.display_id}`}</Text>
+			</Flex>
+			<Flex gap={4} className="py-2" align="center">
+				<Text className="text-[14px] text-gray-500">Ngày nhập hàng:</Text>
+				<Text className="text-lg font-semibold">
+					{dayjs(item.created_at).format('DD/MM/YYYY')}
+				</Text>
 			</Flex>
 			<Button className="w-full" onClick={handleClick}>
 				{isProcessing ? 'Nhập hàng' : 'Chi tiết'}

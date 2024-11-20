@@ -13,7 +13,7 @@ export const adminWarehouseKeys = queryKeysFactory(ADMIN_WAREHOUSE);
 
 type WarehouseQueryKey = typeof adminWarehouseKeys;
 
-export const useAdminItemUnits = (
+export const useAdminWarehouses = (
 	/**
 	 * Filters and pagination configurations to apply on retrieved currencies.
 	 */
@@ -33,7 +33,7 @@ export const useAdminItemUnits = (
 	return { ...data, ...rest } as const;
 };
 
-export const useAdminItemUnit = (id: string) => {
+export const useAdminWarehouse = (id: string) => {
 	const { client } = useMedusa();
 	const { data, ...rest } = useQuery(
 		adminWarehouseKeys.detail(id),

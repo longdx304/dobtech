@@ -4,11 +4,13 @@ import { Text } from '@/components/Typography';
 import LayeredModal, {
 	LayeredModalContext,
 } from '@/lib/providers/layer-modal-provider';
+import { SupplierOrder } from '@/types/supplier';
 import { LineItem } from '@medusajs/medusa';
 import { useContext } from 'react';
 import WarehouseForm from '../warehouse-form';
 
 type Props = {
+	currentSupplierOrder: SupplierOrder | undefined;
 	open: boolean;
 	onClose: () => void;
 	variantId: string;
@@ -83,6 +85,7 @@ const data = {
 	},
 	subtotal: 10000,
 };
+
 const warehouse = [
 	{
 		id: 1,
@@ -105,8 +108,13 @@ const warehouse = [
 		},
 	},
 ];
-const InboundModal = ({ open, onClose, variantId }: Props) => {
-	console.log('variantId:', variantId);
+const InboundModal = ({
+	currentSupplierOrder,
+	open,
+	onClose,
+	variantId,
+}: Props) => {
+	console.log('currentSupplierOrder:', currentSupplierOrder);
 	const layeredModalContext = useContext(LayeredModalContext);
 
 	return (

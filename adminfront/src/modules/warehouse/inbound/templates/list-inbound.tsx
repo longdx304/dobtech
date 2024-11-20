@@ -4,74 +4,19 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import List from '@/components/List';
-import { Title, Text } from '@/components/Typography';
-import { Search } from 'lucide-react';
-import { ChangeEvent, FC, useState } from 'react';
-import inBoundColumn from './inbound-columns';
-import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
-import InboundItem from '../components/inbound-item';
-import debounce from 'lodash/debounce';
 import { Tabs } from '@/components/Tabs';
-import { TabsProps } from 'antd';
-import { useRouter } from 'next/navigation';
+import { Text, Title } from '@/components/Typography';
+import { useAdminProductInbounds } from '@/lib/hooks/api/product-inbound/queries';
 import { ERoutes } from '@/types/routes';
+import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
+import { TabsProps } from 'antd';
+import debounce from 'lodash/debounce';
+import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, FC, useState } from 'react';
+import InboundItem from '../components/inbound-item';
 
 type Props = {};
-
-const data = [
-	{
-		id: 'so_01JCMNRC7GZWXVKRZDE3C64T05',
-		created_at: '2024-11-14T06:28:43.874Z',
-		updated_at: '2024-11-14T06:28:43.874Z',
-		display_id: 1,
-		supplier_id: 'supplier_01JCMNQHEMC9M93NT2NPBJ8GT6',
-		user_id: 'usr_01JBB4EAXMYP7PCYJAKD8T4XQB',
-		cart_id: 'cart_01JCMNR8NR3B7XC446PTBG6C96',
-		status: 'pending',
-		fulfillment_status: 'delivered',
-		payment_status: 'awaiting',
-		estimated_production_time: '2024-11-21T06:28:40.879Z',
-		settlement_time: '2024-11-21T06:28:40.878Z',
-		canceled_at: null,
-		region_id: 'reg_01JBB4ED399MGK8RKHF09PYHE8',
-		currency_code: 'vnd',
-		tax_rate: 0,
-		metadata: {},
-		no_notification: false,
-		subtotal: 30000,
-		refunded_total: 0,
-		paid_total: 33000,
-		refundable_amount: 33000,
-		tax_total: 0,
-		total: 30000,
-	},
-	{
-		id: 'so_01JCMNRC7GZWXVKRZDE3C64T05',
-		created_at: '2024-11-14T06:28:43.874Z',
-		updated_at: '2024-11-14T06:28:43.874Z',
-		display_id: 2,
-		supplier_id: 'supplier_01JCMNQHEMC9M93NT2NPBJ8GT8',
-		user_id: 'usr_01JBB4EAXMYP7PCYJAKD8T4XQB',
-		cart_id: 'cart_01JCMNR8NR3B7XC446PTBG6C96',
-		status: 'pending',
-		fulfillment_status: 'inventoried',
-		payment_status: 'awaiting',
-		estimated_production_time: '2024-11-21T06:28:40.879Z',
-		settlement_time: '2024-11-21T06:28:40.878Z',
-		canceled_at: null,
-		region_id: 'reg_01JBB4ED399MGK8RKHF09PYHE8',
-		currency_code: 'vnd',
-		tax_rate: 0,
-		metadata: {},
-		no_notification: false,
-		subtotal: 30000,
-		refunded_total: 0,
-		paid_total: 33000,
-		refundable_amount: 33000,
-		tax_total: 0,
-		total: 30000,
-	},
-];
 
 const DEFAULT_PAGE_SIZE = 10;
 const ListInbound: FC<Props> = ({}) => {
@@ -82,6 +27,13 @@ const ListInbound: FC<Props> = ({}) => {
 	const [activeKey, setActiveKey] = useState<FulfillSupplierOrderStt>(
 		FulfillSupplierOrderStt.DELIVERED
 	);
+
+	const { supplierOrder } = useAdminProductInbounds({
+		q: searchValue || undefined,
+		offset,
+		limit: DEFAULT_PAGE_SIZE,
+		status: activeKey,
+	});
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -139,7 +91,7 @@ const ListInbound: FC<Props> = ({}) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, lg: 3 }}
-					dataSource={data}
+					dataSource={supplierOrder}
 					renderItem={(item: SupplierOrder) => (
 						<List.Item>
 							<InboundItem item={item} handleClickDetail={handleClickDetail} />
