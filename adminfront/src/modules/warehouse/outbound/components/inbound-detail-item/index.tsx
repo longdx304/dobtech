@@ -16,6 +16,7 @@ const InboundDetailItem: React.FC<InboundItemProps> = ({
 	item,
 	handleClickDetail,
 }) => {
+	console.log('item:', item);
 	const isProcessing = item.quantity > (item?.fulfilled_quantity ?? 0);
 
 	const handleClick = () => {
