@@ -1,5 +1,6 @@
 import {
 	AdminPostWarehouseReq,
+	AdminPostWarehouseVariantIdReq,
 	AdminWarehouseDeleteRes,
 	AdminWarehouseRes,
 } from '@/types/warehouse';
@@ -26,6 +27,23 @@ export const useAdminCreateWarehouse = (
 	return useMutation(
 		(payload: AdminPostWarehouseReq) =>
 			client.admin.custom.post(`/admin/warehouse`, payload),
+		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
+	);
+};
+
+export const useAdminCreateWarehouseVariantId = (
+	options?: UseMutationOptions<
+		Response<AdminWarehouseRes>,
+		Error,
+		AdminPostWarehouseReq
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminPostWarehouseVariantIdReq) =>
+			client.admin.custom.post(`/admin/warehouse/variant`, payload),
 		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
 	);
 };

@@ -2,12 +2,15 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
+import { useProductUnit } from '@/lib/providers/product-unit-provider';
 
 type Props = {
 	type: 'INBOUND' | 'OUTBOUND';
 };
 
 const VariantInventoryForm = ({ type }: Props) => {
+	const { item_units, optionItemUnits, defaultUnit } = useProductUnit();
+
 	return (
 		<Flex gap="small" vertical>
 			<Flex vertical align="flex-start">
@@ -16,7 +19,11 @@ const VariantInventoryForm = ({ type }: Props) => {
 			</Flex>
 			<Flex vertical align="flex-start">
 				<Text className="text-[14px] text-gray-500">Loại hàng:</Text>
-				<Select className="w-full" options={[]} />
+				<Select
+					className="w-full"
+					options={optionItemUnits}
+					defaultValue={defaultUnit}
+				/>
 			</Flex>
 			<Flex vertical align="flex-start">
 				<Text className="text-[14px] text-gray-500">Số lượng nhập:</Text>

@@ -8,6 +8,12 @@ export interface AdminPostWarehouseReq {
 	location: string;
 	capacity?: number;
 }
+export interface AdminPostWarehouseVariantIdReq {
+	warehouse_id?: string;
+	location: string;
+	variantId: string;
+	capacity?: number;
+}
 
 export type AdminWarehouseRes = {
 	warehouse: Warehouse;

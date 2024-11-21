@@ -10,6 +10,8 @@ import { LoaderCircle, Minus, Plus } from 'lucide-react';
 import { useContext, useMemo, useState } from 'react';
 import VariantInventoryForm from '../variant-inventory-form';
 import debounce from 'lodash/debounce';
+import { useAdminWarehouses } from '@/lib/hooks/api/warehouse';
+import { Warehouse } from '@/types/warehouse';
 
 type WarehouseFormProps = {
 	warehouse: any;
@@ -25,13 +27,23 @@ type ValueType =
 	| [];
 
 const WarehouseForm = ({ warehouse, variantId }: WarehouseFormProps) => {
+	const { warehouses, isLoading } = useAdminWarehouses();
+	console.log('warehouses:', warehouses);
 	const [searchValue, setSearchValue] = useState<string | null>(null);
 
-	const fetching = true;
+	const fetching = false;
 	// Debounce fetcher
 	const debounceFetcher = debounce((value: string) => {
 		setSearchValue(value);
 	}, 300);
+	// Format options warehouse
+	const optionWarehouses = useMemo(() => {
+		if (!warehouses) return [];
+		return warehouses.map((warehouse: Warehouse) => ({
+			label: warehouse.location,
+			value: warehouse.id,
+		}));
+	}, [warehouses]);
 
 	const options: ValueType = useMemo(() => {
 		return [];
@@ -67,14 +79,21 @@ const WarehouseForm = ({ warehouse, variantId }: WarehouseFormProps) => {
 					<Select
 						className="flex-grow"
 						placeholder="Chọn vị trí"
-						options={[]}
+						options={optionWarehouses}
 						labelInValue
 						filterOption={false}
 						onSearch={debounceFetcher}
+						showSearch
 						notFoundContent={
-							fetching ? (
-								<LoaderCircle className="animate-spin" size="small" />
-							) : null
+							isLoading ? (
+								<LoaderCircle
+									className="animate-spin w-full flex justify-center"
+									size={18}
+									strokeWidth={3}
+								/>
+							) : (
+								'Không tìm thấy vị trí, Xác nhận để thêm mới vị trí này'
+							)
 						}
 					/>
 					<Button className="w-fit h-[10]">Thêm</Button>
@@ -88,7 +107,6 @@ export default WarehouseForm;
 
 const WarehouseItem = ({ item }: { item: any }) => {
 	const layeredModalContext = useContext(LayeredModalContext);
-
 	const [unit, setUnit] = useState();
 	const [unitQuantity, setUnitQuantiy] = useState<number>(0);
 	const quantity = `${item.quantity / item.unit.quantity} ${item.unit.unit}`;

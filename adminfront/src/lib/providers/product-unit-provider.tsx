@@ -1,11 +1,7 @@
 'use client';
-import React, {
-	PropsWithChildren,
-	useContext,
-	useEffect,
-	useState,
-} from 'react';
-import { useAdminGetSession, useAdminStore } from 'medusa-react';
+import React, { PropsWithChildren, useContext, useMemo } from 'react';
+import { useAdminItemUnits } from '../hooks/api/item-unit';
+import { ItemUnit } from '@/types/item-unit';
 
 export enum ProductUnit {
 	PRODUCT_CATEGORIES = 'product_categories',
@@ -13,55 +9,34 @@ export enum ProductUnit {
 }
 
 const defaultProductUnitContext: {
-	featureToggleList: Record<string, boolean>;
-	isFeatureEnabled: (flag: string) => boolean;
+	item_units: ItemUnit[];
+	optionItemUnits?: { value: string; label: string }[];
+	defaultUnit: string;
 } = {
-	featureToggleList: {},
-	isFeatureEnabled: function (flag): boolean {
-		return !!this?.featureToggleList[flag] || false;
-	},
+	item_units: [],
+	optionItemUnits: [],
+	defaultUnit: 'đôi',
 };
 
 const ProductUnitContext = React.createContext(defaultProductUnitContext);
 
 export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
-	const { user, isLoading } = useAdminGetSession();
+	const { item_units } = useAdminItemUnits();
 
-	const [featureFlags, setProductUnits] = useState<
-		{ key: string; value: boolean }[]
-	>([]);
+	const optionItemUnits = useMemo(() => {
+		if (!item_units) return [];
+		return item_units.map((item) => ({
+			value: item.id,
+			label: item.unit,
+		}));
+	}, [item_units]);
 
-	const { store, isFetching } = useAdminStore();
-
-	useEffect(() => {
-		if (
-			isFetching ||
-			!store ||
-			(!user && !isLoading) ||
-			!store['feature_flags']?.length
-		) {
-			return;
-		}
-
-		setProductUnits([
-			...(store['feature_flags'] as { key: string; value: boolean }[]),
-			...store['modules'].map((module) => ({
-				key: module.module,
-				value: true,
-			})),
-		]);
-	}, [isFetching, store, user, isLoading]);
-
-	const featureToggleList = featureFlags.reduce(
-		(acc, flag) => ({ ...acc, [flag.key]: flag.value }),
-		{} as Record<string, boolean>
-	);
-
-	const isFeatureEnabled = (flag: string) => !!featureToggleList[flag];
+	const defaultUnit =
+		item_units?.find((item) => item.unit === 'đôi')?.id ?? 'đôi';
 
 	return (
 		<ProductUnitContext.Provider
-			value={{ isFeatureEnabled, featureToggleList }}
+			value={{ item_units: item_units ?? [], optionItemUnits, defaultUnit }}
 		>
 			{children}
 		</ProductUnitContext.Provider>

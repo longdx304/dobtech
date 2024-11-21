@@ -13,11 +13,11 @@ export const adminWarehouseKeys = queryKeysFactory(ADMIN_WAREHOUSE);
 
 type WarehouseQueryKey = typeof adminWarehouseKeys;
 
-export const useAdminItemUnits = (
+export const useAdminWarehouses = (
 	/**
 	 * Filters and pagination configurations to apply on retrieved currencies.
 	 */
-	query?: any,
+	query?: Record<string, unknown>,
 	options?: UseQueryOptionsWrapper<
 		Response<AdminWarehousesListRes>,
 		Error,
@@ -33,7 +33,7 @@ export const useAdminItemUnits = (
 	return { ...data, ...rest } as const;
 };
 
-export const useAdminItemUnit = (id: string) => {
+export const useAdminWarehouse = (id: string) => {
 	const { client } = useMedusa();
 	const { data, ...rest } = useQuery(
 		adminWarehouseKeys.detail(id),
