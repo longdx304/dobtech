@@ -1,8 +1,10 @@
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Title } from '@/components/Typography';
+import { useMarkAsFulfilledMutation } from '@/lib/hooks/api/supplier-order';
 import { getErrorMessage } from '@/lib/utils';
 import {
 	ItemsShippedEvent,
@@ -24,6 +26,7 @@ import { Empty, MenuProps, message } from 'antd';
 import { PackageCheck, PackageX, SendHorizontal } from 'lucide-react';
 import { useAdminCreateNote } from 'medusa-react';
 import { ChangeEvent, useState } from 'react';
+import Fulfillment from './timeline-events/fulfillment';
 import ItemsShipped from './timeline-events/items-shipped';
 import Note from './timeline-events/note';
 import OrderCanceled from './timeline-events/order-canceled';
@@ -35,11 +38,8 @@ import EditDeclined from './timeline-events/order-edit/declined';
 import PaymentRequired from './timeline-events/order-edit/payment-required';
 import EditRequested from './timeline-events/order-edit/requested';
 import OrderPlaced from './timeline-events/order-placed';
-import Refund from './timeline-events/refund';
 import Paid from './timeline-events/paid';
-import { ActionAbles } from '@/components/Dropdown';
-import { useMarkAsFulfilledMutation } from '@/lib/hooks/api/supplier-order';
-import Fulfillment from './timeline-events/fulfillment';
+import Refund from './timeline-events/refund';
 
 type Props = {
 	orderId: SupplierOrder['id'];
@@ -49,13 +49,17 @@ type Props = {
 	refetch: () => void;
 };
 
-const Timeline = ({ orderId, isLoading, events }: Props) => {
+const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 	const createNote = useAdminCreateNote();
 	const [inputValue, setInputValue] = useState<string>('');
 	const changeSttFulfilled = useMarkAsFulfilledMutation(orderId);
 
 	const { data: order, isLoading: isOrderLoading } =
 		useAdminSupplierOrder(orderId);
+
+	const [status, setStatus] = useState<FulfillSupplierOrderStt>(
+		order?.fulfillment_status || FulfillSupplierOrderStt.NOT_FULFILLED
+	);
 
 	if (!events?.length) {
 		return (
@@ -92,6 +96,7 @@ const Timeline = ({ orderId, isLoading, events }: Props) => {
 	};
 
 	const handleMarkAsFulfilled = () => {
+		setStatus(FulfillSupplierOrderStt.DELIVERED);
 		changeSttFulfilled.mutateAsync(
 			{
 				status: FulfillSupplierOrderStt.DELIVERED,
@@ -99,6 +104,7 @@ const Timeline = ({ orderId, isLoading, events }: Props) => {
 			{
 				onSuccess: () => {
 					message.success('Đã đánh dấu nhận hàng thành công');
+					refetch();
 				},
 				onError: (error: any) => {
 					message.error(getErrorMessage(error));
@@ -106,7 +112,9 @@ const Timeline = ({ orderId, isLoading, events }: Props) => {
 			}
 		);
 	};
+
 	const handleCancelAsFulfilled = () => {
+		setStatus(FulfillSupplierOrderStt.REJECTED);
 		changeSttFulfilled.mutateAsync(
 			{
 				status: FulfillSupplierOrderStt.REJECTED,
@@ -114,6 +122,7 @@ const Timeline = ({ orderId, isLoading, events }: Props) => {
 			{
 				onSuccess: () => {
 					message.success('Đã đánh dấu huỷ nhận hàng thành công');
+					refetch();
 				},
 				onError: (error: any) => {
 					message.error(getErrorMessage(error));
@@ -128,6 +137,7 @@ const Timeline = ({ orderId, isLoading, events }: Props) => {
 			label: 'Đánh dấu đã nhận hàng',
 			icon: <PackageCheck size={18} />,
 			onClick: handleMarkAsFulfilled,
+			disabled: status === FulfillSupplierOrderStt.DELIVERED,
 		},
 		{
 			key: 'cancel_as_fulfilled',
@@ -135,6 +145,7 @@ const Timeline = ({ orderId, isLoading, events }: Props) => {
 			icon: <PackageX size={18} />,
 			danger: true,
 			onClick: handleCancelAsFulfilled,
+			disabled: status === FulfillSupplierOrderStt.REJECTED,
 		},
 	];
 	return (

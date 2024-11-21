@@ -277,19 +277,9 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 				</div>
 			</div>
 			<Tooltip title={tooltipContent}>
-				<div className="flex flex-col">
-					<span className="font-medium text-gray-900">
-						{quantity > 1 && <>{`${quantity} x `}</>} {lineItem?.title} &nbsp;
-						{lineItem?.variant?.sku && (
-							<span className="text-xs">{lineItem?.variant?.sku}</span>
-						)}
-					</span>
-					<span className="font-normal text-gray-500 flex">
-						{`${lineItem?.variant?.title}${
-							lineItem?.variant?.sku ? ` (${lineItem.variant?.sku})` : ''
-						}`}
-					</span>
-				</div>
+				<span className="font-medium text-gray-900">
+					{quantity > 1 && <>{`${quantity} x `}</>} {lineItem?.title} &nbsp;
+				</span>
 			</Tooltip>
 		</div>
 	);

@@ -140,6 +140,7 @@ export interface SupplierOrderDocumentRes {
 
 
 export enum FulfillSupplierOrderStt {
+	NOT_FULFILLED = 'not_fulfilled',
 	DELIVERED = 'delivered',
 	INVENTORIED = 'inventoried',
 	REJECTED = 'rejected',

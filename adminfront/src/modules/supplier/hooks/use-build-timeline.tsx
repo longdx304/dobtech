@@ -8,13 +8,10 @@ import {
 	Return,
 	Swap,
 } from '@medusajs/medusa';
+import { isArray } from 'lodash';
 import { useAdminNotes, useAdminNotifications, useGetCart } from 'medusa-react';
 import { useMemo } from 'react';
-import useOrdersExpandParam from '../components/supplier-order-detail/utils/use-admin-expand-parameter';
 import { useAdminSupplierOrderEdits } from './supplier-order-edits';
-import { isArray } from 'lodash';
-import { FulfillmentStatus } from '../components/supplier-order-detail/timeline/timeline-events/order-status';
-import { FulfillSupplierOrderStt } from '@/types/supplier';
 
 export interface TimelineEvent {
 	id: string;
