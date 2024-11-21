@@ -37,9 +37,21 @@ export const useAdminWarehouse = (id: string) => {
 	const { client } = useMedusa();
 	const { data, ...rest } = useQuery(
 		adminWarehouseKeys.detail(id),
-		() => client.admin.custom.get(`/admin/item-unit/${id}`),
+		() => client.admin.custom.get(`/admin/warehouse/${id}`),
 		{
 			enabled: !!id,
+		}
+	);
+	return { ...data, ...rest } as const;
+};
+
+export const useAdminWarehouseInventoryByVariant = (variantId: string) => {
+	const { client } = useMedusa();
+	const { data, ...rest } = useQuery(
+		adminWarehouseKeys.detail(variantId),
+		() => client.admin.custom.get(`/admin/warehouse/variant/${variantId}`),
+		{
+			enabled: !!variantId,
 		}
 	);
 	return { ...data, ...rest } as const;
