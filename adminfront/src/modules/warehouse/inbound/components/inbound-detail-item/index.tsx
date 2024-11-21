@@ -3,7 +3,6 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
-import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
 import { LineItem } from '@medusajs/medusa';
 import { Check, Clock } from 'lucide-react';
 
