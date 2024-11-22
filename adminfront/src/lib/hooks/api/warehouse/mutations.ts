@@ -1,6 +1,6 @@
 import {
 	AdminPostWarehouseReq,
-	AdminPostWarehouseVariantIdReq,
+	AdminPostWarehouseVariantReq,
 	AdminWarehouseDeleteRes,
 	AdminWarehouseRes,
 } from '@/types/warehouse';
@@ -31,7 +31,7 @@ export const useAdminCreateWarehouse = (
 	);
 };
 
-export const useAdminCreateWarehouseVariantId = (
+export const useAdminCreateWarehouseVariant = (
 	options?: UseMutationOptions<
 		Response<AdminWarehouseRes>,
 		Error,
@@ -42,7 +42,7 @@ export const useAdminCreateWarehouseVariantId = (
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		(payload: AdminPostWarehouseVariantIdReq) =>
+		(payload: AdminPostWarehouseVariantReq) =>
 			client.admin.custom.post(`/admin/warehouse/variant`, payload),
 		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
 	);

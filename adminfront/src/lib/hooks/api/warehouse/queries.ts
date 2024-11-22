@@ -1,4 +1,5 @@
 import { AdminWarehousesListRes } from '@/types/warehouse';
+import generateParams from '@/utils/generate-params';
 import { Response } from '@medusajs/medusa-js';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -25,9 +26,10 @@ export const useAdminWarehouses = (
 	>
 ) => {
 	const { client } = useMedusa();
+	const params = query && generateParams(query);
 	const { data, ...rest } = useQuery(
 		adminWarehouseKeys.list(query),
-		() => client.admin.custom.get('/admin/warehouse'),
+		() => client.admin.custom.get(`/admin/warehouse${params}`),
 		options
 	);
 	return { ...data, ...rest } as const;

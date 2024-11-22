@@ -129,7 +129,7 @@ const InboundModal = ({
 			width={800}
 		>
 			<VariantInfo lineItem={data as any} />
-			<WarehouseForm warehouse={warehouse} variantId={variantId} />
+			<WarehouseForm variantId={variantId} />
 		</LayeredModal>
 	);
 };
