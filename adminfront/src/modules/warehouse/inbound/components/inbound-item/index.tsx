@@ -36,11 +36,11 @@ const InboundItem: React.FC<InboundItemProps> = ({
 			</Tag>
 			<Flex gap={4} className="py-2" align="center">
 				<Text className="text-[14px] text-gray-500">Mã đơn hàng:</Text>
-				<Text className="text-lg font-semibold">{`#${item.display_id}`}</Text>
+				<Text className="text-sm font-semibold">{`#${item.display_id}`}</Text>
 			</Flex>
 			<Flex gap={4} className="py-2" align="center">
 				<Text className="text-[14px] text-gray-500">Ngày nhập hàng:</Text>
-				<Text className="text-lg font-semibold">
+				<Text className="text-sm font-semibold">
 					{dayjs(item.created_at).format('DD/MM/YYYY')}
 				</Text>
 			</Flex>

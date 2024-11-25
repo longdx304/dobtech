@@ -28,7 +28,7 @@ const ListInbound: FC<Props> = ({}) => {
 		FulfillSupplierOrderStt.DELIVERED
 	);
 
-	const { supplierOrder } = useAdminProductInbounds({
+	const { supplierOrder, isLoading, count } = useAdminProductInbounds({
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
@@ -92,6 +92,7 @@ const ListInbound: FC<Props> = ({}) => {
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, lg: 3 }}
 					dataSource={supplierOrder}
+					loading={isLoading}
 					renderItem={(item: SupplierOrder) => (
 						<List.Item>
 							<InboundItem item={item} handleClickDetail={handleClickDetail} />
@@ -100,6 +101,10 @@ const ListInbound: FC<Props> = ({}) => {
 					pagination={{
 						onChange: (page) => handleChangePage(page),
 						pageSize: DEFAULT_PAGE_SIZE,
+						current: numPages || 1,
+						total: count,
+						showTotal: (total, range) =>
+							`${range[0]}-${range[1]} trong ${total} đơn nhập`,
 					}}
 				/>
 			</Card>

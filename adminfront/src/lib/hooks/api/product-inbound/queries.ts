@@ -8,7 +8,7 @@ import {
 	UseQueryOptionsWrapper,
 } from 'medusa-react';
 
-const ADMIN_PRODUCT_INBOUND = `admin_product_inbound` as const;
+export const ADMIN_PRODUCT_INBOUND = `admin_product_inbound` as const;
 
 export const adminProductInboundKeys = queryKeysFactory(ADMIN_PRODUCT_INBOUND);
 
@@ -20,13 +20,14 @@ export type ProductInboundQueryKeyParams = {
 	limit?: number;
 	status?: string;
 };
-
 export type AdminProductInboundListRes = {
 	supplierOrder: SupplierOrder[];
+	count: number;
 };
 
 export type AdminProductInboundRes = {
 	supplierOrder: SupplierOrder;
+	count: number;
 };
 
 const createQueryString = (search: Record<string, any> = {}) => {

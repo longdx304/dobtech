@@ -19,6 +19,10 @@ import isEmpty from 'lodash/isEmpty';
 import { LoaderCircle, Minus, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import VariantInventoryForm from '../variant-inventory-form';
+import { getErrorMessage } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
+import { ADMIN_PRODUCT_INBOUND } from '@/lib/hooks/api/product-inbound';
+import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
 
 type WarehouseFormProps = {
 	variantId: string;
@@ -63,10 +67,6 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 		}));
 	}, [warehouse]);
 
-	const options: ValueType | [] = useMemo(() => {
-		return [];
-	}, []);
-
 	const handleAddLocation = async () => {
 		if (!searchValue) return;
 		await addWarehouse.mutateAsync({
@@ -96,7 +96,6 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 		}
 	};
 
-	console.log('warehouseInventory');
 	return (
 		<Card
 			className="mt-2 shadow-none border-[1px] border-solid border-gray-300 rounded-[6px]"
@@ -196,19 +195,21 @@ const WarehouseItem = ({
 	lineItem,
 	refetchInventory,
 }: WarehouseItemProps) => {
-	const { getSelectedUnitData } = useProductUnit();
+	const { getSelectedUnitData, onReset, setSelectedUnit } = useProductUnit();
 	const createInboundInventory = useAdminCreateInboundInventory();
-
-	console.log('item', item);
+	const queryClient = useQueryClient();
 	const quantity =
 		item?.quantity === 0
-			? `0 đôi`
+			? `0`
 			: `${item?.quantity / item?.item_unit?.quantity} ${
 					item?.item_unit?.unit
 			  }`;
 
 	const onAddUnit = async () => {
 		const unitData = getSelectedUnitData();
+		if (!unitData) {
+			return message.error('Vui lòng chọn loại hàng và số lượng');
+		}
 		if (unitData) {
 			const itemData = {
 				warehouse_id: item.warehouse_id,
@@ -221,16 +222,18 @@ const WarehouseItem = ({
 				type: 'INBOUND',
 			};
 
-			refetchInventory();
-			console.log('lineItem', lineItem);
-
-			try {
-				await createInboundInventory.mutateAsync(itemData);
-				message.success('Thêm hàng tại vị trí thành công');
-			} catch (error: any) {
-				console.log('error:', error);
-				message.error(error.error);
-			}
+			onReset();
+			await createInboundInventory.mutateAsync(itemData, {
+				onSuccess: () => {
+					message.success(`Đã nhập hàng vào vị trí ${item.warehouse.location}`);
+					refetchInventory();
+					queryClient.invalidateQueries([ADMIN_PRODUCT_INBOUND, 'detail']);
+					queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
+				},
+				onError: (error: any) => {
+					message.error(getErrorMessage(error));
+				},
+			});
 		}
 	};
 
@@ -238,8 +241,8 @@ const WarehouseItem = ({
 		<Flex
 			align="center"
 			gap="small"
-			justify="center"
-			className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer"
+			justify="space-between"
+			className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
 		>
 			<Popconfirm
 				title={`Lấy hàng tại vị trí (${item.warehouse.location})`}
@@ -248,13 +251,14 @@ const WarehouseItem = ({
 				cancelText="Huỷ"
 				okText="Xác nhận"
 				handleOk={() => console.log('okText')}
-				handleCancel={() => console.log('cancel')}
+				handleCancel={() => onReset()}
 				icon={null}
 			>
 				<Button
 					className="w-[24px] h-[24px] rounded-full"
 					type="default"
 					danger
+					onClick={() => setSelectedUnit(item.item_unit.id)}
 					icon={<Minus size={16} />}
 				/>
 			</Popconfirm>
@@ -262,11 +266,11 @@ const WarehouseItem = ({
 			<Popconfirm
 				title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
 				description={<VariantInventoryForm type="INBOUND" />}
-				// isLoading={isLoading}
+				isLoading={createInboundInventory.isLoading}
 				cancelText="Huỷ"
 				okText="Xác nhận"
 				handleOk={onAddUnit}
-				handleCancel={() => console.log('cancel')}
+				handleCancel={() => onReset()}
 				icon={null}
 			>
 				<Button
@@ -274,6 +278,7 @@ const WarehouseItem = ({
 					color="primary"
 					// variant="outlined"
 					type="default"
+					onClick={() => setSelectedUnit(item.item_unit.id)}
 					icon={<Plus size={16} />}
 				/>
 			</Popconfirm>

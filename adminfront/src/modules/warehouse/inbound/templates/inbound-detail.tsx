@@ -16,7 +16,7 @@ import { TabsProps } from 'antd';
 import debounce from 'lodash/debounce';
 import { ArrowLeft, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, FC, useState } from 'react';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
 import InboundDetailItem from '../components/inbound-detail-item';
 import InboundModal from '../components/inbound-modal';
 
@@ -31,7 +31,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [variantId, setVariantId] = useState<string | null>(null);
 	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
-	const { supplierOrder } = useAdminProductInbound(id);
+	const { supplierOrder, isLoading } = useAdminProductInbound(id);
 
 	const [activeKey, setActiveKey] = useState<FulfillSupplierOrderStt>(
 		FulfillSupplierOrderStt.DELIVERED
@@ -45,6 +45,31 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	const handleChangeTab = (key: string) => {
 		setActiveKey(key as FulfillSupplierOrderStt);
 	};
+
+	const lineItems = useMemo(() => {
+		if (!supplierOrder?.items) return [];
+
+		const itemsByStatus = supplierOrder.items.filter((item: LineItem) => {
+			const fulfilled_quantity = item.fulfilled_quantity ?? 0;
+			if (activeKey === FulfillSupplierOrderStt.INVENTORIED) {
+				return fulfilled_quantity === item.quantity;
+			}
+			return fulfilled_quantity < item.quantity;
+		});
+
+		return itemsByStatus
+			.filter((item: LineItem) => {
+				const title = item.title.toLowerCase();
+				const description = item?.description?.toLowerCase();
+				const search = searchValue.toLowerCase();
+				return title.includes(search) || description?.includes(search);
+			})
+			.sort((a, b) => {
+				return (
+					new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+				);
+			});
+	}, [supplierOrder?.items, searchValue, activeKey]);
 
 	const items: TabsProps['items'] = [
 		{
@@ -68,10 +93,6 @@ const InboundDetail: FC<Props> = ({ id }) => {
 		onClose();
 	};
 
-	const handleChangePage = (page: number) => {
-		console.log('page', page);
-	};
-
 	const handleBackToList = () => {
 		router.push(ERoutes.WAREHOUSE_INBOUND);
 	};
@@ -93,7 +114,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 				</Text> */}
 			</Flex>
 			<Card loading={false} className="w-full mb-10" bordered={false}>
-				<Title level={4}>{`Đơn nhập hàng #${1}`}</Title>
+				<Title level={4}>{`Đơn nhập hàng #${supplierOrder?.display_id}`}</Title>
 				<Flex align="center" justify="flex-end" className="py-4">
 					<Input
 						placeholder="Tìm kiếm biến thể sản phẩm..."
@@ -111,7 +132,8 @@ const InboundDetail: FC<Props> = ({ id }) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, lg: 3 }}
-					dataSource={supplierOrder?.items}
+					dataSource={lineItems}
+					loading={isLoading}
 					renderItem={(item: LineItem) => (
 						<List.Item>
 							<InboundDetailItem
@@ -121,8 +143,10 @@ const InboundDetail: FC<Props> = ({ id }) => {
 						</List.Item>
 					)}
 					pagination={{
-						onChange: (page) => handleChangePage(page),
 						pageSize: DEFAULT_PAGE_SIZE,
+						total: lineItems.length,
+						showTotal: (total, range) =>
+							`${range[0]}-${range[1]} trong ${total} biến thể`,
 					}}
 				/>
 				{state && variantId && selectedItem && (

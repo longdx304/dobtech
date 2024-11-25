@@ -8,6 +8,7 @@ import { SupplierOrder } from '@/types/supplier';
 import { LineItem } from '@medusajs/medusa';
 import { useContext } from 'react';
 import WarehouseForm from '../warehouse-form';
+import { useAdminLineItem } from '@/lib/hooks/api/line-item';
 
 type Props = {
 	open: boolean;
@@ -18,6 +19,7 @@ type Props = {
 
 const InboundModal = ({ open, onClose, variantId, item }: Props) => {
 	const layeredModalContext = useContext(LayeredModalContext);
+	const { lineItem, isLoading } = useAdminLineItem(item.id);
 
 	return (
 		<LayeredModal
@@ -29,9 +31,10 @@ const InboundModal = ({ open, onClose, variantId, item }: Props) => {
 			title="Thao tác nhập kho"
 			className="layered-modal"
 			width={800}
+			loading={isLoading}
 		>
-			<VariantInfo lineItem={item} />
-			<WarehouseForm variantId={variantId} lineItem={item} />
+			<VariantInfo lineItem={lineItem} />
+			<WarehouseForm variantId={variantId} lineItem={lineItem} />
 		</LayeredModal>
 	);
 };

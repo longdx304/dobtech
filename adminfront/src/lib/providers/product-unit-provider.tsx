@@ -17,6 +17,7 @@ type ProductUnitContextType = {
 	setSelectedUnit: (unitId: string) => void;
 	setQuantity: (quantity: number) => void;
 	getSelectedUnitData: () => { unitId: string; quantity: number } | null;
+	onReset: () => void;
 };
 
 const defaultProductUnitContext: ProductUnitContextType = {
@@ -28,6 +29,7 @@ const defaultProductUnitContext: ProductUnitContextType = {
 	setSelectedUnit: () => {},
 	setQuantity: () => {},
 	getSelectedUnitData: () => null,
+	onReset: () => {},
 };
 
 const ProductUnitContext = React.createContext(defaultProductUnitContext);
@@ -49,14 +51,20 @@ export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
 		item_units?.find((item) => item.unit === 'đôi')?.id ?? 'đôi';
 
 	const getSelectedUnitData = () => {
-		if (selectedUnit && quantity > 0) {
+		if (quantity > 0) {
 			return {
-				unitId: selectedUnit,
+				unitId: selectedUnit ?? defaultUnit,
 				quantity: quantity,
 			};
 		}
 		return null;
 	};
+
+	const onReset = () => {
+		setSelectedUnit(null);
+		setQuantity(0);
+	};
+
 	return (
 		<ProductUnitContext.Provider
 			value={{
@@ -68,6 +76,7 @@ export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
 				setSelectedUnit,
 				setQuantity,
 				getSelectedUnitData,
+				onReset,
 			}}
 		>
 			{children}
