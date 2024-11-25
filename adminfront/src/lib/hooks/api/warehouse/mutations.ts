@@ -1,4 +1,5 @@
 import {
+	AdminPostInboundInventoryReq,
 	AdminPostWarehouseReq,
 	AdminPostWarehouseVariantReq,
 	AdminWarehouseDeleteRes,
@@ -62,5 +63,22 @@ export const useAdminDeleteItemUnit = (
 			[adminWarehouseKeys.lists(), adminWarehouseKeys.detail(id)],
 			options
 		)
+	);
+};
+
+export const useAdminCreateInboundInventory = (
+	options?: UseMutationOptions<
+		Response<AdminWarehouseRes>,
+		Error,
+		AdminPostInboundInventoryReq
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminPostInboundInventoryReq) =>
+			client.admin.custom.post(`/admin/warehouse/inbound/create`, payload),
+		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
 	);
 };

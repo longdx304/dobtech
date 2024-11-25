@@ -30,7 +30,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	const { state, onOpen, onClose } = useToggleState();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [variantId, setVariantId] = useState<string | null>(null);
-
+	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
 	const { supplierOrder } = useAdminProductInbound(id);
 
 	const [activeKey, setActiveKey] = useState<FulfillSupplierOrderStt>(
@@ -57,8 +57,9 @@ const InboundDetail: FC<Props> = ({ id }) => {
 		},
 	];
 
-	const handleClickDetail = (id: string | null) => {
+	const handleClickDetail = (id: string | null, item: LineItem) => {
 		setVariantId(id);
+		setSelectedItem(item);
 		onOpen();
 	};
 
@@ -115,7 +116,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 						<List.Item>
 							<InboundDetailItem
 								item={item}
-								handleClickDetail={handleClickDetail}
+								handleClickDetail={(id) => handleClickDetail(id, item)}
 							/>
 						</List.Item>
 					)}
@@ -124,12 +125,12 @@ const InboundDetail: FC<Props> = ({ id }) => {
 						pageSize: DEFAULT_PAGE_SIZE,
 					}}
 				/>
-				{state && variantId && (
+				{state && variantId && selectedItem && (
 					<InboundModal
-						currentSupplierOrder={supplierOrder!}
 						open={state}
 						onClose={handleClose}
 						variantId={variantId as string}
+						item={selectedItem}
 					/>
 				)}
 			</Card>

@@ -1,4 +1,4 @@
-import { ItemUnit } from "./item-unit";
+import { ItemUnit } from './item-unit';
 
 export interface Warehouse {
 	id: string;
@@ -27,7 +27,6 @@ export type AdminWarehousesListRes = {
 	warehouse: Warehouse[];
 };
 
-
 export type AdminWarehouseDeleteRes = {
 	id: string;
 	object: string;
@@ -35,13 +34,25 @@ export type AdminWarehouseDeleteRes = {
 };
 
 export type WarehouseInventory = {
-  id: string;
-  warehouse_id: string;
-  variant_id: string;
-  quantity: number;
-  unit_id: string;
-  item_unit: ItemUnit;
-  warehouse: Warehouse;
+	id: string;
+	warehouse_id: string;
+	variant_id: string;
+	quantity: number;
+	unit_id: string;
+	item_unit: ItemUnit;
+	warehouse: Warehouse;
 	created_at: string;
 	updated_at: string;
+};
+
+export interface AdminPostInboundInventoryReq {
+	id?: string;
+	warehouse_id?: string;
+	variant_id: string;
+	quantity: number;
+	unit_id: string;
+	line_item_id: string;
+	supplier_order_id?: string;
+	type?: string;
+	note?: string;
 }

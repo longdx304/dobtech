@@ -3,24 +3,26 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Popconfirm } from '@/components/Popconfirm';
 import { Select } from '@/components/Select';
-import { Text, Title } from '@/components/Typography';
-import { LayeredModalContext } from '@/lib/providers/layer-modal-provider';
-import { Col, message, Row } from 'antd';
-import { LoaderCircle, Minus, Plus } from 'lucide-react';
-import { useContext, useMemo, useState } from 'react';
-import VariantInventoryForm from '../variant-inventory-form';
-import debounce from 'lodash/debounce';
+import { Text } from '@/components/Typography';
 import {
+	useAdminCreateInboundInventory,
 	useAdminCreateWarehouseVariant,
 	useAdminWarehouseInventoryByVariant,
 	useAdminWarehouses,
 } from '@/lib/hooks/api/warehouse';
+import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
+import { LineItem } from '@medusajs/medusa';
+import { Col, message, Row } from 'antd';
+import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
-import { getErrorMessage } from '@/lib/utils';
+import { LoaderCircle, Minus, Plus } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import VariantInventoryForm from '../variant-inventory-form';
 
 type WarehouseFormProps = {
 	variantId: string;
+	lineItem: LineItem;
 };
 
 type ValueType = {
@@ -29,16 +31,23 @@ type ValueType = {
 	value: string;
 };
 
-const WarehouseForm = ({ variantId }: WarehouseFormProps) => {
+const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 	const [searchValue, setSearchValue] = useState<string | null>(null);
-	const { warehouse, isLoading: warehouseLoading } = useAdminWarehouses({
+	const {
+		warehouse,
+		isLoading: warehouseLoading,
+		refetch: refetchWarehouse,
+	} = useAdminWarehouses({
 		q: searchValue,
 	});
 
 	const [selectedValue, setSelectedValue] = useState<string | null>(null);
 	const addWarehouse = useAdminCreateWarehouseVariant();
-	const { warehouseInventory, isLoading: warehouseInventoryLoading } =
-		useAdminWarehouseInventoryByVariant(variantId);
+	const {
+		warehouseInventory,
+		isLoading: warehouseInventoryLoading,
+		refetch: refetchInventory,
+	} = useAdminWarehouseInventoryByVariant(variantId);
 
 	// Debounce fetcher
 	const debounceFetcher = debounce((value: string) => {
@@ -64,6 +73,8 @@ const WarehouseForm = ({ variantId }: WarehouseFormProps) => {
 			location: searchValue,
 			variant_id: variantId,
 		});
+		refetchWarehouse();
+		refetchInventory();
 	};
 
 	const handleSelect = async (data: ValueType) => {
@@ -76,6 +87,8 @@ const WarehouseForm = ({ variantId }: WarehouseFormProps) => {
 				location: label,
 				variant_id: variantId,
 			});
+			refetchWarehouse();
+			refetchInventory();
 			message.success('Thêm vị trí cho sản phẩm thành công');
 		} catch (error: any) {
 			console.log('error:', error);
@@ -83,6 +96,7 @@ const WarehouseForm = ({ variantId }: WarehouseFormProps) => {
 		}
 	};
 
+	console.log('warehouseInventory');
 	return (
 		<Card
 			className="mt-2 shadow-none border-[1px] border-solid border-gray-300 rounded-[6px]"
@@ -101,7 +115,11 @@ const WarehouseForm = ({ variantId }: WarehouseFormProps) => {
 				<Row gutter={[8, 8]}>
 					{warehouseInventory?.map((item: any) => (
 						<Col xs={24} sm={12} key={item.id}>
-							<WarehouseItem item={item} />
+							<WarehouseItem
+								item={item}
+								lineItem={lineItem as any}
+								refetchInventory={refetchInventory}
+							/>
 						</Col>
 					))}
 				</Row>
@@ -165,16 +183,56 @@ const WarehouseForm = ({ variantId }: WarehouseFormProps) => {
 
 export default WarehouseForm;
 
+type UpdatedLineItem = LineItem & {
+	supplier_order_id: string;
+};
 type WarehouseItemProps = {
 	item: WarehouseInventory;
+	lineItem: UpdatedLineItem;
+	refetchInventory: () => void;
 };
-const WarehouseItem = ({ item }: WarehouseItemProps) => {
-	const [unit, setUnit] = useState();
-	const [unitQuantity, setUnitQuantiy] = useState<number>(0);
+const WarehouseItem = ({
+	item,
+	lineItem,
+	refetchInventory,
+}: WarehouseItemProps) => {
+	const { getSelectedUnitData } = useProductUnit();
+	const createInboundInventory = useAdminCreateInboundInventory();
+
+	console.log('item', item);
 	const quantity =
-		item.quantity === 0
+		item?.quantity === 0
 			? `0 đôi`
-			: `${item.quantity / item.item_unit.quantity} ${item.item_unit.unit}`;
+			: `${item?.quantity / item?.item_unit?.quantity} ${
+					item?.item_unit?.unit
+			  }`;
+
+	const onAddUnit = async () => {
+		const unitData = getSelectedUnitData();
+		if (unitData) {
+			const itemData = {
+				warehouse_id: item.warehouse_id,
+				variant_id: item.variant_id,
+				quantity: unitData.quantity,
+				unit_id: unitData.unitId,
+				line_item_id: lineItem.id,
+				supplier_order_id: lineItem.supplier_order_id,
+				warehouse_inventory_id: item.id,
+				type: 'INBOUND',
+			};
+
+			refetchInventory();
+			console.log('lineItem', lineItem);
+
+			try {
+				await createInboundInventory.mutateAsync(itemData);
+				message.success('Thêm hàng tại vị trí thành công');
+			} catch (error: any) {
+				console.log('error:', error);
+				message.error(error.error);
+			}
+		}
+	};
 
 	return (
 		<Flex
@@ -207,7 +265,7 @@ const WarehouseItem = ({ item }: WarehouseItemProps) => {
 				// isLoading={isLoading}
 				cancelText="Huỷ"
 				okText="Xác nhận"
-				handleOk={() => console.log('okText')}
+				handleOk={onAddUnit}
 				handleCancel={() => console.log('cancel')}
 				icon={null}
 			>

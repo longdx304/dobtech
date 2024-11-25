@@ -9,7 +9,25 @@ type Props = {
 };
 
 const VariantInventoryForm = ({ type }: Props) => {
-	const { item_units, optionItemUnits, defaultUnit } = useProductUnit();
+	const {
+		optionItemUnits,
+		defaultUnit,
+		selectedUnit,
+		quantity,
+		setSelectedUnit,
+		setQuantity,
+	} = useProductUnit();
+
+	const handleUnitChange = (value: string) => {
+		setSelectedUnit(value);
+	};
+
+	const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		if (/^\d*$/.test(value)) {
+			setQuantity(parseInt(value) || 0);
+		}
+	};
 
 	return (
 		<Flex gap="small" vertical>
@@ -22,12 +40,18 @@ const VariantInventoryForm = ({ type }: Props) => {
 				<Select
 					className="w-full"
 					options={optionItemUnits}
-					defaultValue={defaultUnit}
+					value={selectedUnit || defaultUnit}
+					onChange={handleUnitChange}
 				/>
 			</Flex>
 			<Flex vertical align="flex-start">
 				<Text className="text-[14px] text-gray-500">Số lượng nhập:</Text>
-				<Input className="w-full" placeholder="" />
+				<Input
+					className="w-full"
+					placeholder=""
+					value={quantity}
+					onChange={handleQuantityChange}
+				/>
 			</Flex>
 		</Flex>
 	);
