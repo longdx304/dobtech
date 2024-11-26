@@ -1,14 +1,13 @@
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
+import { useAdminLineItem } from '@/lib/hooks/api/line-item';
 import LayeredModal, {
 	LayeredModalContext,
 } from '@/lib/providers/layer-modal-provider';
-import { SupplierOrder } from '@/types/supplier';
 import { LineItem } from '@medusajs/medusa';
 import { useContext } from 'react';
 import WarehouseForm from '../warehouse-form';
-import { useAdminLineItem } from '@/lib/hooks/api/line-item';
 
 type Props = {
 	open: boolean;
