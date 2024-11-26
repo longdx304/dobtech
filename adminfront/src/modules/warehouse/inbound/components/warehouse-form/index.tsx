@@ -217,7 +217,7 @@ const WarehouseItem = ({
 				quantity: unitData.quantity,
 				unit_id: unitData.unitId,
 				line_item_id: lineItem.id,
-				supplier_order_id: lineItem.supplier_order_id,
+				order_id: lineItem.supplier_order_id,
 				warehouse_inventory_id: item.id,
 				type: 'INBOUND',
 			};
