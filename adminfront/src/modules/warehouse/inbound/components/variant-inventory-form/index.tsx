@@ -1,5 +1,5 @@
 import { Flex } from '@/components/Flex';
-import { Input, InputNumber } from '@/components/Input';
+import { InputNumber } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';

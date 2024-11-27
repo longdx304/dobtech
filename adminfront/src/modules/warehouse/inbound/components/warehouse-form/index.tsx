@@ -4,6 +4,8 @@ import { Flex } from '@/components/Flex';
 import { Popconfirm } from '@/components/Popconfirm';
 import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
+import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
+import { ADMIN_PRODUCT_INBOUND } from '@/lib/hooks/api/product-inbound';
 import {
 	useAdminCreateInboundInventory,
 	useAdminCreateWarehouseVariant,
@@ -11,18 +13,16 @@ import {
 	useAdminWarehouses,
 } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
+import { getErrorMessage } from '@/lib/utils';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import { LineItem } from '@medusajs/medusa';
+import { useQueryClient } from '@tanstack/react-query';
 import { Col, message, Row } from 'antd';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import { LoaderCircle, Minus, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import VariantInventoryForm from '../variant-inventory-form';
-import { getErrorMessage } from '@/lib/utils';
-import { useQueryClient } from '@tanstack/react-query';
-import { ADMIN_PRODUCT_INBOUND } from '@/lib/hooks/api/product-inbound';
-import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
 
 type WarehouseFormProps = {
 	variantId: string;

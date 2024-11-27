@@ -33,6 +33,8 @@ export type AdminWarehouseDeleteRes = {
 	deleted: boolean;
 };
 
+export type AdminInventoryRemoveRes = {};
+
 export type WarehouseInventory = {
 	id: string;
 	warehouse_id: string;
@@ -52,7 +54,7 @@ export interface AdminPostInboundInventoryReq {
 	quantity: number;
 	unit_id: string;
 	line_item_id: string;
-	supplier_order_id?: string;
+	order_id?: string;
 	type?: string;
 	note?: string;
 }
