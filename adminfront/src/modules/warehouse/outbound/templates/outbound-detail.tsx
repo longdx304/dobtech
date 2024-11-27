@@ -8,16 +8,16 @@ import { Title, Text } from '@/components/Typography';
 import { ArrowLeft, Search } from 'lucide-react';
 import { ChangeEvent, FC, useState } from 'react';
 import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
-import InboundItem from '../components/inbound-item';
+import InboundItem from '../components/outbound-item';
 import debounce from 'lodash/debounce';
 import { Tabs } from '@/components/Tabs';
 import { TabsProps } from 'antd';
-import InboundDetailItem from '../components/inbound-detail-item';
+import OutboundDetailItem from '../components/outbound-detail-item';
 import { Button } from '@/components/Button';
 import { useRouter } from 'next/navigation';
 import { ERoutes } from '@/types/routes';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import InboundModal from '../components/inbound-modal';
+import InboundModal from '../components/outbound-modal';
 import { LineItem } from '@medusajs/medusa';
 import { useAdminProductInbound } from '@/lib/hooks/api/product-inbound/queries';
 
@@ -26,7 +26,7 @@ type Props = {
 };
 
 const DEFAULT_PAGE_SIZE = 10;
-const InboundDetail: FC<Props> = ({ id }) => {
+const OutboundDetail: FC<Props> = ({ id }) => {
 	const router = useRouter();
 	const { state, onOpen, onClose } = useToggleState();
 	const [searchValue, setSearchValue] = useState<string>('');
@@ -114,7 +114,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 					dataSource={supplierOrder?.items}
 					renderItem={(item: LineItem) => (
 						<List.Item>
-							<InboundDetailItem
+							<OutboundDetailItem
 								item={item}
 								handleClickDetail={handleClickDetail}
 							/>
@@ -137,4 +137,4 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	);
 };
 
-export default InboundDetail;
+export default OutboundDetail;

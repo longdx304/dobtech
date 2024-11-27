@@ -105,8 +105,7 @@ const warehouse = [
 		},
 	},
 ];
-const InboundModal = ({ open, onClose, variantId }: Props) => {
-	console.log('variantId:', variantId);
+const OutboundModal = ({ open, onClose, variantId }: Props) => {
 	const layeredModalContext = useContext(LayeredModalContext);
 
 	return (
@@ -126,7 +125,7 @@ const InboundModal = ({ open, onClose, variantId }: Props) => {
 	);
 };
 
-export default InboundModal;
+export default OutboundModal;
 
 const VariantInfo = ({ lineItem }: { lineItem: LineItem }) => {
 	return (

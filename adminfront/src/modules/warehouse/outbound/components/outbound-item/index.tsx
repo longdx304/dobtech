@@ -3,20 +3,20 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
-import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
+import { FulfillmentStatus, Order } from '@medusajs/medusa';
 import { Check, Clock } from 'lucide-react';
 
-type InboundItemProps = {
-	item: SupplierOrder;
+type OutboundItemProps = {
+	item: Order;
 	handleClickDetail: (id: string) => void;
 };
 
-const InboundItem: React.FC<InboundItemProps> = ({
+const OutboundItem: React.FC<OutboundItemProps> = ({
 	item,
 	handleClickDetail,
 }) => {
 	const isProcessing =
-		item.fulfillment_status === FulfillSupplierOrderStt.DELIVERED;
+		item.fulfillment_status === FulfillmentStatus.NOT_FULFILLED;
 
 	const handleClick = () => {
 		handleClickDetail(item.id);
@@ -44,4 +44,4 @@ const InboundItem: React.FC<InboundItemProps> = ({
 	);
 };
 
-export default InboundItem;
+export default OutboundItem;
