@@ -246,7 +246,12 @@ const WarehouseItem = ({
 		>
 			<Popconfirm
 				title={`Lấy hàng tại vị trí (${item.warehouse.location})`}
-				description={<VariantInventoryForm type="OUTBOUND" />}
+				description={
+					<VariantInventoryForm
+						maxQuantity={item.quantity / item.item_unit.quantity}
+						type="OUTBOUND"
+					/>
+				}
 				// isLoading={isLoading}
 				cancelText="Huỷ"
 				okText="Xác nhận"

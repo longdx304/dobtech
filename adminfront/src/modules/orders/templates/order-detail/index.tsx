@@ -33,18 +33,20 @@ export default function OrderDetail({ id }: Readonly<Props>) {
 			<Col span={24}>
 				<BackToOrders />
 			</Col>
-			<Col xs={24} lg={14} className="flex flex-col gap-y-4">
-				<Information order={order} isLoading={isLoading} />
-				<Summary
-					order={order}
-					isLoading={isLoading}
-					reservations={[]}
-					refetch={refetchOrder}
-				/>
-				<Payment order={order} isLoading={isLoading} refetch={refetchOrder} />
-				<Fulfillment order={order} isLoading={isLoading} refetch={refetch} />
-				<CustomerInfo order={order} isLoading={isLoading} />
-			</Col>
+			{order?.id && (
+				<Col xs={24} lg={14} className="flex flex-col gap-y-4">
+					<Information order={order} isLoading={isLoading} />
+					<Summary
+						order={order}
+						isLoading={isLoading}
+						reservations={[]}
+						refetch={refetchOrder}
+					/>
+					<Payment order={order} isLoading={isLoading} refetch={refetchOrder} />
+					<Fulfillment order={order} isLoading={isLoading} refetch={refetch} />
+					<CustomerInfo order={order} isLoading={isLoading} />
+				</Col>
+			)}
 			<Col xs={24} lg={10}>
 				{order?.id && (
 					<Timeline

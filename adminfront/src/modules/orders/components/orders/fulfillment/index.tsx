@@ -4,13 +4,13 @@ import {
 	ClaimOrder,
 	Swap,
 	LineItem,
+	User,
 } from '@medusajs/medusa';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Text, Title } from '@/components/Typography';
 import StatusIndicator from '@/modules/common/components/status-indicator';
 import { Empty, Modal as AntdModal, message, Divider } from 'antd';
-import dayjs from 'dayjs';
 import {
 	useAdminCancelOrder,
 	useAdminCancelClaimFulfillment,
@@ -26,11 +26,12 @@ import { BadgeButton, Button } from '@/components/Button';
 import { ActionAbles } from '@/components/Dropdown';
 import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import CreateFulfillmentModal from './create-fulfillment-modal';
 import MarkShippedModal from './mark-shipped-modal';
+import { useUser } from '@/lib/providers/user-provider';
+import { useAdminAsignOrder } from '@/lib/hooks/api/order';
 
 type Props = {
-	order: Order | undefined;
+	order: Order & { handler_id?: string; handler?: User };
 	isLoading: boolean;
 	refetch: () => void;
 };
@@ -92,10 +93,13 @@ const gatherAllFulfillments = (order: Order) => {
 };
 
 const Fulfillment = ({ order, isLoading, refetch }: Props) => {
+	console.log('order:', order);
 	const [fulfillmentToShip, setFulfillmentToShip] = useState(null);
-	const { state, onOpen, onClose } = useToggleState(false);
+	const handlerInventoryOrder = useAdminAsignOrder(order!.id);
+	const { user } = useUser();
+	console.log('user:', user);
 
-	if (!order) {
+	if (!order || order.id === undefined) {
 		return (
 			<Card loading={isLoading}>
 				<Empty description="Chưa có đơn hàng" />
@@ -109,8 +113,23 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 
 	const allFulfillments = gatherAllFulfillments(order);
 
-	const handleOkFulfillment = () => {
-		onClose();
+	const handleOkFulfillment = async () => {
+		if (user?.id) {
+			await handlerInventoryOrder.mutateAsync(
+				{
+					handler_id: user!.id,
+				},
+				{
+					onSuccess: () => {
+						message.success('Bạn đã phụ trách đơn hàng này');
+						refetch();
+					},
+					onError: (err) => {
+						message.error(getErrorMessage(err));
+					},
+				}
+			);
+		}
 	};
 
 	return (
@@ -120,13 +139,31 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 					<Title level={4}>{`Fulfillment`}</Title>
 					<div className="flex flex-col-reverse lg:flex-row gap-0 justify-end items-center lg:gap-4">
 						<FulfillmentStatus status={order!.fulfillment_status} />
-						{order.status !== 'canceled' && anyItemsToFulfil && (
-							<Button type="default" onClick={onOpen}>
-								{'Xác nhận đóng gói'}
-							</Button>
-						)}
+						{order.status !== 'canceled' &&
+							anyItemsToFulfil &&
+							!order.handler_id && (
+								<Button
+									type="default"
+									onClick={handleOkFulfillment}
+									loading={handlerInventoryOrder.isLoading}
+								>
+									{'Thực hiện lấy hàng'}
+								</Button>
+							)}
 					</div>
 				</Flex>
+			</div>
+			<div className="mt-6">
+				<div className="flex flex-col text-xs">
+					<span className="font-normal text-gray-500">
+						{'Nhân viên thực hiện lấy hàng'}
+					</span>
+					<span className="font-normal text-gray-900 mt-2">
+						{order?.handler
+							? `${order?.handler?.last_name} ${order.handler?.first_name}`
+							: 'Chưa có'}
+					</span>
+				</div>
 			</div>
 			<div className="mt-6">
 				{order.shipping_methods.map((method: any) => (
@@ -151,14 +188,14 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 					))}
 				</div>
 			</div>
-			<CreateFulfillmentModal
+			{/* <CreateFulfillmentModal
 				refetch={refetch}
 				state={state}
 				orderToFulfill={order as any}
 				handleCancel={() => onClose()}
 				orderId={order.id}
 				handleOk={handleOkFulfillment}
-			/>
+			/> */}
 			{fulfillmentToShip && (
 				<MarkShippedModal
 					handleCancel={() => setFulfillmentToShip(null)}

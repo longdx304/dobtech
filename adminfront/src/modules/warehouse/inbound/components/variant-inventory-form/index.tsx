@@ -1,14 +1,19 @@
 import { Flex } from '@/components/Flex';
-import { Input } from '@/components/Input';
+import { Input, InputNumber } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
+import { InputNumberProps } from 'antd';
 
 type Props = {
 	type: 'INBOUND' | 'OUTBOUND';
+	maxQuantity?: number;
 };
 
-const VariantInventoryForm = ({ type }: Props) => {
+const VariantInventoryForm = ({
+	type,
+	maxQuantity = Number.MAX_SAFE_INTEGER,
+}: Props) => {
 	const {
 		optionItemUnits,
 		defaultUnit,
@@ -22,10 +27,10 @@ const VariantInventoryForm = ({ type }: Props) => {
 		setSelectedUnit(value);
 	};
 
-	const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		if (/^\d*$/.test(value)) {
-			setQuantity(parseInt(value) || 0);
+	const handleQuantityChange: InputNumberProps['onChange'] = (value) => {
+		// const value = e.target.value;
+		if (value && /^\d*$/.test(value.toString())) {
+			setQuantity(parseInt(value.toString()) || 0);
 		}
 	};
 
@@ -42,13 +47,15 @@ const VariantInventoryForm = ({ type }: Props) => {
 					options={optionItemUnits}
 					value={selectedUnit || defaultUnit}
 					onChange={handleUnitChange}
+					disabled={type === 'OUTBOUND'}
 				/>
 			</Flex>
 			<Flex vertical align="flex-start">
 				<Text className="text-[14px] text-gray-500">Số lượng nhập:</Text>
-				<Input
+				<InputNumber
 					className="w-full"
-					placeholder=""
+					max={maxQuantity}
+					min={0}
 					value={quantity}
 					onChange={handleQuantityChange}
 				/>
