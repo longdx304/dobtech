@@ -23,10 +23,11 @@ import { CircleX, Package, Store } from 'lucide-react';
 import {
 	useAdminCancelClaimFulfillment,
 	useAdminCancelFulfillment,
-	useAdminCancelSwapFulfillment
+	useAdminCancelSwapFulfillment,
 } from 'medusa-react';
 import { useState } from 'react';
 import MarkShippedModal from './mark-shipped-modal';
+import useToggleState from '@/lib/hooks/use-toggle-state';
 
 type Props = {
 	order: Order & { handler_id?: string; handler?: User };
@@ -92,10 +93,10 @@ const gatherAllFulfillments = (order: Order) => {
 
 const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 	console.log('order:', order);
+	const { state, onOpen, onClose } = useToggleState();
 	const [fulfillmentToShip, setFulfillmentToShip] = useState(null);
 	const handlerInventoryOrder = useAdminAsignOrder(order!.id);
 	const { user } = useUser();
-	console.log('user:', user);
 
 	if (!order || order.id === undefined) {
 		return (
@@ -142,6 +143,7 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 							!order.handler_id && (
 								<Button
 									type="default"
+									// onClick={onOpen}
 									onClick={handleOkFulfillment}
 									loading={handlerInventoryOrder.isLoading}
 								>

@@ -1,11 +1,10 @@
 import {
 	Cart,
-	LineItem,
-	Order,
 	OrderEdit,
 	Payment,
 	User,
 } from '@medusajs/medusa';
+import { LineItem } from './lineItem';
 
 export interface Supplier {
 	id: string;

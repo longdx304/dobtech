@@ -5,7 +5,6 @@ import { Popconfirm } from '@/components/Popconfirm';
 import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
 import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
-import { ADMIN_PRODUCT_INBOUND } from '@/lib/hooks/api/product-inbound';
 import { ADMIN_PRODUCT_OUTBOUND } from '@/lib/hooks/api/product-outbound';
 import {
 	useAdminCreateInboundInventory,
@@ -18,13 +17,13 @@ import {
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/warehouse/components/variant-inventory-form';
+import { LineItem } from '@/types/lineItem';
 import {
 	AdminPostCreateOutboundInventoryReq,
 	AdminPostRemmoveOutboundInventoryReq,
 	Warehouse,
 	WarehouseInventory,
 } from '@/types/warehouse';
-import { LineItem } from '@medusajs/medusa';
 import { useQueryClient } from '@tanstack/react-query';
 import { Col, message, Row } from 'antd';
 import debounce from 'lodash/debounce';
@@ -250,10 +249,10 @@ const WarehouseItem = ({
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
-		const fulfilled_quantity = lineItem.fulfilled_quantity ?? 0;
-		if (unitData.totalQuantity > fulfilled_quantity) {
+		const warehouse_quantity = lineItem.warehouse_quantity ?? 0;
+		if (unitData.totalQuantity > warehouse_quantity) {
 			return message.error(
-				`Số lượng hàng nhập vào không được lớn hơn số lượng đã lấy (${fulfilled_quantity} đôi) của đơn hàng`
+				`Số lượng hàng nhập vào không được lớn hơn số lượng đã lấy (${warehouse_quantity} đôi) của đơn hàng`
 			);
 		}
 		const itemData: AdminPostCreateOutboundInventoryReq = {
@@ -300,7 +299,8 @@ const WarehouseItem = ({
 				cancelText="Huỷ"
 				okText="Xác nhận"
 				handleOk={onRemoveInventory}
-				handleCancel={() => onReset()}
+				handleCancel={() => {}}
+				onOpenChange={(e) => onReset()}
 				icon={null}
 			>
 				<Button
@@ -319,7 +319,8 @@ const WarehouseItem = ({
 				cancelText="Huỷ"
 				okText="Xác nhận"
 				handleOk={onAddInventory}
-				handleCancel={() => onReset()}
+				handleCancel={() => {}}
+				onOpenChange={(e) => onReset()}
 				icon={null}
 			>
 				<Button
@@ -327,7 +328,9 @@ const WarehouseItem = ({
 					color="primary"
 					// variant="outlined"
 					type="default"
-					onClick={() => setSelectedUnit(item.item_unit.id)}
+					onClick={() =>
+						item && item.item_unit && setSelectedUnit(item.item_unit.id)
+					}
 					icon={<Plus size={16} />}
 				/>
 			</Popconfirm>

@@ -5,10 +5,10 @@ import { useAdminLineItem } from '@/lib/hooks/api/line-item';
 import LayeredModal, {
 	LayeredModalContext,
 } from '@/lib/providers/layer-modal-provider';
-import { LineItem } from '@medusajs/medusa';
 import { useContext } from 'react';
 import WarehouseForm from '../warehouse-form';
 import { message } from 'antd';
+import { LineItem } from '@/types/lineItem';
 
 type Props = {
 	open: boolean;
@@ -22,7 +22,7 @@ const InboundModal = ({ open, onClose, variantId, item }: Props) => {
 	const { lineItem, isLoading } = useAdminLineItem(item.id);
 
 	const handleOk = () => {
-		if ((lineItem.fulfilled_quantity ?? 0) > lineItem.quantity) {
+		if ((lineItem.warehouse_quantity ?? 0) > lineItem.quantity) {
 			message.error('Số lượng đã nhập không được lớn hơn số lượng giao');
 			return;
 		}
@@ -67,7 +67,7 @@ const VariantInfo = ({ lineItem }: { lineItem: LineItem }) => {
 					Đã nhập kho / Tổng giao:
 				</Text>
 				<Text className="text-sm font-medium">{`${
-					lineItem.fulfilled_quantity ?? 0
+					lineItem.warehouse_quantity ?? 0
 				} / ${lineItem.quantity}`}</Text>
 			</Flex>
 		</Flex>

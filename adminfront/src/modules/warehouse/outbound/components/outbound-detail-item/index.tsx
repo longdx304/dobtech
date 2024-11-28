@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { Check, Clock } from 'lucide-react';
 
 type InboundItemProps = {
-	item: LineItem;
+	item: LineItem & { warehouse_quantity: number };
 	handleClickDetail: (id: string | null) => void;
 };
 
@@ -16,7 +16,7 @@ const OutboundDetailItem: React.FC<InboundItemProps> = ({
 	item,
 	handleClickDetail,
 }) => {
-	const isProcessing = item.quantity !== (item?.fulfilled_quantity ?? 0);
+	const isProcessing = item.quantity !== (item?.warehouse_quantity ?? 0);
 
 	const handleClick = () => {
 		handleClickDetail(item.variant_id);
@@ -57,11 +57,11 @@ const OutboundDetailItem: React.FC<InboundItemProps> = ({
 					<Text className="text-[14px] text-gray-500">Số lượng đã lấy:</Text>
 					<Text
 						className={clsx('text-sm font-medium', {
-							'text-red-500': (item.fulfilled_quantity ?? 0) > item.quantity,
+							'text-red-500': (item.warehouse_quantity ?? 0) > item.quantity,
 							'text-green-500':
-								(item.fulfilled_quantity ?? 0) === item.quantity,
+								(item.warehouse_quantity ?? 0) === item.quantity,
 						})}
-					>{`${item.fulfilled_quantity ?? 0}`}</Text>
+					>{`${item.warehouse_quantity ?? 0}`}</Text>
 				</Flex>
 			</Flex>
 			<Button className="w-full" onClick={handleClick}>

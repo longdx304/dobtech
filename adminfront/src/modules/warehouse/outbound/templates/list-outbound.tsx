@@ -107,6 +107,12 @@ const ListOutbound: FC<Props> = ({}) => {
 						showTotal: (total, range) =>
 							`${range[0]}-${range[1]} trong ${total} đơn hàng`,
 					}}
+					locale={{
+						emptyText:
+							activeKey === FulfillmentStatus.NOT_FULFILLED
+								? 'Đã hoàn thành tất cả đơn hàng. Hãy kiểm tra tại tab "Đã hoàn thành"'
+								: 'Chưa có đơn hàng nào hoàn thành. Hãy kiểm tra tại tab "Đang thực hiện"',
+					}}
 				/>
 			</Card>
 		</Flex>

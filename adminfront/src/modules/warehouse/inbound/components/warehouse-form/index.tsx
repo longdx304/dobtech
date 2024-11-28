@@ -15,8 +15,8 @@ import {
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/warehouse/components/variant-inventory-form';
+import { LineItem } from '@/types/lineItem';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
-import { LineItem } from '@medusajs/medusa';
 import { useQueryClient } from '@tanstack/react-query';
 import { Col, message, Row } from 'antd';
 import debounce from 'lodash/debounce';
@@ -210,8 +210,8 @@ const WarehouseItem = ({
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
-		const fulfilled_quantity = lineItem.fulfilled_quantity ?? 0;
-		if (unitData.totalQuantity > lineItem.quantity - fulfilled_quantity) {
+		const warehouse_quantity = lineItem.warehouse_quantity ?? 0;
+		if (unitData.totalQuantity > lineItem.quantity - warehouse_quantity) {
 			return message.error(
 				`Tổng số lượng nhập vào không được lớn hơn số lượng giao (${lineItem.quantity} đôi)`
 			);
@@ -245,55 +245,28 @@ const WarehouseItem = ({
 	};
 
 	return (
-		<Flex
-			align="center"
-			gap="small"
-			justify="space-between"
-			className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
+		<Popconfirm
+			title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
+			description={<VariantInventoryForm type="INBOUND" />}
+			isLoading={createInboundInventory.isLoading}
+			cancelText="Huỷ"
+			okText="Xác nhận"
+			handleOk={onAddUnit}
+			handleCancel={() => {}}
+			onOpenChange={(e) => onReset()}
+			icon={null}
 		>
-			<Popconfirm
-				title={`Lấy hàng tại vị trí (${item.warehouse.location})`}
-				description={
-					<VariantInventoryForm
-						maxQuantity={item.quantity / item.item_unit.quantity}
-						type="OUTBOUND"
-					/>
+			<Flex
+				align="center"
+				gap="small"
+				justify="center"
+				className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
+				onClick={() =>
+					item && item.item_unit && setSelectedUnit(item.item_unit.id)
 				}
-				// isLoading={isLoading}
-				cancelText="Huỷ"
-				okText="Xác nhận"
-				handleOk={() => console.log('okText')}
-				handleCancel={() => onReset()}
-				icon={null}
 			>
-				<Button
-					className="w-[24px] h-[24px] rounded-full"
-					type="default"
-					danger
-					onClick={() => setSelectedUnit(item.item_unit.id)}
-					icon={<Minus size={16} />}
-				/>
-			</Popconfirm>
-			<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
-			<Popconfirm
-				title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
-				description={<VariantInventoryForm type="INBOUND" />}
-				isLoading={createInboundInventory.isLoading}
-				cancelText="Huỷ"
-				okText="Xác nhận"
-				handleOk={onAddUnit}
-				handleCancel={() => onReset()}
-				icon={null}
-			>
-				<Button
-					className="w-[24px] h-[24px] rounded-full"
-					color="primary"
-					// variant="outlined"
-					type="default"
-					onClick={() => setSelectedUnit(item.item_unit.id)}
-					icon={<Plus size={16} />}
-				/>
-			</Popconfirm>
-		</Flex>
+				<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
+			</Flex>
+		</Popconfirm>
 	);
 };

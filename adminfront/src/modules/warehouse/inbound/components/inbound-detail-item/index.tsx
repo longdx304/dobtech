@@ -3,7 +3,7 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
-import { LineItem } from '@medusajs/medusa';
+import { LineItem } from '@/types/lineItem';
 import { Check, Clock } from 'lucide-react';
 
 type InboundItemProps = {
@@ -15,7 +15,7 @@ const InboundDetailItem: React.FC<InboundItemProps> = ({
 	item,
 	handleClickDetail,
 }) => {
-	const isProcessing = item.quantity > (item?.fulfilled_quantity ?? 0);
+	const isProcessing = item.quantity > (item?.warehouse_quantity ?? 0);
 
 	const handleClick = () => {
 		handleClickDetail(item.variant_id);
@@ -50,7 +50,7 @@ const InboundDetailItem: React.FC<InboundItemProps> = ({
 						Số lượng đã nhập vào kho:
 					</Text>
 					<Text className="text-sm font-medium">{`${
-						item.fulfilled_quantity ?? 0
+						item.warehouse_quantity ?? 0
 					}`}</Text>
 				</Flex>
 			</Flex>

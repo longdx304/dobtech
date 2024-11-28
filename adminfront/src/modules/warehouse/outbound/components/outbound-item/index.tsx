@@ -17,8 +17,7 @@ const OutboundItem: React.FC<OutboundItemProps> = ({
 	item,
 	handleClickDetail,
 }) => {
-	const isProcessing =
-		item.fulfillment_status === FulfillmentStatus.NOT_FULFILLED;
+	const isProcessing = item.fulfillment_status !== FulfillmentStatus.FULFILLED;
 
 	const handleClick = () => {
 		handleClickDetail(item.id);

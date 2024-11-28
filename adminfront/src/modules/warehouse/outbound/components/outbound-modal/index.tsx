@@ -23,7 +23,7 @@ const OutboundModal = ({ open, onClose, variantId, item }: Props) => {
 	const { lineItem, isLoading } = useAdminLineItem(item.id);
 
 	const handleOk = () => {
-		if ((lineItem.fulfilled_quantity ?? 0) > lineItem.quantity) {
+		if ((lineItem.warehouse_quantity ?? 0) > lineItem.quantity) {
 			message.error('Số lượng đã lấy không được lớn hơn số lượng giao');
 			return;
 		}
@@ -52,7 +52,11 @@ const OutboundModal = ({ open, onClose, variantId, item }: Props) => {
 
 export default OutboundModal;
 
-const VariantInfo = ({ lineItem }: { lineItem: LineItem }) => {
+const VariantInfo = ({
+	lineItem,
+}: {
+	lineItem: LineItem & { warehouse_quantity: number };
+}) => {
 	return (
 		<Flex gap={4} vertical className="py-2">
 			<Flex vertical align="flex-start">
@@ -68,9 +72,9 @@ const VariantInfo = ({ lineItem }: { lineItem: LineItem }) => {
 				<Text
 					className={clsx('text-sm font-medium', {
 						'text-red-500':
-							(lineItem.fulfilled_quantity ?? 0) > lineItem.quantity,
+							(lineItem.warehouse_quantity ?? 0) > lineItem.quantity,
 					})}
-				>{`${lineItem.fulfilled_quantity ?? 0} / ${lineItem.quantity}`}</Text>
+				>{`${lineItem.warehouse_quantity ?? 0} / ${lineItem.quantity}`}</Text>
 			</Flex>
 		</Flex>
 	);
