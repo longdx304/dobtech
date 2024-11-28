@@ -1,10 +1,10 @@
-import { FindParams, Order } from '@medusajs/medusa';
+import { FindParams, Order, User } from '@medusajs/medusa';
 import { Response } from '@medusajs/medusa-js';
 import { useQuery } from '@tanstack/react-query';
 import {
-  queryKeysFactory,
-  useMedusa,
-  UseQueryOptionsWrapper,
+	queryKeysFactory,
+	useMedusa,
+	UseQueryOptionsWrapper,
 } from 'medusa-react';
 
 export const ADMIN_PRODUCT_OUTBOUND = `admin_product_outbound` as const;
@@ -27,7 +27,7 @@ export type AdminProductOutboundListRes = {
 };
 
 export type AdminProductOutboundRes = {
-	order: Order;
+	order: Order & { handler: User };
 	count: number;
 };
 

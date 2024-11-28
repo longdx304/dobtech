@@ -1,6 +1,8 @@
 import {
 	AdminInventoryRemoveRes,
+	AdminPostCreateOutboundInventoryReq,
 	AdminPostInboundInventoryReq,
+	AdminPostRemmoveOutboundInventoryReq,
 	AdminPostWarehouseReq,
 	AdminPostWarehouseVariantReq,
 	AdminWarehouseDeleteRes,
@@ -105,32 +107,32 @@ export const useAdminCreateOutboundInventory = (
 	options?: UseMutationOptions<
 		Response<AdminWarehouseRes>,
 		Error,
-		AdminPostInboundInventoryReq
+		AdminPostCreateOutboundInventoryReq
 	>
 ) => {
 	const { client } = useMedusa();
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		(payload: AdminPostInboundInventoryReq) =>
+		(payload: AdminPostCreateOutboundInventoryReq) =>
 			client.admin.custom.post(`/admin/warehouse/outbound/create`, payload),
 		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
 	);
 };
 
 export const useAdminRemoveOutboundInventory = (
-	id: string,
-	options?: UseMutationOptions<Response<AdminInventoryRemoveRes>, Error, void>
+	options?: UseMutationOptions<
+		Response<AdminInventoryRemoveRes>,
+		Error,
+		AdminPostRemmoveOutboundInventoryReq
+	>
 ) => {
 	const { client } = useMedusa();
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		() => client.admin.custom.delete(`/admin/warehouse/outbound/remove`),
-		buildOptions(
-			queryClient,
-			[adminWarehouseKeys.lists(), adminWarehouseKeys.detail(id)],
-			options
-		)
+		(payload: AdminPostRemmoveOutboundInventoryReq) =>
+			client.admin.custom.post(`/admin/warehouse/outbound/remove`, payload),
+		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
 	);
 };

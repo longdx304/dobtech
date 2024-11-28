@@ -56,5 +56,25 @@ export interface AdminPostInboundInventoryReq {
 	line_item_id: string;
 	order_id?: string;
 	type?: string;
-	note?: string;
+}
+
+export interface AdminPostRemmoveOutboundInventoryReq {
+	unit_id: string;
+	line_item_id: string;
+	variant_id: string;
+	warehouse_inventory_id: string;
+	quantity: number;
+	order_id?: string;
+	warehouse_id: string;
+	type: 'OUTBOUND';
+}
+export interface AdminPostCreateOutboundInventoryReq {
+	unit_id: string;
+	line_item_id: string;
+	variant_id: string;
+	warehouse_inventory_id: string;
+	quantity: number;
+	order_id?: string;
+	warehouse_id: string;
+	type: 'OUTBOUND';
 }

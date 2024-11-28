@@ -14,7 +14,8 @@ import { useRouter } from 'next/navigation';
 import { ERoutes } from '@/types/routes';
 import { useAdminProductOutbounds } from '@/lib/hooks/api/product-outbound';
 import OutboundItem from '../components/outbound-item';
-import { Order } from '@medusajs/medusa';
+import { Order, User } from '@medusajs/medusa';
+import { FulfillmentStatus } from '@/types/order';
 
 type Props = {};
 
@@ -24,8 +25,8 @@ const ListOutbound: FC<Props> = ({}) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
-	const [activeKey, setActiveKey] = useState<Order['fulfillment_status']>(
-		'NOT_FULFILLED'
+	const [activeKey, setActiveKey] = useState<string>(
+		FulfillmentStatus.NOT_FULFILLED
 	);
 
 	const { orders, isLoading, count } = useAdminProductOutbounds({
@@ -34,7 +35,6 @@ const ListOutbound: FC<Props> = ({}) => {
 		limit: DEFAULT_PAGE_SIZE,
 		status: activeKey,
 	});
-	console.log('orders:', orders);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -47,19 +47,19 @@ const ListOutbound: FC<Props> = ({}) => {
 	};
 
 	const handleChangeTab = (key: string) => {
-		setActiveKey(key as Order['fulfillment_status']);
+		setActiveKey(key);
 	};
 
-	// const items: TabsProps['items'] = [
-	// 	{
-	// 		key: FulfillmentStatus.NOT_FULFILLED,
-	// 		label: 'Đang thực hiện',
-	// 	},
-	// 	{
-	// 		key: FulfillmentStatus.FULFILLED,
-	// 		label: 'Đã hoàn thành',
-	// 	},
-	// ];
+	const items: TabsProps['items'] = [
+		{
+			key: FulfillmentStatus.NOT_FULFILLED,
+			label: 'Đang thực hiện',
+		},
+		{
+			key: FulfillmentStatus.FULFILLED,
+			label: 'Đã hoàn thành',
+		},
+	];
 
 	const handleClickDetail = (id: string) => {
 		router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${id}`);
@@ -90,11 +90,11 @@ const ListOutbound: FC<Props> = ({}) => {
 					onChange={handleChangeTab}
 					centered
 				/>
-				{/* <List
+				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, lg: 3 }}
 					dataSource={orders}
 					loading={isLoading}
-					renderItem={(item: any) => (
+					renderItem={(item: Order & { handler: User }) => (
 						<List.Item>
 							<OutboundItem item={item} handleClickDetail={handleClickDetail} />
 						</List.Item>
@@ -107,7 +107,7 @@ const ListOutbound: FC<Props> = ({}) => {
 						showTotal: (total, range) =>
 							`${range[0]}-${range[1]} trong ${total} đơn hàng`,
 					}}
-				/> */}
+				/>
 			</Card>
 		</Flex>
 	);

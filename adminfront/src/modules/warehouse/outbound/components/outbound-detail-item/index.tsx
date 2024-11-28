@@ -4,6 +4,7 @@ import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import { LineItem } from '@medusajs/medusa';
+import clsx from 'clsx';
 import { Check, Clock } from 'lucide-react';
 
 type InboundItemProps = {
@@ -15,14 +16,21 @@ const OutboundDetailItem: React.FC<InboundItemProps> = ({
 	item,
 	handleClickDetail,
 }) => {
-	const isProcessing = item.quantity > (item?.fulfilled_quantity ?? 0);
+	const isProcessing = item.quantity !== (item?.fulfilled_quantity ?? 0);
 
 	const handleClick = () => {
 		handleClickDetail(item.variant_id);
 	};
 
 	return (
-		<Card className="bg-[#F3F6FF]" rounded>
+		<Card
+			className={
+				(item.fulfilled_quantity ?? 0) > item.quantity
+					? 'bg-red-50'
+					: 'bg-[#F3F6FF]'
+			}
+			rounded
+		>
 			<Tag
 				color={isProcessing ? 'gold' : 'green'}
 				className="w-fit flex items-center gap-1 p-2 rounded-lg"
@@ -46,16 +54,18 @@ const OutboundDetailItem: React.FC<InboundItemProps> = ({
 					<Text className="text-sm font-medium">{`${item.quantity}`}</Text>
 				</Flex>
 				<Flex vertical align="flex-start">
-					<Text className="text-[14px] text-gray-500">
-						Số lượng đã nhập vào kho:
-					</Text>
-					<Text className="text-sm font-medium">{`${
-						item.fulfilled_quantity ?? 0
-					}`}</Text>
+					<Text className="text-[14px] text-gray-500">Số lượng đã lấy:</Text>
+					<Text
+						className={clsx('text-sm font-medium', {
+							'text-red-500': (item.fulfilled_quantity ?? 0) > item.quantity,
+							'text-green-500':
+								(item.fulfilled_quantity ?? 0) === item.quantity,
+						})}
+					>{`${item.fulfilled_quantity ?? 0}`}</Text>
 				</Flex>
 			</Flex>
 			<Button className="w-full" onClick={handleClick}>
-				{isProcessing ? 'Thao tác nhập kho' : 'Chỉnh sửa'}
+				{isProcessing ? 'Cập nhật tồn kho' : 'Chỉnh sửa'}
 			</Button>
 		</Card>
 	);

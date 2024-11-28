@@ -14,6 +14,7 @@ import {
 } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
+import VariantInventoryForm from '@/modules/warehouse/components/variant-inventory-form';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import { LineItem } from '@medusajs/medusa';
 import { useQueryClient } from '@tanstack/react-query';
@@ -22,7 +23,6 @@ import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import { LoaderCircle, Minus, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import VariantInventoryForm from '../variant-inventory-form';
 
 type WarehouseFormProps = {
 	variantId: string;
@@ -210,6 +210,13 @@ const WarehouseItem = ({
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
+		const fulfilled_quantity = lineItem.fulfilled_quantity ?? 0;
+		if (unitData.totalQuantity > lineItem.quantity - fulfilled_quantity) {
+			return message.error(
+				`Tổng số lượng nhập vào không được lớn hơn số lượng giao (${lineItem.quantity} đôi)`
+			);
+		}
+
 		if (unitData) {
 			const itemData = {
 				warehouse_id: item.warehouse_id,

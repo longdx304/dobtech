@@ -8,6 +8,7 @@ import LayeredModal, {
 import { LineItem } from '@medusajs/medusa';
 import { useContext } from 'react';
 import WarehouseForm from '../warehouse-form';
+import { message } from 'antd';
 
 type Props = {
 	open: boolean;
@@ -20,17 +21,27 @@ const InboundModal = ({ open, onClose, variantId, item }: Props) => {
 	const layeredModalContext = useContext(LayeredModalContext);
 	const { lineItem, isLoading } = useAdminLineItem(item.id);
 
+	const handleOk = () => {
+		if ((lineItem.fulfilled_quantity ?? 0) > lineItem.quantity) {
+			message.error('Số lượng đã nhập không được lớn hơn số lượng giao');
+			return;
+		}
+		onClose();
+	};
+
 	return (
 		<LayeredModal
 			context={layeredModalContext}
 			onCancel={onClose}
-			onOk={onClose}
+			onOk={handleOk}
 			open={open}
-			// footer={footer}
 			title="Thao tác nhập kho"
 			className="layered-modal"
 			width={800}
 			loading={isLoading}
+			cancelButtonProps={{ className: 'hidden' }}
+			maskClosable={false}
+			closable={false}
 		>
 			<VariantInfo lineItem={lineItem} />
 			<WarehouseForm variantId={variantId} lineItem={lineItem} />

@@ -16,7 +16,11 @@ type ProductUnitContextType = {
 	quantity: number;
 	setSelectedUnit: (unitId: string) => void;
 	setQuantity: (quantity: number) => void;
-	getSelectedUnitData: () => { unitId: string; quantity: number } | null;
+	getSelectedUnitData: () => {
+		unitId: string;
+		quantity: number;
+		totalQuantity: number;
+	} | null;
 	onReset: () => void;
 };
 
@@ -52,9 +56,11 @@ export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
 
 	const getSelectedUnitData = () => {
 		if (quantity > 0) {
+			const findUnit = item_units?.find((item) => item.id === selectedUnit);
 			return {
 				unitId: selectedUnit ?? defaultUnit,
 				quantity: quantity,
+				totalQuantity: quantity * (findUnit?.quantity ?? 1),
 			};
 		}
 		return null;

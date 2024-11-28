@@ -28,7 +28,6 @@ const VariantInventoryForm = ({
 	};
 
 	const handleQuantityChange: InputNumberProps['onChange'] = (value) => {
-		// const value = e.target.value;
 		if (value && /^\d*$/.test(value.toString())) {
 			setQuantity(parseInt(value.toString()) || 0);
 		}
@@ -36,10 +35,6 @@ const VariantInventoryForm = ({
 
 	return (
 		<Flex gap="small" vertical>
-			{/* <Flex vertical align="flex-start">
-				<Text className="text-[14px] text-gray-500">Vị trí nhập:</Text>
-				<Input className="w-full" value="Vị trí" disabled />
-			</Flex> */}
 			<Flex vertical align="flex-start">
 				<Text className="text-[14px] text-gray-500">Loại hàng:</Text>
 				<Select
@@ -51,7 +46,7 @@ const VariantInventoryForm = ({
 				/>
 			</Flex>
 			<Flex vertical align="flex-start">
-				<Text className="text-[14px] text-gray-500">Số lượng nhập:</Text>
+				<Text className="text-[14px] text-gray-500">Số lượng:</Text>
 				<InputNumber
 					className="w-full"
 					max={maxQuantity}
