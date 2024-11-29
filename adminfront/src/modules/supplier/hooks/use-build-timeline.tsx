@@ -8,11 +8,10 @@ import {
 	Return,
 	Swap,
 } from '@medusajs/medusa';
+import { isArray } from 'lodash';
 import { useAdminNotes, useAdminNotifications, useGetCart } from 'medusa-react';
 import { useMemo } from 'react';
-import useOrdersExpandParam from '../components/supplier-order-detail/utils/use-admin-expand-parameter';
 import { useAdminSupplierOrderEdits } from './supplier-order-edits';
-import { isArray } from 'lodash';
 
 export interface TimelineEvent {
 	id: string;
@@ -42,7 +41,10 @@ export interface TimelineEvent {
 		| 'payment-required'
 		| 'refund-required'
 		| 'paid'
-		| 'change-price';
+		| 'change-price'
+		| 'fulfillment-delivered'
+		| 'fulfillment-inventoried'
+		| 'fulfillment-rejected';
 }
 
 export interface RefundRequiredEvent extends TimelineEvent {
@@ -163,8 +165,6 @@ export interface NotificationEvent extends TimelineEvent {
 }
 
 export const useBuildTimeline = (supplierOrderId: string) => {
-	const { orderRelations } = useOrdersExpandParam();
-
 	const {
 		data: supplierOrder,
 		refetch,
@@ -292,6 +292,31 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 				id: `${supplierOrder.id}-canceled`,
 				time: supplierOrder.updated_at,
 				type: 'canceled',
+				orderId: supplierOrder.id,
+			} as TimelineEvent);
+		}
+
+		if (supplierOrder?.delivered_at) {
+			events.push({
+				id: `${supplierOrder.id}-delivered`,
+				time: supplierOrder?.delivered_at,
+				type: 'fulfillment-delivered',
+				orderId: supplierOrder.id,
+			} as TimelineEvent);
+		}
+		if (supplierOrder?.inventoried_at) {
+			events.push({
+				id: `${supplierOrder.id}-inventoried`,
+				time: supplierOrder?.inventoried_at,
+				type: 'fulfillment-inventoried',
+				orderId: supplierOrder.id,
+			} as TimelineEvent);
+		}
+		if (supplierOrder?.rejected_at) {
+			events.push({
+				id: `${supplierOrder.id}-rejected`,
+				time: supplierOrder?.rejected_at,
+				type: 'fulfillment-rejected',
 				orderId: supplierOrder.id,
 			} as TimelineEvent);
 		}

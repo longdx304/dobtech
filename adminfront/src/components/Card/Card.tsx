@@ -17,8 +17,8 @@ export default function Card({
 		<AntdCard
 			className={cn(
 				'shadow-lg [&_.ant-card-body]:p-4',
-				className,
-				rounded ? 'rounded-xl' : 'max-sm:rounded-none'
+				rounded ? 'rounded-xl' : 'max-sm:rounded-none',
+				className
 			)}
 			bordered={false}
 			{...props}

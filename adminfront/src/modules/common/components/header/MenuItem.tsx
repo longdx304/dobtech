@@ -2,6 +2,7 @@ import type { MenuProps } from 'antd';
 import { Flex } from 'antd';
 import {
 	BadgeDollarSign,
+	Boxes,
 	CalendarRange,
 	CircleDollarSign,
 	ClipboardPenLine,
@@ -9,6 +10,8 @@ import {
 	Ellipsis,
 	LayoutList,
 	LogOut,
+	PackageMinus,
+	PackagePlus,
 	Settings,
 	ShoppingCart,
 	SquarePercent,
@@ -20,9 +23,11 @@ import {
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
-import { IAdminResponse } from '@/types/account';
+import { EPermissions, IAdminResponse } from '@/types/account';
 import { ERoutes } from '@/types/routes';
 import { User } from '@medusajs/medusa';
+import isEmpty from 'lodash/isEmpty';
+import intersection from 'lodash/intersection';
 
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(
@@ -58,6 +63,13 @@ const itemOverview = (role: string, permissions: string[]) =>
 		getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
 	].filter(() => true);
 
+// Item menu warehouse
+const itemsWarehouse: MenuProps['items'] = [
+	getItem('Nhập hàng', 'warehouse-inbound', <PackagePlus />),
+	getItem('Lấy hàng', 'warehouse-outbound', <PackageMinus />),
+	getItem('Sổ kho', 'warehouse-transaction', <LayoutList />),
+];
+
 // Item menu option
 const itemsAdmin: MenuProps['items'] = [
 	getItem('Quản lý nhân viên', 'accounts', <Users />),
@@ -68,6 +80,7 @@ const itemsAdmin: MenuProps['items'] = [
 	getItem('Giảm giá', 'discounts', <SquarePercent />),
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
+		getItem('Đơn vị hàng', 'item-unit', <Boxes />),
 		getItem('Tiền tệ', 'currencies', <BadgeDollarSign />),
 		getItem('Lý do trả hàng', 'return-reasons', <Undo2 />),
 	]),
@@ -103,7 +116,26 @@ export const menuItems = (
 	handleDropdownClick: (e: any) => void
 ) => {
 	const role = user?.role;
-	const permissions = (user as any)?.permissions?.split(',');
+	let permissions = (user as any)?.permissions?.split(',');
+
+	if (role === 'admin') {
+		permissions = [
+			EPermissions.WarehouseManager,
+			EPermissions.WarehouseStaff,
+			EPermissions.Driver,
+			EPermissions.InventoryChecker,
+			EPermissions.AssistantDriver,
+		];
+	}
+
+	// Check if user has required permissions for warehouse
+	const hasRequiredPermissionsWarehouse = !isEmpty(
+		intersection(permissions, [
+			EPermissions.WarehouseManager,
+			EPermissions.WarehouseStaff,
+		])
+	);
+
 	return [
 		getItem(
 			'Tổng quan',
@@ -112,7 +144,8 @@ export const menuItems = (
 			itemOverview(role, permissions) as MenuItem[],
 			'group'
 		),
-		getItem('Kho', 'inventory', null, undefined, 'group'),
+		hasRequiredPermissionsWarehouse &&
+			getItem('Kho', 'inventory', null, itemsWarehouse as MenuItem[], 'group'),
 		role === 'admin' &&
 			getItem('Admin', 'admin', null, itemsAdmin as MenuItem[], 'group'),
 		getItem(
@@ -137,4 +170,8 @@ export const menuRoutes: Record<string, string> = {
 	discounts: ERoutes.DISCOUNTS,
 	suppliers: ERoutes.SUPPLIERS,
 	currencies: ERoutes.CURRENCIES,
+	'warehouse-inbound': ERoutes.WAREHOUSE_INBOUND,
+	'warehouse-outbound': ERoutes.WAREHOUSE_OUTBOUND,
+	'warehouse-transaction': ERoutes.WAREHOUSE_TRANSACTIONS,
+	'item-unit': ERoutes.ITEM_UNIT,
 };

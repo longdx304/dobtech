@@ -1,11 +1,10 @@
 import {
 	Cart,
-	LineItem,
-	Order,
 	OrderEdit,
 	Payment,
 	User,
 } from '@medusajs/medusa';
+import { LineItem } from './lineItem';
 
 export interface Supplier {
 	id: string;
@@ -68,7 +67,7 @@ export interface SupplierOrders {
 	cart_id: string;
 	status: string;
 	payment_status: string;
-	fulfillment_status: string;
+	fulfillment_status: FulfillSupplierOrderStt;
 	estimated_production_time: string;
 	settlement_time: string;
 	tax_rate: number;
@@ -110,7 +109,7 @@ export interface SupplierOrder {
 	status: string;
 	payment_status: string;
 	payments?: Payment[];
-	fulfillment_status: string;
+	fulfillment_status: FulfillSupplierOrderStt;
 	estimated_production_time: string;
 	settlement_time: string;
 	items: LineItem[];
@@ -125,6 +124,9 @@ export interface SupplierOrder {
 	created_at: string;
 	updated_at: string;
 	canceled_at?: string | null;
+	delivered_at?: string;
+	inventoried_at?: string;
+	rejected_at?: string;
 }
 
 export interface SupplierOrderEdit extends OrderEdit {
@@ -134,3 +136,16 @@ export interface SupplierOrderEdit extends OrderEdit {
 export interface SupplierOrderDocumentRes {
 	documents: string | string[];
 }
+
+
+export enum FulfillSupplierOrderStt {
+	NOT_FULFILLED = 'not_fulfilled',
+	DELIVERED = 'delivered',
+	INVENTORIED = 'inventoried',
+	REJECTED = 'rejected',
+}
+
+export type MarkAsFulfilledReq = {
+	status: FulfillSupplierOrderStt;
+};
+export type MarkAsFulfilledRes = any;
