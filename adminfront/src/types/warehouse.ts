@@ -78,3 +78,8 @@ export interface AdminPostCreateOutboundInventoryReq {
 	warehouse_id: string;
 	type: 'OUTBOUND';
 }
+
+export type AdminWarehouseTransactionsRes = {
+	inventoryTransactions: WarehouseInventory[];
+	count: number;
+};

@@ -67,6 +67,7 @@ const itemOverview = (role: string, permissions: string[]) =>
 const itemsWarehouse: MenuProps['items'] = [
 	getItem('Nhập hàng', 'warehouse-inbound', <PackagePlus />),
 	getItem('Lấy hàng', 'warehouse-outbound', <PackageMinus />),
+	getItem('Sổ kho', 'warehouse-transaction', <LayoutList />),
 ];
 
 // Item menu option
@@ -171,5 +172,6 @@ export const menuRoutes: Record<string, string> = {
 	currencies: ERoutes.CURRENCIES,
 	'warehouse-inbound': ERoutes.WAREHOUSE_INBOUND,
 	'warehouse-outbound': ERoutes.WAREHOUSE_OUTBOUND,
+	'warehouse-transaction': ERoutes.WAREHOUSE_TRANSACTIONS,
 	'item-unit': ERoutes.ITEM_UNIT,
 };
