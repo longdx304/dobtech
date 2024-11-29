@@ -104,7 +104,7 @@ const ListTransaction: FC<Props> = () => {
 				dataSource={inventoryTransactions}
 				rowKey="code"
 				scroll={{ x: 700 }}
-				onChange={onChange}
+				onChange={onChange as any}
 				pagination={{
 					total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
 					pageSize: PAGE_SIZE,

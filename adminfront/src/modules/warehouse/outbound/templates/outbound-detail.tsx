@@ -66,18 +66,20 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	const lineItems = useMemo(() => {
 		if (!order?.items) return [];
 
-		const itemsByStatus = order.items.filter((item: LineItem) => {
-			const fulfilled_quantity = item.fulfilled_quantity ?? 0;
+		const itemsByStatus = order.items.filter((item: any) => {
+			const lineItem = item as LineItem;
+			const warehouse_quantity = lineItem.warehouse_quantity ?? 0;
 			if (activeKey === FulfillmentStatus.FULFILLED) {
-				return fulfilled_quantity === item.quantity;
+				return warehouse_quantity === item.quantity;
 			}
-			return fulfilled_quantity !== item.quantity;
+			return warehouse_quantity !== item.quantity;
 		});
 
 		return itemsByStatus
-			.filter((item: LineItem) => {
-				const title = item.title.toLowerCase();
-				const description = item?.description?.toLowerCase();
+			.filter((item: any) => {
+				const lineItem = item as LineItem;
+				const title = lineItem.title.toLowerCase();
+				const description = lineItem?.description?.toLowerCase();
 				const search = searchValue.toLowerCase();
 				return title.includes(search) || description?.includes(search);
 			})
