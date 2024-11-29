@@ -76,7 +76,6 @@ export const useAdminWarehouseTransactions = (
 	const { client } = useMedusa();
 	const params = query && generateParams(query);
 
-	console.log('params', params);
 	const { data, ...rest } = useQuery(
 		adminWarehouseKeys.list(query),
 		() => client.admin.custom.get(`/admin/warehouse/transaction${params}`),

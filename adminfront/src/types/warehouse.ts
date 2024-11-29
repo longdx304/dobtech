@@ -83,3 +83,8 @@ export type AdminWarehouseTransactionsRes = {
 	inventoryTransactions: WarehouseInventory[];
 	count: number;
 };
+
+export enum TransactionType {
+	INBOUND = 'INBOUND',
+	OUTBOUND = 'OUTBOUND',
+}

@@ -3,8 +3,8 @@ import ListTransaction from '@/modules/warehouse/transactions/templates/list-tra
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Lấy hàng',
-	description: 'Trang quản lý lấy hàng.',
+	title: 'Sổ kho',
+	description: 'Trang quản lý sổ kho.',
 };
 
 interface Props {}

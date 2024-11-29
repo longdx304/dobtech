@@ -1,6 +1,17 @@
+import { Button } from '@/components/Button';
+import { Flex } from '@/components/Flex';
+import { TransactionType } from '@/types/warehouse';
+import { DatePicker } from 'antd';
+import { FilterDropdownProps } from 'antd/es/table/interface';
 import dayjs from 'dayjs';
 
 type Props = {};
+
+const typeMap = {
+	INBOUND: 'Nhập hàng',
+	OUTBOUND: 'Lấy hàng',
+};
+const { RangePicker } = DatePicker;
 
 const transactionColumns = ({}: Props) => [
 	{
@@ -14,6 +25,19 @@ const transactionColumns = ({}: Props) => [
 		},
 	},
 	{
+		title: 'Loại hàng',
+		dataIndex: 'type',
+		key: 'type',
+		width: 150,
+		filters: [
+			{ text: 'Nhập hàng', value: 'INBOUND' },
+			{ text: 'Lấy hàng', value: 'OUTBOUND' },
+		],
+		render: (type: TransactionType) => {
+			return typeMap[type];
+		},
+	},
+	{
 		title: 'Ghi chú',
 		dataIndex: 'note',
 		key: 'note',
@@ -24,12 +48,49 @@ const transactionColumns = ({}: Props) => [
 		title: 'Ngày tạo',
 		dataIndex: 'created_at',
 		key: 'created_at',
-		width: 150,
+		width: 180,
 		className: 'text-xs',
-		render: (_: any) => {
-			return dayjs(_).format('DD/MM/YYYY HH:mm');
+		sorter: (a: any, b: any) =>
+			dayjs(a.created_at).valueOf() - dayjs(b.created_at).valueOf(),
+		filterDropdown: ({
+			setSelectedKeys,
+			selectedKeys,
+			confirm,
+			close,
+		}: FilterDropdownProps) => {
+			return (
+				<Flex style={{ padding: 8 }} className="flex-col">
+					<RangePicker
+						style={{ marginBottom: 8, width: '100%' }}
+						onChange={(dates, dateStrings) => {
+							setSelectedKeys(dateStrings);
+						}}
+					/>
+					<Flex justify="space-between">
+						<Button
+							onClick={() => {}}
+							style={{ marginRight: 8 }}
+							type="default"
+						>
+							Xóa
+						</Button>
+						<Button
+							onClick={() => {
+								confirm({ closeDropdown: true });
+								close();
+							}}
+							type="primary"
+						>
+							Lọc
+						</Button>
+					</Flex>
+				</Flex>
+			);
 		},
-	}
+		render: (createdAt: string) => {
+			return dayjs(createdAt).format('DD/MM/YYYY HH:mm');
+		},
+	},
 ];
 
 export default transactionColumns;
