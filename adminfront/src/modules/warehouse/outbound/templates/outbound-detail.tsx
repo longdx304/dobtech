@@ -27,6 +27,7 @@ import { useAdminCreateFulfillment } from 'medusa-react';
 import { getErrorMessage } from '@/lib/utils';
 import { LineItem } from '@/types/lineItem';
 import clsx from 'clsx';
+import { useUser } from '@/lib/providers/user-provider';
 
 type Props = {
 	id: string;
@@ -35,12 +36,19 @@ type Props = {
 const DEFAULT_PAGE_SIZE = 10;
 const OutboundDetail: FC<Props> = ({ id }) => {
 	const router = useRouter();
+	const { user } = useUser();
 	const { state, onOpen, onClose } = useToggleState();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [variantId, setVariantId] = useState<string | null>(null);
 	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
 	const { order, isLoading, refetch } = useAdminProductOutbound(id);
 	const createOrderFulfillment = useAdminCreateFulfillment(id);
+
+	const isPermission = useMemo(() => {
+		if (!user) return false;
+		if (user.role === 'admin' || order?.handler_id === user.id) return true;
+		return false;
+	}, [user, order?.handler_id]);
 
 	const [activeKey, setActiveKey] = useState<FulfillmentStatus>(
 		FulfillmentStatus.NOT_FULFILLED
@@ -149,13 +157,20 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	};
 
 	const actions = [
-		{
+		isPermission && {
 			label: 'Hoàn thành lấy hàng',
-			icon: <Check size={20} />,
+			icon: <Check size={18} />,
 			onClick: () => {
 				handleComplete();
 			},
 			disabled: order?.fulfillment_status === FulfillmentStatus.FULFILLED,
+		},
+		{
+			label: 'Trang Order chi tiết',
+			icon: <ArrowLeft size={18} />,
+			onClick: () => {
+				router.push(`${ERoutes.ORDERS}/${id}`);
+			},
 		},
 	];
 
@@ -224,6 +239,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 				/>
 				{state && variantId && selectedItem && (
 					<OutboundModal
+						isPermission={isPermission}
 						open={state}
 						onClose={handleClose}
 						variantId={variantId as string}

@@ -27,7 +27,8 @@ import {
 } from 'medusa-react';
 import { useState } from 'react';
 import MarkShippedModal from './mark-shipped-modal';
-import useToggleState from '@/lib/hooks/use-toggle-state';
+import Link from 'next/link';
+import { ERoutes } from '@/types/routes';
 
 type Props = {
 	order: Order & { handler_id?: string; handler?: User };
@@ -93,7 +94,6 @@ const gatherAllFulfillments = (order: Order) => {
 
 const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 	console.log('order:', order);
-	const { state, onOpen, onClose } = useToggleState();
 	const [fulfillmentToShip, setFulfillmentToShip] = useState(null);
 	const handlerInventoryOrder = useAdminAsignOrder(order!.id);
 	const { user } = useUser();
@@ -159,9 +159,16 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 						{'Nhân viên thực hiện lấy hàng'}
 					</span>
 					<span className="font-normal text-gray-900 mt-2">
-						{order?.handler
-							? `${order?.handler?.last_name} ${order.handler?.first_name}`
-							: 'Chưa có'}
+						{order?.handler ? (
+							<>
+								<span>{`${order?.handler?.last_name} ${order.handler?.first_name} - `}</span>
+								<Link href={`${ERoutes.WAREHOUSE_OUTBOUND}/${order.id}`}>
+									Xem chi tiết lấy hàng
+								</Link>
+							</>
+						) : (
+							'Chưa có'
+						)}
 					</span>
 				</div>
 			</div>

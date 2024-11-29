@@ -16,9 +16,16 @@ type Props = {
 	onClose: () => void;
 	variantId: string;
 	item: LineItem;
+	isPermission: boolean;
 };
 
-const OutboundModal = ({ open, onClose, variantId, item }: Props) => {
+const OutboundModal = ({
+	open,
+	onClose,
+	variantId,
+	item,
+	isPermission,
+}: Props) => {
 	const layeredModalContext = useContext(LayeredModalContext);
 	const { lineItem, isLoading } = useAdminLineItem(item.id);
 
@@ -45,7 +52,11 @@ const OutboundModal = ({ open, onClose, variantId, item }: Props) => {
 			closable={false}
 		>
 			<VariantInfo lineItem={lineItem} />
-			<WarehouseForm variantId={variantId} lineItem={lineItem} />
+			<WarehouseForm
+				variantId={variantId}
+				lineItem={lineItem}
+				isPermission={isPermission}
+			/>
 		</LayeredModal>
 	);
 };

@@ -34,6 +34,7 @@ import { useMemo, useState } from 'react';
 type WarehouseFormProps = {
 	variantId: string;
 	lineItem: LineItem;
+	isPermission: boolean;
 };
 
 type ValueType = {
@@ -42,7 +43,11 @@ type ValueType = {
 	value: string;
 };
 
-const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
+const WarehouseForm = ({
+	variantId,
+	lineItem,
+	isPermission,
+}: WarehouseFormProps) => {
 	const [searchValue, setSearchValue] = useState<string | null>(null);
 	const {
 		warehouse,
@@ -125,64 +130,67 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 								item={item}
 								lineItem={lineItem as any}
 								refetchInventory={refetchInventory}
+								isPermission={isPermission}
 							/>
 						</Col>
 					))}
 				</Row>
 			</Flex>
-			<Flex vertical gap={6} className="mt-2">
-				<Text strong className="">
-					Tìm & thêm vị trí mới
-				</Text>
-				<Flex gap={4}>
-					<Select
-						className="flex-grow"
-						placeholder="Chọn vị trí"
-						allowClear
-						options={optionWarehouses}
-						labelInValue
-						filterOption={false}
-						value={
-							selectedValue
-								? { label: selectedValue, value: selectedValue }
-								: null
-						}
-						onSearch={debounceFetcher}
-						onSelect={handleSelect}
-						showSearch
-						dropdownRender={(menu) => (
-							<div>
-								{menu}
-								{!isEmpty(searchValue) && (
-									<div className="flex items-center justify-start p-2">
-										<Text className="text-gray-300 cursor-pointer">
-											Chọn thêm để tạo vị trí mới
-										</Text>
-									</div>
-								)}
-							</div>
-						)}
-						notFoundContent={
-							warehouseLoading ? (
-								<LoaderCircle
-									className="animate-spin w-full flex justify-center"
-									size={18}
-									strokeWidth={3}
-								/>
-							) : (
-								'Không tìm thấy vị trí'
-							)
-						}
-					/>
-					<Button
-						className="w-fit h-[10]"
-						onClick={handleAddLocation}
-						disabled={isEmpty(searchValue)}
-					>
-						Thêm
-					</Button>
+			{isPermission && (
+				<Flex vertical gap={6} className="mt-2">
+					<Text strong className="">
+						Tìm & thêm vị trí mới
+					</Text>
+					<Flex gap={4}>
+						<Select
+							className="flex-grow"
+							placeholder="Chọn vị trí"
+							allowClear
+							options={optionWarehouses}
+							labelInValue
+							filterOption={false}
+							value={
+								selectedValue
+									? { label: selectedValue, value: selectedValue }
+									: null
+							}
+							onSearch={debounceFetcher}
+							onSelect={handleSelect}
+							showSearch
+							dropdownRender={(menu) => (
+								<div>
+									{menu}
+									{!isEmpty(searchValue) && (
+										<div className="flex items-center justify-start p-2">
+											<Text className="text-gray-300 cursor-pointer">
+												Chọn thêm để tạo vị trí mới
+											</Text>
+										</div>
+									)}
+								</div>
+							)}
+							notFoundContent={
+								warehouseLoading ? (
+									<LoaderCircle
+										className="animate-spin w-full flex justify-center"
+										size={18}
+										strokeWidth={3}
+									/>
+								) : (
+									'Không tìm thấy vị trí'
+								)
+							}
+						/>
+						<Button
+							className="w-fit h-[10]"
+							onClick={handleAddLocation}
+							disabled={isEmpty(searchValue)}
+						>
+							Thêm
+						</Button>
+					</Flex>
 				</Flex>
-			</Flex>
+			)}
 		</Card>
 	);
 };
@@ -196,11 +204,13 @@ type WarehouseItemProps = {
 	item: WarehouseInventory;
 	lineItem: UpdatedLineItem;
 	refetchInventory: () => void;
+	isPermission: boolean;
 };
 const WarehouseItem = ({
 	item,
 	lineItem,
 	refetchInventory,
+	isPermission,
 }: WarehouseItemProps) => {
 	const { getSelectedUnitData, onReset, setSelectedUnit } = useProductUnit();
 	const createOutboundInventory = useAdminCreateOutboundInventory();
@@ -287,53 +297,57 @@ const WarehouseItem = ({
 			justify="space-between"
 			className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
 		>
-			<Popconfirm
-				title={`Lấy hàng tại vị trí (${item.warehouse.location})`}
-				description={
-					<VariantInventoryForm
-						maxQuantity={item.quantity / item.item_unit.quantity}
-						type="OUTBOUND"
-					/>
-				}
-				isLoading={removeOutboundInventory.isLoading}
-				cancelText="Huỷ"
-				okText="Xác nhận"
-				handleOk={onRemoveInventory}
-				handleCancel={() => {}}
-				onOpenChange={(e) => onReset()}
-				icon={null}
-			>
-				<Button
-					className="w-[24px] h-[24px] rounded-full"
-					type="default"
-					danger
-					onClick={() => setSelectedUnit(item.item_unit.id)}
-					icon={<Minus size={16} />}
-				/>
-			</Popconfirm>
-			<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
-			<Popconfirm
-				title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
-				description={<VariantInventoryForm type="INBOUND" />}
-				isLoading={createOutboundInventory.isLoading}
-				cancelText="Huỷ"
-				okText="Xác nhận"
-				handleOk={onAddInventory}
-				handleCancel={() => {}}
-				onOpenChange={(e) => onReset()}
-				icon={null}
-			>
-				<Button
-					className="w-[24px] h-[24px] rounded-full"
-					color="primary"
-					// variant="outlined"
-					type="default"
-					onClick={() =>
-						item && item.item_unit && setSelectedUnit(item.item_unit.id)
+			{isPermission && (
+				<Popconfirm
+					title={`Lấy hàng tại vị trí (${item.warehouse.location})`}
+					description={
+						<VariantInventoryForm
+							maxQuantity={item.quantity / item.item_unit.quantity}
+							type="OUTBOUND"
+						/>
 					}
-					icon={<Plus size={16} />}
-				/>
-			</Popconfirm>
+					isLoading={removeOutboundInventory.isLoading}
+					cancelText="Huỷ"
+					okText="Xác nhận"
+					handleOk={onRemoveInventory}
+					handleCancel={() => {}}
+					onOpenChange={(e) => onReset()}
+					icon={null}
+				>
+					<Button
+						className="w-[24px] h-[24px] rounded-full"
+						type="default"
+						danger
+						onClick={() => setSelectedUnit(item.item_unit.id)}
+						icon={<Minus size={16} />}
+					/>
+				</Popconfirm>
+			)}
+			<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
+			{isPermission && (
+				<Popconfirm
+					title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
+					description={<VariantInventoryForm type="INBOUND" />}
+					isLoading={createOutboundInventory.isLoading}
+					cancelText="Huỷ"
+					okText="Xác nhận"
+					handleOk={onAddInventory}
+					handleCancel={() => {}}
+					onOpenChange={(e) => onReset()}
+					icon={null}
+				>
+					<Button
+						className="w-[24px] h-[24px] rounded-full"
+						color="primary"
+						// variant="outlined"
+						type="default"
+						onClick={() =>
+							item && item.item_unit && setSelectedUnit(item.item_unit.id)
+						}
+						icon={<Plus size={16} />}
+					/>
+				</Popconfirm>
+			)}
 		</Flex>
 	);
 };

@@ -23,7 +23,12 @@ import {
 import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
 import { Region } from '@medusajs/medusa';
 import { Empty, MenuProps, message } from 'antd';
-import { PackageCheck, PackageX, SendHorizontal } from 'lucide-react';
+import {
+	ArrowLeft,
+	PackageCheck,
+	PackageX,
+	SendHorizontal,
+} from 'lucide-react';
 import { useAdminCreateNote } from 'medusa-react';
 import { ChangeEvent, useState } from 'react';
 import Fulfillment from './timeline-events/fulfillment';
@@ -40,6 +45,8 @@ import EditRequested from './timeline-events/order-edit/requested';
 import OrderPlaced from './timeline-events/order-placed';
 import Paid from './timeline-events/paid';
 import Refund from './timeline-events/refund';
+import { useRouter } from 'next/navigation';
+import { ERoutes } from '@/types/routes';
 
 type Props = {
 	orderId: SupplierOrder['id'];
@@ -50,16 +57,17 @@ type Props = {
 };
 
 const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
+	const router = useRouter();
 	const createNote = useAdminCreateNote();
 	const [inputValue, setInputValue] = useState<string>('');
 	const changeSttFulfilled = useMarkAsFulfilledMutation(orderId);
 
-	const { data: order, isLoading: isOrderLoading } =
-		useAdminSupplierOrder(orderId);
-
-	const [status, setStatus] = useState<FulfillSupplierOrderStt>(
-		order?.fulfillment_status || FulfillSupplierOrderStt.NOT_FULFILLED
-	);
+	const {
+		data: order,
+		isLoading: isOrderLoading,
+		refetch: refetchSupplierOrder,
+	} = useAdminSupplierOrder(orderId);
+	console.log('order:', order);
 
 	if (!events?.length) {
 		return (
@@ -96,7 +104,6 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 	};
 
 	const handleMarkAsFulfilled = () => {
-		setStatus(FulfillSupplierOrderStt.DELIVERED);
 		changeSttFulfilled.mutateAsync(
 			{
 				status: FulfillSupplierOrderStt.DELIVERED,
@@ -105,6 +112,7 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 				onSuccess: () => {
 					message.success('Đã đánh dấu nhận hàng thành công');
 					refetch();
+					refetchSupplierOrder();
 				},
 				onError: (error: any) => {
 					message.error(getErrorMessage(error));
@@ -114,7 +122,6 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 	};
 
 	const handleCancelAsFulfilled = () => {
-		setStatus(FulfillSupplierOrderStt.REJECTED);
 		changeSttFulfilled.mutateAsync(
 			{
 				status: FulfillSupplierOrderStt.REJECTED,
@@ -123,6 +130,7 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 				onSuccess: () => {
 					message.success('Đã đánh dấu huỷ nhận hàng thành công');
 					refetch();
+					refetchSupplierOrder();
 				},
 				onError: (error: any) => {
 					message.error(getErrorMessage(error));
@@ -131,21 +139,33 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 		);
 	};
 
-	const actions: MenuProps['items'] = [
-		{
+	const actions = [
+		[
+			FulfillSupplierOrderStt.NOT_FULFILLED,
+			FulfillSupplierOrderStt.REJECTED,
+		].includes(order?.fulfillment_status) && {
 			key: 'mark_as_fulfilled',
 			label: 'Đánh dấu đã nhận hàng',
 			icon: <PackageCheck size={18} />,
 			onClick: handleMarkAsFulfilled,
-			disabled: status === FulfillSupplierOrderStt.DELIVERED,
 		},
-		{
-			key: 'cancel_as_fulfilled',
-			label: 'Đánh dấu huỷ nhận hàng',
-			icon: <PackageX size={18} />,
-			danger: true,
-			onClick: handleCancelAsFulfilled,
-			disabled: status === FulfillSupplierOrderStt.REJECTED,
+		// order?.fulfillment_status === FulfillSupplierOrderStt.DELIVERED && {
+		// 	key: 'cancel_as_fulfilled',
+		// 	label: 'Đánh dấu huỷ nhận hàng',
+		// 	icon: <PackageX size={18} />,
+		// 	danger: true,
+		// 	onClick: handleCancelAsFulfilled,
+		// },
+		[
+			FulfillSupplierOrderStt.DELIVERED,
+			FulfillSupplierOrderStt.INVENTORIED,
+		].includes(order?.fulfillment_status) && {
+			key: 'inbound_detail',
+			label: 'Trang nhập hàng chi tiết',
+			icon: <ArrowLeft size={18} />,
+			onClick: () => {
+				router.push(`${ERoutes.WAREHOUSE_INBOUND}/${orderId}`);
+			},
 		},
 	];
 	return (
@@ -157,7 +177,7 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 				<Flex align="center" justify="space-between" className="pb-4">
 					<Title level={4}>{`Dòng thời gian`}</Title>
 					<div className="flex justify-end items-center gap-4">
-						<ActionAbles actions={actions} />
+						<ActionAbles actions={actions as any} />
 					</div>
 				</Flex>
 				<Flex

@@ -27,7 +27,7 @@ export type AdminProductOutboundListRes = {
 };
 
 export type AdminProductOutboundRes = {
-	order: Order & { handler: User };
+	order: Order & { handler?: User; handler_id?: string };
 	count: number;
 };
 

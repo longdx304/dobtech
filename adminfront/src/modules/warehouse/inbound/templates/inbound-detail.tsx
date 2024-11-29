@@ -154,6 +154,13 @@ const InboundDetail: FC<Props> = ({ id }) => {
 				supplierOrder?.fulfillment_status ===
 				FulfillSupplierOrderStt.INVENTORIED,
 		},
+		{
+			label: 'Trang đặt hàng từ NCC',
+			icon: <ArrowLeft size={20} />,
+			onClick: () => {
+				router.push(`${ERoutes.SUPPLIERS}/${id}`);
+			},
+		},
 	];
 
 	return (
