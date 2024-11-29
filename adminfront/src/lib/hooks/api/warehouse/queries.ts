@@ -1,4 +1,7 @@
-import { AdminWarehousesListRes } from '@/types/warehouse';
+import {
+	AdminWarehousesListRes,
+	AdminWarehouseTransactionsRes,
+} from '@/types/warehouse';
 import generateParams from '@/utils/generate-params';
 import { Response } from '@medusajs/medusa-js';
 import { useQuery } from '@tanstack/react-query';
@@ -55,6 +58,29 @@ export const useAdminWarehouseInventoryByVariant = (variantId: string) => {
 		{
 			enabled: !!variantId,
 		}
+	);
+	return { ...data, ...rest } as const;
+};
+
+export const useAdminWarehouseTransactions = (
+	/**
+	 * Filters and pagination configurations to apply on retrieved currencies.
+	 */
+	query?: Record<string, unknown>,
+	options?: UseQueryOptionsWrapper<
+		Response<AdminWarehouseTransactionsRes>,
+		Error,
+		ReturnType<WarehouseQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+	const params = query && generateParams(query);
+
+	console.log('params', params);
+	const { data, ...rest } = useQuery(
+		adminWarehouseKeys.list(query),
+		() => client.admin.custom.get(`/admin/warehouse/transaction${params}`),
+		options
 	);
 	return { ...data, ...rest } as const;
 };

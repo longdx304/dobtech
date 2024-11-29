@@ -87,7 +87,6 @@ export const useAdminCreateInboundInventory = (
 };
 
 export const useAdminRemoveInboundInventory = (
-	id: string,
 	options?: UseMutationOptions<Response<AdminInventoryRemoveRes>, Error, void>
 ) => {
 	const { client } = useMedusa();
@@ -95,11 +94,7 @@ export const useAdminRemoveInboundInventory = (
 
 	return useMutation(
 		() => client.admin.custom.delete(`/admin/warehouse/inbound/remove`),
-		buildOptions(
-			queryClient,
-			[adminWarehouseKeys.lists(), adminWarehouseKeys.detail(id)],
-			options
-		)
+		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
 	);
 };
 
