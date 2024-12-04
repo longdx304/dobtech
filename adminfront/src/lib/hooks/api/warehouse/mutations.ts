@@ -52,7 +52,7 @@ export const useAdminCreateWarehouseVariant = (
 	);
 };
 
-export const useAdminDeleteItemUnit = (
+export const useAdminDeleteWarehouse = (
 	id: string,
 	options?: UseMutationOptions<Response<AdminWarehouseDeleteRes>, Error, void>
 ) => {
