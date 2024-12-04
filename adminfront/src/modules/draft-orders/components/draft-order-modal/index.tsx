@@ -12,6 +12,7 @@ import SelectRegion from '../new/select-region';
 import SelectShipping from '../new/select-shipping';
 import ShippingDetails from '../new/shipping-details';
 import Summary from '../new/summary';
+import useIsDesktop from '@/lib/hooks/useIsDesktop';
 
 type Props = {
 	state: boolean;
@@ -21,6 +22,7 @@ type Props = {
 
 const DraftOrderModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 	const { mutate } = useAdminCreateDraftOrder();
+	const isDesktop = useIsDesktop();
 	const {
 		form,
 		context: { items },
@@ -63,7 +65,6 @@ const DraftOrderModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 
 			mutate(transformedData as any, {
 				onSuccess: () => {
-					// notification.success({ message: 'Draft order created successfully' });
 					message.success('Tạo bản nháp đơn hàng thành công');
 					form.resetFields();
 					handleOk();
@@ -86,9 +87,11 @@ const DraftOrderModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 				title="Tạo bản nháp đơn hàng"
 				steps={steps}
 				onFinish={handleFinish}
+				isMobile={!isDesktop}
 			/>
 		</StepModalProvider>
 	);
 };
 
 export default DraftOrderModal;
+

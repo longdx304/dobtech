@@ -10,6 +10,7 @@ import {
 	Ellipsis,
 	LayoutList,
 	LogOut,
+	NotebookPen,
 	PackageMinus,
 	PackagePlus,
 	Settings,
@@ -67,16 +68,16 @@ const itemOverview = (role: string, permissions: string[]) =>
 const itemsWarehouse: MenuProps['items'] = [
 	getItem('Nhập kho', 'warehouse-inbound', <PackagePlus />),
 	getItem('Xuất kho', 'warehouse-outbound', <PackageMinus />),
-	getItem('Sổ kho', 'warehouse-transaction', <LayoutList />),
+	getItem('Sổ kho', 'warehouse-transaction', <NotebookPen />),
 ];
 
 // Item menu option
 const itemsAdmin: MenuProps['items'] = [
+	getItem('Nhập hàng', 'suppliers', <Warehouse />),
 	getItem('Quản lý nhân viên', 'accounts', <Users />),
 	getItem('Danh mục', 'product-categories', <LayoutList />),
 	getItem('Định giá', 'pricing', <CircleDollarSign />),
 	getItem('Khách hàng', 'customers', <UsersRound />),
-	getItem('Nhà Cung Cấp', 'suppliers', <Warehouse />),
 	getItem('Giảm giá', 'discounts', <SquarePercent />),
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
