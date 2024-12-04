@@ -25,7 +25,7 @@ import {
 	WarehouseInventory,
 } from '@/types/warehouse';
 import { useQueryClient } from '@tanstack/react-query';
-import { Col, message, Row } from 'antd';
+import { Col, message, Row, Modal as AntdModal } from 'antd';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import { LoaderCircle, Minus, Plus } from 'lucide-react';
@@ -48,6 +48,8 @@ const WarehouseForm = ({
 	lineItem,
 	isPermission,
 }: WarehouseFormProps) => {
+	const { getSelectedUnitData, onReset } = useProductUnit();
+
 	const [searchValue, setSearchValue] = useState<string | null>(null);
 	const {
 		warehouse,
@@ -81,31 +83,65 @@ const WarehouseForm = ({
 
 	const handleAddLocation = async () => {
 		if (!searchValue) return;
-		await addWarehouse.mutateAsync({
-			location: searchValue,
-			variant_id: variantId,
+		const unitData = getSelectedUnitData();
+		AntdModal.confirm({
+			title: 'Thêm vị trí mới',
+			content: <VariantInventoryForm type="INBOUND" />,
+			onOk: async () => {
+				await addWarehouse.mutateAsync(
+					{
+						location: searchValue,
+						variant_id: variantId,
+					},
+					{
+						onSuccess: () => {
+							message.success('Thêm vị trí cho sản phẩm thành công');
+							refetchWarehouse();
+							refetchInventory();
+						},
+						onError: (error: any) => {
+							message.error(getErrorMessage(error));
+						},
+					}
+				);
+			},
+			cancelText: 'Huỷ',
+			okText: 'Xác nhận',
+			icon: null,
 		});
-		refetchWarehouse();
-		refetchInventory();
 	};
 
 	const handleSelect = async (data: ValueType) => {
-		try {
-			setSelectedValue(null);
-			const { label, value } = data as ValueType;
-			if (!value || !label) return;
-			await addWarehouse.mutateAsync({
-				warehouse_id: value,
-				location: label,
-				variant_id: variantId,
-			});
-			refetchWarehouse();
-			refetchInventory();
-			message.success('Thêm vị trí cho sản phẩm thành công');
-		} catch (error: any) {
-			console.log('error:', error);
-			message.error(error.error);
-		}
+		setSelectedValue(null);
+		const { label, value } = data as ValueType;
+		if (!value || !label) return;
+		const unitData = getSelectedUnitData();
+		AntdModal.confirm({
+			title: 'Thêm vị trí mới',
+			content: <VariantInventoryForm type="INBOUND" />,
+			onOk: async () => {
+				await addWarehouse.mutateAsync(
+					{
+						warehouse_id: value,
+						location: label,
+						variant_id: variantId,
+					},
+					{
+						onSuccess: () => {
+							message.success('Thêm vị trí cho sản phẩm thành công');
+							refetchWarehouse();
+							refetchInventory();
+						},
+						onError: (error: any) => {
+							message.error(getErrorMessage(error));
+						},
+					}
+				);
+			},
+			cancelText: 'Huỷ',
+			okText: 'Xác nhận',
+			icon: null,
+		});
 	};
 
 	return (

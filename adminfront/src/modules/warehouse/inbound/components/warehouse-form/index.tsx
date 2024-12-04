@@ -18,7 +18,7 @@ import VariantInventoryForm from '@/modules/warehouse/components/variant-invento
 import { LineItem } from '@/types/lineItem';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import { useQueryClient } from '@tanstack/react-query';
-import { Col, message, Row } from 'antd';
+import { Col, message, Row, Modal as AntdModal } from 'antd';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import { LoaderCircle, Minus, Plus } from 'lucide-react';
@@ -36,6 +36,7 @@ type ValueType = {
 };
 
 const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
+	const { getSelectedUnitData, onReset } = useProductUnit();
 	const [searchValue, setSearchValue] = useState<string | null>(null);
 	const {
 		warehouse,
@@ -69,31 +70,65 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 
 	const handleAddLocation = async () => {
 		if (!searchValue) return;
-		await addWarehouse.mutateAsync({
-			location: searchValue,
-			variant_id: variantId,
+		const unitData = getSelectedUnitData();
+		AntdModal.confirm({
+			title: 'Thêm vị trí mới',
+			content: <VariantInventoryForm type="INBOUND" />,
+			onOk: async () => {
+				await addWarehouse.mutateAsync(
+					{
+						location: searchValue,
+						variant_id: variantId,
+					},
+					{
+						onSuccess: () => {
+							message.success('Thêm vị trí cho sản phẩm thành công');
+							refetchWarehouse();
+							refetchInventory();
+						},
+						onError: (error: any) => {
+							message.error(getErrorMessage(error));
+						},
+					}
+				);
+			},
+			cancelText: 'Huỷ',
+			okText: 'Xác nhận',
+			icon: null,
 		});
-		refetchWarehouse();
-		refetchInventory();
 	};
 
 	const handleSelect = async (data: ValueType) => {
-		try {
-			setSelectedValue(null);
-			const { label, value } = data as ValueType;
-			if (!value || !label) return;
-			await addWarehouse.mutateAsync({
-				warehouse_id: value,
-				location: label,
-				variant_id: variantId,
-			});
-			refetchWarehouse();
-			refetchInventory();
-			message.success('Thêm vị trí cho sản phẩm thành công');
-		} catch (error: any) {
-			console.log('error:', error);
-			message.error(error.error);
-		}
+		setSelectedValue(null);
+		const { label, value } = data as ValueType;
+		if (!value || !label) return;
+		const unitData = getSelectedUnitData();
+		AntdModal.confirm({
+			title: 'Thêm vị trí mới',
+			content: <VariantInventoryForm type="INBOUND" />,
+			onOk: async () => {
+				await addWarehouse.mutateAsync(
+					{
+						warehouse_id: value,
+						location: label,
+						variant_id: variantId,
+					},
+					{
+						onSuccess: () => {
+							message.success('Thêm vị trí cho sản phẩm thành công');
+							refetchWarehouse();
+							refetchInventory();
+						},
+						onError: (error: any) => {
+							message.error(getErrorMessage(error));
+						},
+					}
+				);
+			},
+			cancelText: 'Huỷ',
+			okText: 'Xác nhận',
+			icon: null,
+		});
 	};
 
 	return (
@@ -189,11 +224,13 @@ type WarehouseItemProps = {
 	item: WarehouseInventory;
 	lineItem: UpdatedLineItem;
 	refetchInventory: () => void;
+	isPermission?: boolean;
 };
 const WarehouseItem = ({
 	item,
 	lineItem,
 	refetchInventory,
+	isPermission = false,
 }: WarehouseItemProps) => {
 	const { getSelectedUnitData, onReset, setSelectedUnit } = useProductUnit();
 	const createInboundInventory = useAdminCreateInboundInventory();
@@ -245,28 +282,86 @@ const WarehouseItem = ({
 	};
 
 	return (
-		<Popconfirm
-			title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
-			description={<VariantInventoryForm type="INBOUND" />}
-			isLoading={createInboundInventory.isLoading}
-			cancelText="Huỷ"
-			okText="Xác nhận"
-			handleOk={onAddUnit}
-			handleCancel={() => {}}
-			onOpenChange={(e) => onReset()}
-			icon={null}
+		// <Popconfirm
+		// 	title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
+		// 	description={<VariantInventoryForm type="INBOUND" />}
+		// 	isLoading={createInboundInventory.isLoading}
+		// 	cancelText="Huỷ"
+		// 	okText="Xác nhận"
+		// 	handleOk={onAddUnit}
+		// 	handleCancel={() => {}}
+		// 	onOpenChange={(e) => onReset()}
+		// 	icon={null}
+		// >
+		// 	<Flex
+		// 		align="center"
+		// 		gap="small"
+		// 		justify="center"
+		// 		className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
+		// 		onClick={() =>
+		// 			item && item.item_unit && setSelectedUnit(item.item_unit.id)
+		// 		}
+		// 	>
+		// 		<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
+		// 	</Flex>
+		// </Popconfirm>
+		<Flex
+			align="center"
+			gap="small"
+			justify="space-between"
+			className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
 		>
-			<Flex
-				align="center"
-				gap="small"
-				justify="center"
-				className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
-				onClick={() =>
-					item && item.item_unit && setSelectedUnit(item.item_unit.id)
-				}
-			>
-				<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
-			</Flex>
-		</Popconfirm>
+			{isPermission && (
+				<Popconfirm
+					title={`Lấy hàng tại vị trí (${item.warehouse.location})`}
+					description={
+						<VariantInventoryForm
+							maxQuantity={item.quantity / item.item_unit.quantity}
+							type="OUTBOUND"
+						/>
+					}
+					isLoading={createInboundInventory.isLoading}
+					cancelText="Huỷ"
+					okText="Xác nhận"
+					handleOk={onAddUnit}
+					handleCancel={() => {}}
+					onOpenChange={(e) => onReset()}
+					icon={null}
+				>
+					<Button
+						className="w-[24px] h-[24px] rounded-full"
+						type="default"
+						danger
+						onClick={() => setSelectedUnit(item.item_unit.id)}
+						icon={<Minus size={16} />}
+					/>
+				</Popconfirm>
+			)}
+			<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
+			{isPermission && (
+				<Popconfirm
+					title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
+					description={<VariantInventoryForm type="INBOUND" />}
+					isLoading={createInboundInventory.isLoading}
+					cancelText="Huỷ"
+					okText="Xác nhận"
+					handleOk={onAddUnit}
+					handleCancel={() => {}}
+					onOpenChange={(e) => onReset()}
+					icon={null}
+				>
+					<Button
+						className="w-[24px] h-[24px] rounded-full"
+						color="primary"
+						// variant="outlined"
+						type="default"
+						onClick={() =>
+							item && item.item_unit && setSelectedUnit(item.item_unit.id)
+						}
+						icon={<Plus size={16} />}
+					/>
+				</Popconfirm>
+			)}
+		</Flex>
 	);
 };
