@@ -82,11 +82,13 @@ const Header: FC<Props> = ({}) => {
 					</Flex>
 				</Flex>
 				{/* Desktop: Content Menu */}
-				<Menubar
-					user={user as Omit<User, 'password_hash'>}
-					remove={remove}
-					className="hidden sm:block"
-				/>
+				<div className="hidden sm:block h-[calc(100vh-100px)] overflow-y-auto">
+					<Menubar
+						user={user as Omit<User, 'password_hash'>}
+						remove={remove}
+						className="pr-2"
+					/>
+				</div>
 				{/* Mobile: Drawer menu */}
 				<DrawerMenu
 					state={state}

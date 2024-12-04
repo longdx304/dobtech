@@ -41,7 +41,7 @@ const ItemUnitModal = ({
 						handleClose();
 					},
 					onError: (error: any) => {
-						message.error('Cập nhật đơn vị hàng thất bại');
+						message.error(getErrorMessage(error));
 					},
 				});
 			} else {
@@ -52,7 +52,7 @@ const ItemUnitModal = ({
 						handleClose();
 					},
 					onError: (error: any) => {
-						message.error('Tạo đơn vị hàng thất bại! Kiểm tra lại');
+						message.error(getErrorMessage(error));
 					},
 				});
 			}

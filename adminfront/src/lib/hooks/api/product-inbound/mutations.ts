@@ -1,5 +1,6 @@
-import { ProductInboundHandlerReq } from '@/types/supplier';
+import { SupplierOrder } from '@/types/supplier';
 import { buildOptions } from '@/utils/build-options';
+import { Response } from '@medusajs/medusa-js';
 import {
 	useMutation,
 	UseMutationOptions,
@@ -18,5 +19,31 @@ export const useAdminProductInboundHandler = (
 		({ id }: { id: string }) =>
 			client.admin.custom.post(`/admin/product-inbound/${id}/handler`),
 		buildOptions(queryClient, [adminProductInboundKeys.lists()], options)
+	);
+};
+
+type AdminProductInboundConfirmRes = {
+	supplierOrder: SupplierOrder;
+	message: string;
+};
+
+export const useAdminProductInboundConfirmById = (
+	id: string,
+	options?: UseMutationOptions<
+		Response<AdminProductInboundConfirmRes>,
+		Error,
+		void
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		() => client.admin.custom.post(`/admin/product-inbound/${id}/confirm`),
+		buildOptions(
+			queryClient,
+			[adminProductInboundKeys.lists(), adminProductInboundKeys.detail(id)],
+			options
+		)
 	);
 };

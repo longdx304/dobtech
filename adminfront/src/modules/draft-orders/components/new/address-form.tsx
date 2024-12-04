@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
-import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
 import { Option } from '@/types/shared';
-import { Col, Divider, Form, Row, Checkbox } from 'antd';
+import { Checkbox, Col, Divider, Form, Row } from 'antd';
+import React, { useEffect } from 'react';
 
 export type AddressPayload = {
 	first_name: string;

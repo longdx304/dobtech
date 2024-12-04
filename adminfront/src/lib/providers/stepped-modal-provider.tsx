@@ -23,6 +23,7 @@ interface StepModalProps {
 	title: string;
 	steps: StepModalScreen[];
 	onFinish: () => void;
+	isMobile?: boolean;
 }
 
 // Step Context
@@ -117,6 +118,7 @@ export const StepModal: React.FC<StepModalProps> = ({
 	title,
 	steps,
 	onFinish,
+	isMobile = false,
 }) => {
 	const SteppedContext = useStepModal();
 
@@ -169,21 +171,34 @@ export const StepModal: React.FC<StepModalProps> = ({
 					{SteppedContext.currentStep === steps.length - 1 ? 'Tạo' : 'Tiếp tục'}
 				</Button>,
 			]}
-			width={800}
+			width={isMobile ? '95%' : 800}
 			centered
+			styles={{
+				body: {
+					maxHeight: isMobile ? '65vh' : '600px',
+					overflowY: 'auto',
+				},
+			}}
+			style={{
+				top: isMobile ? 20 : undefined,
+			}}
+			className={isMobile ? 'mobile-step-modal' : ''}
 		>
-			<div className="mb-6">
+			<div className={`mb-6 ${isMobile ? 'px-2' : ''}`}>
 				<Steps
 					current={SteppedContext.currentStep}
 					items={steps.map((step) => ({ title: step.title }))}
+					size={isMobile ? 'small' : 'default'}
+					direction="horizontal"
+					className="flex-row"
 				/>
 			</div>
 			<div
-				className={clsx('transition-all duration-200', 'min-h-[200px] p-4')}
-				style={{
-					maxHeight: '600px',
-					overflowY: 'auto',
-				}}
+				className={clsx(
+					'transition-all duration-200',
+					'min-h-[200px]',
+					isMobile ? 'p-2' : 'p-4'
+				)}
 			>
 				{steps[SteppedContext.currentStep].content}
 			</div>
