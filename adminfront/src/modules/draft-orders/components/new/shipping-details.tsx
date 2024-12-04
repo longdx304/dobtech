@@ -31,6 +31,7 @@ const ShippingDetails = () => {
 	const shippingAddressId = Form.useWatch('shipping_address_id', form);
 	const { customers, isLoading } = useAdminCustomers();
 
+	// select customer options
 	useEffect(() => {
 		if (customers) {
 			setCustomerOptions(
@@ -42,10 +43,12 @@ const ShippingDetails = () => {
 		}
 	}, [customers]);
 
+	// get customer
 	const { customer } = useAdminCustomer(customerId, {
 		enabled: !!customerId,
 	});
 
+	// get valid addresses
 	const validAddresses = useMemo(() => {
 		if (!customer) {
 			return [];
@@ -176,7 +179,7 @@ const ShippingDetails = () => {
 					<Form.Item
 						name={'customer_id'}
 						label="Tìm khách hàng có sẵn"
-						className="flex-1"
+						className="flex-1 truncate"
 					>
 						<Select
 							showSearch

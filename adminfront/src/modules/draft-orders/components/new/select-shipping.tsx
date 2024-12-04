@@ -40,7 +40,7 @@ const SelectShipping = () => {
 	}, [selectedShippingOption]);
 
 	return (
-		<div className="min-h-[705px]">
+		<div className="min-h-[500px]">
 			<h3 className="inter-base-semibold">
 				Phương thức vận chuyển{' '}
 				<span className="inter-base-regular text-grey-50">

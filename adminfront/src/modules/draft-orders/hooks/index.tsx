@@ -6,7 +6,7 @@ import {
 	UseMutationOptions,
 	useQueryClient,
 } from '@tanstack/react-query';
-import { adminDraftOrderKeys } from 'medusa-react';
+import { adminDraftOrderKeys, adminOrderKeys } from 'medusa-react';
 import api from '../../../services/api';
 
 export type AdminDraftOrderTransferRes = {
@@ -25,5 +25,5 @@ export const useAdminDraftOrderTransferOrder = (
 	return useMutation(async () => {
 		const response = await api.draftOrders.transferToOrder(id);
 		return response.data as unknown as Response<AdminDraftOrderTransferRes>;
-	}, buildOptions(queryClient, [adminDraftOrderKeys.detail(id), adminDraftOrderKeys.lists()], options));
+	}, buildOptions(queryClient, [adminDraftOrderKeys.detail(id), adminDraftOrderKeys.lists(), adminOrderKeys.lists()], options));
 };
