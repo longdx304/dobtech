@@ -65,8 +65,8 @@ const itemOverview = (role: string, permissions: string[]) =>
 
 // Item menu warehouse
 const itemsWarehouse: MenuProps['items'] = [
-	getItem('Nhập hàng', 'warehouse-inbound', <PackagePlus />),
-	getItem('Lấy hàng', 'warehouse-outbound', <PackageMinus />),
+	getItem('Nhập kho', 'warehouse-inbound', <PackagePlus />),
+	getItem('Xuất kho', 'warehouse-outbound', <PackageMinus />),
 	getItem('Sổ kho', 'warehouse-transaction', <LayoutList />),
 ];
 
@@ -133,6 +133,7 @@ export const menuItems = (
 		intersection(permissions, [
 			EPermissions.WarehouseManager,
 			EPermissions.WarehouseStaff,
+			EPermissions.InventoryChecker,
 		])
 	);
 

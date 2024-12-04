@@ -24,8 +24,8 @@ import { Modal as AntdModal, message } from 'antd';
 import { useMarkAsFulfilledMutation } from '@/lib/hooks/api/supplier-order';
 import Image from 'next/image';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
-import clsx from 'clsx';
 import { getErrorMessage } from '@/lib/utils';
+import { useUser } from '@/lib/providers/user-provider';
 
 type Props = {
 	id: string;
@@ -34,6 +34,7 @@ type Props = {
 const DEFAULT_PAGE_SIZE = 10;
 const InboundDetail: FC<Props> = ({ id }) => {
 	const router = useRouter();
+	const { user } = useUser();
 	const { state, onOpen, onClose } = useToggleState();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [variantId, setVariantId] = useState<string | null>(null);
@@ -44,6 +45,13 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	const [activeKey, setActiveKey] = useState<FulfillSupplierOrderStt>(
 		FulfillSupplierOrderStt.DELIVERED
 	);
+
+	const isPermission = useMemo(() => {
+		if (!user) return false;
+		if (user.role === 'admin' || supplierOrder?.handler_id === user.id)
+			return true;
+		return false;
+	}, [user, supplierOrder?.handler_id]);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;

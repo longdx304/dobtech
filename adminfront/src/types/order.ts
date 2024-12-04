@@ -1,4 +1,10 @@
 import { FormImage, Option } from '@/types/shared';
+import { Order as MedusaOrder, User } from '@medusajs/medusa';
+
+export type Order = MedusaOrder &{
+	handler_id?: string;
+	handler?: User;
+}
 
 export type AddressPayload = {
 	first_name: string;

@@ -19,7 +19,7 @@ const Fulfillment: React.FC<OrderPlacedProps> = ({ event }) => {
 
 	const title =
 		event.type === 'fulfillment-delivered'
-			? 'Đã nhận hàng thành công'
+			? 'Hàng đã về kho'
 			: event.type === 'fulfillment-inventoried'
 			? 'Đã nhập hàng vào kho'
 			: 'Đã hủy nhận hàng';

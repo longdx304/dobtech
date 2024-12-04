@@ -5,8 +5,8 @@ import { ProductUnitProvider } from '@/lib/providers/product-unit-provider';
 import OutboundDetail from '@/modules/warehouse/outbound/templates/outbound-detail';
 
 export const metadata: Metadata = {
-	title: 'Chi tiết lấy hàng',
-	description: 'Trang quản lý lấy hàng.',
+	title: 'Chi tiết xuất kho',
+	description: 'Trang quản lý xuất kho.',
 };
 
 interface Props {

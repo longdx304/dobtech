@@ -9,12 +9,14 @@ import { Text, Title } from '@/components/Typography';
 import { useAdminProductInbounds } from '@/lib/hooks/api/product-inbound/queries';
 import { ERoutes } from '@/types/routes';
 import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
-import { TabsProps } from 'antd';
+import { message, TabsProps } from 'antd';
 import debounce from 'lodash/debounce';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import InboundItem from '../components/inbound-item';
+import { useAdminProductInboundHandler } from '@/lib/hooks/api/product-inbound/mutations';
+import { getErrorMessage } from '@/lib/utils';
 
 type Props = {};
 
@@ -34,6 +36,7 @@ const ListInbound: FC<Props> = ({}) => {
 		limit: DEFAULT_PAGE_SIZE,
 		status: activeKey,
 	});
+	const productInboundHandler = useAdminProductInboundHandler();
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -60,17 +63,30 @@ const ListInbound: FC<Props> = ({}) => {
 		},
 	];
 
-	const handleClickDetail = (id: string) => {
-		router.push(`${ERoutes.WAREHOUSE_INBOUND}/${id}`);
+	const handleClickDetail = async (item: SupplierOrder) => {
+		console.log('item:', item);
+		if (item?.handler_id) {
+			return router.push(`${ERoutes.WAREHOUSE_INBOUND}/${item.id}`);
+		}
+
+		await productInboundHandler.mutateAsync(
+			{ id: item.id },
+			{
+				onSuccess: () => {
+					router.push(`${ERoutes.WAREHOUSE_INBOUND}/${item.id}`);
+				},
+				onError: (err) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
 	};
 
 	return (
 		<Flex vertical gap={12}>
 			<Flex vertical align="flex-start" className="">
-				<Title level={3}>Đơn nhập hàng</Title>
-				<Text className="text-gray-600">
-					Trang danh sách các đơn nhập hàng.
-				</Text>
+				<Title level={3}>Đơn nhập kho</Title>
+				<Text className="text-gray-600">Trang danh sách các đơn nhập kho.</Text>
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				<Title level={4}>Theo dõi các đơn hàng</Title>
@@ -92,7 +108,7 @@ const ListInbound: FC<Props> = ({}) => {
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, lg: 3 }}
 					dataSource={supplierOrder}
-					loading={isLoading}
+					loading={isLoading || productInboundHandler.isLoading}
 					renderItem={(item: SupplierOrder) => (
 						<List.Item>
 							<InboundItem item={item} handleClickDetail={handleClickDetail} />

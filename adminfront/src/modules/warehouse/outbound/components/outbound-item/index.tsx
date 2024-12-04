@@ -3,14 +3,13 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
-import { FulfillmentStatus } from '@/types/order';
-import { Order, User } from '@medusajs/medusa';
+import { FulfillmentStatus, Order } from '@/types/order';
 import dayjs from 'dayjs';
 import { Check, Clock } from 'lucide-react';
 
 type OutboundItemProps = {
-	item: Order & { handler: User };
-	handleClickDetail: (id: string) => void;
+	item: Order;
+	handleClickDetail: (item: Order) => void;
 };
 
 const OutboundItem: React.FC<OutboundItemProps> = ({
@@ -20,7 +19,7 @@ const OutboundItem: React.FC<OutboundItemProps> = ({
 	const isProcessing = item.fulfillment_status !== FulfillmentStatus.FULFILLED;
 
 	const handleClick = () => {
-		handleClickDetail(item.id);
+		handleClickDetail(item);
 	};
 
 	return (
@@ -39,17 +38,25 @@ const OutboundItem: React.FC<OutboundItemProps> = ({
 				<Text className="text-sm font-semibold">{`#${item.display_id}`}</Text>
 			</Flex>
 			<Flex gap={4} className="" align="center">
-				<Text className="text-[14px] text-gray-500">Người xử lý:</Text>
-				<Text className="text-sm font-semibold">{`${item.handler.last_name} ${item.handler.first_name}`}</Text>
-			</Flex>
-			<Flex gap={4} className="" align="center">
 				<Text className="text-[14px] text-gray-500">Ngày đặt hàng:</Text>
 				<Text className="text-sm font-semibold">
 					{dayjs(item.created_at).format('DD/MM/YYYY')}
 				</Text>
 			</Flex>
+			<Flex gap={4} className="" align="center">
+				<Text className="text-[14px] text-gray-500">Người xử lý:</Text>
+				<Text className="text-sm font-semibold">
+					{item?.handler_id
+						? `${item.handler?.last_name} ${item.handler?.first_name}`
+						: 'Chưa xác định'}
+				</Text>
+			</Flex>
 			<Button className="w-full mt-2" onClick={handleClick}>
-				{isProcessing ? 'Lấy hàng' : 'Chi tiết'}
+				{!item?.handler_id
+					? 'Nhận xuất kho'
+					: isProcessing
+					? 'Xuất kho'
+					: 'Chi tiết'}
 			</Button>
 		</Card>
 	);

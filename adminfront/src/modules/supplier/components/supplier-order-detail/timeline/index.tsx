@@ -67,7 +67,6 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 		isLoading: isOrderLoading,
 		refetch: refetchSupplierOrder,
 	} = useAdminSupplierOrder(orderId);
-	console.log('order:', order);
 
 	if (!events?.length) {
 		return (
@@ -110,7 +109,7 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 			},
 			{
 				onSuccess: () => {
-					message.success('Đã đánh dấu nhận hàng thành công');
+					message.success('Đã xác nhận hàng đã về kho thành công');
 					refetch();
 					refetchSupplierOrder();
 				},
@@ -145,7 +144,7 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 			FulfillSupplierOrderStt.REJECTED,
 		].includes(order?.fulfillment_status) && {
 			key: 'mark_as_fulfilled',
-			label: 'Đánh dấu đã nhận hàng',
+			label: 'Xác nhận hàng đã về kho',
 			icon: <PackageCheck size={18} />,
 			onClick: handleMarkAsFulfilled,
 		},

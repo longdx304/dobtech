@@ -5,8 +5,8 @@ import InboundDetail from '@/modules/warehouse/inbound/templates/inbound-detail'
 import { ProductUnitProvider } from '@/lib/providers/product-unit-provider';
 
 export const metadata: Metadata = {
-	title: 'Chi tiết nhập hàng',
-	description: 'Trang quản lý nhập hàng.',
+	title: 'Chi tiết nhập kho',
+	description: 'Trang quản lý nhập kho.',
 };
 
 interface Props {
