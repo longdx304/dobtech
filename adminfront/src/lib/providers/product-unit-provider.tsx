@@ -11,7 +11,7 @@ export enum ProductUnit {
 type ProductUnitContextType = {
 	item_units: ItemUnit[];
 	optionItemUnits?: { value: string; label: string }[];
-	defaultUnit: string;
+	defaultUnit: string | null;
 	selectedUnit: string | null;
 	quantity: number;
 	setSelectedUnit: (unitId: string) => void;
@@ -45,14 +45,15 @@ export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
 
 	const optionItemUnits = useMemo(() => {
 		if (!item_units) return [];
-		return item_units.map((item) => ({
-			value: item.id,
-			label: item.unit,
-		}));
+		return item_units
+			.filter((item) => item.id !== 'default')
+			.map((item) => ({
+				value: item.id,
+				label: item.unit,
+			}));
 	}, [item_units]);
 
-	const defaultUnit =
-		item_units?.find((item) => item.unit === 'đôi')?.id ?? 'đôi';
+	const defaultUnit = item_units?.find((item) => item.quantity === 6)?.id ?? '';
 
 	const getSelectedUnitData = () => {
 		if (quantity > 0) {

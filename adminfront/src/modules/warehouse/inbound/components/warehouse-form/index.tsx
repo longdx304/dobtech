@@ -36,6 +36,7 @@ type ValueType = {
 };
 
 const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
+	const [modal, contextHolder] = AntdModal.useModal();
 	const { getSelectedUnitData, onReset } = useProductUnit();
 	const [searchValue, setSearchValue] = useState<string | null>(null);
 	const {
@@ -71,7 +72,7 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 	const handleAddLocation = async () => {
 		if (!searchValue) return;
 		const unitData = getSelectedUnitData();
-		AntdModal.confirm({
+		await modal.confirm({
 			title: 'Thêm vị trí mới',
 			content: <VariantInventoryForm type="INBOUND" />,
 			onOk: async () => {
@@ -103,7 +104,7 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 		const { label, value } = data as ValueType;
 		if (!value || !label) return;
 		const unitData = getSelectedUnitData();
-		AntdModal.confirm({
+		await modal.confirm({
 			title: 'Thêm vị trí mới',
 			content: <VariantInventoryForm type="INBOUND" />,
 			onOk: async () => {
@@ -137,6 +138,7 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 			rounded
 			loading={warehouseInventoryLoading}
 		>
+			{contextHolder}
 			<Flex vertical gap={6}>
 				<Text strong className="">
 					Vị trí sản phẩm trong kho
