@@ -93,10 +93,9 @@ const gatherAllFulfillments = (order: Order) => {
 };
 
 const Fulfillment = ({ order, isLoading, refetch }: Props) => {
-	console.log('order:', order);
 	const [fulfillmentToShip, setFulfillmentToShip] = useState(null);
-	const handlerInventoryOrder = useAdminAsignOrder(order!.id);
-	const { user } = useUser();
+	// const handlerInventoryOrder = useAdminAsignOrder(order!.id);
+	// const { user } = useUser();
 
 	if (!order || order.id === undefined) {
 		return (
@@ -106,30 +105,30 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 		);
 	}
 
-	const anyItemsToFulfil = order.items.some(
-		(item: LineItem) => item.quantity > (item.fulfilled_quantity ?? 0)
-	);
+	// const anyItemsToFulfil = order.items.some(
+	// 	(item: LineItem) => item.quantity > (item.fulfilled_quantity ?? 0)
+	// );
 
 	const allFulfillments = gatherAllFulfillments(order);
 
-	const handleOkFulfillment = async () => {
-		if (user?.id) {
-			await handlerInventoryOrder.mutateAsync(
-				{
-					handler_id: user!.id,
-				},
-				{
-					onSuccess: () => {
-						message.success('Bạn đã phụ trách đơn hàng này');
-						refetch();
-					},
-					onError: (err) => {
-						message.error(getErrorMessage(err));
-					},
-				}
-			);
-		}
-	};
+	// const handleOkFulfillment = async () => {
+	// 	if (user?.id) {
+	// 		await handlerInventoryOrder.mutateAsync(
+	// 			{
+	// 				handler_id: user!.id,
+	// 			},
+	// 			{
+	// 				onSuccess: () => {
+	// 					message.success('Bạn đã phụ trách đơn hàng này');
+	// 					refetch();
+	// 				},
+	// 				onError: (err) => {
+	// 					message.error(getErrorMessage(err));
+	// 				},
+	// 			}
+	// 		);
+	// 	}
+	// };
 
 	return (
 		<Card loading={isLoading} className="px-4">
@@ -138,7 +137,7 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 					<Title level={4}>{`Fulfillment`}</Title>
 					<div className="flex flex-col-reverse lg:flex-row gap-0 justify-end items-center lg:gap-4">
 						<FulfillmentStatus status={order!.fulfillment_status} />
-						{order.status !== 'canceled' &&
+						{/* {order.status !== 'canceled' &&
 							anyItemsToFulfil &&
 							!order.handler_id && (
 								<Button
@@ -149,7 +148,7 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 								>
 									{'Thực hiện lấy hàng'}
 								</Button>
-							)}
+							)} */}
 					</div>
 				</Flex>
 			</div>
