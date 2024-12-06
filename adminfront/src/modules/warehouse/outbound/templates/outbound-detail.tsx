@@ -28,6 +28,7 @@ import { getErrorMessage } from '@/lib/utils';
 import { LineItem } from '@/types/lineItem';
 import clsx from 'clsx';
 import { useUser } from '@/lib/providers/user-provider';
+import Notes from '../../inbound/components/notes';
 
 type Props = {
 	id: string;
@@ -215,7 +216,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					centered
 				/>
 				<List
-					grid={{ gutter: 12, xs: 1, sm: 2, lg: 3 }}
+					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
 					dataSource={lineItems}
 					loading={isLoading}
 					renderItem={(item: LineItem) => (
@@ -249,6 +250,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					/>
 				)}
 			</Card>
+			<Notes orderId={id} type="OUTBOUND" />
 		</Flex>
 	);
 };

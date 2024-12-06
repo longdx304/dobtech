@@ -1,32 +1,35 @@
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
-import { Popconfirm } from '@/components/Popconfirm';
+import { Modal } from '@/components/Modal';
 import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
+import { queryClient } from '@/lib/constants/query-client';
 import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
-import { ADMIN_PRODUCT_INBOUND } from '@/lib/hooks/api/product-inbound';
+import { useAdminCreateWarehouseAndInventory } from '@/lib/hooks/api/product-inbound';
 import {
-	useAdminCreateInboundInventory,
-	useAdminCreateWarehouseVariant,
 	useAdminWarehouseInventoryByVariant,
 	useAdminWarehouses,
 } from '@/lib/hooks/api/warehouse';
+import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/warehouse/components/variant-inventory-form';
 import { LineItem } from '@/types/lineItem';
-import { Warehouse, WarehouseInventory } from '@/types/warehouse';
-import { useQueryClient } from '@tanstack/react-query';
-import { Col, message, Row, Modal as AntdModal } from 'antd';
+import { AdminPostItemData, Warehouse } from '@/types/warehouse';
+import { Col, message, Row } from 'antd';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
-import { LoaderCircle, Minus, Plus } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import WarehouseItem from './warehouse-item';
 
 type WarehouseFormProps = {
 	variantId: string;
-	lineItem: LineItem;
+	lineItem: LineItem & {
+		supplier_order_id: string;
+	};
+	isPermission: boolean;
 };
 
 type ValueType = {
@@ -35,20 +38,24 @@ type ValueType = {
 	value: string;
 };
 
-const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
-	const [modal, contextHolder] = AntdModal.useModal();
+const WarehouseForm = ({
+	variantId,
+	lineItem,
+	isPermission,
+}: WarehouseFormProps) => {
 	const { getSelectedUnitData, onReset } = useProductUnit();
-	const [searchValue, setSearchValue] = useState<string | null>(null);
+	const [searchValue, setSearchValue] = useState<ValueType | null>(null);
+	const { state: isModalOpen, onOpen, onClose } = useToggleState(false);
 	const {
 		warehouse,
 		isLoading: warehouseLoading,
 		refetch: refetchWarehouse,
 	} = useAdminWarehouses({
-		q: searchValue,
+		q: searchValue?.label ?? undefined,
 	});
 
 	const [selectedValue, setSelectedValue] = useState<string | null>(null);
-	const addWarehouse = useAdminCreateWarehouseVariant();
+	const addWarehouse = useAdminCreateWarehouseAndInventory();
 	const {
 		warehouseInventory,
 		isLoading: warehouseInventoryLoading,
@@ -57,8 +64,12 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 
 	// Debounce fetcher
 	const debounceFetcher = debounce((value: string) => {
-		setSearchValue(value);
+		setSearchValue({
+			label: value,
+			value: '',
+		});
 	}, 800);
+	const unitData = getSelectedUnitData();
 
 	// Format options warehouse
 	const optionWarehouses = useMemo(() => {
@@ -69,67 +80,72 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 		}));
 	}, [warehouse]);
 
-	const handleAddLocation = async () => {
+	const handleAddLocation = () => {
 		if (!searchValue) return;
-		const unitData = getSelectedUnitData();
-		await modal.confirm({
-			title: 'Thêm vị trí mới',
-			content: <VariantInventoryForm type="INBOUND" />,
-			onOk: async () => {
-				await addWarehouse.mutateAsync(
-					{
-						location: searchValue,
-						variant_id: variantId,
-					},
-					{
-						onSuccess: () => {
-							message.success('Thêm vị trí cho sản phẩm thành công');
-							refetchWarehouse();
-							refetchInventory();
-						},
-						onError: (error: any) => {
-							message.error(getErrorMessage(error));
-						},
-					}
-				);
-			},
-			cancelText: 'Huỷ',
-			okText: 'Xác nhận',
-			icon: null,
-		});
+
+		onOpen();
 	};
 
 	const handleSelect = async (data: ValueType) => {
 		setSelectedValue(null);
 		const { label, value } = data as ValueType;
 		if (!value || !label) return;
-		const unitData = getSelectedUnitData();
-		await modal.confirm({
-			title: 'Thêm vị trí mới',
-			content: <VariantInventoryForm type="INBOUND" />,
-			onOk: async () => {
-				await addWarehouse.mutateAsync(
-					{
-						warehouse_id: value,
-						location: label,
-						variant_id: variantId,
-					},
-					{
-						onSuccess: () => {
-							message.success('Thêm vị trí cho sản phẩm thành công');
-							refetchWarehouse();
-							refetchInventory();
-						},
-						onError: (error: any) => {
-							message.error(getErrorMessage(error));
-						},
-					}
-				);
-			},
-			cancelText: 'Huỷ',
-			okText: 'Xác nhận',
-			icon: null,
+
+		setSearchValue({
+			label,
+			value,
 		});
+		onOpen();
+	};
+
+	const handleOkModal = async () => {
+		if (!searchValue) return;
+
+		if (!unitData) {
+			return message.error('Vui lòng chọn loại hàng và số lượng');
+		}
+		const warehouse_quantity = lineItem.warehouse_quantity ?? 0;
+		if (unitData.totalQuantity > lineItem.quantity - warehouse_quantity) {
+			return message.error(
+				`Tổng số lượng nhập vào không được lớn hơn số lượng giao (${lineItem.quantity} đôi)`
+			);
+		}
+		const itemData: AdminPostItemData = {
+			variant_id: variantId,
+			quantity: unitData?.quantity ?? 0,
+			unit_id: unitData?.unitId ?? '',
+			line_item_id: lineItem.id,
+			order_id: lineItem.supplier_order_id,
+			type: 'INBOUND',
+		};
+
+		if (!itemData) return;
+
+		const payload = {
+			warehouse: {
+				warehouse_id: searchValue?.value ?? undefined,
+				location: searchValue.label,
+				variant_id: variantId,
+				unit_id: unitData?.unitId,
+			},
+			itemInventory: itemData,
+		};
+
+		await addWarehouse.mutateAsync(payload, {
+			onSuccess: () => {
+				message.success('Thêm vị trí cho sản phẩm thành công');
+				refetchWarehouse();
+				refetchInventory();
+				queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
+
+				onReset();
+				onClose();
+			},
+			onError: (error: any) => {
+				message.error(getErrorMessage(error));
+			},
+		});
+		setSearchValue(null);
 	};
 
 	return (
@@ -138,7 +154,6 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 			rounded
 			loading={warehouseInventoryLoading}
 		>
-			{contextHolder}
 			<Flex vertical gap={6}>
 				<Text strong className="">
 					Vị trí sản phẩm trong kho
@@ -155,215 +170,83 @@ const WarehouseForm = ({ variantId, lineItem }: WarehouseFormProps) => {
 								item={item}
 								lineItem={lineItem as any}
 								refetchInventory={refetchInventory}
+								isPermission={isPermission}
 							/>
 						</Col>
 					))}
 				</Row>
 			</Flex>
-			<Flex vertical gap={6} className="mt-2">
-				<Text strong className="">
-					Tìm & thêm vị trí mới
-				</Text>
-				<Flex gap={4}>
-					<Select
-						className="flex-grow"
-						placeholder="Chọn vị trí"
-						allowClear
-						options={optionWarehouses}
-						labelInValue
-						filterOption={false}
-						value={
-							selectedValue
-								? { label: selectedValue, value: selectedValue }
-								: null
-						}
-						onSearch={debounceFetcher}
-						onSelect={handleSelect}
-						showSearch
-						dropdownRender={(menu) => (
-							<div>
-								{menu}
-								{!isEmpty(searchValue) && (
-									<div className="flex items-center justify-start p-2">
-										<Text className="text-gray-300 cursor-pointer">
-											Chọn thêm để tạo vị trí mới
-										</Text>
-									</div>
-								)}
-							</div>
-						)}
-						notFoundContent={
-							warehouseLoading ? (
-								<LoaderCircle
-									className="animate-spin w-full flex justify-center"
-									size={18}
-									strokeWidth={3}
-								/>
-							) : (
-								'Không tìm thấy vị trí'
-							)
-						}
-					/>
-					<Button
-						className="w-fit h-[10]"
-						onClick={handleAddLocation}
-						disabled={isEmpty(searchValue)}
+			{isPermission && (
+				<Flex vertical gap={6} className="mt-2">
+					<Text strong className="">
+						Tìm & thêm vị trí mới
+					</Text>
+					<Flex gap={4}>
+						<Select
+							className="flex-grow"
+							placeholder="Chọn vị trí"
+							allowClear
+							options={optionWarehouses}
+							labelInValue
+							mode="multiple"
+							autoClearSearchValue={false}
+							filterOption={false}
+							value={
+								selectedValue
+									? { label: selectedValue, value: selectedValue }
+									: null
+							}
+							onSearch={debounceFetcher}
+							onSelect={handleSelect}
+							showSearch
+							dropdownRender={(menu) => (
+								<div>
+									{menu}
+									{!isEmpty(searchValue) && (
+										<div className="flex items-center justify-start p-2">
+											<Text className="text-gray-300 cursor-pointer">
+												Chọn thêm để tạo vị trí mới
+											</Text>
+										</div>
+									)}
+								</div>
+							)}
+							notFoundContent={
+								warehouseLoading ? (
+									<LoaderCircle
+										className="animate-spin w-full flex justify-center"
+										size={18}
+										strokeWidth={3}
+									/>
+								) : (
+									'Không tìm thấy vị trí'
+								)
+							}
+						/>
+						<Button
+							className="w-fit h-[10]"
+							onClick={handleAddLocation}
+							disabled={isEmpty(searchValue)}
+						>
+							Thêm
+						</Button>
+					</Flex>
+					{/* modal */}
+					<Modal
+						open={isModalOpen}
+						handleCancel={() => {
+							onReset();
+							onClose();
+						}}
+						handleOk={handleOkModal}
+						title={`Thao tác tại vị trí ${searchValue?.label}`}
 					>
-						Thêm
-					</Button>
+						<VariantInventoryForm type="INBOUND" />
+					</Modal>
 				</Flex>
-			</Flex>
+			)}
 		</Card>
 	);
 };
 
 export default WarehouseForm;
-
-type UpdatedLineItem = LineItem & {
-	supplier_order_id: string;
-};
-type WarehouseItemProps = {
-	item: WarehouseInventory;
-	lineItem: UpdatedLineItem;
-	refetchInventory: () => void;
-	isPermission?: boolean;
-};
-const WarehouseItem = ({
-	item,
-	lineItem,
-	refetchInventory,
-	isPermission = false,
-}: WarehouseItemProps) => {
-	const { getSelectedUnitData, onReset, setSelectedUnit } = useProductUnit();
-	const createInboundInventory = useAdminCreateInboundInventory();
-	const queryClient = useQueryClient();
-	const quantity =
-		item?.quantity === 0
-			? `0`
-			: `${item?.quantity / item?.item_unit?.quantity} ${
-					item?.item_unit?.unit
-			  }`;
-
-	const onAddUnit = async () => {
-		const unitData = getSelectedUnitData();
-		if (!unitData) {
-			return message.error('Vui lòng chọn loại hàng và số lượng');
-		}
-		const warehouse_quantity = lineItem.warehouse_quantity ?? 0;
-		if (unitData.totalQuantity > lineItem.quantity - warehouse_quantity) {
-			return message.error(
-				`Tổng số lượng nhập vào không được lớn hơn số lượng giao (${lineItem.quantity} đôi)`
-			);
-		}
-
-		if (unitData) {
-			const itemData = {
-				warehouse_id: item.warehouse_id,
-				variant_id: item.variant_id,
-				quantity: unitData.quantity,
-				unit_id: unitData.unitId,
-				line_item_id: lineItem.id,
-				order_id: lineItem.supplier_order_id,
-				warehouse_inventory_id: item.id,
-				type: 'INBOUND',
-			};
-
-			onReset();
-			await createInboundInventory.mutateAsync(itemData, {
-				onSuccess: () => {
-					message.success(`Đã nhập hàng vào vị trí ${item.warehouse.location}`);
-					refetchInventory();
-					queryClient.invalidateQueries([ADMIN_PRODUCT_INBOUND, 'detail']);
-					queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
-				},
-				onError: (error: any) => {
-					message.error(getErrorMessage(error));
-				},
-			});
-		}
-	};
-
-	return (
-		// <Popconfirm
-		// 	title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
-		// 	description={<VariantInventoryForm type="INBOUND" />}
-		// 	isLoading={createInboundInventory.isLoading}
-		// 	cancelText="Huỷ"
-		// 	okText="Xác nhận"
-		// 	handleOk={onAddUnit}
-		// 	handleCancel={() => {}}
-		// 	onOpenChange={(e) => onReset()}
-		// 	icon={null}
-		// >
-		// 	<Flex
-		// 		align="center"
-		// 		gap="small"
-		// 		justify="center"
-		// 		className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
-		// 		onClick={() =>
-		// 			item && item.item_unit && setSelectedUnit(item.item_unit.id)
-		// 		}
-		// 	>
-		// 		<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
-		// 	</Flex>
-		// </Popconfirm>
-		<Flex
-			align="center"
-			gap="small"
-			justify="space-between"
-			className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
-		>
-			{isPermission && (
-				<Popconfirm
-					title={`Lấy hàng tại vị trí (${item.warehouse.location})`}
-					description={
-						<VariantInventoryForm
-							maxQuantity={item.quantity / item.item_unit.quantity}
-							type="OUTBOUND"
-						/>
-					}
-					isLoading={createInboundInventory.isLoading}
-					cancelText="Huỷ"
-					okText="Xác nhận"
-					handleOk={onAddUnit}
-					handleCancel={() => {}}
-					onOpenChange={(e) => onReset()}
-					icon={null}
-				>
-					<Button
-						className="w-[24px] h-[24px] rounded-full"
-						type="default"
-						danger
-						onClick={() => setSelectedUnit(item.item_unit.id)}
-						icon={<Minus size={16} />}
-					/>
-				</Popconfirm>
-			)}
-			<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
-			{isPermission && (
-				<Popconfirm
-					title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
-					description={<VariantInventoryForm type="INBOUND" />}
-					isLoading={createInboundInventory.isLoading}
-					cancelText="Huỷ"
-					okText="Xác nhận"
-					handleOk={onAddUnit}
-					handleCancel={() => {}}
-					onOpenChange={(e) => onReset()}
-					icon={null}
-				>
-					<Button
-						className="w-[24px] h-[24px] rounded-full"
-						color="primary"
-						// variant="outlined"
-						type="default"
-						onClick={() =>
-							item && item.item_unit && setSelectedUnit(item.item_unit.id)
-						}
-						icon={<Plus size={16} />}
-					/>
-				</Popconfirm>
-			)}
-		</Flex>
-	);
-};

@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-query';
 import { useMedusa } from 'medusa-react';
 import { adminProductInboundKeys } from './queries';
+import { AdminPostWarehouseVariantReq1 } from '@/types/warehouse';
 
 export const useAdminProductInboundHandler = (
 	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
@@ -45,5 +46,23 @@ export const useAdminProductInboundConfirmById = (
 			[adminProductInboundKeys.lists(), adminProductInboundKeys.detail(id)],
 			options
 		)
+	);
+};
+
+
+export const useAdminCreateWarehouseAndInventory = (
+	options?: UseMutationOptions<
+		Response<any>,
+		Error,
+		AdminPostWarehouseVariantReq1
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminPostWarehouseVariantReq1) =>
+			client.admin.custom.post(`/admin/product-inbound`, payload),
+		buildOptions(queryClient, [adminProductInboundKeys.lists()], options)
 	);
 };

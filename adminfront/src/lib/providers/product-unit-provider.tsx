@@ -1,7 +1,7 @@
 'use client';
+import { ItemUnit } from '@/types/item-unit';
 import React, { PropsWithChildren, useContext, useMemo, useState } from 'react';
 import { useAdminItemUnits } from '../hooks/api/item-unit';
-import { ItemUnit } from '@/types/item-unit';
 
 export enum ProductUnit {
 	PRODUCT_CATEGORIES = 'product_categories',
@@ -56,15 +56,12 @@ export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
 	const defaultUnit = item_units?.find((item) => item.quantity === 6)?.id ?? '';
 
 	const getSelectedUnitData = () => {
-		if (quantity > 0) {
-			const findUnit = item_units?.find((item) => item.id === selectedUnit);
-			return {
-				unitId: selectedUnit ?? defaultUnit,
-				quantity: quantity,
-				totalQuantity: quantity * (findUnit?.quantity ?? 1),
-			};
-		}
-		return null;
+		const findUnit = item_units?.find((item) => item.id === selectedUnit);
+		return {
+			unitId: selectedUnit ?? defaultUnit,
+			quantity: quantity,
+			totalQuantity: quantity * (findUnit?.quantity ?? 1),
+		};
 	};
 
 	const onReset = () => {

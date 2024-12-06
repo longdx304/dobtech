@@ -67,7 +67,7 @@ const ListOutbound: FC<Props> = ({}) => {
 
 	const handleClickDetail = async (item: Order) => {
 		if (item?.handler_id) {
-			return router.push(`${ERoutes.WAREHOUSE_INBOUND}/${item.id}`);
+			return router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${item.id}`);
 		}
 
 		await productOutboundHandler.mutateAsync(
@@ -107,7 +107,7 @@ const ListOutbound: FC<Props> = ({}) => {
 					centered
 				/>
 				<List
-					grid={{ gutter: 12, xs: 1, sm: 2, lg: 3 }}
+					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
 					dataSource={orders}
 					loading={isLoading}
 					renderItem={(item: Order) => (

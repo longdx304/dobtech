@@ -3,7 +3,6 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
-import { useUser } from '@/lib/providers/user-provider';
 import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
 import dayjs from 'dayjs';
 import { Check, Clock } from 'lucide-react';
@@ -17,7 +16,6 @@ const InboundItem: React.FC<InboundItemProps> = ({
 	item,
 	handleClickDetail,
 }) => {
-	console.log('item:', item);
 	const isProcessing =
 		item.fulfillment_status === FulfillSupplierOrderStt.DELIVERED;
 

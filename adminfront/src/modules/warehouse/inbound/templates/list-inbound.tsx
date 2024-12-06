@@ -6,7 +6,9 @@ import { Input } from '@/components/Input';
 import List from '@/components/List';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
+import { useAdminProductInboundHandler } from '@/lib/hooks/api/product-inbound/mutations';
 import { useAdminProductInbounds } from '@/lib/hooks/api/product-inbound/queries';
+import { getErrorMessage } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
 import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
 import { message, TabsProps } from 'antd';
@@ -15,8 +17,6 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import InboundItem from '../components/inbound-item';
-import { useAdminProductInboundHandler } from '@/lib/hooks/api/product-inbound/mutations';
-import { getErrorMessage } from '@/lib/utils';
 
 type Props = {};
 
@@ -64,7 +64,6 @@ const ListInbound: FC<Props> = ({}) => {
 	];
 
 	const handleClickDetail = async (item: SupplierOrder) => {
-		console.log('item:', item);
 		if (item?.handler_id) {
 			return router.push(`${ERoutes.WAREHOUSE_INBOUND}/${item.id}`);
 		}
@@ -106,7 +105,7 @@ const ListInbound: FC<Props> = ({}) => {
 					centered
 				/>
 				<List
-					grid={{ gutter: 12, xs: 1, sm: 2, lg: 3 }}
+					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
 					dataSource={supplierOrder}
 					loading={isLoading || productInboundHandler.isLoading}
 					renderItem={(item: SupplierOrder) => (
