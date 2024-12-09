@@ -27,7 +27,7 @@ type ProductUnitContextType = {
 const defaultProductUnitContext: ProductUnitContextType = {
 	item_units: [],
 	optionItemUnits: [],
-	defaultUnit: 'đôi',
+	defaultUnit: '',
 	selectedUnit: null,
 	quantity: 0,
 	setSelectedUnit: () => {},
@@ -53,7 +53,7 @@ export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
 			}));
 	}, [item_units]);
 
-	const defaultUnit = item_units?.find((item) => item.quantity === 6)?.id ?? '';
+	const defaultUnit = item_units?.find((item) => item.quantity === 6)?.id || '';
 
 	const getSelectedUnitData = () => {
 		const findUnit = item_units?.find((item) => item.id === selectedUnit);
@@ -65,8 +65,8 @@ export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
 	};
 
 	const onReset = () => {
-		setSelectedUnit(null);
-		setQuantity(0);
+		setSelectedUnit(defaultUnit);
+		setQuantity(1);
 	};
 
 	return (

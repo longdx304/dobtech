@@ -36,10 +36,14 @@ const WarehouseItem = ({
 	refetchInventory,
 	isPermission,
 }: WarehouseItemProps) => {
-	const { getSelectedUnitData, onReset, setSelectedUnit } = useProductUnit();
+	const { getSelectedUnitData, onReset, setSelectedUnit, setQuantity } =
+		useProductUnit();
 	const createOutboundInventory = useAdminCreateInventory();
 	const removeOutboundInventory = useAdminRemoveInventory();
 	const queryClient = useQueryClient();
+
+	const unitData = getSelectedUnitData();
+
 	const quantity =
 		item?.quantity === 0
 			? `0`
@@ -48,7 +52,6 @@ const WarehouseItem = ({
 			  }`;
 
 	const onRemoveInventory = async () => {
-		const unitData = getSelectedUnitData();
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
@@ -79,7 +82,6 @@ const WarehouseItem = ({
 	};
 
 	const onAddInventory = async () => {
-		const unitData = getSelectedUnitData();
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
@@ -134,15 +136,17 @@ const WarehouseItem = ({
 					cancelText="Huỷ"
 					okText="Xác nhận"
 					handleOk={onRemoveInventory}
-					handleCancel={() => {}}
-					onOpenChange={(e) => onReset()}
+					handleCancel={() => onReset()}
 					icon={null}
 				>
 					<Button
 						className="w-[24px] h-[24px] rounded-full"
 						type="default"
 						danger
-						onClick={() => setSelectedUnit(item.item_unit.id)}
+						onClick={() => {
+							item && item.item_unit && setSelectedUnit(item.item_unit.id);
+							setQuantity(1);
+						}}
 						icon={<Minus size={16} />}
 					/>
 				</Popconfirm>
@@ -156,8 +160,7 @@ const WarehouseItem = ({
 					cancelText="Huỷ"
 					okText="Xác nhận"
 					handleOk={onAddInventory}
-					handleCancel={() => {}}
-					onOpenChange={(e) => onReset()}
+					handleCancel={() => onReset()}
 					icon={null}
 				>
 					<Button
@@ -165,9 +168,10 @@ const WarehouseItem = ({
 						color="primary"
 						// variant="outlined"
 						type="default"
-						onClick={() =>
-							item && item.item_unit && setSelectedUnit(item.item_unit.id)
-						}
+						onClick={() => {
+							item && item.item_unit && setSelectedUnit(item.item_unit.id);
+							setQuantity(1);
+						}}
 						icon={<Plus size={16} />}
 					/>
 				</Popconfirm>

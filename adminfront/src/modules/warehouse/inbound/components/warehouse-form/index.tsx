@@ -43,33 +43,42 @@ const WarehouseForm = ({
 	lineItem,
 	isPermission,
 }: WarehouseFormProps) => {
+	// state
 	const { getSelectedUnitData, onReset } = useProductUnit();
 	const [searchValue, setSearchValue] = useState<ValueType | null>(null);
 	const { state: isModalOpen, onOpen, onClose } = useToggleState(false);
+
+	// fetch hook api
 	const {
 		warehouse,
 		isLoading: warehouseLoading,
 		refetch: refetchWarehouse,
 	} = useAdminWarehouses({
-		q: searchValue?.label ?? undefined,
+		q: searchValue?.label || undefined,
 	});
 
-	const [selectedValue, setSelectedValue] = useState<string | null>(null);
 	const addWarehouse = useAdminCreateWarehouseAndInventory();
+
 	const {
 		warehouseInventory,
 		isLoading: warehouseInventoryLoading,
 		refetch: refetchInventory,
 	} = useAdminWarehouseInventoryByVariant(variantId);
+	const unitData = getSelectedUnitData();
 
 	// Debounce fetcher
 	const debounceFetcher = debounce((value: string) => {
+		if (!value.trim()) {
+			return setSearchValue({
+				label: '',
+				value: '',
+			});
+		}
 		setSearchValue({
 			label: value,
 			value: '',
 		});
 	}, 800);
-	const unitData = getSelectedUnitData();
 
 	// Format options warehouse
 	const optionWarehouses = useMemo(() => {
@@ -87,7 +96,6 @@ const WarehouseForm = ({
 	};
 
 	const handleSelect = async (data: ValueType) => {
-		setSelectedValue(null);
 		const { label, value } = data as ValueType;
 		if (!value || !label) return;
 
@@ -131,6 +139,10 @@ const WarehouseForm = ({
 			itemInventory: itemData,
 		};
 
+		setSearchValue({
+			label: '',
+			value: '',
+		});
 		await addWarehouse.mutateAsync(payload, {
 			onSuccess: () => {
 				message.success('Thêm vị trí cho sản phẩm thành công');
@@ -145,7 +157,6 @@ const WarehouseForm = ({
 				message.error(getErrorMessage(error));
 			},
 		});
-		setSearchValue(null);
 	};
 
 	return (
@@ -188,13 +199,10 @@ const WarehouseForm = ({
 							allowClear
 							options={optionWarehouses}
 							labelInValue
-							mode="multiple"
 							autoClearSearchValue={false}
 							filterOption={false}
 							value={
-								selectedValue
-									? { label: selectedValue, value: selectedValue }
-									: null
+								!isEmpty(searchValue) ? [searchValue] : undefined
 							}
 							onSearch={debounceFetcher}
 							onSelect={handleSelect}
@@ -226,7 +234,7 @@ const WarehouseForm = ({
 						<Button
 							className="w-fit h-[10]"
 							onClick={handleAddLocation}
-							disabled={isEmpty(searchValue)}
+							disabled={isEmpty(searchValue?.label)}
 						>
 							Thêm
 						</Button>
@@ -237,6 +245,10 @@ const WarehouseForm = ({
 						handleCancel={() => {
 							onReset();
 							onClose();
+							setSearchValue({
+								label: '',
+								value: '',
+							});
 						}}
 						handleOk={handleOkModal}
 						title={`Thao tác tại vị trí ${searchValue?.label}`}

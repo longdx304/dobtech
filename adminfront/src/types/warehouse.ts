@@ -18,6 +18,7 @@ type AdminPostWarehouseRes = {
 	location: string;
 	variant_id: string;
 	capacity?: number;
+	unit_id: string;
 };
 
 export type AdminPostItemData = {

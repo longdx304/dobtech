@@ -3,10 +3,13 @@ import { Flex } from '@/components/Flex';
 import { Popconfirm } from '@/components/Popconfirm';
 import { Text } from '@/components/Typography';
 import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
-import { ADMIN_PRODUCT_INBOUND } from '@/lib/hooks/api/product-inbound';
+import {
+	ADMIN_PRODUCT_INBOUND,
+	adminProductInboundKeys,
+} from '@/lib/hooks/api/product-inbound';
 import {
 	useAdminCreateInventory,
-	useAdminRemoveInventory
+	useAdminRemoveInventory,
 } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
@@ -35,9 +38,12 @@ const WarehouseItem = ({
 	refetchInventory,
 	isPermission = false,
 }: WarehouseItemProps) => {
-	const { getSelectedUnitData, onReset, setSelectedUnit } = useProductUnit();
+	const { getSelectedUnitData, onReset, setSelectedUnit, setQuantity } =
+		useProductUnit();
 	const createInboundInventory = useAdminCreateInventory();
 	const removeInboundInventory = useAdminRemoveInventory();
+
+	const unitData = getSelectedUnitData();
 
 	const queryClient = useQueryClient();
 	const quantity =
@@ -48,7 +54,6 @@ const WarehouseItem = ({
 			  }`;
 
 	const onAddUnit = async () => {
-		const unitData = getSelectedUnitData();
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
@@ -87,15 +92,8 @@ const WarehouseItem = ({
 	};
 
 	const onRemoveUnit = async () => {
-		const unitData = getSelectedUnitData();
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
-		}
-		const warehouse_quantity = lineItem.warehouse_quantity ?? 0;
-		if (unitData.totalQuantity > lineItem.quantity - warehouse_quantity) {
-			return message.error(
-				`Tổng số lượng nhập vào không được lớn hơn số lượng giao (${lineItem.quantity} đôi)`
-			);
 		}
 
 		if (unitData) {
@@ -145,15 +143,17 @@ const WarehouseItem = ({
 					cancelText="Huỷ"
 					okText="Xác nhận"
 					handleOk={onRemoveUnit}
-					handleCancel={() => {}}
-					onOpenChange={(e) => onReset()}
+					handleCancel={() => onReset()}
 					icon={null}
 				>
 					<Button
 						className="w-[24px] h-[24px] rounded-full"
 						type="default"
 						danger
-						onClick={() => setSelectedUnit(item.item_unit.id)}
+						onClick={() => {
+							item && item.item_unit && setSelectedUnit(item.item_unit.id);
+							setQuantity(1);
+						}}
 						icon={<Minus size={16} />}
 					/>
 				</Popconfirm>
@@ -167,18 +167,16 @@ const WarehouseItem = ({
 					cancelText="Huỷ"
 					okText="Xác nhận"
 					handleOk={onAddUnit}
-					handleCancel={() => {}}
-					onOpenChange={(e) => onReset()}
+					handleCancel={() => onReset()}
 					icon={null}
 				>
 					<Button
 						className="w-[24px] h-[24px] rounded-full"
 						color="primary"
-						// variant="outlined"
-						type="default"
-						onClick={() =>
-							item && item.item_unit && setSelectedUnit(item.item_unit.id)
-						}
+						onClick={() => {
+							item && item.item_unit && setSelectedUnit(item.item_unit.id);
+							setQuantity(1);
+						}}
 						icon={<Plus size={16} />}
 					/>
 				</Popconfirm>
