@@ -5,7 +5,7 @@ type Props = {
 	supplier: Supplier[] | null;
 };
 
-const decideFulfillmentStt = (status: any) => {
+const decidePaymentStt = (status: any) => {
 	switch (status) {
 		case 'pending':
 			return 'Chờ thanh toán';
@@ -15,6 +15,23 @@ const decideFulfillmentStt = (status: any) => {
 			return 'Đã huỷ';
 		default:
 			return 'Xem xét';
+	}
+};
+
+const decideFulfillmentStatus = (status: any) => {
+	switch (status) {
+		case 'not_fulfilled':
+			return 'Chưa hoàn thành';
+		case 'delivered':
+			return 'Hàng đã về kho';
+		case 'partially_inventoried':
+			return 'Hoàn thành một phần';
+		case 'inventoried':
+			return 'Đã nhập kho';
+		case 'rejected':
+			return 'Đã hủy';
+		default:
+			return 'N/A';
 	}
 };
 const supplierOrdersColumn = ({ supplier }: Props) => [
@@ -44,12 +61,21 @@ const supplierOrdersColumn = ({ supplier }: Props) => [
 		},
 	},
 	{
+		title: 'Nhập hàng',
+		dataIndex: 'fulfillment_status',
+		key: 'fulfillment_status',
+		className: 'text-xs',
+		render: (_: SupplierOrders['fulfillment_status']) => {
+			return decideFulfillmentStatus(_);
+		},
+	},
+	{
 		title: 'Thanh toán',
 		dataIndex: 'status',
 		key: 'status',
 		className: 'text-xs',
 		render: (_: SupplierOrders['status']) => {
-			return decideFulfillmentStt(_);
+			return decidePaymentStt(_);
 		},
 	},
 	{

@@ -2,7 +2,7 @@
 
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
-import { Input } from '@/components/Input';
+import { Input, TextArea } from '@/components/Input';
 import List from '@/components/List';
 import { Title, Text } from '@/components/Typography';
 import { ArrowLeft, Check, Search } from 'lucide-react';
@@ -23,12 +23,14 @@ import { ActionAbles } from '@/components/Dropdown';
 import { Modal as AntdModal, message } from 'antd';
 import Image from 'next/image';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
-import { useAdminCreateFulfillment } from 'medusa-react';
+import { useAdminCreateFulfillment, useAdminCreateNote } from 'medusa-react';
 import { getErrorMessage } from '@/lib/utils';
 import { LineItem } from '@/types/lineItem';
 import clsx from 'clsx';
 import { useUser } from '@/lib/providers/user-provider';
 import Notes from '../../inbound/components/notes';
+import ConfirmOrder from '../../components/confirm-order';
+import { isEmpty } from 'lodash';
 
 type Props = {
 	id: string;
@@ -44,6 +46,15 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
 	const { order, isLoading, refetch } = useAdminProductOutbound(id);
 	const createOrderFulfillment = useAdminCreateFulfillment(id);
+
+	const createNote = useAdminCreateNote();
+
+	const {
+		state: confirmState,
+		onOpen: onOpenConfirm,
+		onClose: onCloseConfirm,
+	} = useToggleState(false);
+	const [noteInput, setNoteInput] = useState<string>('');
 
 	const isPermission = useMemo(() => {
 		if (!user) return false;
@@ -117,55 +128,79 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 		router.push(ERoutes.WAREHOUSE_OUTBOUND);
 	};
 
-	const handleComplete = () => {
-		AntdModal.confirm({
-			icon: null,
-			title: 'Xác nhận hoàn thành lấy hàng',
-			content: order?.items.map((item, idx) => {
-				return (
-					<FulfillmentLine
-						item={item as LineItem}
-						key={`fulfillmentLine-${idx}`}
-					/>
-				);
-			}),
-			onOk: async () => {
-				let action: any = createOrderFulfillment;
-				let successText = 'Đơn hàng đã được đóng gói thành công.';
-				let requestObj;
+	const handleComplete = async () => {
+		let action: any = createOrderFulfillment;
+		let successText = 'Đơn hàng đã được đóng gói thành công.';
+		let requestObj;
 
-				requestObj = {
-					no_notification: false,
-				} as AdminPostOrdersOrderFulfillmentsReq;
+		requestObj = {
+			no_notification: false,
+		} as AdminPostOrdersOrderFulfillmentsReq;
 
-				requestObj.items = (order?.items as LineItem[])
-					?.filter(
-						(item: LineItem) =>
-							item?.warehouse_quantity - (item.fulfilled_quantity ?? 0) > 0
-					)
-					.map((item: LineItem) => ({
-						item_id: item.id,
-						quantity: item?.warehouse_quantity - (item.fulfilled_quantity ?? 0),
-					}));
+		requestObj.items = (order?.items as LineItem[])
+			?.filter(
+				(item: LineItem) =>
+					item?.warehouse_quantity - (item.fulfilled_quantity ?? 0) > 0
+			)
+			.map((item: LineItem) => ({
+				item_id: item.id,
+				quantity: item?.warehouse_quantity - (item.fulfilled_quantity ?? 0),
+			}));
 
-				await action.mutateAsync(requestObj as any, {
-					onSuccess: () => {
-						message.success(successText);
-						refetch();
-					},
-					onError: (err: any) => message.error(getErrorMessage(err)),
-				});
+		const isUnsufficientQuantity = (order?.items as LineItem[]).some(
+			(item) => item.warehouse_quantity < item.quantity
+		);
+
+		if (isUnsufficientQuantity && isEmpty(noteInput)) {
+			message.error(
+				'Số lượng xuất kho không đúng với số lượng giao của đơn hàng. Vui lòng thêm ghi chú nếu muốn hoàn thành đơn'
+			);
+			return;
+		}
+		await action.mutateAsync(requestObj as any, {
+			onSuccess: () => {
+				message.success(successText);
+				refetch();
+
+				onWriteNote();
+
+				onCloseConfirm();
 			},
+			onError: (err: any) => message.error(getErrorMessage(err)),
 		});
+	};
+
+	const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+		const { value: inputValue } = e.target;
+
+		setNoteInput(inputValue);
+	};
+
+	const onWriteNote = () => {
+		if (!noteInput) {
+			return;
+		}
+		createNote.mutate(
+			{
+				resource_id: id,
+				resource_type: 'product-outbound',
+				value: noteInput,
+			},
+			{
+				onSuccess: () => {
+					message.success('Ghi chú đã được tạo');
+				},
+				onError: (err) => message.error(getErrorMessage(err)),
+			}
+		);
+		setNoteInput('');
 	};
 
 	const actions = [
 		isPermission && {
 			label: 'Hoàn thành lấy hàng',
 			icon: <Check size={18} />,
-			onClick: () => {
-				handleComplete();
-			},
+			onClick: onOpenConfirm,
 			disabled: order?.fulfillment_status === FulfillmentStatus.FULFILLED,
 		},
 		{
@@ -251,6 +286,32 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 				)}
 			</Card>
 			<Notes orderId={id} type="OUTBOUND" />
+			{confirmState && (
+				<ConfirmOrder
+					state={confirmState}
+					title="Xác nhận hoàn thành nhập kho"
+					handleOk={handleComplete}
+					handleCancel={onCloseConfirm}
+				>
+					{/* Danh sách san pham */}
+					{order?.items.map((item, idx) => {
+						return (
+							<FulfillmentLine
+								item={item as LineItem}
+								key={`fulfillmentLine-${idx}`}
+							/>
+						);
+					})}
+
+					{/* Ghi chú */}
+					<TextArea
+						value={noteInput}
+						onChange={onChangeInput}
+						placeholder="Nhập ghi chú"
+						className="w-full"
+					/>
+				</ConfirmOrder>
+			)}
 		</Flex>
 	);
 };
