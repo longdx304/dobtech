@@ -122,12 +122,14 @@ const Summary = () => {
 	return (
 		<div className="min-h-[705px]">
 			<SummarySection title="Sản phẩm" editIndex={2}>
-				<Table
-					dataSource={items}
-					columns={itemColumns as any}
-					pagination={false}
-					rowKey="id"
-				/>
+				<div className="overflow-auto lg:overflow-visible">
+					<Table
+						dataSource={items}
+						columns={itemColumns as any}
+						pagination={false}
+						rowKey="id"
+					/>
+				</div>
 			</SummarySection>
 
 			<SummarySection title="Khách hàng" editIndex={1}>

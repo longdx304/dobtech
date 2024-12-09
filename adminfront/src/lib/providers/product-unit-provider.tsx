@@ -1,7 +1,7 @@
 'use client';
+import { ItemUnit } from '@/types/item-unit';
 import React, { PropsWithChildren, useContext, useMemo, useState } from 'react';
 import { useAdminItemUnits } from '../hooks/api/item-unit';
-import { ItemUnit } from '@/types/item-unit';
 
 export enum ProductUnit {
 	PRODUCT_CATEGORIES = 'product_categories',
@@ -11,7 +11,7 @@ export enum ProductUnit {
 type ProductUnitContextType = {
 	item_units: ItemUnit[];
 	optionItemUnits?: { value: string; label: string }[];
-	defaultUnit: string;
+	defaultUnit: string | null;
 	selectedUnit: string | null;
 	quantity: number;
 	setSelectedUnit: (unitId: string) => void;
@@ -27,7 +27,7 @@ type ProductUnitContextType = {
 const defaultProductUnitContext: ProductUnitContextType = {
 	item_units: [],
 	optionItemUnits: [],
-	defaultUnit: 'đôi',
+	defaultUnit: '',
 	selectedUnit: null,
 	quantity: 0,
 	setSelectedUnit: () => {},
@@ -45,30 +45,28 @@ export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
 
 	const optionItemUnits = useMemo(() => {
 		if (!item_units) return [];
-		return item_units.map((item) => ({
-			value: item.id,
-			label: item.unit,
-		}));
+		return item_units
+			.filter((item) => item.id !== 'default')
+			.map((item) => ({
+				value: item.id,
+				label: item.unit,
+			}));
 	}, [item_units]);
 
-	const defaultUnit =
-		item_units?.find((item) => item.unit === 'đôi')?.id ?? 'đôi';
+	const defaultUnit = item_units?.find((item) => item.quantity === 6)?.id || '';
 
 	const getSelectedUnitData = () => {
-		if (quantity > 0) {
-			const findUnit = item_units?.find((item) => item.id === selectedUnit);
-			return {
-				unitId: selectedUnit ?? defaultUnit,
-				quantity: quantity,
-				totalQuantity: quantity * (findUnit?.quantity ?? 1),
-			};
-		}
-		return null;
+		const findUnit = item_units?.find((item) => item.id === selectedUnit);
+		return {
+			unitId: selectedUnit ?? defaultUnit,
+			quantity: quantity,
+			totalQuantity: quantity * (findUnit?.quantity ?? 1),
+		};
 	};
 
 	const onReset = () => {
-		setSelectedUnit(null);
-		setQuantity(0);
+		setSelectedUnit(defaultUnit);
+		setQuantity(1);
 	};
 
 	return (

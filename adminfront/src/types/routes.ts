@@ -97,4 +97,28 @@ export const routesConfig: TRouteConfig[] = [
 		path: ERoutes.CURRENCIES,
 		mode: [],
 	},
+	{
+		path: ERoutes.WAREHOUSE_INBOUND,
+		mode: [
+			EPermissions.WarehouseStaff,
+			EPermissions.WarehouseManager,
+			EPermissions.InventoryChecker,
+		],
+	},
+	{
+		path: ERoutes.WAREHOUSE_OUTBOUND,
+		mode: [
+			EPermissions.WarehouseStaff,
+			EPermissions.WarehouseManager,
+			EPermissions.InventoryChecker,
+		],
+	},
+	{
+		path: ERoutes.WAREHOUSE_TRANSACTIONS,
+		mode: [
+			EPermissions.WarehouseStaff,
+			EPermissions.WarehouseManager,
+			EPermissions.InventoryChecker,
+		],
+	},
 ];

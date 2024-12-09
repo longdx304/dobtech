@@ -21,6 +21,7 @@ const VariantInventoryForm = ({
 		quantity,
 		setSelectedUnit,
 		setQuantity,
+		item_units,
 	} = useProductUnit();
 
 	const handleUnitChange = (value: string) => {

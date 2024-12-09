@@ -3,7 +3,7 @@ import ListInbound from '@/modules/warehouse/inbound/templates/list-inbound';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Nhập hàng',
+	title: 'Nhập kho',
 	description: 'Trang quản lý nhập hàng.',
 };
 

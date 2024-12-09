@@ -12,6 +12,29 @@ export interface AdminPostWarehouseReq {
 	location: string;
 	capacity?: number;
 }
+
+type AdminPostWarehouseRes = {
+	warehouse_id?: string;
+	location: string;
+	variant_id: string;
+	capacity?: number;
+	unit_id: string;
+};
+
+export type AdminPostItemData = {
+	variant_id: string;
+	quantity: number;
+	unit_id: string;
+	line_item_id: string;
+	order_id: string;
+	type: string;
+};
+
+export interface AdminPostWarehouseVariantReq1 {
+	warehouse: AdminPostWarehouseRes;
+	itemInventory: AdminPostItemData;
+}
+
 export interface AdminPostWarehouseVariantReq {
 	warehouse_id?: string;
 	location: string;
@@ -58,7 +81,7 @@ export interface AdminPostInboundInventoryReq {
 	type?: string;
 }
 
-export interface AdminPostRemmoveOutboundInventoryReq {
+export interface AdminPostRemmoveInventoryReq {
 	unit_id: string;
 	line_item_id: string;
 	variant_id: string;
@@ -66,7 +89,7 @@ export interface AdminPostRemmoveOutboundInventoryReq {
 	quantity: number;
 	order_id?: string;
 	warehouse_id: string;
-	type: 'OUTBOUND';
+	type: 'INBOUND' | 'OUTBOUND';
 }
 export interface AdminPostCreateOutboundInventoryReq {
 	unit_id: string;

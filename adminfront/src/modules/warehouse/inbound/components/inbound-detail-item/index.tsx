@@ -4,6 +4,8 @@ import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import { LineItem } from '@/types/lineItem';
+import { Tooltip } from 'antd';
+import clsx from 'clsx';
 import { Check, Clock } from 'lucide-react';
 
 type InboundItemProps = {
@@ -36,10 +38,12 @@ const InboundDetailItem: React.FC<InboundItemProps> = ({
 				<Flex vertical align="flex-start">
 					<Text className="text-[14px] text-gray-500">Tên sản phẩm:</Text>
 					<Text className="text-sm font-medium">{`${item.title}`}</Text>
-					<Tag
-						className="text-sm mt-1"
-						color="blue"
-					>{`${item.description}`}</Tag>
+					<Tag className="text-sm mt-1" color="blue">
+						<Tooltip
+							title={item.description}
+							color="white"
+						>{`${item.description}`}</Tooltip>
+					</Tag>
 				</Flex>
 				<Flex vertical align="flex-start">
 					<Text className="text-[14px] text-gray-500">Số lượng hàng:</Text>
@@ -49,9 +53,11 @@ const InboundDetailItem: React.FC<InboundItemProps> = ({
 					<Text className="text-[14px] text-gray-500">
 						Số lượng đã nhập vào kho:
 					</Text>
-					<Text className="text-sm font-medium">{`${
-						item.warehouse_quantity ?? 0
-					}`}</Text>
+					<Text
+						className={clsx('text-sm font-medium', {
+							'text-red-500': (item.warehouse_quantity ?? 0) < 0,
+						})}
+					>{`${item.warehouse_quantity ?? 0}`}</Text>
 				</Flex>
 			</Flex>
 			<Button className="w-full" onClick={handleClick}>

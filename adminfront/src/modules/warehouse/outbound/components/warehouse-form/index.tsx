@@ -1,35 +1,28 @@
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
-import { Popconfirm } from '@/components/Popconfirm';
+import { Modal } from '@/components/Modal';
 import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
+import { queryClient } from '@/lib/constants/query-client';
 import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
-import { ADMIN_PRODUCT_OUTBOUND } from '@/lib/hooks/api/product-outbound';
+import { useAdminCreateWarehouseAndInventory } from '@/lib/hooks/api/product-inbound';
 import {
-	useAdminCreateInboundInventory,
-	useAdminCreateOutboundInventory,
-	useAdminCreateWarehouseVariant,
-	useAdminRemoveOutboundInventory,
 	useAdminWarehouseInventoryByVariant,
 	useAdminWarehouses,
 } from '@/lib/hooks/api/warehouse';
+import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/warehouse/components/variant-inventory-form';
 import { LineItem } from '@/types/lineItem';
-import {
-	AdminPostCreateOutboundInventoryReq,
-	AdminPostRemmoveOutboundInventoryReq,
-	Warehouse,
-	WarehouseInventory,
-} from '@/types/warehouse';
-import { useQueryClient } from '@tanstack/react-query';
+import { AdminPostItemData, Warehouse } from '@/types/warehouse';
 import { Col, message, Row } from 'antd';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
-import { LoaderCircle, Minus, Plus } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import WarehouseItem from './warehouse-item';
 
 type WarehouseFormProps = {
 	variantId: string;
@@ -48,26 +41,42 @@ const WarehouseForm = ({
 	lineItem,
 	isPermission,
 }: WarehouseFormProps) => {
-	const [searchValue, setSearchValue] = useState<string | null>(null);
-	const {
-		warehouse,
-		isLoading: warehouseLoading,
-		refetch: refetchWarehouse,
-	} = useAdminWarehouses({
-		q: searchValue,
-	});
+	// state
+	const { state: isModalOpen, onOpen, onClose } = useToggleState(false);
+	const [searchValue, setSearchValue] = useState<ValueType | null>(null);
+	const { getSelectedUnitData, onReset } = useProductUnit();
 
-	const [selectedValue, setSelectedValue] = useState<string | null>(null);
-	const addWarehouse = useAdminCreateWarehouseVariant();
+	// fetch hook api
 	const {
 		warehouseInventory,
 		isLoading: warehouseInventoryLoading,
 		refetch: refetchInventory,
 	} = useAdminWarehouseInventoryByVariant(variantId);
 
+	const {
+		warehouse,
+		isLoading: warehouseLoading,
+		refetch: refetchWarehouse,
+	} = useAdminWarehouses({
+		q: searchValue?.label ?? undefined,
+	});
+
+	const addWarehouse = useAdminCreateWarehouseAndInventory();
+
+	const unitData = getSelectedUnitData();
+
 	// Debounce fetcher
 	const debounceFetcher = debounce((value: string) => {
-		setSearchValue(value);
+		if (!value.trim()) {
+			return setSearchValue({
+				label: '',
+				value: '',
+			});
+		}
+		setSearchValue({
+			label: value,
+			value: '',
+		});
 	}, 800);
 
 	// Format options warehouse
@@ -79,33 +88,73 @@ const WarehouseForm = ({
 		}));
 	}, [warehouse]);
 
-	const handleAddLocation = async () => {
+	const handleAddLocation = () => {
 		if (!searchValue) return;
-		await addWarehouse.mutateAsync({
-			location: searchValue,
-			variant_id: variantId,
-		});
-		refetchWarehouse();
-		refetchInventory();
+
+		onOpen();
 	};
 
 	const handleSelect = async (data: ValueType) => {
-		try {
-			setSelectedValue(null);
-			const { label, value } = data as ValueType;
-			if (!value || !label) return;
-			await addWarehouse.mutateAsync({
-				warehouse_id: value,
-				location: label,
-				variant_id: variantId,
-			});
-			refetchWarehouse();
-			refetchInventory();
-			message.success('Thêm vị trí cho sản phẩm thành công');
-		} catch (error: any) {
-			console.log('error:', error);
-			message.error(error.error);
+		const { label, value } = data as ValueType;
+		if (!value || !label) return;
+
+		setSearchValue({
+			label,
+			value,
+		});
+		onOpen();
+	};
+	const handleOkModal = async () => {
+		if (!searchValue) return;
+
+		if (!unitData) {
+			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
+		const warehouse_quantity = lineItem.warehouse_quantity ?? 0;
+		if (unitData.totalQuantity > warehouse_quantity) {
+			return message.error(
+				`Tổng số lượng nhập vào không được lớn hơn số lượng đã lấy (${warehouse_quantity} đôi)`
+			);
+		}
+		const itemData: AdminPostItemData = {
+			variant_id: variantId,
+			quantity: unitData?.quantity ?? 0,
+			unit_id: unitData?.unitId ?? '',
+			line_item_id: lineItem.id,
+			order_id: lineItem.order_id ?? '',
+			type: 'OUTBOUND',
+		};
+
+		if (!itemData) return;
+
+		const payload = {
+			warehouse: {
+				warehouse_id: searchValue?.value ?? undefined,
+				location: searchValue.label,
+				variant_id: variantId,
+				unit_id: unitData?.unitId,
+			},
+			itemInventory: itemData,
+		};
+
+		setSearchValue({
+			label: '',
+			value: '',
+		});
+		await addWarehouse.mutateAsync(payload, {
+			onSuccess: () => {
+				message.success('Thêm vị trí cho sản phẩm thành công');
+				refetchWarehouse();
+				refetchInventory();
+				queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
+
+				onReset();
+				onClose();
+			},
+			onError: (error: any) => {
+				message.error(getErrorMessage(error));
+			},
+		});
 	};
 
 	return (
@@ -149,11 +198,7 @@ const WarehouseForm = ({
 							options={optionWarehouses}
 							labelInValue
 							filterOption={false}
-							value={
-								selectedValue
-									? { label: selectedValue, value: selectedValue }
-									: null
-							}
+							value={!isEmpty(searchValue) ? searchValue : undefined}
 							onSearch={debounceFetcher}
 							onSelect={handleSelect}
 							showSearch
@@ -184,10 +229,27 @@ const WarehouseForm = ({
 						<Button
 							className="w-fit h-[10]"
 							onClick={handleAddLocation}
-							disabled={isEmpty(searchValue)}
+							disabled={isEmpty(searchValue?.label)}
 						>
 							Thêm
 						</Button>
+
+						{/* modal */}
+						<Modal
+							open={isModalOpen}
+							handleCancel={() => {
+								onReset();
+								onClose();
+								setSearchValue({
+									label: '',
+									value: '',
+								});
+							}}
+							handleOk={handleOkModal}
+							title={`Thao tác tại vị trí ${searchValue?.label}`}
+						>
+							<VariantInventoryForm type="INBOUND" />
+						</Modal>
 					</Flex>
 				</Flex>
 			)}
@@ -196,158 +258,3 @@ const WarehouseForm = ({
 };
 
 export default WarehouseForm;
-
-type UpdatedLineItem = LineItem & {
-	supplier_order_id: string;
-};
-type WarehouseItemProps = {
-	item: WarehouseInventory;
-	lineItem: UpdatedLineItem;
-	refetchInventory: () => void;
-	isPermission: boolean;
-};
-const WarehouseItem = ({
-	item,
-	lineItem,
-	refetchInventory,
-	isPermission,
-}: WarehouseItemProps) => {
-	const { getSelectedUnitData, onReset, setSelectedUnit } = useProductUnit();
-	const createOutboundInventory = useAdminCreateOutboundInventory();
-	const removeOutboundInventory = useAdminRemoveOutboundInventory();
-	const queryClient = useQueryClient();
-	const quantity =
-		item?.quantity === 0
-			? `0`
-			: `${item?.quantity / item?.item_unit?.quantity} ${
-					item?.item_unit?.unit
-			  }`;
-
-	const onRemoveInventory = async () => {
-		const unitData = getSelectedUnitData();
-		if (!unitData) {
-			return message.error('Vui lòng chọn loại hàng và số lượng');
-		}
-
-		const itemData: AdminPostRemmoveOutboundInventoryReq = {
-			variant_id: item.variant_id,
-			quantity: unitData.quantity,
-			unit_id: unitData.unitId,
-			line_item_id: lineItem.id,
-			order_id: lineItem?.order_id ?? '',
-			warehouse_inventory_id: item.id,
-			warehouse_id: item.warehouse_id,
-			type: 'OUTBOUND',
-		};
-
-		onReset();
-		await removeOutboundInventory.mutateAsync(itemData, {
-			onSuccess: () => {
-				message.success(`Đã lấy hàng tại vị trí ${item.warehouse.location}`);
-				refetchInventory();
-				queryClient.invalidateQueries([ADMIN_PRODUCT_OUTBOUND, 'detail']);
-				queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
-			},
-			onError: (error: any) => {
-				message.error(getErrorMessage(error));
-			},
-		});
-	};
-
-	const onAddInventory = async () => {
-		const unitData = getSelectedUnitData();
-		if (!unitData) {
-			return message.error('Vui lòng chọn loại hàng và số lượng');
-		}
-		const warehouse_quantity = lineItem.warehouse_quantity ?? 0;
-		if (unitData.totalQuantity > warehouse_quantity) {
-			return message.error(
-				`Số lượng hàng nhập vào không được lớn hơn số lượng đã lấy (${warehouse_quantity} đôi) của đơn hàng`
-			);
-		}
-		const itemData: AdminPostCreateOutboundInventoryReq = {
-			warehouse_id: item.warehouse_id,
-			variant_id: item.variant_id,
-			quantity: unitData.quantity,
-			unit_id: unitData.unitId,
-			line_item_id: lineItem.id,
-			order_id: lineItem.order_id ?? '',
-			warehouse_inventory_id: item.id,
-			type: 'OUTBOUND',
-		};
-
-		onReset();
-		await createOutboundInventory.mutateAsync(itemData, {
-			onSuccess: () => {
-				message.success(`Đã nhập hàng vào vị trí ${item.warehouse.location}`);
-				refetchInventory();
-				queryClient.invalidateQueries([ADMIN_PRODUCT_OUTBOUND, 'detail']);
-				queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
-			},
-			onError: (error: any) => {
-				message.error(getErrorMessage(error));
-			},
-		});
-	};
-
-	return (
-		<Flex
-			align="center"
-			gap="small"
-			justify="space-between"
-			className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
-		>
-			{isPermission && (
-				<Popconfirm
-					title={`Lấy hàng tại vị trí (${item.warehouse.location})`}
-					description={
-						<VariantInventoryForm
-							maxQuantity={item.quantity / item.item_unit.quantity}
-							type="OUTBOUND"
-						/>
-					}
-					isLoading={removeOutboundInventory.isLoading}
-					cancelText="Huỷ"
-					okText="Xác nhận"
-					handleOk={onRemoveInventory}
-					handleCancel={() => {}}
-					onOpenChange={(e) => onReset()}
-					icon={null}
-				>
-					<Button
-						className="w-[24px] h-[24px] rounded-full"
-						type="default"
-						danger
-						onClick={() => setSelectedUnit(item.item_unit.id)}
-						icon={<Minus size={16} />}
-					/>
-				</Popconfirm>
-			)}
-			<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
-			{isPermission && (
-				<Popconfirm
-					title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
-					description={<VariantInventoryForm type="INBOUND" />}
-					isLoading={createOutboundInventory.isLoading}
-					cancelText="Huỷ"
-					okText="Xác nhận"
-					handleOk={onAddInventory}
-					handleCancel={() => {}}
-					onOpenChange={(e) => onReset()}
-					icon={null}
-				>
-					<Button
-						className="w-[24px] h-[24px] rounded-full"
-						color="primary"
-						// variant="outlined"
-						type="default"
-						onClick={() =>
-							item && item.item_unit && setSelectedUnit(item.item_unit.id)
-						}
-						icon={<Plus size={16} />}
-					/>
-				</Popconfirm>
-			)}
-		</Flex>
-	);
-};

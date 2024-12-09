@@ -9,13 +9,16 @@ import { Search } from 'lucide-react';
 import { ChangeEvent, FC, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { Tabs } from '@/components/Tabs';
-import { TabsProps } from 'antd';
+import { message, TabsProps } from 'antd';
 import { useRouter } from 'next/navigation';
 import { ERoutes } from '@/types/routes';
-import { useAdminProductOutbounds } from '@/lib/hooks/api/product-outbound';
+import {
+	useAdminProductOutboundHandler,
+	useAdminProductOutbounds,
+} from '@/lib/hooks/api/product-outbound';
 import OutboundItem from '../components/outbound-item';
-import { Order, User } from '@medusajs/medusa';
-import { FulfillmentStatus } from '@/types/order';
+import { FulfillmentStatus, Order } from '@/types/order';
+import { getErrorMessage } from '@/lib/utils';
 
 type Props = {};
 
@@ -35,6 +38,7 @@ const ListOutbound: FC<Props> = ({}) => {
 		limit: DEFAULT_PAGE_SIZE,
 		status: activeKey,
 	});
+	const productOutboundHandler = useAdminProductOutboundHandler();
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -61,17 +65,29 @@ const ListOutbound: FC<Props> = ({}) => {
 		},
 	];
 
-	const handleClickDetail = (id: string) => {
-		router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${id}`);
+	const handleClickDetail = async (item: Order) => {
+		if (item?.handler_id) {
+			return router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${item.id}`);
+		}
+
+		await productOutboundHandler.mutateAsync(
+			{ id: item.id },
+			{
+				onSuccess: () => {
+					router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${item.id}`);
+				},
+				onError: (err) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
 	};
 
 	return (
 		<Flex vertical gap={12}>
 			<Flex vertical align="flex-start" className="">
 				<Title level={3}>Đơn hàng</Title>
-				<Text className="text-gray-600">
-					Trang danh sách các đơn nhập hàng.
-				</Text>
+				<Text className="text-gray-600">Trang danh sách các đơn xuất kho.</Text>
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				<Title level={4}>Theo dõi các đơn hàng</Title>
@@ -91,10 +107,10 @@ const ListOutbound: FC<Props> = ({}) => {
 					centered
 				/>
 				<List
-					grid={{ gutter: 12, xs: 1, sm: 2, lg: 3 }}
+					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
 					dataSource={orders}
 					loading={isLoading}
-					renderItem={(item: Order & { handler: User }) => (
+					renderItem={(item: Order) => (
 						<List.Item>
 							<OutboundItem item={item} handleClickDetail={handleClickDetail} />
 						</List.Item>

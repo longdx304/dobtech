@@ -4,11 +4,15 @@ import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { ERoutes } from '@/types/routes';
 import _ from 'lodash';
-import { Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useAdminOrders } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import orderColumns from './order-column';
+import { FloatButton } from '@/components/Button';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import NewDraftOrderFormProvider from '@/modules/draft-orders/hooks/use-new-draft-form';
+import NewOrderModal from '../../components/orders/new-order';
 
 type Props = {};
 
@@ -26,7 +30,13 @@ const OrderList: FC<Props> = () => {
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
 
-	const { orders, isLoading, count } = useAdminOrders(
+	const {
+		state: stateOrderByAdminModal,
+		onOpen: openOrderByAdminModal,
+		onClose: closeOrderByAdminModal,
+	} = useToggleState(false);
+
+	const { orders, isLoading, count, refetch } = useAdminOrders(
 		{
 			...(defaultQueryProps as any),
 			q: searchValue || undefined,
@@ -60,6 +70,14 @@ const OrderList: FC<Props> = () => {
 		router.push(`${ERoutes.ORDERS}/${record.id}`);
 	};
 
+	const handleCreateOrderByAdmin = () => {
+		openOrderByAdminModal();
+	};
+
+	const handleCancelOrderByAdmin = () => {
+		closeOrderByAdminModal();
+	};
+
 	return (
 		<div className="w-full">
 			<Flex align="center" justify="flex-end" className="pb-4">
@@ -91,6 +109,23 @@ const OrderList: FC<Props> = () => {
 						`${range[0]}-${range[1]} trong ${total} đơn hàng`,
 				}}
 			/>
+			<FloatButton
+				className="absolute"
+				icon={<Plus color="white" size={20} strokeWidth={2} />}
+				type="primary"
+				onClick={handleCreateOrderByAdmin}
+				data-testid="btnCreateSupplier"
+			/>
+			{stateOrderByAdminModal && (
+				<NewDraftOrderFormProvider>
+					<NewOrderModal
+						state={stateOrderByAdminModal}
+						handleOk={handleCancelOrderByAdmin}
+						handleCancel={handleCancelOrderByAdmin}
+						refetch={refetch}
+					/>
+				</NewDraftOrderFormProvider>
+			)}
 		</div>
 	);
 };

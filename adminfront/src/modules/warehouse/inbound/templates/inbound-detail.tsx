@@ -2,30 +2,31 @@
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import List from '@/components/List';
 import { Tabs } from '@/components/Tabs';
 import { Title } from '@/components/Typography';
+import { useAdminProductInboundConfirmById } from '@/lib/hooks/api/product-inbound';
 import { useAdminProductInbound } from '@/lib/hooks/api/product-inbound/queries';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import { useUser } from '@/lib/providers/user-provider';
+import { getErrorMessage } from '@/lib/utils';
+import PlaceholderImage from '@/modules/common/components/placeholder-image';
+import { LineItem } from '@/types/lineItem';
 import { ERoutes } from '@/types/routes';
 import { FulfillSupplierOrderStt } from '@/types/supplier';
-import { TabsProps } from 'antd';
+import { Modal as AntdModal, message, TabsProps } from 'antd';
+import clsx from 'clsx';
 import debounce from 'lodash/debounce';
 import { ArrowLeft, Check, Search } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import InboundDetailItem from '../components/inbound-detail-item';
 import InboundModal from '../components/inbound-modal';
-import { LineItem } from '@/types/lineItem';
-import { ActionAbles } from '@/components/Dropdown';
-import { Modal as AntdModal, message } from 'antd';
-import { useMarkAsFulfilledMutation } from '@/lib/hooks/api/supplier-order';
-import Image from 'next/image';
-import PlaceholderImage from '@/modules/common/components/placeholder-image';
-import clsx from 'clsx';
-import { getErrorMessage } from '@/lib/utils';
+import Notes from '../components/notes';
 
 type Props = {
 	id: string;
@@ -34,16 +35,24 @@ type Props = {
 const DEFAULT_PAGE_SIZE = 10;
 const InboundDetail: FC<Props> = ({ id }) => {
 	const router = useRouter();
+	const { user } = useUser();
 	const { state, onOpen, onClose } = useToggleState();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [variantId, setVariantId] = useState<string | null>(null);
 	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
 	const { supplierOrder, isLoading, refetch } = useAdminProductInbound(id);
-	const changeSttFulfilled = useMarkAsFulfilledMutation(id);
+	const confirmInboundProduct = useAdminProductInboundConfirmById(id);
 
 	const [activeKey, setActiveKey] = useState<FulfillSupplierOrderStt>(
 		FulfillSupplierOrderStt.DELIVERED
 	);
+
+	const isPermission = useMemo(() => {
+		if (!user) return false;
+		if (user.role === 'admin' || supplierOrder?.handler_id === user.id)
+			return true;
+		return false;
+	}, [user, supplierOrder?.handler_id]);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -119,26 +128,21 @@ const InboundDetail: FC<Props> = ({ id }) => {
 			}),
 			onOk: async () => {
 				const isProcessing = supplierOrder?.items.some(
-					(item) => item.warehouse_quantity < item.quantity
+					(item) => item.warehouse_quantity < 0
 				);
 				if (isProcessing) {
-					message.error('Chưa hoàn thành tất cả sản phẩm');
+					message.error('Tồn tại sản phẩm đang xuất kho');
 					return;
 				}
-				await changeSttFulfilled.mutateAsync(
-					{
-						status: FulfillSupplierOrderStt.INVENTORIED,
+				await confirmInboundProduct.mutateAsync(void 0, {
+					onSuccess: () => {
+						message.success('Đã đánh dấu nhập hàng thành công');
+						refetch();
 					},
-					{
-						onSuccess: () => {
-							message.success('Đã đánh dấu nhập hàng thành công');
-							refetch();
-						},
-						onError: (error: any) => {
-							message.error(getErrorMessage(error));
-						},
-					}
-				);
+					onError: (error: any) => {
+						message.error(getErrorMessage(error));
+					},
+				});
 			},
 		});
 	};
@@ -164,7 +168,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	];
 
 	return (
-		<Flex vertical gap={12}>
+		<Flex vertical>
 			<Flex vertical align="flex-start" className="">
 				<Button
 					onClick={handleBackToList}
@@ -200,7 +204,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 					centered
 				/>
 				<List
-					grid={{ gutter: 12, xs: 1, sm: 2, lg: 3 }}
+					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
 					dataSource={lineItems}
 					loading={isLoading}
 					renderItem={(item: LineItem) => (
@@ -230,9 +234,11 @@ const InboundDetail: FC<Props> = ({ id }) => {
 						onClose={handleClose}
 						variantId={variantId as string}
 						item={selectedItem}
+						isPermission={isPermission}
 					/>
 				)}
 			</Card>
+			<Notes orderId={id} type="INBOUND" />
 		</Flex>
 	);
 };
@@ -271,7 +277,13 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 			</div>
 			<div className="flex items-center">
 				<span className="flex text-gray-500 text-xs">
-					<span className="pl-1">{item.warehouse_quantity}</span>
+					<span
+						className={clsx('pr-1', {
+							'text-red-500': item.warehouse_quantity < 0,
+						})}
+					>
+						{item.warehouse_quantity}
+					</span>
 					{'/'}
 					<span className="pl-1">{item.quantity}</span>
 				</span>

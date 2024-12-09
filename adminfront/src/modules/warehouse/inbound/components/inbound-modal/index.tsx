@@ -9,15 +9,23 @@ import { useContext } from 'react';
 import WarehouseForm from '../warehouse-form';
 import { message } from 'antd';
 import { LineItem } from '@/types/lineItem';
+import clsx from 'clsx';
 
 type Props = {
 	open: boolean;
 	onClose: () => void;
 	variantId: string;
 	item: LineItem;
+	isPermission: boolean;
 };
 
-const InboundModal = ({ open, onClose, variantId, item }: Props) => {
+const InboundModal = ({
+	open,
+	onClose,
+	variantId,
+	item,
+	isPermission,
+}: Props) => {
 	const layeredModalContext = useContext(LayeredModalContext);
 	const { lineItem, isLoading } = useAdminLineItem(item.id);
 
@@ -44,7 +52,11 @@ const InboundModal = ({ open, onClose, variantId, item }: Props) => {
 			closable={false}
 		>
 			<VariantInfo lineItem={lineItem} />
-			<WarehouseForm variantId={variantId} lineItem={lineItem} />
+			<WarehouseForm
+				variantId={variantId}
+				lineItem={lineItem}
+				isPermission={isPermission}
+			/>
 		</LayeredModal>
 	);
 };
@@ -66,9 +78,12 @@ const VariantInfo = ({ lineItem }: { lineItem: LineItem }) => {
 				<Text className="text-[14px] text-gray-500">
 					Đã nhập kho / Tổng giao:
 				</Text>
-				<Text className="text-sm font-medium">{`${
-					lineItem.warehouse_quantity ?? 0
-				} / ${lineItem.quantity}`}</Text>
+				<Text
+					className={clsx('text-sm font-medium', {
+						'text-red-500':
+							(lineItem.warehouse_quantity ?? 0) < 0,
+					})}
+				>{`${lineItem.warehouse_quantity ?? 0} / ${lineItem.quantity}`}</Text>
 			</Flex>
 		</Flex>
 	);

@@ -1,9 +1,4 @@
-import {
-	Cart,
-	OrderEdit,
-	Payment,
-	User,
-} from '@medusajs/medusa';
+import { Cart, OrderEdit, Payment, User } from '@medusajs/medusa';
 import { LineItem } from './lineItem';
 
 export interface Supplier {
@@ -127,6 +122,8 @@ export interface SupplierOrder {
 	delivered_at?: string;
 	inventoried_at?: string;
 	rejected_at?: string;
+	handler_id?: string;
+	handler?: User;
 }
 
 export interface SupplierOrderEdit extends OrderEdit {
@@ -136,7 +133,6 @@ export interface SupplierOrderEdit extends OrderEdit {
 export interface SupplierOrderDocumentRes {
 	documents: string | string[];
 }
-
 
 export enum FulfillSupplierOrderStt {
 	NOT_FULFILLED = 'not_fulfilled',
@@ -149,3 +145,8 @@ export type MarkAsFulfilledReq = {
 	status: FulfillSupplierOrderStt;
 };
 export type MarkAsFulfilledRes = any;
+
+export type ProductInboundHandlerReq = {
+	id: string;
+	// handler_id: string;
+};
