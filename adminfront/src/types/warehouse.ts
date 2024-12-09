@@ -1,3 +1,4 @@
+import { User } from '@medusajs/medusa';
 import { ItemUnit } from './item-unit';
 
 export interface Warehouse {
@@ -68,6 +69,8 @@ export type WarehouseInventory = {
 	warehouse: Warehouse;
 	created_at: string;
 	updated_at: string;
+	user_id: string;
+	user: User;
 };
 
 export interface AdminPostInboundInventoryReq {
