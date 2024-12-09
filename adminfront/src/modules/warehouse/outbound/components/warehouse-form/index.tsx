@@ -23,6 +23,7 @@ import isEmpty from 'lodash/isEmpty';
 import { LoaderCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import WarehouseItem from './warehouse-item';
+import { ADMIN_PRODUCT_OUTBOUND } from '@/lib/hooks/api/product-outbound';
 
 type WarehouseFormProps = {
 	variantId: string;
@@ -68,10 +69,7 @@ const WarehouseForm = ({
 	// Debounce fetcher
 	const debounceFetcher = debounce((value: string) => {
 		if (!value.trim()) {
-			return setSearchValue({
-				label: '',
-				value: '',
-			});
+			return;
 		}
 		setSearchValue({
 			label: value,
@@ -137,6 +135,7 @@ const WarehouseForm = ({
 			itemInventory: itemData,
 		};
 
+		// clear state to refetch warehouse
 		setSearchValue({
 			label: '',
 			value: '',
@@ -147,6 +146,7 @@ const WarehouseForm = ({
 				refetchWarehouse();
 				refetchInventory();
 				queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
+				queryClient.invalidateQueries([ADMIN_PRODUCT_OUTBOUND, 'detail']);
 
 				onReset();
 				onClose();
@@ -247,6 +247,7 @@ const WarehouseForm = ({
 							}}
 							handleOk={handleOkModal}
 							title={`Thao tác tại vị trí ${searchValue?.label}`}
+							isLoading={addWarehouse.isLoading}
 						>
 							<VariantInventoryForm type="INBOUND" />
 						</Modal>

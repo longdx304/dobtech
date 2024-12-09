@@ -6,7 +6,7 @@ import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
 import { queryClient } from '@/lib/constants/query-client';
 import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
-import { useAdminCreateWarehouseAndInventory } from '@/lib/hooks/api/product-inbound';
+import { ADMIN_PRODUCT_INBOUND, useAdminCreateWarehouseAndInventory } from '@/lib/hooks/api/product-inbound';
 import {
 	useAdminWarehouseInventoryByVariant,
 	useAdminWarehouses,
@@ -69,10 +69,7 @@ const WarehouseForm = ({
 	// Debounce fetcher
 	const debounceFetcher = debounce((value: string) => {
 		if (!value.trim()) {
-			return setSearchValue({
-				label: '',
-				value: '',
-			});
+			return;
 		}
 		setSearchValue({
 			label: value,
@@ -139,16 +136,19 @@ const WarehouseForm = ({
 			itemInventory: itemData,
 		};
 
+		// clear state to refetch warehouse
 		setSearchValue({
 			label: '',
 			value: '',
 		});
+
 		await addWarehouse.mutateAsync(payload, {
 			onSuccess: () => {
 				message.success('Thêm vị trí cho sản phẩm thành công');
 				refetchWarehouse();
 				refetchInventory();
 				queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
+				queryClient.invalidateQueries([ADMIN_PRODUCT_INBOUND, 'detail']);
 
 				onReset();
 				onClose();
@@ -201,9 +201,7 @@ const WarehouseForm = ({
 							labelInValue
 							autoClearSearchValue={false}
 							filterOption={false}
-							value={
-								!isEmpty(searchValue) ? [searchValue] : undefined
-							}
+							value={!isEmpty(searchValue) ? searchValue : undefined}
 							onSearch={debounceFetcher}
 							onSelect={handleSelect}
 							showSearch
@@ -252,6 +250,7 @@ const WarehouseForm = ({
 						}}
 						handleOk={handleOkModal}
 						title={`Thao tác tại vị trí ${searchValue?.label}`}
+						isLoading={addWarehouse.isLoading}
 					>
 						<VariantInventoryForm type="INBOUND" />
 					</Modal>

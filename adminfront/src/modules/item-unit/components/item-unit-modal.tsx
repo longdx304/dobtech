@@ -81,7 +81,7 @@ const ItemUnitModal = ({
 			open={open}
 			onCancel={handleClose}
 			onOk={form.submit}
-			// confirmLoading={createItemUnit.isPending || updateItemUnit.isPending}
+			confirmLoading={createItemUnit.isLoading || updateItemUnit.isLoading}
 		>
 			<Form
 				form={form}
@@ -102,7 +102,12 @@ const ItemUnitModal = ({
 					name="quantity"
 					rules={[{ required: true, message: 'Vui lòng nhập số lượng' }]}
 				>
-					<InputNumber className="w-full" min={1} placeholder="Nhập số lượng" />
+					<InputNumber
+						className="w-full"
+						min={1}
+						placeholder="Nhập số lượng"
+						disabled={selectedItemUnit?.quantity === 1}
+					/>
 				</Form.Item>
 			</Form>
 		</Modal>

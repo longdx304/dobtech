@@ -1,6 +1,7 @@
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { TransactionType } from '@/types/warehouse';
+import { User } from '@medusajs/medusa';
 import { DatePicker } from 'antd';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import dayjs from 'dayjs';
@@ -29,12 +30,23 @@ const transactionColumns = ({}: Props) => [
 		dataIndex: 'type',
 		key: 'type',
 		width: 150,
+		className: 'text-xs',
 		filters: [
 			{ text: 'Nhập hàng', value: 'INBOUND' },
 			{ text: 'Lấy hàng', value: 'OUTBOUND' },
 		],
 		render: (type: TransactionType) => {
 			return typeMap[type];
+		},
+	},
+	{
+		title: 'Người xử lý',
+		dataIndex: 'user',
+		key: 'user',
+		width: 150,
+		className: 'text-xs',
+		render: (user: User, record: any) => {
+			return user?.last_name + ' ' + user?.first_name;
 		},
 	},
 	{
