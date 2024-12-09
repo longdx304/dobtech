@@ -74,15 +74,30 @@ const InboundDetail: FC<Props> = ({ id }) => {
 		setActiveKey(key as FulfillSupplierOrderStt);
 	};
 
+	const isFinished = [
+		FulfillSupplierOrderStt.PARTIALLY_INVENTORIED,
+		FulfillSupplierOrderStt.INVENTORIED,
+	].includes(
+		supplierOrder?.fulfillment_status || FulfillSupplierOrderStt.DELIVERED
+	);
 	const lineItems = useMemo(() => {
 		if (!supplierOrder?.items) return [];
 
 		const itemsByStatus = supplierOrder.items.filter((item: LineItem) => {
 			const warehouse_quantity = item.warehouse_quantity ?? 0;
-			if (activeKey === FulfillSupplierOrderStt.INVENTORIED) {
-				return warehouse_quantity === item.quantity;
+			if (isFinished) {
+				if (activeKey === FulfillSupplierOrderStt.INVENTORIED) return true;
+				else return false;
+			} else {
+				if (activeKey === FulfillSupplierOrderStt.INVENTORIED) {
+					return warehouse_quantity === item.quantity;
+				}
+
+				return warehouse_quantity < item.quantity;
 			}
-			return warehouse_quantity < item.quantity;
+
+			// if (activeKey === FulfillSupplierOrderStt.INVENTORIED) {
+			// }
 		});
 
 		return itemsByStatus
@@ -97,7 +112,9 @@ const InboundDetail: FC<Props> = ({ id }) => {
 					new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
 				);
 			});
-	}, [supplierOrder?.items, searchValue, activeKey]);
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [supplierOrder, searchValue, activeKey]);
 
 	const items: TabsProps['items'] = [
 		{
@@ -248,6 +265,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 						<List.Item>
 							<InboundDetailItem
 								item={item}
+								tag={activeKey}
 								handleClickDetail={(id) => handleClickDetail(id, item)}
 							/>
 						</List.Item>

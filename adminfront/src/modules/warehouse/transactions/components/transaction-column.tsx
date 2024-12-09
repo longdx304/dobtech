@@ -46,7 +46,7 @@ const transactionColumns = ({}: Props) => [
 		width: 150,
 		className: 'text-xs',
 		render: (user: User, record: any) => {
-			return user?.last_name + ' ' + user?.first_name;
+			return (user?.last_name ?? '') + ' ' + user?.first_name;
 		},
 	},
 	{

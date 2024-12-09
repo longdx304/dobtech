@@ -21,10 +21,7 @@ const Note: React.FC<NoteProps> = ({ event }) => {
 		return null;
 	}
 
-	const name =
-		user.first_name && user.last_name
-			? `${user.first_name} ${user.last_name}`
-			: user.email;
+	const name = user.first_name ? `${user.first_name}` : user.email;
 
 	const handleDelete = async () => {
 		AntdModal.confirm({

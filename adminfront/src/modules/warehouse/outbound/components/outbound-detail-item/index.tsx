@@ -3,20 +3,23 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
+import { FulfillmentStatus } from '@/types/order';
 import { LineItem } from '@medusajs/medusa';
 import clsx from 'clsx';
 import { Check, Clock } from 'lucide-react';
 
 type InboundItemProps = {
 	item: LineItem & { warehouse_quantity: number };
+	tag: string;
 	handleClickDetail: (id: string | null) => void;
 };
 
 const OutboundDetailItem: React.FC<InboundItemProps> = ({
 	item,
+	tag,
 	handleClickDetail,
 }) => {
-	const isProcessing = item.quantity !== (item?.warehouse_quantity ?? 0);
+	const isProcessing = tag === FulfillmentStatus.NOT_FULFILLED;
 
 	const handleClick = () => {
 		handleClickDetail(item.variant_id);

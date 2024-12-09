@@ -4,20 +4,23 @@ import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import { LineItem } from '@/types/lineItem';
+import { FulfillSupplierOrderStt } from '@/types/supplier';
 import { Tooltip } from 'antd';
 import clsx from 'clsx';
 import { Check, Clock } from 'lucide-react';
 
 type InboundItemProps = {
 	item: LineItem;
+	tag: string;
 	handleClickDetail: (id: string | null) => void;
 };
 
 const InboundDetailItem: React.FC<InboundItemProps> = ({
 	item,
+	tag,
 	handleClickDetail,
 }) => {
-	const isProcessing = item.quantity > (item?.warehouse_quantity ?? 0);
+	const isProcessing = tag === FulfillSupplierOrderStt.DELIVERED;
 
 	const handleClick = () => {
 		handleClickDetail(item.variant_id);

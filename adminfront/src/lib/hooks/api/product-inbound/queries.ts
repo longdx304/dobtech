@@ -1,4 +1,4 @@
-import { SupplierOrder } from '@/types/supplier';
+import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
 import { FindParams } from '@medusajs/medusa';
 import { Response } from '@medusajs/medusa-js';
 import { useQuery } from '@tanstack/react-query';
@@ -18,7 +18,7 @@ export type ProductInboundQueryKeyParams = {
 	q?: string;
 	offset?: number;
 	limit?: number;
-	status?: string;
+	status?: FulfillSupplierOrderStt | FulfillSupplierOrderStt[];
 };
 export type AdminProductInboundListRes = {
 	supplierOrder: SupplierOrder[];

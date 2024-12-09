@@ -75,16 +75,24 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 		setActiveKey(key as FulfillmentStatus);
 	};
 
+	const isFinished =
+		order?.fulfillment_status !== FulfillmentStatus.NOT_FULFILLED;
 	const lineItems = useMemo(() => {
 		if (!order?.items) return [];
 
 		const itemsByStatus = order.items.filter((item: any) => {
 			const lineItem = item as LineItem;
 			const warehouse_quantity = lineItem.warehouse_quantity ?? 0;
-			if (activeKey === FulfillmentStatus.FULFILLED) {
-				return warehouse_quantity === item.quantity;
+			if (isFinished) {
+				if (activeKey === FulfillmentStatus.FULFILLED) return true;
+				else return false;
+			} else {
+				if (activeKey === FulfillmentStatus.FULFILLED) {
+					return warehouse_quantity === item.quantity;
+				}
+
+				return warehouse_quantity < item.quantity;
 			}
-			return warehouse_quantity !== item.quantity;
 		});
 
 		return itemsByStatus
@@ -100,7 +108,8 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
 				);
 			});
-	}, [order?.items, searchValue, activeKey]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [order, searchValue, activeKey]);
 
 	const items: TabsProps['items'] = [
 		{
@@ -229,7 +238,9 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					<Flex vertical>
 						<Title level={4}>{`Đơn hàng #${order?.display_id}`}</Title>
 						<Text className="text-gray-600">
-							{`Người phụ trách: ${order?.handler?.last_name} ${order?.handler?.first_name}`}
+							{`Người phụ trách: ${order?.handler?.last_name ?? ''} ${
+								order?.handler?.first_name
+							}`}
 						</Text>
 					</Flex>
 					<ActionAbles actions={actions as any} />
@@ -258,6 +269,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 						<List.Item>
 							<OutboundDetailItem
 								item={item}
+								tag={activeKey}
 								handleClickDetail={(id) => handleClickDetail(id, item)}
 							/>
 						</List.Item>

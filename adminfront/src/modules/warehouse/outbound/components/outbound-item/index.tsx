@@ -16,7 +16,7 @@ const OutboundItem: React.FC<OutboundItemProps> = ({
 	item,
 	handleClickDetail,
 }) => {
-	const isProcessing = item.fulfillment_status !== FulfillmentStatus.FULFILLED;
+	const isProcessing = item.fulfillment_status === FulfillmentStatus.NOT_FULFILLED;
 
 	const handleClick = () => {
 		handleClickDetail(item);
@@ -47,7 +47,7 @@ const OutboundItem: React.FC<OutboundItemProps> = ({
 				<Text className="text-[14px] text-gray-500">Người xử lý:</Text>
 				<Text className="text-sm font-semibold">
 					{item?.handler_id
-						? `${item.handler?.last_name} ${item.handler?.first_name}`
+						? `${item.handler?.last_name ?? ''} ${item.handler?.first_name}`
 						: 'Chưa xác định'}
 				</Text>
 			</Flex>
