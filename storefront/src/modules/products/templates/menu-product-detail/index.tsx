@@ -32,14 +32,14 @@ const MenuProductDetail: FC<Props> = ({}) => {
         gap='middle'
       >
         <Heart size={28} strokeWidth={2} color='#000000' />
-        <Button
+        {/* <Button
           disabled={!product || !region}
           className='w-full flex items-center justify-center gap rounded-[4px]'
           icon={<ShoppingCart strokeWidth={2} size={24} color='#ffffff' />}
           onClick={onOpen}
         >
           THÊM VÀO GIỎ HÀNG
-        </Button>
+        </Button> */}
       </Flex>
       <DrawPriceProduct
         open={state}

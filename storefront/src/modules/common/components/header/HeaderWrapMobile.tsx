@@ -44,7 +44,7 @@ const HeaderWrapMobile: FC<Props> = ({ categories }) => {
 					</LocalizedClientLink>
 
 					{/* Cart */}
-					<CartButton />
+					{/* <CartButton /> */}
 				</Flex>
 			</div>
 		</div>
