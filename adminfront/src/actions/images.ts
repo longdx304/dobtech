@@ -29,7 +29,6 @@ export const prepareImages = async (
 	images: FormImage[],
 	oldImagesUrls: string[] | null
 ) => {
-	console.log('oldImagesUrls:', oldImagesUrls);
 	const { uploadImages, existingImages } = splitImages(images);
 
 	let uploadedImgs: FormImage[] = [];

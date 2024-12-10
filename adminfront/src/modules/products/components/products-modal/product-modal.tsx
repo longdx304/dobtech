@@ -168,7 +168,7 @@ export default function ProductModal({
 		},
 		{
 			key: 'variantForm',
-			label: 'Variants',
+			label: 'Biến thể',
 			children: <AddVariant form={form} />,
 		},
 		{
@@ -196,6 +196,7 @@ export default function ProductModal({
 			handleCancel={handleCancel}
 			width={800}
 			form={form}
+			isLoading={isLoading}
 		>
 			<Title level={3} className="text-center">
 				{titleModal}
@@ -279,7 +280,7 @@ const createPayload = (
 					price?.currency_code ?? 'vnd',
 					price?.amount ?? 0
 				),
-				currency_code: price.currency_code,
+				currency_code: price?.currency_code ?? 'vnd',
 			})) as any,
 		})),
 		// Dimensions

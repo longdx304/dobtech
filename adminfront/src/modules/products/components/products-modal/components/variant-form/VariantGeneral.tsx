@@ -1,5 +1,5 @@
 import { Col, Form, Row } from 'antd';
-import { CircleAlert } from 'lucide-react';
+import { CircleAlert, Copy, Tags } from 'lucide-react';
 import { FC } from 'react';
 
 import { Input, InputNumber } from '@/components/Input';
@@ -7,6 +7,7 @@ import { Select } from '@/components/Select';
 import { TooltipIcon } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
 import { useStoreData } from '@/modules/regions/components/region-modal/use-store-data';
+import { Flex } from '@/components/Flex';
 
 type Props = {
 	form: any;
@@ -15,8 +16,14 @@ type Props = {
 
 const VariantGeneral: FC<Props> = ({ form, field }) => {
 	const options = Form.useWatch('options', form) || undefined;
+	const variant = Form.useWatch(['variants', field.name], form) || undefined;
 	const { currencyOptions } = useStoreData();
 
+	const handleCopyTitle = (indexOption: any) => {
+		const value = variant?.options[indexOption]?.value ?? undefined;
+		if (!value) return;
+		form.setFieldValue(['variants', field.name, 'title'], value);
+	};
 	return (
 		<Row gutter={[16, 0]} className="w-full text-gray-500">
 			<Col span={24}>
@@ -75,6 +82,7 @@ const VariantGeneral: FC<Props> = ({ form, field }) => {
 					name={[field.name, 'allowed_quantity']}
 					label="Định lượng đôi"
 					className="mb-2"
+					initialValue={6}
 				>
 					<InputNumber className="w-full" placeholder="0" min={6} allowClear />
 				</Form.Item>
@@ -97,23 +105,30 @@ const VariantGeneral: FC<Props> = ({ form, field }) => {
 					}));
 					return (
 						<Col xs={24} sm={12} key={index}>
-							<Form.Item
-								labelCol={{ span: 24 }}
-								name={[field.name, 'options', index, 'value']}
-								rules={[
-									{
-										required: true,
-										message: `Giá trị ${option.title.toLowerCase()} phải tồn tại!`,
-									},
-								]}
-								label={option.title}
-								className="mb-2"
-							>
-								<Select
-									placeholder={`Chọn một ${option.title.toLowerCase()}`}
-									options={optionsSelect}
+							<Flex align="flex-end" className="w-full">
+								<Form.Item
+									labelCol={{ span: 24 }}
+									name={[field.name, 'options', index, 'value']}
+									rules={[
+										{
+											required: true,
+											message: `Giá trị ${option.title.toLowerCase()} phải tồn tại!`,
+										},
+									]}
+									label={option.title}
+									className="mb-0 w-full"
+								>
+									<Select
+										placeholder={`Chọn một ${option.title.toLowerCase()}`}
+										options={optionsSelect}
+									/>
+								</Form.Item>
+								<Copy
+									size={18}
+									className="mb-2 ml-2"
+									onClick={() => handleCopyTitle(index)}
 								/>
-							</Form.Item>
+							</Flex>
 						</Col>
 					);
 				})}
