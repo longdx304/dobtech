@@ -57,28 +57,31 @@ const itemDropdown: MenuProps['items'] = [
 ];
 
 // Item menu overview
-const itemOverview = (role: string, permissions: string[]) =>
-	[
-		getItem('Đơn hàng', 'orders', <ShoppingCart />),
-		getItem('Sản phẩm', 'products', <ClipboardPenLine />),
-		getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
-	].filter(() => true);
+const itemSales = [
+	getItem('Đơn hàng', 'orders', <ShoppingCart />),
+	getItem('Danh mục', 'product-categories', <LayoutList />),
+	getItem('Sản phẩm', 'products', <ClipboardPenLine />),
+	getItem('Định giá', 'pricing', <CircleDollarSign />),
+	getItem('Khách hàng', 'customers', <UsersRound />),
+	getItem('Giảm giá', 'discounts', <SquarePercent />),
+].filter(() => true);
+
+const itemPurchases = [
+	getItem('Nhà cung cấp', 'suppliers', <LayoutList />),
+].filter(() => true);
 
 // Item menu warehouse
 const itemsWarehouse: MenuProps['items'] = [
 	getItem('Nhập kho', 'warehouse-inbound', <PackagePlus />),
 	getItem('Xuất kho', 'warehouse-outbound', <PackageMinus />),
 	getItem('Sổ kho', 'warehouse-transaction', <NotebookPen />),
+	getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
 ];
 
 // Item menu option
 const itemsAdmin: MenuProps['items'] = [
-	getItem('Nhập hàng', 'suppliers', <Warehouse />),
 	getItem('Quản lý nhân viên', 'accounts', <Users />),
-	getItem('Danh mục', 'product-categories', <LayoutList />),
-	getItem('Định giá', 'pricing', <CircleDollarSign />),
-	getItem('Khách hàng', 'customers', <UsersRound />),
-	getItem('Giảm giá', 'discounts', <SquarePercent />),
+
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
 		getItem('Đơn vị hàng', 'item-unit', <Boxes />),
@@ -129,6 +132,9 @@ export const menuItems = (
 		];
 	}
 
+	const hasRequiredPermissionsSale = !isEmpty(
+		intersection(permissions, [EPermissions.InventoryChecker])
+	);
 	// Check if user has required permissions for warehouse
 	const hasRequiredPermissionsWarehouse = !isEmpty(
 		intersection(permissions, [
@@ -139,13 +145,16 @@ export const menuItems = (
 	);
 
 	return [
-		getItem(
-			'Tổng quan',
-			'overview',
-			null,
-			itemOverview(role, permissions) as MenuItem[],
-			'group'
-		),
+		hasRequiredPermissionsSale &&
+			getItem('Bán hàng', 'sale', null, itemSales as MenuItem[], 'group'),
+		hasRequiredPermissionsSale &&
+			getItem(
+				'Mua hàng',
+				'purchase',
+				null,
+				itemPurchases as MenuItem[],
+				'group'
+			),
 		hasRequiredPermissionsWarehouse &&
 			getItem('Kho', 'inventory', null, itemsWarehouse as MenuItem[], 'group'),
 		role === 'admin' &&

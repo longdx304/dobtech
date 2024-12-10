@@ -6,6 +6,7 @@ import { Flex } from '@/components/Flex';
 import { Input, InputNumber } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
+import { countries } from '@/utils/countries';
 
 type Props = {
 	form: any;
@@ -13,6 +14,11 @@ type Props = {
 };
 
 const VariantShipping: FC<Props> = ({ form, field }) => {
+	const countryOptions = countries.map((c) => ({
+		label: c.name,
+		value: c.alpha2.toLowerCase(),
+	}));
+
 	return (
 		<Row gutter={[16, 4]} className="w-full text-gray-500">
 			<Col span={24} className="text-[12px]">
@@ -113,7 +119,16 @@ const VariantShipping: FC<Props> = ({ form, field }) => {
 					label="Quốc gia xuất xứ"
 					className="mb-2"
 				>
-					<Select placeholder="Chọn một quốc gia" options={[]} />
+					<Select
+						placeholder="Chọn một quốc gia"
+						options={countryOptions}
+						showSearch
+						filterOption={(input, option) =>
+							((option?.label as string) ?? '')
+								.toLowerCase()
+								.includes(input.toLowerCase())
+						}
+					/>
 				</Form.Item>
 			</Col>
 		</Row>
