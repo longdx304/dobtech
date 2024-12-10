@@ -1,5 +1,5 @@
 import { Col, Form, Row } from 'antd';
-import { CircleAlert } from 'lucide-react';
+import { CircleAlert, Copy } from 'lucide-react';
 import { FC } from 'react';
 
 import { Input, InputNumber } from '@/components/Input';
@@ -7,6 +7,7 @@ import { Select } from '@/components/Select';
 import { TooltipIcon } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
 import { Product } from '@medusajs/medusa';
+import { Flex } from '@/components/Flex';
 
 type Props = {
 	form: any;
@@ -14,6 +15,15 @@ type Props = {
 };
 
 const VariantGeneral: FC<Props> = ({ form, options }) => {
+	const _options = Form.useWatch('options', form) || undefined;
+
+	const handleCopyTitle = (indexOption: any) => {
+		console.log('_options[indexOption].values', _options[indexOption]);
+		const value = _options[indexOption].value[0] ?? undefined;
+		if (!value) return;
+		form.setFieldValue('title', value);
+	};
+
 	return (
 		<Row gutter={[16, 0]} className="w-full text-gray-500">
 			<Col span={24}>
@@ -69,34 +79,41 @@ const VariantGeneral: FC<Props> = ({ form, options }) => {
 					}));
 				return (
 					<Col xs={24} sm={12} key={index}>
-						<Form.Item
-							labelCol={{ span: 24 }}
-							name={['options', index, 'option_id']}
-							hidden
-							initialValue={option.id}
-						>
-							<Input />
-						</Form.Item>
-						<Form.Item
-							labelCol={{ span: 24 }}
-							name={['options', index, 'value']}
-							rules={[
-								{
-									required: true,
-									message: `Giá trị ${option.title.toLowerCase()} phải tồn tại!`,
-								},
-							]}
-							label={option.title}
-							className="mb-2"
-						>
-							{/* <Input placeholder={`${option.title}...`} /> */}
-							<Select
-								mode="tags"
-								placeholder={`Chọn hoặc thêm một ${option.title.toLowerCase()}`}
-								options={optionsSelect}
-								maxCount={1}
+						<Flex align="flex-end" className="w-full">
+							<Form.Item
+								labelCol={{ span: 24 }}
+								name={['options', index, 'option_id']}
+								hidden
+								initialValue={option.id}
+							>
+								<Input />
+							</Form.Item>
+							<Form.Item
+								labelCol={{ span: 24 }}
+								name={['options', index, 'value']}
+								rules={[
+									{
+										required: true,
+										message: `Giá trị ${option.title.toLowerCase()} phải tồn tại!`,
+									},
+								]}
+								label={option.title}
+								className="mb-0 w-full"
+							>
+								{/* <Input placeholder={`${option.title}...`} /> */}
+								<Select
+									mode="tags"
+									placeholder={`Chọn hoặc thêm một ${option.title.toLowerCase()}`}
+									options={optionsSelect}
+									maxCount={1}
+								/>
+							</Form.Item>
+							<Copy
+								size={18}
+								className="mb-2 ml-2"
+								onClick={() => handleCopyTitle(index)}
 							/>
-						</Form.Item>
+						</Flex>
 					</Col>
 				);
 			})}

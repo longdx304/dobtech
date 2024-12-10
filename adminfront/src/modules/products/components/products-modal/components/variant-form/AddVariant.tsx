@@ -56,6 +56,7 @@ const AddVariant: FC<Props> = ({ form }) => {
 							labelCol={{ span: 24 }}
 							name={['defaultPrice', 'currency_code']}
 							label="Tiền tệ:"
+							initialValue={'vnd'}
 						>
 							<Select placeholder="Chọn tiền tệ" options={currencyOptions} />
 						</Form.Item>
@@ -65,6 +66,7 @@ const AddVariant: FC<Props> = ({ form }) => {
 							labelCol={{ span: 24 }}
 							name={'allowed_quantity'}
 							label="Định lượng đôi mặc định:"
+							initialValue={6}
 						>
 							<InputNumber min={1} allowClear placeholder="6" />
 						</Form.Item>
@@ -118,7 +120,7 @@ const AddVariant: FC<Props> = ({ form }) => {
 			<Col span={24}>
 				<Flex gap="4px" className="pb-2" align="center">
 					<Text className="text-sm text-gray-500 font-medium">
-						Các phiên bản sản phẩm
+						Các biến thể sản phẩm
 					</Text>
 					<TooltipIcon
 						title="Bạn phải thêm ít nhất một tùy chọn sản phẩm trước khi bạn có thể bắt đầu thêm các phiên bản sản phẩm."
@@ -268,18 +270,15 @@ const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant }) => {
 			{(fields, { add, remove }, { errors }) => (
 				<Flex vertical gap="small" className="w-full">
 					{fields.length > 0 && (
-						<Row gutter={[16, 16]}>
+						<Row gutter={[16, 16]} wrap={false}>
 							<Col flex="200px">
 								<Text className="text-sm text-gray-500 font-medium">
-									Phiên bản
+									Biến thể
 								</Text>
 							</Col>
 							<Col flex="auto">
-								<Text className="text-sm text-gray-500 font-medium">
-									Hàng tồn kho
-								</Text>
+								<Text className="text-sm text-gray-500 font-medium">SKU</Text>
 							</Col>
-							<Col flex="40px"></Col>
 							<Col flex="40px"></Col>
 						</Row>
 					)}
@@ -295,7 +294,10 @@ const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant }) => {
 									{variants[index]?.title && (
 										<Flex vertical gap="2px" justify="center">
 											<Flex>
-												<Text className="text-sm text-black font-medium">
+												<Text
+													tooltip
+													className="text-sm text-black font-medium line-clamp-1"
+												>
 													{variants[index]?.title}
 												</Text>
 												<Text className="text-xs">{''}</Text>
@@ -304,13 +306,14 @@ const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant }) => {
 									)}
 								</Col>
 								<Col flex="auto">
-									<Text className="text-sm text-black font-medium">
-										{variants[index]?.inventory_quantity
-											? variants[index]?.inventory_quantity
-											: '-'}
+									<Text
+										className="text-sm text-black font-medium line-clamp-1"
+										tooltip
+									>
+										{variants[index]?.sku ? variants[index]?.sku : '-'}
 									</Text>
 								</Col>
-								<Col flex="40px">
+								{/* <Col flex="40px">
 									{variants[index]?.inventory_quantity ? (
 										<TooltipIcon
 											title={`${variants[index]?.title} là phiên bản hợp lệ.`}
@@ -349,7 +352,7 @@ const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant }) => {
 											}
 										></TooltipIcon>
 									)}
-								</Col>
+								</Col> */}
 								<Col flex="40px">
 									{fields.length > 0 ? (
 										<div className="h-full">
@@ -364,17 +367,19 @@ const AddVersions: FC<AddVersionProps> = ({ form, disabledBtnAddVariant }) => {
 									) : null}
 								</Col>
 
-								<AddVariantModal
-									key={field.key}
-									state={state}
-									handleOk={() => onClose()}
-									handleCancel={() => {
-										onClose();
-										remove(field.name);
-									}}
-									field={field}
-									form={form}
-								/>
+								{state && (
+									<AddVariantModal
+										key={field.key}
+										state={state}
+										handleOk={() => onClose()}
+										handleCancel={() => {
+											onClose();
+											remove(field.name);
+										}}
+										field={field}
+										form={form}
+									/>
+								)}
 							</Row>
 						);
 					})}

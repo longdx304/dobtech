@@ -46,7 +46,7 @@ const MediaForm: FC<Props> = ({ form }) => {
 					<Form.Item name="media">
 						<Upload
 							onFileChosen={handleFilesChosen}
-							placeholder="Khuyến nghị 1200 x 1600 (3:4), tối đa kích thước 10MB mỗi hình ảnh."
+							placeholder="Khuyến nghị 1200 x 1600 (3:4), tối đa kích thước 100MB cho các hình ảnh."
 							filetypes={[
 								'image/gif',
 								'image/jpeg',

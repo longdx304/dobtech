@@ -51,6 +51,7 @@ export default function SubmitModal({
 			className={cn('', className)}
 			onCancel={handleCancel}
 			footer={renderFooter()}
+			styles={{ body: { overflowY: 'auto', maxHeight: 'calc(100vh - 250px)' } }}
 			{...props}
 		>
 			{children}
