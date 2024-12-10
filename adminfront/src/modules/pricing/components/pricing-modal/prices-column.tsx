@@ -44,10 +44,7 @@ const PricesColumn = ({ currencies, storeRegions, discountPercent }: Props) => {
 							{currencyMeta?.symbol_native}
 						</Text>
 						<Text className="">
-							{`${price ?? '-'}`.replace(
-								/\B(?=(\d{3})+(?!\d))/g,
-								','
-							)}
+							{`${price ?? '-'}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
 						</Text>
 					</Flex>
 				);

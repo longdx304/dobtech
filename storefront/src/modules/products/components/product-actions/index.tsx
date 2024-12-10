@@ -23,7 +23,7 @@ type ProductActionsProps = {
 export type PriceType = {
 	calculated_price: string;
 	original_price?: string;
-	price_type?: 'sale' | 'default';
+	price_type?: 'sale' | 'default' | 'override';
 	percentage_diff?: string;
 	original_price_incl_tax?: string;
 	calculated_price_incl_tax?: string;
@@ -131,14 +131,14 @@ export default function ProductActions({
 									onChange={handleInputChange as any}
 								/>
 
-								<span>{`${inventoryQuantity ?? 0} sản phẩm có sẵn`}</span>
+								{/* <span>{`${inventoryQuantity ?? 0} sản phẩm có sẵn`}</span> */}
 							</div>
 							<Divider />
 						</div>
 					)}
 				</div>
 
-				{/* <Button
+				<Button
 					onClick={handleAddToCart}
 					disabled={
 						!inStock ||
@@ -158,7 +158,7 @@ export default function ProductActions({
 						: !inStock
 						? 'Hàng đã hết'
 						: 'Thêm vào giỏ hàng'}
-				</Button> */}
+				</Button>
 			</div>
 		</>
 	);

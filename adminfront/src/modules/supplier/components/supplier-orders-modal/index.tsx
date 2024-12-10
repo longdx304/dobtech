@@ -3,7 +3,6 @@ import { Modal } from '@/components/Modal';
 import { Steps } from '@/components/Steps';
 import { Title } from '@/components/Typography';
 import { useUser } from '@/lib/providers/user-provider';
-import Medusa from '@/services/api';
 import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PDFViewer } from '@react-pdf/renderer';

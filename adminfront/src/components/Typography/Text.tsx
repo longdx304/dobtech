@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 
 type Props = TextProps & {
 	className?: string;
-	children?: ReactNode;
+	children?: ReactNode | string | number;
 	strong?: boolean;
 };
 

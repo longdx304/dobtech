@@ -18,6 +18,7 @@ import {
 } from '@/modules/supplier/hooks/supplier-order-edits';
 import { ByLine } from '.';
 import EventContainer from '../event-container';
+import { Tooltip } from '@/components/Tooltip';
 type EditCreatedProps = {
 	event: OrderEditEvent;
 };
@@ -259,6 +260,10 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 
 	const lineItem = isAdd ? change.line_item : change.original_line_item;
 
+	const tooltipContent = `${lineItem?.title} - ${lineItem?.variant?.title} (${
+		lineItem?.variant?.sku || ''
+	})`;
+
 	return (
 		<div className="gap-x-4 flex">
 			<div>
@@ -271,19 +276,11 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 					)}
 				</div>
 			</div>
-			<div className="flex flex-col">
+			<Tooltip title={tooltipContent}>
 				<span className="font-medium text-gray-900">
 					{quantity > 1 && <>{`${quantity} x `}</>} {lineItem?.title} &nbsp;
-					{lineItem?.variant?.sku && (
-						<span className="text-xs">{lineItem?.variant?.sku}</span>
-					)}
 				</span>
-				<span className="font-normal text-gray-500 flex">
-					{`${lineItem?.variant?.title}${
-						lineItem?.variant?.sku ? ` (${lineItem.variant?.sku})` : ''
-					}`}
-				</span>
-			</div>
+			</Tooltip>
 		</div>
 	);
 };

@@ -37,24 +37,21 @@ export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
 					refetch={refetchOrder}
 				/>
 				<Documents order={supplierOrder} isLoading={isLoading} />
-
 				<Payment
 					supplierOrder={supplierOrder}
 					isLoading={isLoading}
 					refetch={refetchOrder}
 				/>
-				{/* <CustomerInfo order={order} isLoading={isLoading} /> */}
 			</Col>
 			<Col xs={24} lg={10}>
 				<Timeline
-					orderId={supplierOrder?.id}
+					orderId={id}
 					isLoading={isLoading}
 					events={events}
 					refetchOrder={refetch}
 					refetch={refetchTimeline}
 				/>
 			</Col>
-			{/* open the edit modal: add & update line item */}
 			{supplierOrder && (
 				<SupplierOrderEditModalContainer supplierOrder={supplierOrder} />
 			)}

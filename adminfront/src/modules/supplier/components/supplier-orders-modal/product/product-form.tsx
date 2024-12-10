@@ -134,27 +134,27 @@ const ProductForm: FC<ProductFormProps> = ({
 	const { collections } = useAdminCollections();
 
 	// set item quantities
-	const handleToAddQuantity = (value: number, variantId: string) => {
-		setItemQuantities((prevQuantities) => {
-			const existingItemIndex = prevQuantities.findIndex(
-				(item) => item.variantId === variantId
-			);
+	// const handleToAddQuantity = (value: number, variantId: string) => {
+	// 	setItemQuantities((prevQuantities) => {
+	// 		const existingItemIndex = prevQuantities.findIndex(
+	// 			(item) => item.variantId === variantId
+	// 		);
 
-			if (existingItemIndex !== -1) {
-				const updatedQuantities = [...prevQuantities];
-				updatedQuantities[existingItemIndex] = {
-					...updatedQuantities[existingItemIndex],
-					quantity: Math.max(
-						0,
-						updatedQuantities[existingItemIndex].quantity + value
-					),
-				};
-				return updatedQuantities;
-			} else {
-				return [...prevQuantities, { variantId, quantity: Math.max(0, value) }];
-			}
-		});
-	};
+	// 		if (existingItemIndex !== -1) {
+	// 			const updatedQuantities = [...prevQuantities];
+	// 			updatedQuantities[existingItemIndex] = {
+	// 				...updatedQuantities[existingItemIndex],
+	// 				quantity: Math.max(
+	// 					0,
+	// 					updatedQuantities[existingItemIndex].quantity + value
+	// 				),
+	// 			};
+	// 			return updatedQuantities;
+	// 		} else {
+	// 			return [...prevQuantities, { variantId, quantity: Math.max(0, value) }];
+	// 		}
+	// 	});
+	// };
 
 	// set item prices
 	const handlePriceChange = (value: number | null, variantId: string) => {
@@ -176,13 +176,33 @@ const ProductForm: FC<ProductFormProps> = ({
 		});
 	};
 
+	const handleQuantityChange = (value: number, variantId: string) => {
+		setItemQuantities((prevQuantities) => {
+			const existingItemIndex = prevQuantities.findIndex(
+				(item) => item.variantId === variantId
+			);
+
+			if (existingItemIndex !== -1) {
+				const updatedQuantities = [...prevQuantities];
+				updatedQuantities[existingItemIndex] = {
+					...updatedQuantities[existingItemIndex],
+					quantity: Math.max(0, value),
+				};
+				return updatedQuantities;
+			} else {
+				return [...prevQuantities, { variantId, quantity: Math.max(0, value) }];
+			}
+		});
+	};
+
 	const columns = useMemo(
 		() =>
 			productColumns({
 				itemQuantities,
-				handleToAddQuantity,
+				// handleToAddQuantity,
 				itemPrices,
 				handlePriceChange,
+				handleQuantityChange,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[itemQuantities, itemPrices]

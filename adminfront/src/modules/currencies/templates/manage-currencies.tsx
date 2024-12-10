@@ -90,7 +90,7 @@ const CurrencyList: FC<Props> = () => {
 				</Text>
 			</Flex>
 			<FloatButton
-				className="absolute"
+				className="absolute top-3"
 				icon={<Plus color="white" size={20} strokeWidth={2} />}
 				type="primary"
 				onClick={onOpenActionCurrency}

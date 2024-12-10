@@ -7,7 +7,7 @@ import { useAdminUpdateVariant } from 'medusa-react';
 import { Flex } from '@/components/Flex';
 import { Modal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import usePrices from '@/modules/products/hooks/usePrices';
+import usePrices from '@/modules/products/components/manage-product/hooks/usePrices';
 import EditPricesActions from './EditPricesAction';
 import EditPricesTable from './EditPricesTable';
 
@@ -81,7 +81,7 @@ const PricesModal = ({
 			handleOk={onFinish}
 			isLoading={isLoading}
 			handleCancel={onCancel}
-			width={500}
+			width={800}
 		>
 			{contextHolder}
 			<Title level={3} className="text-center">

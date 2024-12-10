@@ -1,36 +1,37 @@
-import {
-	Order,
-	Fulfillment as TFulfillment,
-	ClaimOrder,
-	Swap,
-	LineItem,
-} from '@medusajs/medusa';
+import { BadgeButton, Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
-import { Text, Title } from '@/components/Typography';
+import { Title } from '@/components/Typography';
+import { useAdminAsignOrder } from '@/lib/hooks/api/order';
+import { useUser } from '@/lib/providers/user-provider';
+import { getErrorMessage } from '@/lib/utils';
 import StatusIndicator from '@/modules/common/components/status-indicator';
-import { Empty, Modal as AntdModal, message, Divider } from 'antd';
-import dayjs from 'dayjs';
+import { TrackingLink } from '@/modules/orders/components/common';
+import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
 import {
-	useAdminCancelOrder,
+	ClaimOrder,
+	LineItem,
+	Order,
+	Swap,
+	Fulfillment as TFulfillment,
+	User,
+} from '@medusajs/medusa';
+import { Modal as AntdModal, Divider, Empty, message } from 'antd';
+import _ from 'lodash';
+import { CircleX, Package, Store } from 'lucide-react';
+import {
 	useAdminCancelClaimFulfillment,
 	useAdminCancelFulfillment,
 	useAdminCancelSwapFulfillment,
 } from 'medusa-react';
-import { getErrorMessage } from '@/lib/utils';
-import { Store, Package, CircleX } from 'lucide-react';
 import { useState } from 'react';
-import _ from 'lodash';
-import { TrackingLink } from '@/modules/orders/components/common';
-import { BadgeButton, Button } from '@/components/Button';
-import { ActionAbles } from '@/components/Dropdown';
-import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
-import useToggleState from '@/lib/hooks/use-toggle-state';
-import CreateFulfillmentModal from './create-fulfillment-modal';
 import MarkShippedModal from './mark-shipped-modal';
+import Link from 'next/link';
+import { ERoutes } from '@/types/routes';
 
 type Props = {
-	order: Order | undefined;
+	order: Order & { handler_id?: string; handler?: User };
 	isLoading: boolean;
 	refetch: () => void;
 };
@@ -93,9 +94,10 @@ const gatherAllFulfillments = (order: Order) => {
 
 const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 	const [fulfillmentToShip, setFulfillmentToShip] = useState(null);
-	const { state, onOpen, onClose } = useToggleState(false);
+	// const handlerInventoryOrder = useAdminAsignOrder(order!.id);
+	// const { user } = useUser();
 
-	if (!order) {
+	if (!order || order.id === undefined) {
 		return (
 			<Card loading={isLoading}>
 				<Empty description="Chưa có đơn hàng" />
@@ -103,15 +105,30 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 		);
 	}
 
-	const anyItemsToFulfil = order.items.some(
-		(item: LineItem) => item.quantity > (item.fulfilled_quantity ?? 0)
-	);
+	// const anyItemsToFulfil = order.items.some(
+	// 	(item: LineItem) => item.quantity > (item.fulfilled_quantity ?? 0)
+	// );
 
 	const allFulfillments = gatherAllFulfillments(order);
 
-	const handleOkFulfillment = () => {
-		onClose();
-	};
+	// const handleOkFulfillment = async () => {
+	// 	if (user?.id) {
+	// 		await handlerInventoryOrder.mutateAsync(
+	// 			{
+	// 				handler_id: user!.id,
+	// 			},
+	// 			{
+	// 				onSuccess: () => {
+	// 					message.success('Bạn đã phụ trách đơn hàng này');
+	// 					refetch();
+	// 				},
+	// 				onError: (err) => {
+	// 					message.error(getErrorMessage(err));
+	// 				},
+	// 			}
+	// 		);
+	// 	}
+	// };
 
 	return (
 		<Card loading={isLoading} className="px-4">
@@ -120,13 +137,39 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 					<Title level={4}>{`Fulfillment`}</Title>
 					<div className="flex flex-col-reverse lg:flex-row gap-0 justify-end items-center lg:gap-4">
 						<FulfillmentStatus status={order!.fulfillment_status} />
-						{order.status !== 'canceled' && anyItemsToFulfil && (
-							<Button type="default" onClick={onOpen}>
-								{'Xác nhận đóng gói'}
-							</Button>
-						)}
+						{/* {order.status !== 'canceled' &&
+							anyItemsToFulfil &&
+							!order.handler_id && (
+								<Button
+									type="default"
+									// onClick={onOpen}
+									onClick={handleOkFulfillment}
+									loading={handlerInventoryOrder.isLoading}
+								>
+									{'Thực hiện lấy hàng'}
+								</Button>
+							)} */}
 					</div>
 				</Flex>
+			</div>
+			<div className="mt-6">
+				<div className="flex flex-col text-xs">
+					<span className="font-normal text-gray-500">
+						{'Nhân viên thực hiện lấy hàng'}
+					</span>
+					<span className="font-normal text-gray-900 mt-2">
+						{order?.handler ? (
+							<>
+								<span>{`${order?.handler?.last_name} ${order.handler?.first_name} - `}</span>
+								<Link href={`${ERoutes.WAREHOUSE_OUTBOUND}/${order.id}`}>
+									Xem chi tiết lấy hàng
+								</Link>
+							</>
+						) : (
+							'Chưa có'
+						)}
+					</span>
+				</div>
 			</div>
 			<div className="mt-6">
 				{order.shipping_methods.map((method: any) => (
@@ -151,14 +194,14 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 					))}
 				</div>
 			</div>
-			<CreateFulfillmentModal
+			{/* <CreateFulfillmentModal
 				refetch={refetch}
 				state={state}
 				orderToFulfill={order as any}
 				handleCancel={() => onClose()}
 				orderId={order.id}
 				handleOk={handleOkFulfillment}
-			/>
+			/> */}
 			{fulfillmentToShip && (
 				<MarkShippedModal
 					handleCancel={() => setFulfillmentToShip(null)}

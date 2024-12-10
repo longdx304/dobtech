@@ -26,3 +26,22 @@
 * feat: manage supplier
 * feat: add supplier price for product
 * feat: manage supplier order
+
+## 0.0.5 (2024-10-22)
+* feat: default price & import price
+* feat: quantity for the even mode
+* feat: price list management
+* feat: update the document (upload file & content)
+* feat: customer order detail
+
+## 0.0.6 (2024-11-23)
+
+* fix: Update timeline action refund & paid supplier order detail
+* feat: Admin create order for customer
+* feat: Create private price for customer when admin update price at order detail
+
+## 0.0.7 (2024-12-09)
+* feat: inventory book management 
+* feat: item unit management
+* feat: Warehouse officers need to be assigned and process sale order
+* feat: Warehouse officer needs to be notify and process procurement order when it arrived

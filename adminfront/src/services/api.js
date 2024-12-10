@@ -685,6 +685,11 @@ export default {
 			return medusaRequest('POST', path);
 		},
 
+		transferToOrder(id) {
+			const path = `/admin/draft-orders/${id}/transfer`;
+			return medusaRequest('POST', path);
+		},
+
 		list(search = {}) {
 			const params = Object.keys(search)
 				.map((k) => {

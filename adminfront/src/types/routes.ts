@@ -11,11 +11,16 @@ export enum ERoutes {
 	CUSTOMERS = '/admin/customers',
 	REGIONS = '/admin/regions',
 	ORDERS = '/admin/orders',
+	DRAFT_ORDERS = '/admin/draft-orders',
 	RETURN_REASONS = '/admin/return-reasons',
 	DISCOUNTS = '/admin/discounts',
 	SUPPLIERS = '/admin/suppliers',
 	GIFT_CARDS = '/admin/gift-cards',
 	CURRENCIES = '/admin/currencies',
+	WAREHOUSE_INBOUND = '/admin/warehouse/inbound',
+	WAREHOUSE_OUTBOUND = '/admin/warehouse/outbound',
+	WAREHOUSE_TRANSACTIONS = '/admin/warehouse/transactions',
+	ITEM_UNIT = '/admin/item-unit',
 }
 
 export interface TRouteConfig {
@@ -91,5 +96,29 @@ export const routesConfig: TRouteConfig[] = [
 	{
 		path: ERoutes.CURRENCIES,
 		mode: [],
+	},
+	{
+		path: ERoutes.WAREHOUSE_INBOUND,
+		mode: [
+			EPermissions.WarehouseStaff,
+			EPermissions.WarehouseManager,
+			EPermissions.InventoryChecker,
+		],
+	},
+	{
+		path: ERoutes.WAREHOUSE_OUTBOUND,
+		mode: [
+			EPermissions.WarehouseStaff,
+			EPermissions.WarehouseManager,
+			EPermissions.InventoryChecker,
+		],
+	},
+	{
+		path: ERoutes.WAREHOUSE_TRANSACTIONS,
+		mode: [
+			EPermissions.WarehouseStaff,
+			EPermissions.WarehouseManager,
+			EPermissions.InventoryChecker,
+		],
 	},
 ];

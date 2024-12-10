@@ -1,7 +1,5 @@
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
-import {
-	useAdminSupplierOrder
-} from '@/modules/supplier/hooks';
+import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
 import {
 	ClaimOrder,
 	Order,
@@ -10,11 +8,10 @@ import {
 	Return,
 	Swap,
 } from '@medusajs/medusa';
+import { isArray } from 'lodash';
 import { useAdminNotes, useAdminNotifications, useGetCart } from 'medusa-react';
 import { useMemo } from 'react';
-import useOrdersExpandParam from '../components/supplier-order-detail/utils/use-admin-expand-parameter';
 import { useAdminSupplierOrderEdits } from './supplier-order-edits';
-import { isArray } from 'lodash';
 
 export interface TimelineEvent {
 	id: string;
@@ -44,7 +41,10 @@ export interface TimelineEvent {
 		| 'payment-required'
 		| 'refund-required'
 		| 'paid'
-		| 'change-price';
+		| 'change-price'
+		| 'fulfillment-delivered'
+		| 'fulfillment-inventoried'
+		| 'fulfillment-rejected';
 }
 
 export interface RefundRequiredEvent extends TimelineEvent {
@@ -165,8 +165,6 @@ export interface NotificationEvent extends TimelineEvent {
 }
 
 export const useBuildTimeline = (supplierOrderId: string) => {
-	const { orderRelations } = useOrdersExpandParam();
-
 	const {
 		data: supplierOrder,
 		refetch,
@@ -206,8 +204,6 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			return undefined;
 		}
 
-		let allItems = [...supplierOrder.items];
-
 		const events: TimelineEvent[] = [];
 
 		events.push({
@@ -226,7 +222,7 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			currency_code: supplierOrder.currency_code,
 		} as PaymentRequiredEvent);
 		if (isFeatureEnabled('order_editing')) {
-			for (const edit of data.edits || []) {
+			for (const edit of data?.edits || []) {
 				events.push({
 					id: edit.id,
 					time: edit.created_at,
@@ -300,6 +296,31 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			} as TimelineEvent);
 		}
 
+		if (supplierOrder?.delivered_at) {
+			events.push({
+				id: `${supplierOrder.id}-delivered`,
+				time: supplierOrder?.delivered_at,
+				type: 'fulfillment-delivered',
+				orderId: supplierOrder.id,
+			} as TimelineEvent);
+		}
+		if (supplierOrder?.inventoried_at) {
+			events.push({
+				id: `${supplierOrder.id}-inventoried`,
+				time: supplierOrder?.inventoried_at,
+				type: 'fulfillment-inventoried',
+				orderId: supplierOrder.id,
+			} as TimelineEvent);
+		}
+		if (supplierOrder?.rejected_at) {
+			events.push({
+				id: `${supplierOrder.id}-rejected`,
+				time: supplierOrder?.rejected_at,
+				type: 'fulfillment-rejected',
+				orderId: supplierOrder.id,
+			} as TimelineEvent);
+		}
+
 		if (notes) {
 			for (const note of notes) {
 				events.push({
@@ -313,7 +334,7 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			}
 		}
 
-		for (const event of supplierOrder.refunds) {
+		for (const event of supplierOrder?.refunds as any[]) {
 			events.push({
 				amount: event.amount,
 				currencyCode: supplierOrder.currency_code,
@@ -425,48 +446,4 @@ function findOriginalItemId(edits: any, originalId: any) {
 	}
 
 	return currentId;
-}
-
-function getReturnItems(allItems: any, edits: any, item: any) {
-	let id = item.item_id;
-	if (edits) {
-		id = findOriginalItemId(edits, id);
-	}
-
-	const line = allItems.find((li: any) => li.id === id);
-
-	if (!line) {
-		return;
-	}
-
-	return {
-		title: line.title,
-		quantity: item.quantity,
-		requestedQuantity: item.requested_quantity,
-		receivedQuantity: item.received_quantity,
-		variant: {
-			title: line?.variant?.title || '-',
-		},
-		thumbnail: line.thumbnail,
-	};
-}
-
-function getFulfilmentItem(allItems: any, edits: any, item: any) {
-	let id = item.item_id;
-	if (edits) {
-		id = findOriginalItemId(edits, id);
-	}
-
-	const line = allItems.find((line: any) => line.id === id);
-
-	if (!line) {
-		return;
-	}
-
-	return {
-		title: line.title,
-		quantity: item.quantity,
-		thumbnail: line.thumbnail,
-		variant: { title: line?.variant?.title || '-' },
-	};
 }

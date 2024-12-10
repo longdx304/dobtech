@@ -5,23 +5,25 @@ import {
 	useAdminDeleteOrderEdit,
 	useAdminUser,
 } from 'medusa-react';
-import React, { useContext } from 'react';
+import React from 'react';
 import { SquarePen } from 'lucide-react';
 
 import { OrderEditEvent } from '@/modules/orders/hooks/use-build-timeline';
 import { getErrorMessage } from '@/lib/utils';
-import { Modal, message, Popconfirm } from 'antd';
+import { message, Popconfirm } from 'antd';
 
-// import TwoStepDelete from "../../../atoms/two-step-delete"
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import EventContainer from '../event-container';
 import { ByLine } from '.';
 import { useOrderEdit } from '@/modules/orders/components/orders/edit-order-modal/context';
+import { formatAmountWithSymbol } from '@/utils/prices';
+import { Tooltip } from '@/components/Tooltip';
 
 type EditCreatedProps = {
 	event: OrderEditEvent;
+	refetchOrder: () => void;
 };
 
 enum OrderEditItemChangeType {
@@ -43,15 +45,8 @@ const getInfo = (edit: OrderEdit): { type: string; user_id: string } => {
 	};
 };
 
-const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
-	const {
-		isModalVisible,
-		showModal,
-		hideModal,
-		orderEdits,
-		activeOrderEditId,
-		setActiveOrderEditId,
-	} = useOrderEdit();
+const EditCreated: React.FC<EditCreatedProps> = ({ event, refetchOrder }) => {
+	const { isModalVisible, showModal, setActiveOrderEditId } = useOrderEdit();
 
 	const orderEdit = event.edit;
 
@@ -95,6 +90,7 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 		await confirmOrderEdit.mutateAsync(undefined, {
 			onSuccess: () => {
 				message.success('Xác nhận chỉnh sửa đơn hàng thành công');
+				refetchOrder();
 			},
 			onError: (err) => {
 				message.error(getErrorMessage(err));
@@ -131,7 +127,11 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 					</div>
 				)}
 				<div className="mb-4">
-					<OrderEditChanges orderEdit={orderEdit} />
+					<OrderEditChanges
+						orderEdit={orderEdit}
+						currencyCode={event.currency_code}
+						taxRate={event.taxRate}
+					/>
 				</div>
 				{(orderEdit.status === 'created' ||
 					orderEdit.status === 'requested') && (
@@ -180,7 +180,7 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 									onConfirm={onCancelOrderEditClicked}
 									// onCancel={cancel}
 									okText="Xác nhận"
-									cancelText="Huy"
+									cancelText="Huỷ"
 								>
 									<Button
 										danger
@@ -200,7 +200,7 @@ const EditCreated: React.FC<EditCreatedProps> = ({ event }) => {
 	);
 };
 
-const OrderEditChanges = ({ orderEdit }: any) => {
+const OrderEditChanges = ({ orderEdit, taxRate, currencyCode }: any) => {
 	if (!orderEdit) {
 		return <></>;
 	}
@@ -214,12 +214,20 @@ const OrderEditChanges = ({ orderEdit }: any) => {
 	);
 
 	const removed = orderEdit.changes.filter(
-		(oec: any) =>
+		(oec: OrderItemChange) =>
 			oec.type === OrderEditItemChangeType.ITEM_REMOVE ||
 			(oec.type === OrderEditItemChangeType.ITEM_UPDATE &&
 				oec.line_item &&
 				oec.original_line_item &&
 				oec.original_line_item.quantity > oec.line_item.quantity)
+	);
+
+	const updatedPrice = orderEdit.changes.filter(
+		(oec: OrderItemChange) =>
+			oec.type === OrderEditItemChangeType.ITEM_UPDATE &&
+			oec.line_item &&
+			oec.original_line_item &&
+			oec.original_line_item.unit_price !== oec.line_item.unit_price
 	);
 
 	return (
@@ -240,16 +248,36 @@ const OrderEditChanges = ({ orderEdit }: any) => {
 					))}
 				</div>
 			)}
+			{updatedPrice.length > 0 && (
+				<div>
+					<span className="font-normal text-gray-500">Thay đổi:</span>
+					{updatedPrice.map((change: any) => (
+						<OrderEditChangeItem
+							change={change}
+							key={change.id}
+							isUpdated
+							taxRate={taxRate}
+							currencyCode={currencyCode}
+						/>
+					))}
+				</div>
+			)}
 		</div>
 	);
 };
 
 type OrderEditChangeItemProps = {
 	change: OrderItemChange;
+	isUpdated?: boolean;
+	taxRate?: number;
+	currencyCode?: string;
 };
 
 const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 	change,
+	isUpdated = false,
+	taxRate = 0,
+	currencyCode,
 }) => {
 	let quantity;
 	const isAdd = change.type === OrderEditItemChangeType.ITEM_ADD;
@@ -265,10 +293,13 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 	quantity = Math.abs(quantity);
 
 	const lineItem = isAdd ? change.line_item : change.original_line_item;
+	const tooltipContent = `${lineItem?.title} - ${lineItem?.variant?.title} (${
+		lineItem?.variant?.sku || ''
+	})`;
 
 	return (
-		<div className="gap-x-4 flex">
-			<div>
+		<div className="gap-x-4 flex items-center justify-between">
+			<div className="flex items-center gap-2">
 				<div className="rounded-md flex h-[40px] w-[30px] overflow-hidden">
 					{lineItem?.thumbnail ? (
 						// eslint-disable-next-line @next/next/no-img-element
@@ -277,20 +308,49 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 						<PlaceholderImage />
 					)}
 				</div>
+				<Tooltip title={tooltipContent}>
+					<div className="flex flex-col max-w-[185px]">
+						<span className="font-medium text-gray-900 truncate">
+							{!isUpdated && quantity > 1 && <>{`${quantity} x `}</>}{' '}
+							{lineItem?.title} &nbsp;
+							{lineItem?.variant?.sku && (
+								<span className="text-xs truncate">
+									{lineItem?.variant?.sku}
+								</span>
+							)}
+						</span>
+						<span className="font-normal text-gray-500 flex truncate max-w-[185px]">
+							{`${lineItem?.variant.title}${
+								lineItem?.variant.sku ? ` (${lineItem.variant.sku})` : ''
+							}`}
+						</span>
+					</div>
+				</Tooltip>
 			</div>
-			<div className="flex flex-col">
-				<span className="font-medium text-gray-900">
-					{quantity > 1 && <>{`${quantity} x `}</>} {lineItem?.title} &nbsp;
-					{lineItem?.variant?.sku && (
-						<span className="text-xs">{lineItem?.variant?.sku}</span>
+			{isUpdated && (
+				<div className="flex flex-col">
+					{change.original_line_item && (
+						<div className="text-gray-500 line-through">
+							{formatAmountWithSymbol({
+								amount: Math.round(
+									change.original_line_item.unit_price * (1 + taxRate / 100)
+								),
+								currency: currencyCode ?? 'VND',
+							})}
+						</div>
 					)}
-				</span>
-				<span className="font-normal text-gray-500 flex">
-					{`${lineItem?.variant.title}${
-						lineItem?.variant.sku ? ` (${lineItem.variant.sku})` : ''
-					}`}
-				</span>
-			</div>
+					{change.line_item && (
+						<div className="text-gray-500">
+							{formatAmountWithSymbol({
+								amount: Math.round(
+									change.line_item.unit_price * (1 + taxRate / 100)
+								),
+								currency: currencyCode ?? 'VND',
+							})}
+						</div>
+					)}
+				</div>
+			)}
 		</div>
 	);
 };
