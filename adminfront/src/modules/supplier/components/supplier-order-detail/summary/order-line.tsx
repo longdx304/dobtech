@@ -63,9 +63,9 @@ const OrderLine = ({
 			<div className="flex items-center">
 				<div className="space-x-2 lg:space-x-4 2xl:space-x-6 mr-1 flex text-[12px]">
 					<div className="flex items-center gap-2 font-normal text-gray-500">
-						{['not_paid', 'awaiting', 'pending'].includes(paymentStt) && (
+						{/* {['not_paid', 'awaiting', 'pending'].includes(paymentStt) && (
 							<Pencil size={12} onClick={onOpen} />
-						)}
+						)} */}
 						{formatAmountWithSymbol({
 							// amount: item?.unit_price ?? 0,
 							amount: (item?.subtotal ?? 0) / item?.quantity,
@@ -83,7 +83,7 @@ const OrderLine = ({
 						})}
 					</div>
 				</div>
-				{state && item && (
+				{/* {state && item && (
 					<EditPriceModal
 						state={state}
 						handleCancel={onClose}
@@ -93,7 +93,7 @@ const OrderLine = ({
 						initialAmount={(item?.total ?? 0) / item?.quantity}
 						refetch={refetch}
 					/>
-				)}
+				)} */}
 			</div>
 		</div>
 	);
