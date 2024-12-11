@@ -133,29 +133,6 @@ const ProductForm: FC<ProductFormProps> = ({
 	});
 	const { collections } = useAdminCollections();
 
-	// set item quantities
-	// const handleToAddQuantity = (value: number, variantId: string) => {
-	// 	setItemQuantities((prevQuantities) => {
-	// 		const existingItemIndex = prevQuantities.findIndex(
-	// 			(item) => item.variantId === variantId
-	// 		);
-
-	// 		if (existingItemIndex !== -1) {
-	// 			const updatedQuantities = [...prevQuantities];
-	// 			updatedQuantities[existingItemIndex] = {
-	// 				...updatedQuantities[existingItemIndex],
-	// 				quantity: Math.max(
-	// 					0,
-	// 					updatedQuantities[existingItemIndex].quantity + value
-	// 				),
-	// 			};
-	// 			return updatedQuantities;
-	// 		} else {
-	// 			return [...prevQuantities, { variantId, quantity: Math.max(0, value) }];
-	// 		}
-	// 	});
-	// };
-
 	// set item prices
 	const handlePriceChange = (value: number | null, variantId: string) => {
 		setItemPrices((prevPrices) => {
