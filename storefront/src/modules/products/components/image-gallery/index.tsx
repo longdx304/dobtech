@@ -12,12 +12,15 @@ import { useVariantImages } from '@/lib/providers/product/variant-images-provide
 
 import 'swiper/css';
 import 'swiper/css/pagination';
+import clsx from 'clsx';
 
 type Props = {
 	isImgVertical?: boolean;
+	isModal?: boolean;
 };
 export default function ImageGallery({
-	isImgVertical = true,
+	isImgVertical = false,
+	isModal = false,
 }: Readonly<Props>) {
 	const { optionValue } = useVariantImages();
 	const { product } = useProduct();
@@ -71,43 +74,54 @@ export default function ImageGallery({
 	return (
 		<Flex
 			className={cn(
-				'flex flex-col-reverse lg:flex-row justify-center items-center gap-4 w-full lg:w-auto',
+				'flex flex-col-reverse lg:flex-row justify-end items-start gap-4 w-full overflow-x-auto lg:h-fit lg:w-auto',
 				!isImgVertical && 'lg:flex-col-reverse'
 			)}
 		>
-			{/* Thumbnails */}
-			<Flex
-				className={cn(
-					'flex flex-wrap lg:flex-col justify-center w-full lg:w-fit gap-4',
-					!isImgVertical && 'lg:flex-row'
-				)}
+			{/* Thumbnails images */}
+			<div
+				className={clsx('w-full h-full overflow-x-auto', {
+					'h-fit': isModal,
+				})}
 			>
-				{images?.map((img, index) => (
-					<Flex
-						key={typeof img === 'string' ? index : img.url}
-						onClick={() => handleThumbnailClick(index)}
-						className={`cursor-pointer w-16 h-16 lg:w-20 lg:h-20 rounded-sm overflow-hidden border border-gray-200 ${
-							selectedImage === index ? 'border-primary' : ''
-						}`}
-						onMouseEnter={() => handleThumbnailClick(index)}
-					>
-						<Image
-							src={typeof img === 'string' ? img : img.url}
-							className="object-cover"
-							alt={`Thumbnail ${index + 1}`}
-							width="inherit"
-							height="inherit"
-							preview={false}
-						/>
-					</Flex>
-				))}
-			</Flex>
-
+				<div
+					className={cn(
+						'flex flex-nowrap justify-center w-full lg:h-full gap-4 lg:overflow-y-auto h-fit overflow-x-auto',
+						'custom-scrollbar',
+						!isImgVertical && 'lg:flex-row',
+						isModal &&
+							'flex-nowrap overflow-x-auto w-auto h-auto gap-2 justify-start'
+					)}
+				>
+					{images?.map((img, index) => (
+						<Flex
+							key={typeof img === 'string' ? index : img.url}
+							onClick={() => handleThumbnailClick(index)}
+							className={`flex-none cursor-pointer w-24 h-24 lg:w-20 lg:h-20 rounded-sm overflow-hidden border ${
+								selectedImage === index ? 'border-primary' : 'border-gray-200'
+							}`}
+							onMouseEnter={() => handleThumbnailClick(index)}
+						>
+							<Image
+								src={typeof img === 'string' ? img : img.url}
+								className="object-contain object-center w-24 h-24 lg:w-20 lg:h-20"
+								alt={`Thumbnail ${index + 1}`}
+								preview={false}
+							/>
+						</Flex>
+					))}
+				</div>
+			</div>
 			{/* Main Image */}
-			<Flex className="flex justify-center w-full lg:w-auto">
+			<Flex className={clsx('flex justify-center w-full')}>
 				<Swiper
 					onSlideChange={handleSlideChange}
-					className="relative w-full sm:w-[400px] h-[350px] sm:h-[400px]"
+					className={clsx(
+						'relative w-full sm:w-[400px] h-[350px] sm:h-[400px]',
+						{
+							'sm:w-full': isModal,
+						}
+					)}
 					onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
 					modules={[Pagination]}
 					slidesPerView={1}
@@ -129,6 +143,25 @@ export default function ImageGallery({
 						</SwiperSlide>
 					))}
 				</Swiper>
+
+				{/* Global styles for custom scrollbar */}
+				<style jsx global>{`
+					.custom-scrollbar::-webkit-scrollbar {
+						width: 5px;
+						height: 5px;
+					}
+					.custom-scrollbar::-webkit-scrollbar-track {
+						background: #f1f1f1;
+						border-radius: 10px;
+					}
+					.custom-scrollbar::-webkit-scrollbar-thumb {
+						background: #888;
+						border-radius: 10px;
+					}
+					.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+						background: #555;
+					}
+				`}</style>
 			</Flex>
 		</Flex>
 	);

@@ -7,15 +7,12 @@ interface Props extends ModalProps {
 	children?: ReactNode;
 }
 
-export default function Modal({
-	className,
-	children,
-	...props
-}: Props) {
+export default function Modal({ className, children, ...props }: Props) {
 	return (
 		<AntdModal
 			className={cn('', className)}
 			{...props}
+			styles={{ body: { overflowY: 'auto', maxHeight: 'calc(100vh - 250px)' } }}
 		>
 			{children}
 		</AntdModal>
