@@ -98,8 +98,24 @@ const ProductTotalForm: FC<Props> = ({
 						pagination={false}
 					/>
 					<Text strong className="mt-4">
-						Tổng tiền: {totalPrice.toLocaleString()}
-						{region?.currency.symbol}
+						Tổng sản phẩm:{' '}
+						<span className="font-normal">
+							{filterVariants.length} (sản phẩm)
+						</span>
+					</Text>
+					<Text strong className="mt-4">
+						Tổng số lượng:{' '}
+						<span className="font-normal">
+							{itemQuantities.reduce((total, item) => total + item.quantity, 0)}{' '}
+							(đôi)
+						</span>
+					</Text>
+					<Text strong className="mt-4">
+						Tổng tiền:{' '}
+						<span className="font-normal">
+							{totalPrice.toLocaleString()}
+							{region?.currency.symbol}
+						</span>
 					</Text>
 				</Flex>
 			</Col>

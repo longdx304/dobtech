@@ -55,6 +55,7 @@ export interface pdfOrderRes {
 	supplierId: string;
 	userId: string;
 	supplier?: Supplier | null;
+	quantity?: number;
 	user?: User | null;
 	email: string;
 	countryCode: string;
@@ -131,12 +132,19 @@ const SupplierOrdersModal: FC<Props> = ({
 		const productionDate = supplierDates.productionDate?.toDate();
 		const settlementDate = supplierDates.settlementDate?.toDate();
 
+		// i Want to take all quantity inside lineItems
+		const totalQuantity = payload.lineItems.reduce(
+			(total, item) => total + item.quantity,
+			0
+		);
+
 		const supplierOrdersDraft: pdfOrderRes = {
 			lineItems: payload?.lineItems || [],
 			supplierId: payload?.supplier?.id || '',
 			supplier: payload?.supplier,
 			userId: payload?.user?.id || '',
 			user: payload?.user as any,
+			quantity: totalQuantity,
 			email: payload?.user?.email || '',
 			estimated_production_time: productionDate || new Date(),
 			settlement_time: settlementDate || new Date(),
@@ -204,10 +212,10 @@ const SupplierOrdersModal: FC<Props> = ({
 					onClick={() => {
 						setCurrentStep(0);
 						setSelectedSupplier(null);
-						setSelectedProducts([]);
-						setItemQuantities([]);
-						setItemPrices([]);
-						setRegionId(null);
+						// setSelectedProducts([]);
+						// setItemQuantities([]);
+						// setItemPrices([]);
+						// setRegionId(null);
 					}}
 				>
 					Quay lại
@@ -237,7 +245,7 @@ const SupplierOrdersModal: FC<Props> = ({
 				open={state}
 				handleOk={handleOk}
 				handleCancel={onCancel}
-				width={800}
+				width={850}
 				footer={footer}
 				maskClosable={false}
 			>
