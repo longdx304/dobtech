@@ -18,10 +18,10 @@ const ProductTemplateModal = ({
 	return (
 		<Modal open={state} onCancel={handleCancel} footer={null} width={800}>
 			<div className="flex flex-col lg:flex-row justify-between w-full pb-8 gap-4">
-				<div className="w-full lg:w-fit lg:flex-grow lg:pr-4">
-					<ImageGallery isImgVertical={false} />
+				<div className="w-full lg:w-1/2 lg:flex-grow lg:pr-4">
+					<ImageGallery isImgVertical={false} isModal={state} />
 				</div>
-				<div className="w-full lg:w-full lg:flex-grow lg:pl-4">
+				<div className="w-full lg:w-1/2 lg:flex-grow lg:pl-4">
 					<ProductActions handleCancel={handleCancel} />
 				</div>
 			</div>

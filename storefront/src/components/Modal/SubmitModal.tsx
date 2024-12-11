@@ -22,8 +22,8 @@ export default function SubmitModal({
   return (
     <AntdModal
       className={cn('', className)}
-      // afterClose={() => form.resetFields()}
       onCancel={handleCancel}
+      styles={{ body: { overflowY: 'auto', maxHeight: 'calc(100vh - 250px)' } }}
       footer={[
         <Button key='1' type='default' danger onClick={handleCancel}>
           Huỷ
