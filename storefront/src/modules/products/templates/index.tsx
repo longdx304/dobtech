@@ -24,11 +24,11 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 }) => {
 	return (
 		<div data-testid="product-container">
-			<div className="flex flex-col lg:flex-row justify-between w-full pb-8 gap-4">
-				<div className="w-full lg:w-fit lg:flex-grow lg:pr-4">
+			<div className="flex flex-col lg:flex-row justify-between w-full h-fit pb-8 gap-4">
+				<div className="w-full h-full lg:w-1/2 lg:flex-grow lg:pr-4">
 					<ImageGallery />
 				</div>
-				<div className="w-full lg:w-full lg:flex-grow lg:pl-4">
+				<div className="w-full h-full lg:w-1/2 lg:flex-grow lg:pl-16">
 					<ProductActions />
 				</div>
 			</div>

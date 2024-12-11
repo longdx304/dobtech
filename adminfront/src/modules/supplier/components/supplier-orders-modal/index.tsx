@@ -7,6 +7,7 @@ import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PDFViewer } from '@react-pdf/renderer';
 import { message, Spin } from 'antd';
+import Medusa from '@/services/api';
 import {
 	useAdminRegion,
 	useAdminRegions,
@@ -162,11 +163,9 @@ const SupplierOrdersModal: FC<Props> = ({
 			});
 
 			// Upload pdf to s3 using Medusa uploads API
-			// const uploadRes = await Medusa.uploads.create([file]);
+			const uploadRes = await Medusa.uploads.create([file]);
 
-			// const pdfUrl = (uploadRes.data as any).uploads[0].url;
-			const pdfUrl =
-				'https://dob-ecommerce.s3.ap-southeast-1.amazonaws.com/purchase-order-1728871955540.pdf';
+			const pdfUrl = (uploadRes.data as any).uploads[0].url;
 
 			const orderPayload: SupplierOrdersReq = {
 				lineItems: pdfOrder?.lineItems || [],
@@ -194,7 +193,6 @@ const SupplierOrdersModal: FC<Props> = ({
 			setIsSubmitting(false);
 		}
 	};
-
 
 	// footer
 	const footer = useMemo(() => {
