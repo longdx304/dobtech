@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 
-import { formatDate } from '@/utils/get-relative-time';
+import { Region } from '@medusajs/medusa';
 import {
 	Document,
 	Font,
@@ -10,9 +10,9 @@ import {
 	Text,
 	View,
 } from '@react-pdf/renderer';
+import dayjs from 'dayjs';
 import { FC } from 'react';
 import { pdfOrderRes } from '..';
-import { Region } from '@medusajs/medusa';
 
 // Register fonts that supports Vietnamese characters
 Font.register({
@@ -25,77 +25,81 @@ const styles = StyleSheet.create({
 	page: {
 		padding: 30,
 		fontFamily: 'Roboto',
+		fontSize: 10,
+		lineHeight: 1.5,
 	},
 	header: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		marginBottom: 20,
-	},
-	title: {
-		fontSize: 24,
-		fontWeight: 'bold',
-		marginBottom: 10,
-	},
-	subtitle: {
-		fontSize: 14,
-		color: '#555',
+		paddingBottom: 10,
+		borderBottomWidth: 1,
+		borderBottomColor: '#dddddd',
 	},
 	section: {
-		margin: 10,
 		marginBottom: 15,
+		paddingBottom: 10,
+		borderBottomWidth: 1,
+		borderBottomColor: '#eeeeee',
 	},
 	row: {
 		flexDirection: 'row',
-		borderBottomWidth: 1,
-		borderBottomColor: '#ccc',
-		paddingBottom: 5,
-		marginBottom: 5,
+		justifyContent: 'space-between',
+		marginBottom: 10,
 	},
 	column: {
 		flex: 1,
+		marginRight: 10,
+	},
+	title: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		marginBottom: 5,
 	},
 	label: {
-		fontSize: 10,
-		color: '#555',
-		marginBottom: 3,
+		fontSize: 9,
 		fontWeight: 'bold',
+		color: '#666666',
+		marginBottom: 3,
 	},
 	text: {
-		fontSize: 12,
+		fontSize: 10,
 	},
 	tableHeader: {
 		flexDirection: 'row',
-		borderBottomWidth: 2,
-		borderBottomColor: '#000',
+		borderBottomWidth: 1,
+		borderBottomColor: '#dddddd',
 		paddingBottom: 5,
 		marginBottom: 5,
-		fontWeight: 'bold',
 	},
 	tableRow: {
 		flexDirection: 'row',
 		borderBottomWidth: 1,
-		borderBottomColor: '#ccc',
-		paddingBottom: 5,
-		marginBottom: 5,
+		borderBottomColor: '#eeeeee',
+		paddingVertical: 5,
+		alignItems: 'center',
 	},
 	tableCell: {
 		flex: 1,
-		fontSize: 10,
+		fontSize: 9,
+		paddingHorizontal: 5,
 	},
-
-	total: {
-		flexDirection: 'row',
-		justifyContent: 'flex-end',
-		marginTop: 10,
+	productCell: {
+		flex: 2,
+		flexDirection: 'column',
+		textAlign: 'left',
 	},
-	totalLabel: {
-		fontSize: 12,
+	quantityTotal: {
 		fontWeight: 'bold',
-		marginRight: 15,
+		textAlign: 'center',
 	},
 	totalAmount: {
-		fontSize: 12,
 		fontWeight: 'bold',
+		fontSize: 10,
+	},
+	emptyCell: {
+		textAlign: 'center',
+		color: '#999999',
 	},
 });
 
@@ -119,7 +123,9 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants, region }) => {
 						<Text style={styles.title}>Purchase Order</Text>
 					</View>
 					<View>
-						<Text style={styles.text}>Date: {formatDate(new Date())}</Text>
+						<Text style={styles.text}>
+							Date: {dayjs(new Date()).format('DD/MM/YYYY')}
+						</Text>
 					</View>
 				</View>
 
@@ -166,9 +172,10 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants, region }) => {
 				<View style={styles.section}>
 					<Text style={styles.title}>Order Items</Text>
 					<View style={styles.tableHeader}>
+						<Text style={styles.tableCell}>#</Text>
 						<Text style={[styles.tableCell, { flex: 2 }]}>Product</Text>
-						<Text style={styles.tableCell}>Quantity</Text>
 						<Text style={styles.tableCell}>Unit Price</Text>
+						<Text style={styles.tableCell}>Quantity</Text>
 						<Text style={styles.tableCell}>Total</Text>
 					</View>
 
@@ -182,15 +189,16 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants, region }) => {
 
 						return (
 							<View key={index} style={styles.tableRow}>
-								<Text style={[styles.tableCell, { flex: 2 }]}>
-									{productTitle}
-									{'\n'}
-									{variantTitle}
-								</Text>
-								<Text style={styles.tableCell}>{item.quantity}</Text>
+								<Text style={styles.tableCell}>{index + 1}</Text>
+
+								<View style={[styles.tableCell, styles.productCell]}>
+									<Text>{productTitle}</Text>
+									<Text>{variantTitle}</Text>
+								</View>
 								<Text style={styles.tableCell}>
 									{item.unit_price?.toLocaleString()} {region?.currency.symbol}
 								</Text>
+								<Text style={styles.tableCell}>{item.quantity}</Text>
 								<Text style={styles.tableCell}>
 									{(item.quantity * (item.unit_price || 0)).toLocaleString()}{' '}
 									{region?.currency.symbol}
@@ -198,11 +206,17 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants, region }) => {
 							</View>
 						);
 					})}
-					<View style={styles.total}>
-						<Text style={styles.totalLabel}>Total:</Text>
-						<Text style={styles.totalAmount}>
-							{total.toLocaleString()}
-							{region?.currency.symbol}
+
+					{/* Overview */}
+					<View style={styles.tableRow}>
+						<Text style={styles.tableCell}>{'-'}</Text>
+						<View style={[styles.tableCell, styles.productCell]}>
+							<Text>{'-'}</Text>
+						</View>
+						<Text style={styles.tableCell}>{'-'}</Text>
+						<Text style={styles.tableCell}>{order.quantity}</Text>
+						<Text style={styles.tableCell}>
+							{total.toLocaleString()} {region?.currency.symbol}
 						</Text>
 					</View>
 				</View>

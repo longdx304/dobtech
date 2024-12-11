@@ -25,6 +25,8 @@ export interface LineItemReq {
 	variantId: string;
 	quantity: number;
 	unit_price?: number;
+	totalQuantity?: number;
+	total?: number;
 }
 
 export interface SupplierOrdersReq {
