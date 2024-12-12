@@ -2,13 +2,13 @@ import { Input, InputNumber, TextArea } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
 import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
+import { useAdminSupplierOrderRefundPayment } from '@/lib/hooks/api/supplier-order';
 import { getErrorMessage } from '@/lib/utils';
-import { useAdminSupplierRefundPayment } from '@/modules/supplier/hooks';
+// import { useAdminSupplierRefundPayment } from '@/modules/supplier/hooks';
 import { currencies } from '@/types/currencies';
 import { SupplierOrder } from '@/types/supplier';
 import { normalizeAmount, persistedPrice } from '@/utils/prices';
 import { Form, message } from 'antd';
-import { useAdminRefundPayment } from 'medusa-react';
 import { useEffect, useMemo } from 'react';
 
 interface Props {
@@ -46,7 +46,7 @@ const RefundModal = ({
 	refetch,
 }: Props) => {
 	const [form] = Form.useForm();
-	const { mutateAsync, isLoading } = useAdminSupplierRefundPayment(supplierOrder.id);
+	const { mutateAsync, isLoading } = useAdminSupplierOrderRefundPayment(supplierOrder.id);
 
 	const refundable = useMemo(() => {
 		return supplierOrder.paid_total - 1000;

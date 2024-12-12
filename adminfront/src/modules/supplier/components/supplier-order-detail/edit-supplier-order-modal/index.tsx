@@ -7,20 +7,18 @@ import useToggleState from '@/lib/hooks/use-toggle-state';
 import AddProductVariant from '@/modules/supplier/common/add-product-variant';
 import { ProductVariant } from '@medusajs/medusa';
 import { message } from 'antd';
-
 import { Input } from '@/components/Input';
 import {
 	useAdminDeleteSupplierOrderEdit,
 	useAdminRequestSOrderEditConfirmation,
 	useAdminSupplierOrderEditAddLineItem,
 	useAdminUpdateSupplierOrderEdit,
-} from '@/modules/supplier/hooks/supplier-order-edits';
+} from '@/lib/hooks/api/supplier-order-edits';
 import { AddOrderEditLineItemInput } from '@/types/supplier';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { useEffect, useRef, useState } from 'react';
 import { useSupplierOrderEdit } from './context';
 import SupplierOrderEditLine from './supplier-order-edit-line';
-import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
 
 type SupplierOrderEditModalContainerProps = {
 	supplierOrder: SupplierOrder | null;

@@ -10,8 +10,11 @@ import _ from 'lodash';
 import { CircleAlert, Plus, Search } from 'lucide-react';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import SupplierModal from '../../components/supplier-modal';
-import { useAdminDeleteSupplier, useAdminSuppliers } from '../../hooks';
 import supplierColumn from './supplier-column';
+import {
+	useAdminDeleteSupplier,
+	useAdminSuppliers,
+} from '@/lib/hooks/api/supplier';
 
 type Props = {};
 
@@ -30,7 +33,12 @@ const SupplierList: FC<Props> = () => {
 	const [currentSupplier, setCurrentSupplier] = useState<Supplier | null>(null);
 
 	const deleteSupplier = useAdminDeleteSupplier();
-	const { data, isLoading, isRefetching } = useAdminSuppliers({
+	const {
+		suppliers,
+		isLoading,
+		isRefetching,
+		count: supplierCount,
+	} = useAdminSuppliers({
 		q: searchValue || '',
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
@@ -119,11 +127,11 @@ const SupplierList: FC<Props> = () => {
 			<Table
 				loading={isLoading || isRefetching}
 				columns={columns as any}
-				dataSource={data?.suppliers ?? []}
+				dataSource={suppliers ?? []}
 				rowKey="id"
 				scroll={{ x: 700 }}
 				pagination={{
-					total: data?.count ?? 0,
+					total: supplierCount ?? 0,
 					pageSize: DEFAULT_PAGE_SIZE,
 					current: numPages,
 					onChange: handleChangePage,

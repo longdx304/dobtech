@@ -1,4 +1,9 @@
-import { SupplierOrderListRes, SupplierOrderRes } from '@/types/supplier';
+import {
+	SupplierListResponse,
+	SupplierOrderListRes,
+	SupplierOrderRes,
+	SupplierResponse,
+} from '@/types/supplier';
 import generateParams from '@/utils/generate-params';
 import { FindParams } from '@medusajs/medusa';
 import { Response } from '@medusajs/medusa-js';
@@ -9,54 +14,54 @@ import {
 	UseQueryOptionsWrapper,
 } from 'medusa-react';
 
-const SUPPLIER_ORDER_LIST = `admin-supplier-order` as const;
+const SUPPLIER_LIST = `admin-supplier` as const;
 
-export const supplierOrdersKeys = queryKeysFactory(SUPPLIER_ORDER_LIST);
+export const supplierKeys = queryKeysFactory(SUPPLIER_LIST);
 
-type supplierOrdersQueryKey = typeof supplierOrdersKeys;
+type supplierQueryKey = typeof supplierKeys;
 
-export type SupplierOrderQueryKeyParams = {
+export type SupplierQueryKeyParams = {
 	q?: string;
 	offset?: number;
 	limit?: number;
 };
-export const useAdminSupplierOrders = (
+export const useAdminSuppliers = (
 	/**
 	 * Filters and pagination configurations to apply on retrieved currencies.
 	 */
-	query?: SupplierOrderQueryKeyParams,
+	query?: SupplierQueryKeyParams,
 	options?: UseQueryOptionsWrapper<
-		Response<SupplierOrderListRes>,
+		Response<SupplierListResponse>,
 		Error,
-		ReturnType<supplierOrdersQueryKey['list']>
+		ReturnType<supplierQueryKey['list']>
 	>
 ) => {
 	const { client } = useMedusa();
 
 	const { data, ...rest } = useQuery(
-		supplierOrdersKeys.list(query),
+		supplierKeys.list(query),
 		() => {
 			const params = query && generateParams(query);
-			return client.admin.custom.get(`/admin/supplier-order${params}`);
+			return client.admin.custom.get(`/admin/supplier${params}`);
 		},
 		options
 	);
 	return { ...data, ...rest } as const;
 };
 
-export const useAdminSupplierOrder = (
+export const useAdminSupplier = (
 	id: string,
 	query?: FindParams,
 	options?: UseQueryOptionsWrapper<
-		Response<SupplierOrderRes>,
+		Response<SupplierResponse>,
 		Error,
-		ReturnType<supplierOrdersQueryKey['detail']>
+		ReturnType<supplierQueryKey['detail']>
 	>
 ) => {
 	const { client } = useMedusa();
 	const { data, ...rest } = useQuery(
-		supplierOrdersKeys.detail(id),
-		() => client.admin.custom.get(`/admin/supplier-order/${id}`),
+		supplierKeys.detail(id),
+		() => client.admin.custom.get(`/admin/supplier/${id}`),
 		options
 	);
 	return { ...data, ...rest } as const;

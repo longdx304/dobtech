@@ -1,4 +1,11 @@
-import { Cart, OrderEdit, Payment, Region, User } from '@medusajs/medusa';
+import {
+	Cart,
+	OrderEdit,
+	Payment,
+	Refund,
+	Region,
+	User,
+} from '@medusajs/medusa';
 import { LineItem } from './lineItem';
 
 export interface Supplier {
@@ -20,11 +27,27 @@ export interface SupplierListResponse {
 	offset: number;
 	limit: number;
 }
+export interface SupplierResponse {
+	supplier: Supplier;
+}
+
+export type CreateSupplierInput = {
+	email: string;
+	supplier_name: string;
+	phone?: string;
+	address?: string;
+	estimated_production_time: number;
+	settlement_time: number;
+	metadata?: Record<string, unknown>;
+};
+
+export type UpdateSupplierInput = Partial<CreateSupplierInput>;
 
 export interface LineItemReq {
 	variantId: string;
 	quantity: number;
 	unit_price?: number;
+	title?: string;
 }
 
 export interface SupplierOrdersReq {
@@ -80,6 +103,10 @@ export interface SupplierOrderListRes {
 	limit: number;
 }
 
+export interface SupplierOrderRes {
+	supplierOrder: SupplierOrder;
+}
+
 export interface SupplierOrderDocument {
 	id: string;
 	document_url: string;
@@ -104,7 +131,7 @@ export interface SupplierOrder {
 	user: User;
 	status: string;
 	payment_status: string;
-	payments?: Payment[];
+	payments: Payment[];
 	fulfillment_status: FulfillSupplierOrderStt;
 	estimated_production_time: string;
 	settlement_time: string;
@@ -116,13 +143,14 @@ export interface SupplierOrder {
 	tax_total: number;
 	paid_total: number;
 	refunded_total: number;
+	refunds: Refund[];
 	no_notification?: boolean;
-	created_at: string;
-	updated_at: string;
+	created_at: string | Date;
+	updated_at: string | Date;
 	canceled_at?: string | null;
-	delivered_at?: string;
-	inventoried_at?: string;
-	rejected_at?: string;
+	delivered_at?: string | Date;
+	inventoried_at?: string | Date;
+	rejected_at?: string | Date;
 	handler_id?: string;
 	handler?: User;
 }

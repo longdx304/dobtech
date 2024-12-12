@@ -105,11 +105,10 @@ const styles = StyleSheet.create({
 
 interface OrderPDFProps {
 	order: pdfOrderRes;
-	variants: any;
 	region?: Region;
 }
 
-const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants, region }) => {
+const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 	const total = order.lineItems.reduce(
 		(sum, item) => sum + item.quantity * (item.unit_price || 0),
 		0
@@ -180,20 +179,12 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants, region }) => {
 					</View>
 
 					{order.lineItems.map((item, index) => {
-						// Find the variant and product for this line item
-						const variant = variants?.find((v: any) => v.id === item.variantId);
-						const productTitle = variant
-							? variant.product.title
-							: 'Unknown Product';
-						const variantTitle = variant ? variant.title : 'Unknown Variant';
-
 						return (
 							<View key={index} style={styles.tableRow}>
 								<Text style={styles.tableCell}>{index + 1}</Text>
 
 								<View style={[styles.tableCell, styles.productCell]}>
-									<Text>{productTitle}</Text>
-									<Text>{variantTitle}</Text>
+									<Text>{item.title}</Text>
 								</View>
 								<Text style={styles.tableCell}>
 									{item.unit_price?.toLocaleString()} {region?.currency?.symbol}
@@ -229,10 +220,8 @@ export const OrderPDF: FC<OrderPDFProps> = (props) => {
 	return <OrderPDFDocument {...props} />;
 };
 
-export const generatePdfBlob = async (order: pdfOrderRes, variants: any) => {
-	const blob = await pdf(
-		<OrderPDFDocument order={order} variants={variants} />
-	).toBlob();
+export const generatePdfBlob = async (order: pdfOrderRes) => {
+	const blob = await pdf(<OrderPDFDocument order={order} />).toBlob();
 	return blob;
 };
 
