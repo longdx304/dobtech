@@ -4,7 +4,10 @@ import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Title } from '@/components/Typography';
-import { useMarkAsFulfilledMutation } from '@/lib/hooks/api/supplier-order';
+import {
+	useAdminSupplierOrder,
+	useMarkAsFulfilledMutation,
+} from '@/lib/hooks/api/supplier-order';
 import { getErrorMessage } from '@/lib/utils';
 import {
 	ItemsShippedEvent,
@@ -13,7 +16,7 @@ import {
 	OrderPlacedEvent,
 	PaymentRequiredEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
-import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
+// import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
 import {
 	NoteEvent,
 	PaidEvent,
@@ -63,7 +66,7 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 	const changeSttFulfilled = useMarkAsFulfilledMutation(orderId);
 
 	const {
-		data: order,
+		supplierOrder: order,
 		isLoading: isOrderLoading,
 		refetch: refetchSupplierOrder,
 	} = useAdminSupplierOrder(orderId);
@@ -142,7 +145,7 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 		[
 			FulfillSupplierOrderStt.NOT_FULFILLED,
 			FulfillSupplierOrderStt.REJECTED,
-		].includes(order?.fulfillment_status) && {
+		].includes(order?.fulfillment_status as FulfillSupplierOrderStt) && {
 			key: 'mark_as_fulfilled',
 			label: 'Xác nhận hàng đã về kho',
 			icon: <PackageCheck size={18} />,
@@ -158,7 +161,7 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 		[
 			FulfillSupplierOrderStt.DELIVERED,
 			FulfillSupplierOrderStt.INVENTORIED,
-		].includes(order?.fulfillment_status) && {
+		].includes(order?.fulfillment_status as FulfillSupplierOrderStt) && {
 			key: 'inbound_detail',
 			label: 'Trang nhập hàng chi tiết',
 			icon: <ArrowLeft size={18} />,

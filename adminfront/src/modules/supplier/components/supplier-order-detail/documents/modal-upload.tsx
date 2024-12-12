@@ -3,7 +3,8 @@ import { ActionAbles } from '@/components/Dropdown';
 import { Modal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
 import { Upload } from '@/components/Upload';
-import { useAdminSupplierOrderCreateDocument } from '@/modules/supplier/hooks';
+import { useAdminSupplierOrderCreateDocument } from '@/lib/hooks/api/supplier-order';
+
 import { FormImage } from '@/types/common';
 import { Col, MenuProps, message, Row } from 'antd';
 import { File, Trash2 } from 'lucide-react';
@@ -18,6 +19,7 @@ type Props = {
 };
 
 const UploadModal = ({ state, handleCancel, orderId }: Props) => {
+	// const createDocument = useAdminSupplierOrderCreateDocument(orderId);
 	const createDocument = useAdminSupplierOrderCreateDocument(orderId);
 	const [files, setFiles] = useState<FormImage[]>([]);
 

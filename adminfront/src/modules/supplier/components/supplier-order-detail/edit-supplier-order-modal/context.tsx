@@ -1,9 +1,9 @@
 'use client';
-import useToggleState from '@/lib/hooks/use-toggle-state';
 import {
 	useAdminCreateSupplierOrderEdit,
 	useAdminSupplierOrderEdits,
-} from '@/modules/supplier/hooks/supplier-order-edits';
+} from '@/lib/hooks/api/supplier-order-edits';
+import useToggleState from '@/lib/hooks/use-toggle-state';
 import { SupplierOrderEdit } from '@/types/supplier';
 import { message } from 'antd';
 
@@ -49,7 +49,7 @@ export const SupplierOrderEditProvider = ({
 		string | undefined
 	>(undefined);
 
-	const { data } = useAdminSupplierOrderEdits({
+	const { edits } = useAdminSupplierOrderEdits({
 		supplier_order_id: supplierOrderId,
 		// limit: count, // TODO
 	});
@@ -76,7 +76,7 @@ export const SupplierOrderEditProvider = ({
 				isModalVisible,
 				activeOrderEditId,
 				setActiveOrderEditId,
-				supplierOrderEdits: data?.edits,
+				supplierOrderEdits: edits,
 			}}
 		>
 			{children}

@@ -7,15 +7,15 @@ import Documents from '../../components/supplier-order-detail/documents';
 import SupplierOrderEditModalContainer from '../../components/supplier-order-detail/edit-supplier-order-modal';
 import Payment from '../../components/supplier-order-detail/payment';
 import Timeline from '../../components/supplier-order-detail/timeline';
-import { useAdminSupplierOrder } from '../../hooks';
 import { useBuildTimeline } from '../../hooks/use-build-timeline';
+import { useAdminSupplierOrder } from '@/lib/hooks/api/supplier-order';
 
 interface Props {
 	id: string;
 }
 
 export default function SupplierOrdersDetail({ id }: Readonly<Props>) {
-	const { data: supplierOrder, isLoading, refetch } = useAdminSupplierOrder(id);
+	const { supplierOrder, isLoading, refetch } = useAdminSupplierOrder(id);
 	const { events, refetch: refetchTimeline } = useBuildTimeline(id);
 
 	const refetchOrder = () => {

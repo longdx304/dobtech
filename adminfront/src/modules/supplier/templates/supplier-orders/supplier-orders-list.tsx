@@ -9,10 +9,11 @@ import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import SupplierOrdersModal from '../../components/supplier-orders-modal';
-import { useAdminSupplierOrders, useAdminSuppliers } from '../../hooks';
-import supplierOrdersColumn from './supplier-orders-column';
-import { useRouter } from 'next/navigation';
+import { useAdminSuppliers } from '@/lib/hooks/api/supplier';
+import { useAdminSupplierOrders } from '@/lib/hooks/api/supplier-order';
 import { ERoutes } from '@/types/routes';
+import { useRouter } from 'next/navigation';
+import supplierOrdersColumn from './supplier-orders-column';
 
 type Props = {};
 
@@ -32,17 +33,13 @@ const SupplierOrdersList: FC<Props> = () => {
 	const [currentSupplierOrders, setCurrentSupplierOrders] =
 		useState<SupplierOrders | null>(null);
 
-	const {
-		data: dataSupplierOrders,
-		isLoading,
-		isRefetching,
-	} = useAdminSupplierOrders({
+	const { supplierOrder, isLoading, isRefetching } = useAdminSupplierOrders({
 		q: searchValue || '',
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
 	});
 
-	const { data: dataSuppliers } = useAdminSuppliers({
+	const { suppliers } = useAdminSuppliers({
 		q: '',
 		offset: 0,
 		limit: 100,
@@ -68,10 +65,10 @@ const SupplierOrdersList: FC<Props> = () => {
 
 	const columns = useMemo(() => {
 		return supplierOrdersColumn({
-			supplier: dataSuppliers?.suppliers ?? [],
+			supplier: suppliers ?? [],
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dataSuppliers]);
+	}, [suppliers]);
 
 	const handleCloseModal = () => {
 		closeSupplierOrdersModal();
@@ -99,7 +96,7 @@ const SupplierOrdersList: FC<Props> = () => {
 			<Table
 				loading={isLoading || isRefetching}
 				columns={(columns as any) ?? []}
-				dataSource={dataSupplierOrders?.supplierOrder ?? []}
+				dataSource={supplierOrder ?? []}
 				rowKey="id"
 				onRow={(record) => ({
 					onClick: () => handleRowClick(record),
@@ -107,7 +104,7 @@ const SupplierOrdersList: FC<Props> = () => {
 				})}
 				scroll={{ x: 700 }}
 				pagination={{
-					total: dataSupplierOrders?.count ?? 0,
+					total: supplierOrder?.length ?? 0,
 					pageSize: DEFAULT_PAGE_SIZE,
 					current: numPages,
 					onChange: handleChangePage,
@@ -127,7 +124,7 @@ const SupplierOrdersList: FC<Props> = () => {
 					state={stateSupplierOrdersModal}
 					handleOk={handleCloseModal}
 					handleCancel={handleCloseModal}
-					suppliers={dataSuppliers?.suppliers || []}
+					suppliers={suppliers || []}
 				/>
 			)}
 		</div>

@@ -2,19 +2,15 @@ import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
 import { Steps } from '@/components/Steps';
 import { Title } from '@/components/Typography';
+import { useAdminCreateSupplierOrders } from '@/lib/hooks/api/supplier-order';
 import { useUser } from '@/lib/providers/user-provider';
 import Medusa from '@/services/api';
 import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PDFViewer } from '@react-pdf/renderer';
 import { message, Spin } from 'antd';
-import {
-	useAdminRegion,
-	useAdminRegions,
-	useAdminVariants,
-} from 'medusa-react';
+import { useAdminRegion, useAdminRegions } from 'medusa-react';
 import { FC, useMemo, useState } from 'react';
-import { useAdminCreateSupplierOrders } from '../../hooks';
 import useSupplierTime from '../../hooks/use-supplier-time';
 import OrderPDF, { generatePdfBlob } from './order-pdf';
 import ProductTotalForm from './product-total/product-total-form';
@@ -71,10 +67,11 @@ const SupplierOrdersModal: FC<Props> = ({
 	suppliers,
 }) => {
 	const [currentStep, setCurrentStep] = useState<number>(0);
-	const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
+	const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 	const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
 		null
 	);
+	const [selectedRowsProducts, setSelectedRowsProducts] = useState<any[]>([]);
 	const [itemQuantities, setItemQuantities] = useState<ItemQuantity[]>([]);
 	const [itemPrices, setItemPrices] = useState<ItemPrice[]>([]);
 	const [showPDF, setShowPDF] = useState(false);
@@ -96,14 +93,10 @@ const SupplierOrdersModal: FC<Props> = ({
 
 	const { user: selectedAdmin } = useUser();
 
-	const { variants } = useAdminVariants({
-		id: selectedProducts,
-		limit: 100,
-	});
-
 	const onCancel = () => {
 		setCurrentStep(0);
 		setSelectedProducts([]);
+		setSelectedRowsProducts([]);
 		setSelectedSupplier(null);
 		handleCancel();
 	};
@@ -113,10 +106,18 @@ const SupplierOrdersModal: FC<Props> = ({
 			const priceItem = itemPrices.find(
 				(price) => price.variantId === item.variantId
 			);
+
+			const selectedProduct = selectedRowsProducts?.find(
+				(product) => product?.id === item?.variantId
+			);
+
+			const productTitle =
+				selectedProduct?.product?.title + ' - ' + selectedProduct?.title;
 			return {
 				variantId: item.variantId,
 				quantity: item.quantity,
 				unit_price: priceItem ? priceItem.unit_price : undefined,
+				title: productTitle ?? '',
 			};
 		});
 		return {
@@ -132,8 +133,8 @@ const SupplierOrdersModal: FC<Props> = ({
 		const productionDate = supplierDates.productionDate?.toDate();
 		const settlementDate = supplierDates.settlementDate?.toDate();
 
-		// i Want to take all quantity inside lineItems
-		const totalQuantity = payload.lineItems.reduce(
+		// Get all quantity inside lineItems
+		const totalQuantity = payload?.lineItems?.reduce(
 			(total, item) => total + item.quantity,
 			0
 		);
@@ -160,7 +161,7 @@ const SupplierOrdersModal: FC<Props> = ({
 
 		try {
 			// Generate pdf blob
-			const pdfBlob = await generatePdfBlob(pdfOrder!, variants);
+			const pdfBlob = await generatePdfBlob(pdfOrder!);
 
 			// Create a File object
 			const fileName = `purchase-order.pdf`;
@@ -257,6 +258,7 @@ const SupplierOrdersModal: FC<Props> = ({
 					<ProductForm
 						selectedProducts={selectedProducts}
 						setSelectedProducts={setSelectedProducts}
+						setSelectedRowsProducts={setSelectedRowsProducts}
 						setCurrentStep={setCurrentStep}
 						handleCancel={onCancel}
 						itemQuantities={itemQuantities}
@@ -312,7 +314,7 @@ const SupplierOrdersModal: FC<Props> = ({
 					loading={isSubmitting}
 				>
 					<PDFViewer width="100%" height="600px">
-						<OrderPDF order={pdfOrder} variants={variants} region={region} />
+						<OrderPDF order={pdfOrder} region={region} />
 					</PDFViewer>
 				</Modal>
 			)}

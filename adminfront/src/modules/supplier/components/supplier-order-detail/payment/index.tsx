@@ -1,11 +1,11 @@
 import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Title } from '@/components/Typography';
+import { useAdminSupplierOrderCapturePayment } from '@/lib/hooks/api/supplier-order';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import StatusIndicator from '@/modules/common/components/status-indicator';
 import { DisplayTotal } from '@/modules/supplier/common';
-import { useAdminSupplierOrderCapturePayment } from '@/modules/supplier/hooks';
 import { SupplierOrder } from '@/types/supplier';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { Modal as AntdModal, Divider, Empty, MenuProps, message } from 'antd';
@@ -211,7 +211,8 @@ const Payment = ({ supplierOrder, isLoading, refetch }: Props) => {
 						<div className="flex">
 							<div className="font-semibold text-gray-900 mr-3">
 								{formatAmountWithSymbol({
-									amount: supplierOrder.paid_total - supplierOrder.refunded_total,
+									amount:
+										supplierOrder.paid_total - supplierOrder.refunded_total,
 									currency: supplierOrder.currency_code,
 								})}
 							</div>

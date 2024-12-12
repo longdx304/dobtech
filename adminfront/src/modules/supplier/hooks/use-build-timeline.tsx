@@ -1,5 +1,6 @@
+import { useAdminSupplierOrder } from '@/lib/hooks/api/supplier-order';
+import { useAdminSupplierOrderEdits } from '@/lib/hooks/api/supplier-order-edits';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
-import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
 import {
 	ClaimOrder,
 	Order,
@@ -11,7 +12,6 @@ import {
 import { isArray } from 'lodash';
 import { useAdminNotes, useAdminNotifications, useGetCart } from 'medusa-react';
 import { useMemo } from 'react';
-import { useAdminSupplierOrderEdits } from './supplier-order-edits';
 
 export interface TimelineEvent {
 	id: string;
@@ -166,7 +166,8 @@ export interface NotificationEvent extends TimelineEvent {
 
 export const useBuildTimeline = (supplierOrderId: string) => {
 	const {
-		data: supplierOrder,
+		// data: supplierOrder,
+		supplierOrder,
 		refetch,
 		isLoading: isOrderLoading,
 	} = useAdminSupplierOrder(supplierOrderId);
@@ -178,10 +179,11 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 		}
 	);
 
-	const { data, isLoading: isOrderEditsLoading } = useAdminSupplierOrderEdits({
-		supplier_order_id: supplierOrderId,
-		// limit: count, // TODO
-	});
+	const { edits, isLoading: isOrderEditsLoading } =
+		useAdminSupplierOrderEdits({
+			supplier_order_id: supplierOrderId,
+			// limit: count, // TODO
+		});
 
 	const { isFeatureEnabled } = useFeatureFlag();
 
@@ -222,7 +224,7 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 			currency_code: supplierOrder.currency_code,
 		} as PaymentRequiredEvent);
 		if (isFeatureEnabled('order_editing')) {
-			for (const edit of data?.edits || []) {
+			for (const edit of edits || []) {
 				events.push({
 					id: edit.id,
 					time: edit.created_at,
@@ -237,7 +239,7 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 						time: edit.requested_at,
 						orderId: supplierOrder.id,
 						type: 'edit-requested',
-						email: supplierOrder.email,
+						email: supplierOrder?.user?.email,
 						edit: edit,
 					} as OrderEditRequestedEvent);
 				}
@@ -406,7 +408,7 @@ export const useBuildTimeline = (supplierOrderId: string) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		supplierOrder,
-		data?.edits,
+		edits,
 		notes,
 		notifications,
 		isFeatureEnabled,

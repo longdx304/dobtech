@@ -1,10 +1,13 @@
 import { Input, InputNumber } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
+import {
+	useAdminCreateSupplier,
+	useAdminUpdateSupplier,
+} from '@/lib/hooks/api/supplier';
 import { getErrorMessage } from '@/lib/utils';
 import { Supplier } from '@/types/supplier';
 import { Col, Form, Row, message } from 'antd';
 import { FC, useEffect } from 'react';
-import { useAdminCreateSupplier, useAdminUpdateSupplier } from '../../hooks';
 
 type Props = {
 	state: boolean;
@@ -41,8 +44,7 @@ const SupplierModal: FC<Props> = ({
 				supplier_name: supplier.supplier_name,
 				phone: supplier.phone,
 				address: supplier.address,
-				estimated_production_time:
-					supplier.estimated_production_time,
+				estimated_production_time: supplier.estimated_production_time,
 				settlement_time: supplier.settlement_time,
 			});
 		} else {

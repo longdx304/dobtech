@@ -2,9 +2,10 @@ import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Text, Title } from '@/components/Typography';
+import { useAdminCancelSupplierOrder } from '@/lib/hooks/api/supplier-order';
 import { getErrorMessage } from '@/lib/utils';
 import StatusIndicator from '@/modules/common/components/status-indicator';
-import { useAdminCancelSupplierOrder } from '@/modules/supplier/hooks';
+// import { useAdminCancelSupplierOrder } from '@/modules/supplier/hooks';
 import { SupplierOrder } from '@/types/supplier';
 import { Empty, message, Modal as AntdModal } from 'antd';
 import dayjs from 'dayjs';
@@ -16,6 +17,7 @@ type Props = {
 };
 
 const Information = ({ supplierOrder, isLoading }: Props) => {
+	// const cancelOrder = useAdminCancelSupplierOrder(supplierOrder?.id!);
 	const cancelOrder = useAdminCancelSupplierOrder(supplierOrder?.id!);
 
 	const handleCancelOrder = () => {

@@ -5,10 +5,14 @@ import { Empty } from '@/components/Empty';
 import { Flex } from '@/components/Flex';
 import { Modal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
+import { queryClient } from '@/lib/constants/query-client';
 import { useAdminDeleteFile } from '@/lib/hooks';
+import {
+	useAdminSupplierOrderDeleteDocument,
+	useCreateDocument,
+} from '@/lib/hooks/api/supplier-order';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
-import { useAdminSupplierOrderDeleteDocument } from '@/modules/supplier/hooks';
 import Medusa from '@/services/api';
 import {
 	LineItemReq,
@@ -18,21 +22,20 @@ import {
 import { PDFViewer } from '@react-pdf/renderer';
 import { Modal as AntdModal, message } from 'antd';
 import { Paperclip, Plus, Trash2 } from 'lucide-react';
-import { useAdminVariants } from 'medusa-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import OrderPDF, {
 	generatePdfBlob,
 } from '../../supplier-orders-modal/order-pdf';
 import UploadModal from './modal-upload';
-import { useCreateDocument } from '@/lib/hooks/api/supplier-order';
-import { queryClient } from '@/lib/constants/query-client';
+import { pdfOrderRes } from '../../supplier-orders-modal';
 
 type Props = {
 	order: SupplierOrder | undefined;
 	isLoading: boolean;
 };
 
+const PAGE_SIZE = 10;
 const Documents = ({ order, isLoading }: Props) => {
 	const deleteFile = useAdminDeleteFile();
 	const deleteDocument = useAdminSupplierOrderDeleteDocument(order?.id || '');
@@ -45,7 +48,6 @@ const Documents = ({ order, isLoading }: Props) => {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const createDocument = useCreateDocument();
 
-	console.log('==> order', order);
 	const handleRemoveDoc = async (docId: string, docName: string) => {
 		AntdModal.confirm({
 			title: 'Xác nhận xoá tài liệu',
@@ -57,9 +59,7 @@ const Documents = ({ order, isLoading }: Props) => {
 					},
 					{
 						onSuccess: async () => {
-							await deleteDocument.mutateAsync({
-								documentId: docId,
-							});
+							await deleteDocument.mutateAsync(docId);
 							message.success('Xoá tài liệu thành công');
 						},
 						onError: (error: any) => {
@@ -88,13 +88,9 @@ const Documents = ({ order, isLoading }: Props) => {
 			variantId: item.variant_id,
 			quantity: item.quantity,
 			unit_price: item.unit_price,
+			title: item.title + ' - ' + item.variant.title,
 		};
 	}) as LineItemReq[];
-
-	// get all variants
-	const { variants } = useAdminVariants({
-		id: order?.items?.map((item) => item.variant_id) as string[],
-	});
 
 	const region = order?.region;
 
@@ -103,19 +99,20 @@ const Documents = ({ order, isLoading }: Props) => {
 		supplierId: order?.supplier?.id || '',
 		supplier: order?.supplier,
 		userId: order?.user?.id || '',
+		quantity: lineItems?.reduce((total, item) => total + item.quantity, 0),
 		email: order?.user?.email || '',
 		user: order?.user,
 		estimated_production_time: order?.estimated_production_time || new Date(),
 		settlement_time: order?.settlement_time || new Date(),
 		region_id: order?.region_id || '',
-	};
+	} as pdfOrderRes;
 
 	const onSubmitOrder = async () => {
 		setIsSubmitting(true);
 
 		try {
 			// Generate pdf blob
-			const pdfBlob = await generatePdfBlob(pdfOrder, variants);
+			const pdfBlob = await generatePdfBlob(pdfOrder);
 
 			// Create a File object
 			const fileName = `purchase-order.pdf`;
@@ -219,11 +216,7 @@ const Documents = ({ order, isLoading }: Props) => {
 					loading={isSubmitting}
 				>
 					<PDFViewer width="100%" height="600px">
-						<OrderPDF
-							order={pdfOrder as any}
-							variants={variants}
-							region={region}
-						/>
+						<OrderPDF order={pdfOrder as any} region={region} />
 					</PDFViewer>
 				</Modal>
 			)}

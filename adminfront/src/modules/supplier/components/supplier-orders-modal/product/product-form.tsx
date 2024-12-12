@@ -22,6 +22,7 @@ import productColumns from './product-columns';
 type ProductFormProps = {
 	selectedProducts: string[];
 	setSelectedProducts: (products: string[]) => void;
+	setSelectedRowsProducts: (products: any) => void;
 	setCurrentStep: (step: number) => void;
 	handleCancel: () => void;
 	itemQuantities: ItemQuantity[];
@@ -37,6 +38,7 @@ const PAGE_SIZE = 10;
 const ProductForm: FC<ProductFormProps> = ({
 	selectedProducts,
 	setSelectedProducts,
+	setSelectedRowsProducts,
 	setCurrentStep,
 	handleCancel,
 	itemQuantities,
@@ -52,7 +54,10 @@ const ProductForm: FC<ProductFormProps> = ({
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const { state, onOpen, onClose } = useToggleState(false);
 
-	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
+	const handleRowSelectionChange = (
+		selectedRowKeys: React.Key[],
+		selectedRows: any
+	) => {
 		// Identify deselected products
 		const deselectedProducts = selectedProducts.filter(
 			(productId) => !selectedRowKeys.includes(productId)
@@ -106,6 +111,7 @@ const ProductForm: FC<ProductFormProps> = ({
 
 		// Update selected products
 		setSelectedProducts(selectedRowKeys as string[]);
+		setSelectedRowsProducts(selectedRows);
 	};
 
 	const handleChangeDebounce = _.debounce(

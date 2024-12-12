@@ -3,8 +3,10 @@ import React from 'react';
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { PaymentRequiredEvent } from '@/modules/orders/hooks/use-build-timeline';
-import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
-import { useAdminSupplierOrderEdits } from '@/modules/supplier/hooks/supplier-order-edits';
+// import { useAdminSupplierOrder } from '@/modules/supplier/hooks';
+// import { useAdminSupplierOrderEdits } from '@/modules/supplier/hooks/supplier-order-edits';
+import { useAdminSupplierOrder } from '@/lib/hooks/api/supplier-order';
+import { useAdminSupplierOrderEdits } from '@/lib/hooks/api/supplier-order-edits';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { CircleAlert } from 'lucide-react';
 import EventContainer, { EventIconColor } from '../event-container';
@@ -14,18 +16,18 @@ type RequestedProps = {
 };
 
 const PaymentRequired: React.FC<RequestedProps> = ({ event }) => {
-	const { data } = useAdminSupplierOrderEdits({
+	const { edits } = useAdminSupplierOrderEdits({
 		supplier_order_id: event.orderId,
 	});
 
-	const { data: order } = useAdminSupplierOrder(event.orderId);
+	const { supplierOrder: order } = useAdminSupplierOrder(event.orderId);
 
-	if (!order || !data.edits) {
+	if (!order || !edits) {
 		return null;
 	}
 
 	const requestedEditDifferenceDue =
-		data.edits?.find((e: any) => e.status === 'requested')?.difference_due || 0;
+		edits?.find((e: any) => e.status === 'requested')?.difference_due || 0;
 
 	const amount = requestedEditDifferenceDue
 		? order.total - order.paid_total + requestedEditDifferenceDue
