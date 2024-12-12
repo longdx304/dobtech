@@ -1,17 +1,32 @@
-import useToggleState from '@/lib/hooks/use-toggle-state';
-import { SupplierOrder, SupplierOrderDocument } from '@/types/supplier';
-import { Modal as AntdModal, message } from 'antd';
-import UploadModal from './modal-upload';
-import { getErrorMessage } from '@/lib/utils';
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { ActionAbles } from '@/components/Dropdown';
 import { Empty } from '@/components/Empty';
 import { Flex } from '@/components/Flex';
+import { Modal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import { Button } from '@/components/Button';
-import { Paperclip, Plus, Trash2 } from 'lucide-react';
 import { useAdminDeleteFile } from '@/lib/hooks';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import { getErrorMessage } from '@/lib/utils';
 import { useAdminSupplierOrderDeleteDocument } from '@/modules/supplier/hooks';
+import Medusa from '@/services/api';
+import {
+	LineItemReq,
+	SupplierOrder,
+	SupplierOrderDocument,
+} from '@/types/supplier';
+import { PDFViewer } from '@react-pdf/renderer';
+import { Modal as AntdModal, message } from 'antd';
+import { Paperclip, Plus, Trash2 } from 'lucide-react';
+import { useAdminVariants } from 'medusa-react';
 import Link from 'next/link';
+import { useState } from 'react';
+import OrderPDF, {
+	generatePdfBlob,
+} from '../../supplier-orders-modal/order-pdf';
+import UploadModal from './modal-upload';
+import { useCreateDocument } from '@/lib/hooks/api/supplier-order';
+import { queryClient } from '@/lib/constants/query-client';
 
 type Props = {
 	order: SupplierOrder | undefined;
@@ -22,7 +37,15 @@ const Documents = ({ order, isLoading }: Props) => {
 	const deleteFile = useAdminDeleteFile();
 	const deleteDocument = useAdminSupplierOrderDeleteDocument(order?.id || '');
 	const { state, onOpen, onClose } = useToggleState();
+	const {
+		state: stateRefreshPdf,
+		onOpen: onOpenRefreshPdf,
+		onClose: onCloseRefreshPdf,
+	} = useToggleState();
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const createDocument = useCreateDocument();
 
+	console.log('==> order', order);
 	const handleRemoveDoc = async (docId: string, docName: string) => {
 		AntdModal.confirm({
 			title: 'Xác nhận xoá tài liệu',
@@ -52,6 +75,76 @@ const Documents = ({ order, isLoading }: Props) => {
 		const parts = url.split('/');
 		return parts[parts.length - 1];
 	};
+
+	const actions = [
+		{
+			label: 'Tạo lại tài liệu PDF',
+			onClick: onOpenRefreshPdf,
+		},
+	];
+
+	const lineItems = order?.items?.map((item) => {
+		return {
+			variantId: item.variant_id,
+			quantity: item.quantity,
+			unit_price: item.unit_price,
+		};
+	}) as LineItemReq[];
+
+	// get all variants
+	const { variants } = useAdminVariants({
+		id: order?.items?.map((item) => item.variant_id) as string[],
+	});
+
+	const region = order?.region;
+
+	const pdfOrder = {
+		lineItems: lineItems || [],
+		supplierId: order?.supplier?.id || '',
+		supplier: order?.supplier,
+		userId: order?.user?.id || '',
+		email: order?.user?.email || '',
+		user: order?.user,
+		estimated_production_time: order?.estimated_production_time || new Date(),
+		settlement_time: order?.settlement_time || new Date(),
+		region_id: order?.region_id || '',
+	};
+
+	const onSubmitOrder = async () => {
+		setIsSubmitting(true);
+
+		try {
+			// Generate pdf blob
+			const pdfBlob = await generatePdfBlob(pdfOrder, variants);
+
+			// Create a File object
+			const fileName = `purchase-order.pdf`;
+
+			// Create a File object
+			const file = new File([pdfBlob], fileName, {
+				type: 'application/pdf',
+			});
+
+			// Upload pdf to s3 using Medusa uploads API
+			const uploadRes = await Medusa.uploads.create([file]);
+			const pdfUrl = (uploadRes.data as any).uploads[0].url;
+
+			await createDocument.mutateAsync({
+				id: order?.id || '',
+				document_url: [pdfUrl],
+			});
+
+			queryClient.invalidateQueries(['admin-supplier-order', order?.id]);
+			message.success('Tạo tài liệu mới thành công');
+			onCloseRefreshPdf();
+		} catch (error) {
+			console.error('error:', error);
+			message.error('Tạo tài liệu thất bại');
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
 	return (
 		<Card loading={isLoading} className="px-4">
 			{!order && <Empty description="Không tìm thấy đơn hàng" />}
@@ -66,6 +159,7 @@ const Documents = ({ order, isLoading }: Props) => {
 								icon={<Plus size={20} />}
 								onClick={onOpen}
 							/>
+							<ActionAbles actions={actions as any} />
 						</div>
 					</Flex>
 					<Flex vertical gap={4} className="pt-8">
@@ -106,6 +200,32 @@ const Documents = ({ order, isLoading }: Props) => {
 			)}
 			{state && (
 				<UploadModal state={state} handleCancel={onClose} orderId={order!.id} />
+			)}
+
+			{stateRefreshPdf && (
+				<Modal
+					open={stateRefreshPdf}
+					handleOk={onCloseRefreshPdf}
+					handleCancel={onCloseRefreshPdf}
+					width={850}
+					footer={[
+						<Button key="close" onClick={onCloseRefreshPdf} type="default">
+							Thoát
+						</Button>,
+						<Button key="submit" type="primary" onClick={onSubmitOrder}>
+							Tạo đơn đặt hàng
+						</Button>,
+					]}
+					loading={isSubmitting}
+				>
+					<PDFViewer width="100%" height="600px">
+						<OrderPDF
+							order={pdfOrder as any}
+							variants={variants}
+							region={region}
+						/>
+					</PDFViewer>
+				</Modal>
 			)}
 		</Card>
 	);

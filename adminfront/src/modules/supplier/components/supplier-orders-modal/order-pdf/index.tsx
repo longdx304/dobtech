@@ -196,12 +196,12 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants, region }) => {
 									<Text>{variantTitle}</Text>
 								</View>
 								<Text style={styles.tableCell}>
-									{item.unit_price?.toLocaleString()} {region?.currency.symbol}
+									{item.unit_price?.toLocaleString()} {region?.currency?.symbol}
 								</Text>
 								<Text style={styles.tableCell}>{item.quantity}</Text>
 								<Text style={styles.tableCell}>
 									{(item.quantity * (item.unit_price || 0)).toLocaleString()}{' '}
-									{region?.currency.symbol}
+									{region?.currency?.symbol}
 								</Text>
 							</View>
 						);
@@ -216,7 +216,7 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, variants, region }) => {
 						<Text style={styles.tableCell}>{'-'}</Text>
 						<Text style={styles.tableCell}>{order.quantity}</Text>
 						<Text style={styles.tableCell}>
-							{total.toLocaleString()} {region?.currency.symbol}
+							{total.toLocaleString()} {region?.currency?.symbol}
 						</Text>
 					</View>
 				</View>

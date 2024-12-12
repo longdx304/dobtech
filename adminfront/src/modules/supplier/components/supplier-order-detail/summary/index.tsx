@@ -1,8 +1,8 @@
 import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
-import { Title } from '@/components/Typography';
-import { DisplayTotal } from '@/modules/supplier/common';
+import { Text, Title } from '@/components/Typography';
+import { DisplayTotal, DisplayTotalQuantity } from '@/modules/supplier/common';
 import { SupplierOrder } from '@/types/supplier';
 import { ReservationItemDTO } from '@medusajs/types';
 import { Divider, Empty } from 'antd';
@@ -71,6 +71,10 @@ const Summary = ({
 		supplierOrder.status
 	);
 
+	const totalQuantity = supplierOrder.items.reduce(
+		(acc, item) => acc + item.quantity,
+		0
+	);
 	return (
 		<Card loading={isLoading} className="px-4">
 			<div>
@@ -92,6 +96,10 @@ const Summary = ({
 					/>
 				))}
 				<Divider className="my-2" />
+				<DisplayTotalQuantity
+					totalAmount={totalQuantity}
+					totalTitle={'Tổng số lượng'}
+				/>
 				<DisplayTotal
 					currency={supplierOrder.currency_code}
 					totalAmount={supplierOrder.subtotal}

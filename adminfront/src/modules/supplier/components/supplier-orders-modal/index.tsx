@@ -3,11 +3,11 @@ import { Modal } from '@/components/Modal';
 import { Steps } from '@/components/Steps';
 import { Title } from '@/components/Typography';
 import { useUser } from '@/lib/providers/user-provider';
+import Medusa from '@/services/api';
 import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PDFViewer } from '@react-pdf/renderer';
 import { message, Spin } from 'antd';
-import Medusa from '@/services/api';
 import {
 	useAdminRegion,
 	useAdminRegions,
@@ -58,9 +58,9 @@ export interface pdfOrderRes {
 	quantity?: number;
 	user?: User | null;
 	email: string;
-	countryCode: string;
-	estimated_production_time: Date;
-	settlement_time: Date;
+	countryCode?: string;
+	estimated_production_time: string | Date;
+	settlement_time: string | Date;
 	metadata?: Record<string, unknown>;
 }
 

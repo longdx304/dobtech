@@ -1,4 +1,4 @@
-import { Cart, OrderEdit, Payment, User } from '@medusajs/medusa';
+import { Cart, OrderEdit, Payment, Region, User } from '@medusajs/medusa';
 import { LineItem } from './lineItem';
 
 export interface Supplier {
@@ -25,8 +25,6 @@ export interface LineItemReq {
 	variantId: string;
 	quantity: number;
 	unit_price?: number;
-	totalQuantity?: number;
-	total?: number;
 }
 
 export interface SupplierOrdersReq {
@@ -102,6 +100,7 @@ export interface SupplierOrder {
 	user_id: string;
 	currency_code: string;
 	region_id: string;
+	region?: Region;
 	user: User;
 	status: string;
 	payment_status: string;
