@@ -30,16 +30,16 @@ const Header: FC<Props> = ({}) => {
 		<Card
 			className={cn(
 				'fixed top-0 w-full p-0 [&_.ant-card-body]:py-2 transition-all ease-in-out duration-300 z-[999]',
-				'sm:w-[200px] md:w-[250px] sm:h-full sm:[&_.ant-card-body]:px-0',
+				'lg:w-[200px] lg:h-full lg:[&_.ant-card-body]:px-0',
 				scrollDirection === 'up'
-					? 'max-sm:translate-y-0'
-					: 'max-sm:-translate-y-14'
+					? 'max-lg:translate-y-0'
+					: 'max-lg:-translate-y-14'
 			)}
 			bordered={false}
 		>
 			<Skeleton loading={isLoading} className="px-4 pt-4" active>
 				<Flex
-					className="sm:justify-center"
+					className="lg:justify-center"
 					justify="space-between"
 					align="center"
 				>
@@ -62,7 +62,7 @@ const Header: FC<Props> = ({}) => {
 								height: 'calc(100% - 60px)',
 							}}
 							arrow={{ pointAtCenter: true }}
-							className="block sm:hidden"
+							className="block lg:hidden"
 						>
 							<a onClick={(e) => e.preventDefault()} className="">
 								<Button type="text" shape="circle">
@@ -77,12 +77,12 @@ const Header: FC<Props> = ({}) => {
 							shape="circle"
 							type="text"
 							onClick={() => onOpen()}
-							className="sm:hidden"
+							className="lg:hidden"
 						/>
 					</Flex>
 				</Flex>
 				{/* Desktop: Content Menu */}
-				<div className="hidden sm:block h-[calc(100vh-100px)] overflow-y-auto">
+				<div className="hidden lg:block h-[calc(100vh-100px)] overflow-y-auto">
 					<Menubar
 						user={user as Omit<User, 'password_hash'>}
 						remove={remove}

@@ -73,31 +73,38 @@ export const DisplayTotalQuantity = ({
 	totalColor = 'text-gray-900 mr-3',
 	variant = 'regular',
 	totalAmount,
-	totalTitle,
+	quantityTitle,
+	productTitle,
+	productQuantity,
 }: any) => {
 	return (
-		// <div className="flex">
-		// 	<div
-		// 		className={clsx(totalColor, {
-		// 			'font-medium': variant === 'bold',
-		// 			'font-medium text-[24px]': variant === 'large',
-		// 		})}
-		// 	>
-		// 		{totalAmount}
-		// 	</div>
-		// </div>
-		<div className="mt-4 flex items-center justify-between text-[12px]">
-			<div className="flex flex-col">
-				<div
-					className={clsx('text-gray-900', {
-						'font-normal': variant === 'regular',
-						'font-medium': variant === 'large' || variant === 'bold',
-					})}
-				>
-					{totalTitle}
+		<>
+			<div className="mt-4 flex items-center justify-between text-[12px]">
+				<div className="flex flex-col">
+					<div
+						className={clsx('text-gray-900', {
+							'font-normal': variant === 'regular',
+							'font-medium': variant === 'large' || variant === 'bold',
+						})}
+					>
+						{productTitle}
+					</div>
 				</div>
+				<div className="font-medium text-[16px]">{productQuantity + ' '}(sản phẩm)</div>
 			</div>
-			<div className="font-medium text-[16px]">{totalAmount + ' '}(đôi)</div>
-		</div>
+			<div className="mt-4 flex items-center justify-between text-[12px]">
+				<div className="flex flex-col">
+					<div
+						className={clsx('text-gray-900', {
+							'font-normal': variant === 'regular',
+							'font-medium': variant === 'large' || variant === 'bold',
+						})}
+					>
+						{quantityTitle}
+					</div>
+				</div>
+				<div className="font-medium text-[16px]">{totalAmount + ' '}(đôi)</div>
+			</div>
+		</>
 	);
 };

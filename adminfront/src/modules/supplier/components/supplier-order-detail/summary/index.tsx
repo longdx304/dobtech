@@ -6,10 +6,13 @@ import { DisplayTotal, DisplayTotalQuantity } from '@/modules/supplier/common';
 import { SupplierOrder } from '@/types/supplier';
 import { ReservationItemDTO } from '@medusajs/types';
 import { Divider, Empty } from 'antd';
-import { Pencil } from 'lucide-react';
-import { useMemo } from 'react';
+import { Pencil, Search } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { useSupplierOrderEdit } from '../edit-supplier-order-modal/context';
 import OrderLine from './order-line';
+import { Pagination } from '@/components/Pagination';
+import { Input } from '@/components/Input';
+import _ from 'lodash';
 
 type Props = {
 	supplierOrder: SupplierOrder | undefined;
@@ -18,6 +21,8 @@ type Props = {
 	refetch: () => void;
 };
 
+const PAGE_SIZE = 10;
+
 const Summary = ({
 	supplierOrder,
 	isLoading,
@@ -25,6 +30,9 @@ const Summary = ({
 	refetch,
 }: Props) => {
 	const { showModal } = useSupplierOrderEdit();
+	const [currentPage, setCurrentPage] = useState(1);
+	const [pageSize, setPageSize] = useState(PAGE_SIZE);
+	const [searchValue, setSearchValue] = useState('');
 
 	const reservationItemsMap = useMemo(() => {
 		if (!reservations?.length) {
@@ -75,6 +83,39 @@ const Summary = ({
 		(acc, item) => acc + item.quantity,
 		0
 	);
+
+	// Filter items based on the search term
+	const filteredItems = supplierOrder.items.filter(
+		(item) =>
+			item.variant?.product_id
+				?.toLowerCase()
+				.includes(searchValue.toLowerCase()) ||
+			item.title?.toLowerCase().includes(searchValue?.toLowerCase()) ||
+			item.variant?.title?.toLowerCase().includes(searchValue?.toLowerCase()) ||
+			item.variant?.sku?.toLowerCase().includes(searchValue?.toLowerCase())
+	);
+
+	// Sort items based on the variant product id
+	const sortedItems = [...filteredItems].sort((a, b) => {
+		const productIdA = a.variant?.product_id || '';
+		const productIdB = b.variant?.product_id || '';
+		return productIdA.localeCompare(productIdB);
+	});
+
+	// Paginated items
+	const startIndex = (currentPage - 1) * pageSize;
+	const paginatedItems = sortedItems.slice(startIndex, startIndex + pageSize);
+
+	// Search items
+	const handleChangeDebounce = _.debounce(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			setCurrentPage(1);
+			setSearchValue(e.target.value);
+			setPageSize(PAGE_SIZE);
+		},
+		1000
+	);
+
 	return (
 		<Card loading={isLoading} className="px-4">
 			<div>
@@ -84,21 +125,50 @@ const Summary = ({
 				</Flex>
 			</div>
 			<div>
-				{supplierOrder?.items?.map((item: any, i: number) => (
-					<OrderLine
-						key={item.id}
-						item={item}
-						currencyCode={supplierOrder.currency_code}
-						reservations={reservationItemsMap[item.id]}
-						isAllocatable={isAllocatable}
-						paymentStt={supplierOrder?.payment_status}
-						refetch={refetch}
+				<Flex align="center" justify="flex-end" className="pb-4">
+					<Input
+						placeholder="Tên sản phẩm..."
+						name="search"
+						prefix={<Search size={16} />}
+						onChange={handleChangeDebounce}
+						className="w-[300px]"
 					/>
-				))}
+				</Flex>
+				{paginatedItems.length > 0 ? (
+					paginatedItems.map((item: any, i: number) => (
+						<OrderLine
+							key={item.id}
+							item={item}
+							currencyCode={supplierOrder.currency_code}
+							reservations={reservationItemsMap[item.id]}
+							isAllocatable={isAllocatable}
+							paymentStt={supplierOrder?.payment_status}
+							refetch={refetch}
+						/>
+					))
+				) : (
+					<Empty description="Không tìm thấy kết quả phù hợp" />
+				)}
+
+				{sortedItems.length > pageSize && (
+					<div className="mt-4 flex justify-end">
+						<Pagination
+							current={currentPage}
+							pageSize={pageSize}
+							total={sortedItems.length}
+							onChange={(page, size) => {
+								setCurrentPage(page);
+								setPageSize(size || 5);
+							}}
+						/>
+					</div>
+				)}
 				<Divider className="my-2" />
 				<DisplayTotalQuantity
+					productTitle={'Tổng sản phẩm'}
+					productQuantity={supplierOrder.items.length}
 					totalAmount={totalQuantity}
-					totalTitle={'Tổng số lượng'}
+					quantityTitle={'Tổng số lượng'}
 				/>
 				<DisplayTotal
 					currency={supplierOrder.currency_code}

@@ -13,7 +13,6 @@ import {
 } from '@/lib/hooks/api/supplier-order';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
-import Medusa from '@/services/api';
 import {
 	LineItemReq,
 	SupplierOrder,
@@ -22,20 +21,20 @@ import {
 import { PDFViewer } from '@react-pdf/renderer';
 import { Modal as AntdModal, message } from 'antd';
 import { Paperclip, Plus, Trash2 } from 'lucide-react';
+import { useAdminUploadFile } from 'medusa-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { pdfOrderRes } from '../../supplier-orders-modal';
 import OrderPDF, {
 	generatePdfBlob,
 } from '../../supplier-orders-modal/order-pdf';
 import UploadModal from './modal-upload';
-import { pdfOrderRes } from '../../supplier-orders-modal';
 
 type Props = {
 	order: SupplierOrder | undefined;
 	isLoading: boolean;
 };
 
-const PAGE_SIZE = 10;
 const Documents = ({ order, isLoading }: Props) => {
 	const deleteFile = useAdminDeleteFile();
 	const deleteDocument = useAdminSupplierOrderDeleteDocument(order?.id || '');
@@ -47,6 +46,7 @@ const Documents = ({ order, isLoading }: Props) => {
 	} = useToggleState();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const createDocument = useCreateDocument();
+	const uploadFile = useAdminUploadFile();
 
 	const handleRemoveDoc = async (docId: string, docName: string) => {
 		AntdModal.confirm({
@@ -118,14 +118,22 @@ const Documents = ({ order, isLoading }: Props) => {
 			const fileName = `purchase-order.pdf`;
 
 			// Create a File object
-			const file = new File([pdfBlob], fileName, {
+			const files = new File([pdfBlob], fileName, {
 				type: 'application/pdf',
 			});
 
-			// Upload pdf to s3 using Medusa uploads API
-			const uploadRes = await Medusa.uploads.create([file]);
-			const pdfUrl = (uploadRes.data as any).uploads[0].url;
+			const formData = new FormData();
+			formData.append('prefix', 'supplier-order/');
+			formData.append('files', files);
 
+			// object form data to binary
+
+			// Upload pdf to s3 using Medusa uploads API
+			const uploadRes = await uploadFile.mutateAsync(files);
+
+			const pdfUrl = uploadRes.uploads[0].url;
+
+			console.log('pdfUrl', uploadRes);
 			await createDocument.mutateAsync({
 				id: order?.id || '',
 				document_url: [pdfUrl],
