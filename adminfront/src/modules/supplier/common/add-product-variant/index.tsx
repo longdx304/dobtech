@@ -147,6 +147,25 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 		setSelectedVariants(selectedRows as ProductVariant[]);
 	};
 
+	const handleQuantityChange = (value: number, variantId: string) => {
+		setItemQuantities?.((prevQuantities) => {
+			const existingItemIndex = prevQuantities.findIndex(
+				(item) => item.variantId === variantId
+			);
+
+			if (existingItemIndex !== -1) {
+				const updatedQuantities = [...prevQuantities];
+				updatedQuantities[existingItemIndex] = {
+					...updatedQuantities[existingItemIndex],
+					quantity: Math.max(0, value),
+				};
+				return updatedQuantities;
+			} else {
+				return [...prevQuantities, { variantId, quantity: Math.max(0, value) }];
+			}
+		});
+	};
+
 	const handleChangeDebounce = _.debounce(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			const { value: inputValue } = e.target;
@@ -205,6 +224,7 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 				handleToAddQuantity,
 				itemPrices: itemPrices ?? [],
 				handlePriceChange,
+				handleQuantityChange,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[itemQuantities, itemPrices]

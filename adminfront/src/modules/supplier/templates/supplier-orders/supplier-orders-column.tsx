@@ -1,5 +1,6 @@
 import { Supplier, SupplierOrders } from '@/types/supplier';
 import dayjs from 'dayjs';
+import { Tag } from 'antd';
 
 type Props = {
 	supplier: Supplier[] | null;
@@ -8,30 +9,30 @@ type Props = {
 const decidePaymentStt = (status: any) => {
 	switch (status) {
 		case 'pending':
-			return 'Chờ thanh toán';
+			return <Tag color="warning">Chờ thanh toán</Tag>;
 		case 'completed':
-			return 'Đã thanh toán';
+			return <Tag color="success">Đã thanh toán</Tag>;
 		case 'canceled':
-			return 'Đã huỷ';
+			return <Tag color="error">Đã huỷ</Tag>;
 		default:
-			return 'Xem xét';
+			return <Tag color="processing">Xem xét</Tag>;
 	}
 };
 
 const decideFulfillmentStatus = (status: any) => {
 	switch (status) {
 		case 'not_fulfilled':
-			return 'Chưa hoàn thành';
+			return <Tag color="warning">Chưa hoàn thành</Tag>;
 		case 'delivered':
-			return 'Hàng đã về kho';
+			return <Tag color="cyan">Hàng đã về kho</Tag>;
 		case 'partially_inventoried':
-			return 'Hoàn thành một phần';
+			return <Tag color="blue">Hoàn thành một phần</Tag>;
 		case 'inventoried':
-			return 'Đã nhập kho';
+			return <Tag color="success">Đã nhập kho</Tag>;
 		case 'rejected':
-			return 'Đã hủy';
+			return <Tag color="error">Đã hủy</Tag>;
 		default:
-			return 'N/A';
+			return <Tag color="default">N/A</Tag>;
 	}
 };
 const supplierOrdersColumn = ({ supplier }: Props) => [
@@ -79,11 +80,11 @@ const supplierOrdersColumn = ({ supplier }: Props) => [
 		},
 	},
 	{
-		title: 'Ngày hoàn thành',
-		dataIndex: 'estimated_production_time',
-		key: 'estimated_production_time',
+		title: 'Ngày đặt hàng',
+		dataIndex: 'created_at',
+		key: 'created_at',
 		className: 'text-xs',
-		render: (_: SupplierOrders['estimated_production_time']) => {
+		render: (_: SupplierOrders['created_at']) => {
 			return dayjs(_).format('DD/MM/YYYY');
 		},
 	},
@@ -97,11 +98,11 @@ const supplierOrdersColumn = ({ supplier }: Props) => [
 		},
 	},
 	{
-		title: 'Ngày đặt hàng',
-		dataIndex: 'created_at',
-		key: 'created_at',
+		title: 'Ngày hoàn thành',
+		dataIndex: 'estimated_production_time',
+		key: 'estimated_production_time',
 		className: 'text-xs',
-		render: (_: SupplierOrders['created_at']) => {
+		render: (_: SupplierOrders['estimated_production_time']) => {
 			return dayjs(_).format('DD/MM/YYYY');
 		},
 	},

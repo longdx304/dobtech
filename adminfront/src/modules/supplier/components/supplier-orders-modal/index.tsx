@@ -4,12 +4,15 @@ import { Steps } from '@/components/Steps';
 import { Title } from '@/components/Typography';
 import { useAdminCreateSupplierOrders } from '@/lib/hooks/api/supplier-order';
 import { useUser } from '@/lib/providers/user-provider';
-import Medusa from '@/services/api';
 import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PDFViewer } from '@react-pdf/renderer';
 import { message, Spin } from 'antd';
-import { useAdminRegion, useAdminRegions } from 'medusa-react';
+import {
+	useAdminRegion,
+	useAdminRegions,
+	useAdminUploadFile,
+} from 'medusa-react';
 import { FC, useMemo, useState } from 'react';
 import useSupplierTime from '../../hooks/use-supplier-time';
 import OrderPDF, { generatePdfBlob } from './order-pdf';
@@ -80,6 +83,8 @@ const SupplierOrdersModal: FC<Props> = ({
 	const createSupplierOrder = useAdminCreateSupplierOrders();
 	const { regions } = useAdminRegions();
 	const [regionId, setRegionId] = useState<string | null>(null);
+
+	const uploadFile = useAdminUploadFile();
 
 	const { region } = useAdminRegion(regionId || '');
 
@@ -170,11 +175,14 @@ const SupplierOrdersModal: FC<Props> = ({
 			const file = new File([pdfBlob], fileName, {
 				type: 'application/pdf',
 			});
+			const formData = new FormData();
+			formData.append('prefix', 'supplier-order/');
+			formData.append('files', file);
 
 			// Upload pdf to s3 using Medusa uploads API
-			const uploadRes = await Medusa.uploads.create([file]);
+			const uploadRes = await uploadFile.mutateAsync(formData as any);
 
-			const pdfUrl = (uploadRes.data as any).uploads[0].url;
+			const pdfUrl = uploadRes.uploads[0].url;
 
 			const orderPayload: SupplierOrdersReq = {
 				lineItems: pdfOrder?.lineItems || [],

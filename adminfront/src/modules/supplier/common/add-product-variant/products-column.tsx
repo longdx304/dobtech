@@ -7,19 +7,61 @@ import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
 import clsx from 'clsx';
 import { Minus, Plus } from 'lucide-react';
-import { ItemPrice, ItemQuantity } from '../../components/supplier-orders-modal';
+import {
+	ItemPrice,
+	ItemQuantity,
+} from '../../components/supplier-orders-modal';
+import { useState } from 'react';
 
 interface Props {
 	itemQuantities: ItemQuantity[];
 	handleToAddQuantity: (value: number, variantId: string) => void;
 	itemPrices: ItemPrice[];
 	handlePriceChange: (value: number, variantId: string) => void;
+	handleQuantityChange: (value: number, variantId: string) => void;
 }
+
+const EditableQuantity = ({
+	quantity,
+	record,
+	handleQuantityChange,
+}: {
+	quantity: number;
+	record: any;
+	handleQuantityChange: (value: number, variantId: string) => void;
+}) => {
+	const [isEditing, setIsEditing] = useState(false);
+
+	return isEditing ? (
+		<InputNumber
+			autoFocus
+			min={1}
+			defaultValue={quantity || 1}
+			onBlur={() => setIsEditing(false)}
+			onPressEnter={() => setIsEditing(false)}
+			onChange={(value) => {
+				if (value !== null) {
+					handleQuantityChange(value as number, record?.id as string);
+				}
+			}}
+			className="w-20 text-center"
+		/>
+	) : (
+		<Text
+			className="text-right text-gray-500 cursor-pointer"
+			onClick={() => setIsEditing(true)}
+		>
+			{quantity || 1}
+		</Text>
+	);
+};
+
 const productColumns = ({
 	itemQuantities,
 	handleToAddQuantity,
 	itemPrices,
 	handlePriceChange,
+	handleQuantityChange,
 }: Props) => [
 	{
 		title: 'Tên sản phẩm',
@@ -51,7 +93,7 @@ const productColumns = ({
 		title: 'Số lượng',
 		key: 'quantity',
 		dataIndex: 'quantity',
-		className: 'text-xs',
+		className: 'text-xs text-center',
 		editable: true,
 		render: (_: number, record: any) => {
 			const itemQuantity = itemQuantities.find(
@@ -59,23 +101,11 @@ const productColumns = ({
 			);
 			const quantity = itemQuantity ? itemQuantity.quantity : 0;
 			return (
-				<div className="text-gray-500 flex w-full justify-start text-right">
-					<span
-						onClick={() => handleToAddQuantity(-1, record.id)}
-						className="hover:bg-gray-200 mr-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md"
-					>
-						<Minus size={16} strokeWidth={2} />
-					</span>
-					<span>{quantity || 0}</span>
-					<span
-						onClick={() => handleToAddQuantity(1, record.id)}
-						className={clsx(
-							'hover:bg-gray-200 ml-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md'
-						)}
-					>
-						<Plus size={16} />
-					</span>
-				</div>
+				<EditableQuantity
+					quantity={quantity}
+					record={record}
+					handleQuantityChange={handleQuantityChange}
+				/>
 			);
 		},
 	},
@@ -83,8 +113,9 @@ const productColumns = ({
 		title: 'Giá tiền',
 		key: 'price_from_supplier',
 		dataIndex: 'price_from_supplier',
-		className: 'text-xs',
-		width: 250,
+		className: 'text-xs text-center',
+		width: 220,
+		fixed: 'right',
 		render: (_: any, record: any) => {
 			const itemPrice = itemPrices.find((item) => item.variantId === record.id);
 			const price = itemPrice ? itemPrice.unit_price : record.supplier_price;

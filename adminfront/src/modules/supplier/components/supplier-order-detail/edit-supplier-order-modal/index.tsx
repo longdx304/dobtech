@@ -1,24 +1,28 @@
 // @ts-nocheck
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import useToggleState from '@/lib/hooks/use-toggle-state';
-import AddProductVariant from '@/modules/supplier/common/add-product-variant';
-import { ProductVariant } from '@medusajs/medusa';
-import { message } from 'antd';
-import { Input } from '@/components/Input';
 import {
 	useAdminDeleteSupplierOrderEdit,
 	useAdminRequestSOrderEditConfirmation,
 	useAdminSupplierOrderEditAddLineItem,
 	useAdminUpdateSupplierOrderEdit,
 } from '@/lib/hooks/api/supplier-order-edits';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import AddProductVariant from '@/modules/supplier/common/add-product-variant';
 import { AddOrderEditLineItemInput } from '@/types/supplier';
 import { formatAmountWithSymbol } from '@/utils/prices';
+import { ProductVariant } from '@medusajs/medusa';
+import { message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useSupplierOrderEdit } from './context';
 import SupplierOrderEditLine from './supplier-order-edit-line';
+import { Search } from 'lucide-react';
+import { Pagination } from '@/components/Pagination';
+import { Empty } from '@/components/Empty';
+import clsx from 'clsx';
 
 type SupplierOrderEditModalContainerProps = {
 	supplierOrder: SupplierOrder | null;
@@ -55,11 +59,12 @@ const SupplierOrderEditModalContainer = (
 			state={isModalVisible}
 			close={onClose}
 			supplierOrderEdit={supplierOrderEdit}
-			currentSubtotal={1000}
+			currentSubtotal={supplierOrder?.subtotal}
 			regionId={supplierOrder?.cart?.region_id}
 			customerId={supplierOrder?.user?.id}
-			currencyCode={'vnd'}
-			paidTotal={1000}
+			currencyCode={supplierOrder?.currency_code}
+			paidTotal={supplierOrder?.paid_total}
+			refundedTotal={supplierOrder.refunded_total}
 		/>
 	);
 };
@@ -75,8 +80,10 @@ type SupplierOrderEditModalProps = {
 	customerId?: string;
 	currentSubtotal?: number;
 	paidTotal?: number;
+	refundedTotal?: number;
 };
 
+const PAGE_SIZE = 2;
 const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 	const {
 		state,
@@ -87,6 +94,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 		customerId,
 		currentSubtotal,
 		paidTotal,
+		refundedTotal,
 	} = props;
 
 	const {
@@ -99,12 +107,16 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 	const [note, setNote] = useState<string | undefined>();
 	const [showFilter, setShowFilter] = useState(false);
 	const [filterTerm, setFilterTerm] = useState<string>('');
+	const [currentPage, setCurrentPage] = useState(1);
+	const [pageSize, setPageSize] = useState(PAGE_SIZE);
 	const [itemQuantities, setItemQuantities] = useState<ItemQuantity[]>([]);
 	const [itemPrices, setItemPrices] = useState<ItemPrice[]>([]);
 
-	const showTotals = currentSubtotal !== 1000;
+	const showTotals = currentSubtotal !== supplierOrderEdit?.subtotal;
 	const hasChanges = !!supplierOrderEdit?.changes?.length;
 
+	console.log('supplierOrderEdit', supplierOrderEdit);
+	console.log('showTotals', showTotals);
 	const {
 		mutateAsync: requestConfirmation,
 		isLoading: isRequestingConfirmation,
@@ -147,12 +159,12 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 
 	const onAddVariants = async (selectedVariants: ProductVariant['id']) => {
 		// Creating the lineItems array by merging quantities and prices
-		const lineItems: AddOrderEditLineItemInput[] = selectedVariants.map(
+		const lineItems: AddOrderEditLineItemInput[] = selectedVariants?.map(
 			(variantId) => {
-				const quantityData = itemQuantities.find(
+				const quantityData = itemQuantities?.find(
 					(item) => item.variantId === variantId
 				);
-				const priceData = itemPrices.find(
+				const priceData = itemPrices?.find(
 					(item) => item.variantId === variantId
 				);
 
@@ -182,18 +194,41 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 	};
 
 	let displayItems =
-		supplierOrderEdit?.items?.sort(
-			// @ts-ignore
-			(a, b) => new Date(a.created_at) - new Date(b.created_at)
-		) || [];
+		supplierOrderEdit?.items?.sort((a, b) => {
+			const productIdA = a?.variant?.product_id || '';
+			const productIdB = b?.variant?.product_id || '';
+			return productIdA.localeCompare(productIdB);
+		}) || [];
+
+	// sort with time
+	displayItems = displayItems.sort((a, b) => {
+		const createdAtA = a?.created_at || '';
+		const createdAtB = b?.created_at || '';
+		return createdAtB.localeCompare(createdAtA);
+	})
 
 	if (filterTerm) {
-		displayItems = displayItems.filter(
+		displayItems = displayItems?.filter(
 			(i) =>
-				i.title.toLowerCase().includes(filterTerm) ||
-				i.variant?.sku.toLowerCase().includes(filterTerm)
+				i?.title?.toLowerCase().includes(filterTerm) ||
+				i?.variant?.sku?.toLowerCase().includes(filterTerm) ||
+				i?.variant?.title?.toLowerCase().includes(filterTerm)
 		);
 	}
+
+	// Paginated items
+	const startIndex = (currentPage - 1) * pageSize;
+	const paginatedItems = displayItems?.slice(startIndex, startIndex + pageSize);
+
+	// Search items
+	const handleChangeDebounce = _.debounce(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			setCurrentPage(1);
+			setFilterTerm(e.target.value);
+			setPageSize(PAGE_SIZE);
+		},
+		1000
+	);
 
 	return (
 		<Modal
@@ -207,32 +242,69 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 			<Title level={3} className="text-center">
 				{'Chỉnh sửa đơn hàng'}
 			</Title>
-			<Flex justify="flex-end" className="text-xs pt-4">
-				<Button type="default" className="w-fit" onClick={openAddProduct}>
-					{'Thêm sản phẩm'}
-				</Button>
+			<Flex justify="space-between" className="mt-4">
+				<Flex align="center">
+					<Input
+						placeholder="Tên sản phẩm..."
+						name="search"
+						prefix={<Search size={16} />}
+						onChange={handleChangeDebounce}
+						className="w-[300px]"
+					/>
+				</Flex>
+				<Flex className="text-xs pt-4">
+					<Button type="default" className="w-fit" onClick={openAddProduct}>
+						{'Thêm sản phẩm'}
+					</Button>
+				</Flex>
 			</Flex>
 			<div className="flex flex-col mt-4">
 				{/* ITEMS */}
-				{displayItems?.map((oi) => (
-					<SupplierOrderEditLine
-						key={oi.id}
-						item={oi}
-						customerId={customerId}
-						regionId={regionId}
-						currencyCode={currencyCode}
-						change={
-							supplierOrderEdit?.changes?.find(
-								(change) =>
-									change.line_item_id === oi.id ||
-									change.original_line_item_id === oi.id
-							) || undefined
-						}
-					/>
-				))}
+				{paginatedItems?.length > 0 ? (
+					paginatedItems.map((oi) => (
+						<SupplierOrderEditLine
+							key={oi.id}
+							item={oi}
+							customerId={customerId}
+							regionId={regionId}
+							currencyCode={currencyCode}
+							change={
+								supplierOrderEdit?.changes?.find(
+									(change) =>
+										change.line_item_id === oi.id ||
+										change.original_line_item_id === oi.id
+								) || undefined
+							}
+						/>
+					))
+				) : (
+					<Empty description="Không tìm thấy kết quả phù hợp" />
+				)}
+
+				{displayItems.length > pageSize && (
+					<div className="mt-4 flex justify-center">
+						<Pagination
+							current={currentPage}
+							pageSize={pageSize}
+							total={displayItems.length}
+							onChange={(page, size) => {
+								setCurrentPage(page);
+								setPageSize(size || 5);
+							}}
+						/>
+					</div>
+				)}
 				{/* TOTALS */}
 				{showTotals && (
-					<TotalsSection currencyCode={currencyCode} amountPaid={paidTotal} />
+					// <TotalsSection currencyCode={currencyCode} amountPaid={paidTotal} />
+					<TotalsSection
+						currencyCode={currencyCode}
+						amountPaid={paidTotal - refundedTotal}
+						newTotal={supplierOrderEdit.total}
+						differenceDue={
+							supplierOrderEdit.total - paidTotal // (orderEdit_total - refunded_total) - (paidTotal - refundedTotal)
+						}
+					/>
 				)}
 
 				{/* NOTE */}
@@ -276,19 +348,47 @@ type TotalsSectionProps = {
  * Totals section displaying order and order edit subtotals.
  */
 function TotalsSection(props: TotalsSectionProps) {
-	const { currencyCode, amountPaid } = props;
+	const { currencyCode, amountPaid, newTotal, differenceDue } = props;
 
+
+	console.log('differenceDue', differenceDue);
 	return (
 		<>
 			<div className="bg-gray-200 mb-6 w-full" />
-
 			<div className="mb-2 flex h-[40px] justify-between">
-				<span className="font-semibold text-gray-900">{'Tổng tiền'}</span>
-				<span className="text-2xl font-semibold">
+				<span className="text-gray-500">{'Số tiền đã thanh toán'}</span>
+				<span className="text-gray-900">
 					{formatAmountWithSymbol({
 						amount: amountPaid,
 						currency: currencyCode,
 					})}
+					<span className="text-gray-400"> {currencyCode.toUpperCase()}</span>
+				</span>
+			</div>
+
+			<div className="mb-2 flex h-[40px] justify-between">
+				<span className="font-semibold text-gray-900">{'Tổng mới'}</span>
+				<span className="text-2xl font-semibold">
+					{formatAmountWithSymbol({
+						amount: newTotal,
+						currency: currencyCode,
+					})}
+				</span>
+			</div>
+
+			<div className="flex justify-between">
+				<span className="text-gray-500">{'Sự khác biệt cần thanh toán'}</span>
+				<span
+					className={clsx('', {
+						'text-rose-500': differenceDue < 0,
+						'text-emerald-500': differenceDue >= 0,
+					})}
+				>
+					{formatAmountWithSymbol({
+						amount: differenceDue,
+						currency: currencyCode,
+					})}
+					<span className="text-gray-400"> {currencyCode.toUpperCase()}</span>
 				</span>
 			</div>
 

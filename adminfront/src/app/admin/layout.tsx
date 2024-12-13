@@ -14,7 +14,7 @@ export default async function MainLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<main className="w-full pt-[4.5rem] sm:pt-0">
+		<main className="w-full pt-[4.5rem] lg:pt-0">
 			<UserProvider>
 				<FeatureFlagProvider>
 					<PollingProvider>
@@ -22,7 +22,7 @@ export default async function MainLayout({
 							<LayeredModalProvider>
 								<Header />
 								<Notification />
-								<article className="sm:w-[calc(100%-200px-4rem)] sm:ml-[200px] sm:pt-4 sm:px-8 md:w-[calc(100%-250px-4rem)] md:ml-[250px]">
+								<article className="lg:w-[calc(100%-200px-4rem)] lg:ml-[200px] lg:pt-4 lg:px-8 px-4">
 									{children}
 								</article>
 							</LayeredModalProvider>
