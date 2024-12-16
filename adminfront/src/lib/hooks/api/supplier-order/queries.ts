@@ -19,6 +19,8 @@ export type SupplierOrderQueryKeyParams = {
 	q?: string;
 	offset?: number;
 	limit?: number;
+	status?: any;
+	fulfillment_status?: any;
 };
 export const useAdminSupplierOrders = (
 	/**

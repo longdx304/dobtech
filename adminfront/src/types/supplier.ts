@@ -97,7 +97,7 @@ export interface SupplierOrders {
 }
 
 export interface SupplierOrderListRes {
-	supplierOrder: SupplierOrders[];
+	supplierOrders: SupplierOrders[];
 	count: number;
 	offset: number;
 	limit: number;

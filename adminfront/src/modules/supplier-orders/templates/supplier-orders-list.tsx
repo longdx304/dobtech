@@ -1,56 +1,58 @@
 'use client';
+
 import { FloatButton } from '@/components/Button';
+import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
+import { Title } from '@/components/Typography';
+import { useAdminSuppliers } from '@/lib/hooks/api/supplier';
+import { useAdminSupplierOrders } from '@/lib/hooks/api/supplier-order';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import NewDraftOrderFormProvider from '@/modules/draft-orders/hooks/use-new-draft-form';
 import { ERoutes } from '@/types/routes';
+import { SupplierOrders } from '@/types/supplier';
 import { TableProps } from 'antd';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
-import { useAdminOrders } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
-import NewOrderModal from '../../components/orders/new-order';
-import orderColumns from './order-column';
+import SupplierOrdersModal from '../components/supplier-orders-modal';
+import supplierOrdersColumn from './supplier-order-column';
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
-const defaultQueryProps = {
-	expand: 'customer,shipping_address',
-	fields:
-		'id,status,display_id,created_at,email,fulfillment_status,payment_status,total,currency_code',
-};
 
-const OrderList: FC<Props> = () => {
+const SupplierOrdersList: FC<Props> = () => {
+	const {
+		state: stateSupplierOrdersModal,
+		onOpen: openSupplierOrdersModal,
+		onClose: closeSupplierOrdersModal,
+	} = useToggleState(false);
+
 	const router = useRouter();
-
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
+	const [currentSupplierOrders, setCurrentSupplierOrders] =
+		useState<SupplierOrders | null>(null);
 	const [filters, setFilters] = useState<any>({});
 
-	const {
-		state: stateOrderByAdminModal,
-		onOpen: openOrderByAdminModal,
-		onClose: closeOrderByAdminModal,
-	} = useToggleState(false);
-
-	const { orders, isLoading, count, refetch } = useAdminOrders(
-		{
-			...(defaultQueryProps as any),
-			q: searchValue || undefined,
+	const { supplierOrders, isLoading, isRefetching, count } =
+		useAdminSupplierOrders({
+			q: searchValue || '',
+			status: filters.status || undefined,
+			fulfillment_status: filters.fulfillment_status || undefined,
 			offset,
 			limit: DEFAULT_PAGE_SIZE,
-			payment_status: filters?.payment_status || undefined,
-			fulfillment_status: filters?.fulfillment_status || undefined,
-		},
-		{
-			keepPreviousData: true,
-		}
-	);
+		});
+
+	// fetch suppliers for choosing supplier in order
+	const { suppliers } = useAdminSuppliers({
+		q: '',
+		offset,
+		limit: 100,
+	});
 
 	const handleChangeDebounce = _.debounce(
 		(e: ChangeEvent<HTMLInputElement>) => {
@@ -65,21 +67,25 @@ const OrderList: FC<Props> = () => {
 		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
+	const handleCreateSupplierOrders = () => {
+		setCurrentSupplierOrders(null);
+		openSupplierOrdersModal();
+	};
+
 	const columns = useMemo(() => {
-		return orderColumns({});
+		return supplierOrdersColumn({
+			supplier: suppliers ?? [],
+		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [orders]);
+	}, [suppliers]);
+
+	const handleCloseModal = () => {
+		closeSupplierOrdersModal();
+		setCurrentSupplierOrders(null);
+	};
 
 	const handleRowClick = (record: any) => {
-		router.push(`${ERoutes.ORDERS}/${record.id}`);
-	};
-
-	const handleCreateOrderByAdmin = () => {
-		openOrderByAdminModal();
-	};
-
-	const handleCancelOrderByAdmin = () => {
-		closeOrderByAdminModal();
+		router.push(`${ERoutes.SUPPLIER_ORDERS}/${record.id}`);
 	};
 
 	const handleOnChange: TableProps<any>['onChange'] = (
@@ -101,11 +107,13 @@ const OrderList: FC<Props> = () => {
 	};
 
 	return (
-		<div className="w-full">
+		<Card className="w-full" bordered={false}>
+			<Flex align="center" justify="flex-start" className="">
+				<Title level={3}>Đơn đặt hàng</Title>
+			</Flex>
 			<Flex align="center" justify="flex-end" className="pb-4">
 				<Input
-					// size="small"
-					placeholder="Tìm kiếm đơn hàng..."
+					placeholder="Tìm kiếm đơn đặt hàng..."
 					name="search"
 					prefix={<Search size={16} />}
 					onChange={handleChangeDebounce}
@@ -113,44 +121,42 @@ const OrderList: FC<Props> = () => {
 				/>
 			</Flex>
 			<Table
-				loading={isLoading}
-				columns={columns as any}
-				dataSource={orders ?? []}
+				loading={isLoading || isRefetching}
+				columns={(columns as any) ?? []}
+				dataSource={supplierOrders ?? []}
 				rowKey="id"
-				scroll={{ x: 700 }}
 				onRow={(record) => ({
 					onClick: () => handleRowClick(record),
 					className: 'cursor-pointer',
 				})}
+				scroll={{ x: 700 }}
 				onChange={handleOnChange}
 				pagination={{
-					total: Math.floor(count ?? 0 / (DEFAULT_PAGE_SIZE ?? 0)),
+					total: count ?? 0,
 					pageSize: DEFAULT_PAGE_SIZE,
-					current: numPages || 1,
+					current: numPages,
 					onChange: handleChangePage,
 					showTotal: (total, range) =>
-						`${range[0]}-${range[1]} trong ${total} đơn hàng`,
+						`${range[0]}-${range[1]} trong ${total} nhà cung cấp`,
 				}}
 			/>
 			<FloatButton
 				className="absolute"
 				icon={<Plus color="white" size={20} strokeWidth={2} />}
 				type="primary"
-				onClick={handleCreateOrderByAdmin}
+				onClick={handleCreateSupplierOrders}
 				data-testid="btnCreateSupplier"
 			/>
-			{stateOrderByAdminModal && (
-				<NewDraftOrderFormProvider>
-					<NewOrderModal
-						state={stateOrderByAdminModal}
-						handleOk={handleCancelOrderByAdmin}
-						handleCancel={handleCancelOrderByAdmin}
-						refetch={refetch}
-					/>
-				</NewDraftOrderFormProvider>
+			{stateSupplierOrdersModal && (
+				<SupplierOrdersModal
+					state={stateSupplierOrdersModal}
+					handleOk={handleCloseModal}
+					handleCancel={handleCloseModal}
+					suppliers={suppliers || []}
+				/>
 			)}
-		</div>
+		</Card>
 	);
 };
 
-export default OrderList;
+export default SupplierOrdersList;

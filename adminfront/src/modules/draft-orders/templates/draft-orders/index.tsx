@@ -3,6 +3,7 @@ import { FloatButton } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
+import { useAdminDraftOrderTransferOrder } from '@/lib/hooks/api/draft-orders';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
@@ -13,7 +14,6 @@ import { useAdminDeleteDraftOrder, useAdminDraftOrders } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import DraftOrderModal from '../../components/draft-order-modal';
-import { useAdminDraftOrderTransferOrder } from '../../hooks';
 import NewDraftOrderFormProvider from '../../hooks/use-new-draft-form';
 import draftOrderColumns from './draft-order-column';
 

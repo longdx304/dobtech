@@ -1,17 +1,17 @@
 import { Metadata } from 'next';
 
 import { Flex } from '@/components/Flex';
-import SupplierList from '@/modules/suppliers/templates/suppliers-list';
+import SupplierOrdersList from '@/modules/supplier-orders/templates/supplier-orders-list';
 
 export const metadata: Metadata = {
 	title: 'Quản lý nhà cung cấp',
-	description: 'Trang quản lý nhà cung cấp',
+	description: 'Trang nhập hàng',
 };
 
-export default function Suppliers() {
+export default function SupplierOrders() {
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
-			<SupplierList />
+			<SupplierOrdersList />
 		</Flex>
 	);
 }
