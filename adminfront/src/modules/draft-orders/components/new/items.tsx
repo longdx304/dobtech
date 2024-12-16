@@ -39,7 +39,7 @@ const Items = () => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const {
-		context: { region, setItems },
+		context: { region, items, setItems },
 		form,
 	} = useNewDraftOrderForm();
 	const { enableNext, disableNext } = useStepModal();
@@ -94,14 +94,15 @@ const Items = () => {
 	// Update form items when pricedVariants are available
 	useEffect(() => {
 		if (selectedVariants.length > 0 && newVariants?.length > 0) {
-			updateFormItems(selectedVariants, variantQuantities);
+			updateFormItems(selectedVariants, variantQuantities, variantPrices);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [newVariants]);
 
 	const updateFormItems = (
 		variants: ProductVariant[],
-		quantities: VariantQuantity[]
+		quantities: VariantQuantity[],
+		variantPrices?: VariantPrice[]
 	) => {
 		const formItems = variants.map((variant) => {
 			const pricedVariant = getPricedVariant(variant.id) as PricedVariant;
@@ -262,6 +263,7 @@ const Items = () => {
 		}
 		return true;
 	};
+
 	return (
 		<>
 			<Flex

@@ -5,9 +5,11 @@ import {
 	Boxes,
 	CalendarRange,
 	CircleDollarSign,
-	ClipboardPenLine,
+	Container,
 	Earth,
 	Ellipsis,
+	Factory,
+	Layers,
 	LayoutList,
 	LogOut,
 	NotebookPen,
@@ -20,15 +22,14 @@ import {
 	User as UserIcon,
 	Users,
 	UsersRound,
-	Warehouse,
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
 import { EPermissions, IAdminResponse } from '@/types/account';
 import { ERoutes } from '@/types/routes';
 import { User } from '@medusajs/medusa';
-import isEmpty from 'lodash/isEmpty';
 import intersection from 'lodash/intersection';
+import isEmpty from 'lodash/isEmpty';
 
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(
@@ -60,14 +61,15 @@ const itemDropdown: MenuProps['items'] = [
 const itemSales = [
 	getItem('Đơn hàng', 'orders', <ShoppingCart />),
 	getItem('Danh mục', 'product-categories', <LayoutList />),
-	getItem('Sản phẩm', 'products', <ClipboardPenLine />),
+	getItem('Sản phẩm', 'products', <Layers />),
 	getItem('Định giá', 'pricing', <CircleDollarSign />),
 	getItem('Khách hàng', 'customers', <UsersRound />),
 	getItem('Giảm giá', 'discounts', <SquarePercent />),
 ].filter(() => true);
 
 const itemPurchases = [
-	getItem('Nhà cung cấp', 'suppliers', <LayoutList />),
+	getItem('Nhà cung cấp', 'suppliers', <Factory />),
+	getItem('Nhập hàng', 'supplier-orders', <Container />),
 ].filter(() => true);
 
 // Item menu warehouse
@@ -180,6 +182,7 @@ export const menuRoutes: Record<string, string> = {
 	'return-reasons': ERoutes.RETURN_REASONS,
 	discounts: ERoutes.DISCOUNTS,
 	suppliers: ERoutes.SUPPLIERS,
+	'supplier-orders': ERoutes.SUPPLIER_ORDERS,
 	currencies: ERoutes.CURRENCIES,
 	'warehouse-inbound': ERoutes.WAREHOUSE_INBOUND,
 	'warehouse-outbound': ERoutes.WAREHOUSE_OUTBOUND,
