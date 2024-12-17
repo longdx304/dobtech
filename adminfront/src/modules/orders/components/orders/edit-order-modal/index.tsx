@@ -1,14 +1,17 @@
 // @ts-nocheck
 import { Button } from '@/components/Button';
+import { Empty } from '@/components/Empty';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
+import { Pagination } from '@/components/Pagination';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { Order, OrderEdit, ProductVariant } from '@medusajs/medusa';
 import { message } from 'antd';
 import clsx from 'clsx';
+import { Search } from 'lucide-react';
 import {
 	useAdminDeleteOrderEdit,
 	useAdminOrderEditAddLineItem,
@@ -77,6 +80,7 @@ type OrderEditModalProps = {
 	state: boolean;
 };
 
+const PAGE_SIZE = 10;
 const OrderEditModal = (props: OrderEditModalProps) => {
 	const {
 		state,
@@ -100,6 +104,8 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 	const [note, setNote] = useState<string | undefined>();
 	const [showFilter, setShowFilter] = useState(false);
 	const [filterTerm, setFilterTerm] = useState<string>('');
+	const [currentPage, setCurrentPage] = useState(1);
+	const [pageSize, setPageSize] = useState(PAGE_SIZE);
 
 	const showTotals = currentSubtotal !== orderEdit?.subtotal;
 	const hasChanges = !!orderEdit?.changes?.length;
@@ -166,7 +172,14 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 		setShowFilter((s) => !s);
 	};
 
-	let displayItems = orderEdit.items.sort(
+	let displayItems =
+		orderEdit?.items?.sort((a, b) => {
+			const productIdA = a?.variant?.product_id || '';
+			const productIdB = b?.variant?.product_id || '';
+			return productIdA.localeCompare(productIdB);
+		}) || [];
+
+	displayItems = orderEdit.items.sort(
 		// @ts-ignore
 		(a, b) => new Date(a.created_at) - new Date(b.created_at)
 	);
@@ -178,6 +191,20 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 				i.variant?.sku.toLowerCase().includes(filterTerm)
 		);
 	}
+
+	// Paginated items
+	const startIndex = (currentPage - 1) * pageSize;
+	const paginatedItems = displayItems?.slice(startIndex, startIndex + pageSize);
+
+	// Search items
+	const handleChangeDebounce = _.debounce(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			setCurrentPage(1);
+			setFilterTerm(e.target.value);
+			setPageSize(PAGE_SIZE);
+		},
+		1000
+	);
 
 	return (
 		<Modal
@@ -191,27 +218,57 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 			<Title level={3} className="text-center">
 				{'Chỉnh sửa đơn hàng'}
 			</Title>
-			<Flex justify="flex-end" className="text-xs pt-4">
-				<Button type="default" className="w-fit" onClick={openAddProduct}>
-					{'Thêm sản phẩm'}
-				</Button>
+			<Flex justify="space-between" className="mt-4">
+				<Flex align="center">
+					<Input
+						placeholder="Tên sản phẩm..."
+						name="search"
+						prefix={<Search size={16} />}
+						onChange={handleChangeDebounce}
+						className="w-[300px]"
+					/>
+				</Flex>
+				<Flex className="text-xs pt-4">
+					<Button type="default" className="w-fit" onClick={openAddProduct}>
+						{'Thêm sản phẩm'}
+					</Button>
+				</Flex>
 			</Flex>
 			<div className="flex flex-col mt-4">
 				{/* ITEMS */}
-				{displayItems.map((oi) => (
-					<OrderEditLine
-						key={oi.id}
-						item={oi}
-						customerId={customerId}
-						regionId={regionId}
-						currencyCode={currencyCode}
-						change={orderEdit.changes.find(
-							(change) =>
-								change.line_item_id === oi.id ||
-								change.original_line_item_id === oi.id
-						)}
-					/>
-				))}
+				{paginatedItems?.length > 0 ? (
+					paginatedItems.map((oi) => (
+						<OrderEditLine
+							key={oi.id}
+							item={oi}
+							customerId={customerId}
+							regionId={regionId}
+							currencyCode={currencyCode}
+							change={orderEdit.changes.find(
+								(change) =>
+									change.line_item_id === oi.id ||
+									change.original_line_item_id === oi.id
+							)}
+						/>
+					))
+				) : (
+					<Empty description="Không tìm thấy kết quả phù hợp" />
+				)}
+
+				{displayItems.length > pageSize && (
+					<div className="mt-4 flex justify-center">
+						<Pagination
+							current={currentPage}
+							pageSize={pageSize}
+							total={displayItems.length}
+							onChange={(page, size) => {
+								setCurrentPage(page);
+								setPageSize(size || 5);
+							}}
+						/>
+					</div>
+				)}
+
 				{/* TOTALS */}
 				{showTotals && (
 					<TotalsSection
