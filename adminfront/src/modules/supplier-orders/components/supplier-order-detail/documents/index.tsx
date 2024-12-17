@@ -192,7 +192,7 @@ const Documents = ({ order, isLoading }: Props) => {
 										rel="noopener noreferrer"
 										className="text-gray-500 text-sm group-hover:text-blue-600 line-clamp-1 w-fit"
 									>
-										{getFileKey(doc.document_url)}
+										{getFileName(doc.document_url)}
 									</Link>
 								</Flex>
 								<Trash2
