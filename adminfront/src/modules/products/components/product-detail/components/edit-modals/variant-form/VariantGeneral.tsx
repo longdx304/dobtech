@@ -78,8 +78,8 @@ const VariantGeneral: FC<Props> = ({ form, options }) => {
 						label: value,
 					}));
 				return (
-					<Col xs={24} sm={12} key={index}>
-						<Flex align="flex-end" className="w-full">
+					<Col xs={24} key={index} className="flex">
+						<Flex align="flex-start" className="w-full">
 							<Form.Item
 								labelCol={{ span: 24 }}
 								name={['options', index, 'option_id']}
@@ -108,9 +108,11 @@ const VariantGeneral: FC<Props> = ({ form, options }) => {
 									maxCount={1}
 								/>
 							</Form.Item>
+						</Flex>
+						<Flex>
 							<Copy
 								size={18}
-								className="mb-2 ml-2"
+								className="mt-2 ml-2 h-[18px] w-[18px] cursor-pointer"
 								onClick={() => handleCopyTitle(index)}
 							/>
 						</Flex>
