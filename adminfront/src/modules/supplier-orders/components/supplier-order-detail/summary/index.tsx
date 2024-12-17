@@ -158,11 +158,12 @@ const Summary = ({
 							total={sortedItems.length}
 							onChange={(page, size) => {
 								setCurrentPage(page);
-								setPageSize(size || 5);
+								setPageSize(size || 10);
 							}}
 						/>
 					</div>
 				)}
+				
 				<Divider className="my-2" />
 				<DisplayTotalQuantity
 					productTitle={'Tổng sản phẩm'}

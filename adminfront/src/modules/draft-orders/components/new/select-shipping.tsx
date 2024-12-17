@@ -10,7 +10,7 @@ const SelectShipping = () => {
 	const { enableNext, disableNext } = useStepModal();
 	const { context, form } = useNewDraftOrderForm();
 
-	const { region, shippingOptions, items } = context;
+	const { region, shippingOptions } = context;
 
 	const currentCustomPrice = Form.useWatch('custom_shipping_price', form);
 

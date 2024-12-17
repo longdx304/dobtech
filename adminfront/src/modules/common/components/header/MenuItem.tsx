@@ -3,12 +3,12 @@ import { Flex } from 'antd';
 import {
 	BadgeDollarSign,
 	Boxes,
+	Building,
 	CalendarRange,
 	CircleDollarSign,
 	Container,
 	Earth,
 	Ellipsis,
-	Factory,
 	Layers,
 	LayoutList,
 	LogOut,
@@ -21,7 +21,7 @@ import {
 	Undo2,
 	User as UserIcon,
 	Users,
-	UsersRound,
+	UsersRound
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -68,7 +68,7 @@ const itemSales = [
 ].filter(() => true);
 
 const itemPurchases = [
-	getItem('Nhà cung cấp', 'suppliers', <Factory />),
+	getItem('Nhà cung cấp', 'suppliers', <Building />),
 	getItem('Nhập hàng', 'supplier-orders', <Container />),
 ].filter(() => true);
 

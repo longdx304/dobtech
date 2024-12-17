@@ -1,9 +1,12 @@
 import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
+import { Pagination } from '@/components/Pagination';
 import { Title } from '@/components/Typography';
 import {
 	DisplayTotal,
+	DisplayTotalQuantity,
 	PaymentDetails,
 } from '@/modules/orders/components/common';
 import { useOrderEdit } from '@/modules/orders/components/orders/edit-order-modal/context';
@@ -11,8 +14,8 @@ import { Order } from '@medusajs/medusa';
 import { ReservationItemDTO } from '@medusajs/types';
 import { Divider, Empty } from 'antd';
 import _ from 'lodash';
-import { Pencil } from 'lucide-react';
-import { useMemo } from 'react';
+import { Pencil, Search } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import OrderLine from './order-line';
 
 type Props = {
@@ -23,6 +26,7 @@ type Props = {
 	refetch?: () => void;
 };
 
+const PAGE_SIZE = 10;
 const Summary = ({
 	order,
 	isLoading,
@@ -31,6 +35,9 @@ const Summary = ({
 	refetch,
 }: Props) => {
 	const { showModal } = useOrderEdit();
+	const [currentPage, setCurrentPage] = useState(1);
+	const [pageSize, setPageSize] = useState(PAGE_SIZE);
+	const [searchValue, setSearchValue] = useState('');
 
 	const reservationItemsMap = useMemo(() => {
 		if (!reservations?.length) {
@@ -108,6 +115,43 @@ const Summary = ({
 
 	const isAllocatable = !['canceled', 'archived'].includes(order.status);
 
+	const totalQuantity = order.items.reduce(
+		(acc, item) => acc + item.quantity,
+		0
+	);
+
+	// Filter items based on the search term
+	const filteredItems = order.items.filter(
+		(item) =>
+			item.variant?.product_id
+				?.toLowerCase()
+				.includes(searchValue.toLowerCase()) ||
+			item.title?.toLowerCase().includes(searchValue?.toLowerCase()) ||
+			item.variant?.title?.toLowerCase().includes(searchValue?.toLowerCase()) ||
+			item.variant?.sku?.toLowerCase().includes(searchValue?.toLowerCase())
+	);
+
+	// Sort items based on the variant product id
+	const sortedItems = [...filteredItems].sort((a, b) => {
+		const productIdA = a.variant?.product_id || '';
+		const productIdB = b.variant?.product_id || '';
+		return productIdA.localeCompare(productIdB);
+	});
+
+	// Paginated items
+	const startIndex = (currentPage - 1) * pageSize;
+	const paginatedItems = sortedItems.slice(startIndex, startIndex + pageSize);
+
+	// Search items
+	const handleChangeDebounce = _.debounce(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			setCurrentPage(1);
+			setSearchValue(e.target.value);
+			setPageSize(PAGE_SIZE);
+		},
+		1000
+	);
+
 	return (
 		<Card loading={isLoading} className="px-4">
 			<div>
@@ -118,18 +162,51 @@ const Summary = ({
 				</Flex>
 			</div>
 			<div>
-				{order?.items?.map((item, i: number) => (
-					<OrderLine
-						key={item.id}
-						item={item}
-						currencyCode={order.currency_code}
-						reservations={reservationItemsMap[item.id]}
-						isAllocatable={isAllocatable}
-						paymentStt={order.payment_status}
-						refetch={refetch}
+				<Flex align="center" justify="flex-end" className="pb-4">
+					<Input
+						placeholder="Tên sản phẩm..."
+						name="search"
+						prefix={<Search size={16} />}
+						onChange={handleChangeDebounce}
+						className="w-[300px]"
 					/>
-				))}
+				</Flex>
+				{paginatedItems.length > 0 ? (
+					paginatedItems.map((item: any, i: number) => (
+						<OrderLine
+							key={item.id}
+							item={item}
+							currencyCode={order.currency_code}
+							reservations={reservationItemsMap[item.id]}
+							isAllocatable={isAllocatable}
+							paymentStt={order.payment_status}
+							refetch={refetch}
+						/>
+					))
+				) : (
+					<Empty description="Không tìm thấy kết quả phù hợp" />
+				)}
+
+				{sortedItems.length > pageSize && (
+					<div className="mt-4 flex justify-end">
+						<Pagination
+							current={currentPage}
+							pageSize={pageSize}
+							total={sortedItems.length}
+							onChange={(page, size) => {
+								setCurrentPage(page);
+								setPageSize(size || 10);
+							}}
+						/>
+					</div>
+				)}
 				<Divider className="my-2" />
+				<DisplayTotalQuantity
+					productTitle={'Tổng sản phẩm'}
+					productQuantity={order.items.length}
+					totalAmount={totalQuantity}
+					quantityTitle={'Tổng số lượng'}
+				/>
 				<DisplayTotal
 					currency={order.currency_code}
 					totalAmount={order.subtotal}

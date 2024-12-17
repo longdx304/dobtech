@@ -160,7 +160,9 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 					<span className="font-normal text-gray-900 mt-2">
 						{order?.handler ? (
 							<>
-								<span>{`${order?.handler?.last_name} ${order.handler?.first_name} - `}</span>
+								<span>{`${order?.handler?.last_name ?? ''} ${
+									order.handler?.first_name ?? ''
+								} - `}</span>
 								<Link href={`${ERoutes.WAREHOUSE_OUTBOUND}/${order.id}`}>
 									Xem chi tiết lấy hàng
 								</Link>
