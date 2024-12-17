@@ -1,10 +1,10 @@
 import { LineItem } from '@medusajs/medusa';
 import { ReservationItemDTO } from '@medusajs/types';
 
+import { Tooltip } from '@/components/Tooltip';
 import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import Image from 'next/image';
-import { Tooltip } from '@/components/Tooltip';
 
 type OrderLineProps = {
 	item: LineItem;
@@ -42,16 +42,14 @@ const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
 						</span>
 						{item?.variant && (
 							<span className="font-normal text-gray-500 truncate">
-								{`${item.variant.title}${
-									item.variant.sku ? ` (${item.variant.sku})` : ''
-								}`}
+								{`${item.variant.title}`} x {item.quantity}
 							</span>
 						)}
 					</div>
 				</Tooltip>
 			</div>
 			<div className="flex items-center">
-				<div className="space-x-2 lg:space-x-4 2xl:space-x-6 mr-1 flex text-[12px]">
+				<div className="space-x-2 lg:space-x-4 2xl:space-x-6 flex flex-col items-end text-[12px]">
 					<div className="flex items-center gap-2 font-normal text-gray-500">
 						{formatAmountWithSymbol({
 							amount: (item?.total ?? 0) / item.quantity,
@@ -59,7 +57,6 @@ const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
 							tax: [],
 						})}
 					</div>
-					<div className="font-normal text-gray-500">x {item.quantity}</div>
 					<div className="font-normal text-gray-900 min-w-[55px] text-right">
 						{formatAmountWithSymbol({
 							amount: item.total ?? 0,
