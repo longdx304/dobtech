@@ -11,14 +11,14 @@ import { Minus, Plus } from 'lucide-react';
 import { useAdminCreateProduct } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 
-import { prepareImages } from '@/actions/images';
+import { splitFiles } from '@/actions/images';
 import { Collapse } from '@/components/Collapse';
 import { Flex } from '@/components/Flex';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
 import { getErrorMessage } from '@/lib/utils';
-import { FormImage } from '@/types/common';
 import { NewProductForm, ProductStatus } from '@/types/products';
 import { ERoutes } from '@/types/routes';
 import { persistedPrice } from '@/utils/prices';
@@ -53,6 +53,7 @@ export default function ProductModal({
 	const router = useRouter();
 	const { isFeatureEnabled } = useFeatureFlag();
 	const { mutateAsync, isLoading } = useAdminCreateProduct();
+	const uploadFile = useAdminUploadFile();
 
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
@@ -70,39 +71,47 @@ export default function ProductModal({
 
 		// Prepped images thumbnail
 		if (values.thumbnail?.length) {
-			let preppedImages: FormImage[] = [];
-			try {
-				preppedImages = await prepareImages(values.thumbnail, null);
-			} catch (error) {
-				console.log('error:', error);
-				console.log('getErrorMessage thumbnail', getErrorMessage(error));
-				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
-				messageApi.open({
-					type: 'error',
-					content: errorMsg,
-				});
-				return;
-			}
-			const urls = preppedImages.map((img) => img.url);
-			payload.thumbnail = urls[0];
+			const { uploadImages } = splitFiles(values?.thumbnail, null);
+			await uploadFile.mutateAsync(
+				{
+					files: uploadImages,
+					prefix: 'product',
+				},
+				{
+					onSuccess: ({ uploads }) => {
+						const urls = uploads.map((img) => img.url);
+						payload.thumbnail = urls[0];
+					},
+					onError: (error) => {
+						messageApi.open({
+							type: 'error',
+							content: getErrorMessage(error),
+						});
+					},
+				}
+			);
 		}
 		// Prepped images media
 		if (values.media?.length) {
-			let preppedImages: FormImage[] = [];
-			try {
-				preppedImages = await prepareImages(values.media, null);
-			} catch (error) {
-				let errorMsg = 'Đã xảy ra lỗi khi tải hình ảnh lên.';
-				console.log('getErrorMessage media', getErrorMessage(error));
-
-				messageApi.open({
-					type: 'error',
-					content: errorMsg,
-				});
-				return;
-			}
-			const urls = preppedImages.map((img) => img.url);
-			payload.images = urls;
+			const { uploadImages } = splitFiles(values?.media, null);
+			await uploadFile.mutateAsync(
+				{
+					files: uploadImages,
+					prefix: 'product',
+				},
+				{
+					onSuccess: ({ uploads }) => {
+						const urls = uploads.map((img) => img.url);
+						payload.images = urls;
+					},
+					onError: (error) => {
+						messageApi.open({
+							type: 'error',
+							content: getErrorMessage(error),
+						});
+					},
+				}
+			);
 		}
 
 		console.log('payload', payload);
@@ -198,6 +207,7 @@ export default function ProductModal({
 			form={form}
 			isLoading={isLoading}
 		>
+			{contextHolder}
 			<Title level={3} className="text-center">
 				{titleModal}
 			</Title>

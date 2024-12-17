@@ -1,14 +1,14 @@
 import { Product } from '@medusajs/medusa';
 import { Form, FormProps, message } from 'antd';
-import { useAdminUpdateProduct } from 'medusa-react';
+import { useAdminDeleteFile, useAdminUpdateProduct } from 'medusa-react';
 import { FC, useEffect } from 'react';
 
-import { prepareImages, deleteImages } from '@/actions/images';
+import { splitFiles } from '@/actions/images';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import { getErrorMessage } from '@/lib/utils';
 import ThumbnailForm from '@/modules/products/components/products-modal/components/ThumbnailForm';
-import { FormImage } from '@/types/common';
 import { ThumbnailFormType } from '@/types/products';
 
 type Props = {
@@ -31,6 +31,8 @@ const ThumbnailModal: FC<Props> = ({
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 	const updateProduct = useAdminUpdateProduct(product?.id);
+	const uploadFile = useAdminUploadFile();
+	const deleteFile = useAdminDeleteFile();
 
 	useEffect(() => {
 		form.setFieldsValue({
@@ -46,10 +48,6 @@ const ThumbnailModal: FC<Props> = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [product, state]);
 
-	const handleDeleteFile = async (url: string) => {
-		await deleteImages(url);
-	};
-
 	const onFinish: FormProps<ThumbnailFormProps>['onFinish'] = async (
 		values
 	) => {
@@ -60,28 +58,46 @@ const ThumbnailModal: FC<Props> = ({
 		}
 		// Prepped images thumbnail
 		if (values.thumbnail?.length) {
-			let payload: Record<string, unknown> = {};
-			let preppedImages: FormImage[] = [];
 			try {
 				const oldImg = product?.thumbnail ? [product.thumbnail] : null;
-				preppedImages = await prepareImages(values.thumbnail, oldImg);
+				const { uploadImages, existingImages, deleteImages } = splitFiles(
+					values?.thumbnail,
+					oldImg
+				);
+				let newImages: any = [...existingImages];
+				if (uploadImages?.length) {
+					const { uploads } = await uploadFile.mutateAsync({
+						files: uploadImages,
+						prefix: 'product',
+					});
+					newImages = [...newImages, ...uploads];
+				}
+				if (deleteImages?.length) {
+					await deleteFile.mutateAsync({ file_key: deleteImages });
+				}
+				await updateImageProduct(newImages[0].url);
 			} catch (error) {
 				console.log('error:', error);
 				messageApi.error('Đã xảy ra lỗi khi tải hình ảnh lên.');
 				return;
 			}
-			const urls = preppedImages.map((img) => img.url);
-			payload.thumbnail = urls[0];
-			await updateProduct.mutateAsync(payload, {
-				onSuccess: () => {
-					messageApi.success('Chỉnh sửa thumbnail thành công');
+		}
+	};
+
+	const updateImageProduct = async (url: string) => {
+		await updateProduct.mutateAsync(
+			{ thumbnail: url },
+			{
+				onSuccess: async () => {
+					messageApi.success('Chỉnh sửa ảnh đại diện thành công');
 					handleOk();
+					return;
 				},
 				onError: (error) => {
 					messageApi.error(getErrorMessage(error));
 				},
-			});
-		}
+			}
+		);
 	};
 
 	return (
@@ -104,15 +120,3 @@ const ThumbnailModal: FC<Props> = ({
 };
 
 export default ThumbnailModal;
-
-const getDefaultValues = (thumbnailProduct: Product['thumbnail']) => {
-	return {
-		thumbnail: thumbnailProduct
-			? [
-					{
-						url: thumbnailProduct,
-					},
-			  ]
-			: [],
-	};
-};
