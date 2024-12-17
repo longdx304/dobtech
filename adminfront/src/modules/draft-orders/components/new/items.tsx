@@ -2,9 +2,7 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { useStepModal } from '@/lib/providers/stepped-modal-provider';
-import { extractUnitPrice } from '@/utils/prices';
 import { ProductVariant, Region } from '@medusajs/medusa';
-import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import _ from 'lodash';
 import { Search } from 'lucide-react';
 import { useAdminVariants } from 'medusa-react';
@@ -22,8 +20,7 @@ interface VariantQuantity {
 export interface VariantPrice {
 	variantId: string;
 	unit_price: number;
-	currency_code: string;
-	isCustom: boolean;
+	amount?: number;
 }
 
 const Items = () => {
@@ -52,16 +49,38 @@ const Items = () => {
 		customer_id: form.getFieldValue('customer_id'),
 	});
 
-	const { variants: newVariants = [] } = useAdminVariants({
-		id: selectedVariantIds,
-		region_id: region?.id,
-	});
+	// Get default price for a variant
+	const getDefaultPrice = (variant: any) => {
+		if (!variant) {
+			return {
+				amount: 0,
+				currency_code: region?.currency_code || 'vnd',
+			};
+		}
 
-	// Get priced variant by id
-	const getPricedVariant = (variantId: string) => {
-		return variants?.find((v) => v.id === variantId);
+		// If calculated_price_type is override or sale, use calculated_price
+		// Otherwise use original_price
+		const priceAmount =
+			variant.calculated_price_type === 'override' ||
+			variant.calculated_price_type === 'sale'
+				? variant.calculated_price
+				: variant.original_price;
+
+		return {
+			amount: priceAmount ?? 0,
+			currency_code: region?.currency_code || 'vnd',
+		};
 	};
 
+	/**
+	 * Handle row selection change.
+	 *
+	 * Updates the state with the new selected variants and their quantities.
+	 * If the priced variants are available, it also updates the form items.
+	 *
+	 * @param {React.Key[]} selectedRowKeys - The keys of the selected rows.
+	 * @param {ProductVariant[]} selectedRows - The selected rows.
+	 */
 	const handleRowSelectionChange = (
 		selectedRowKeys: React.Key[],
 		selectedRows: ProductVariant[]
@@ -85,38 +104,47 @@ const Items = () => {
 
 		setVariantQuantities(updatedQuantities);
 
-		// Wait for pricedVariants to be available before updating form items
-		if (newVariants?.length > 0) {
-			updateFormItems(selectedRows, updatedQuantities);
-		}
-	};
+		// Initialize prices for newly selected variants
+		const newPrices = selectedRows.map((variant) => ({
+			variantId: variant.id,
+			unit_price: getDefaultPrice(variant).amount,
+		}));
 
-	// Update form items when pricedVariants are available
-	useEffect(() => {
-		if (selectedVariants.length > 0 && newVariants?.length > 0) {
-			updateFormItems(selectedVariants, variantQuantities, variantPrices);
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [newVariants]);
+		// Preserve existing prices for previously selected variants
+		const updatedPrices = newPrices.map((newPrice) => {
+			const existing = variantPrices.find(
+				(p) => p.variantId === newPrice.variantId
+			);
+			return existing || newPrice;
+		});
+
+		setVariantPrices(updatedPrices);
+
+		// Wait for pricedVariants to be available before updating form items
+		// if (newVariants?.length > 0) {
+		updateFormItems(selectedRows, updatedQuantities, updatedPrices);
+		// }
+	};
 
 	const updateFormItems = (
 		variants: ProductVariant[],
 		quantities: VariantQuantity[],
-		variantPrices?: VariantPrice[]
+		prices?: VariantPrice[]
 	) => {
 		const formItems = variants.map((variant) => {
-			const pricedVariant = getPricedVariant(variant.id) as PricedVariant;
+			const selectedQuantity =
+				quantities.find((q) => q.variantId === variant.id)?.quantity || 1;
+
+			const selectedPrice =
+				prices?.find((p) => p.variantId === variant.id)?.unit_price || 0;
 
 			return {
-				quantity:
-					quantities.find((q) => q.variantId === variant.id)?.quantity || 1,
+				quantity: selectedQuantity,
+				unit_price: selectedPrice,
 				variant_id: variant.id,
-				title: variant.title as string,
-				unit_price: pricedVariant
-					? extractUnitPrice(pricedVariant, region as Region, false)
-					: 0,
-				product_title: (variant.product as any)?.title,
-				thumbnail: (variant.product as any)?.thumbnail,
+				title: variant?.title as string,
+				product_title: variant?.product?.title,
+				thumbnail: variant?.product?.thumbnail,
 			};
 		});
 
@@ -131,6 +159,7 @@ const Items = () => {
 		500
 	);
 
+	// Handle page change
 	const handleChangePage = (page: number) => {
 		setCurrentPage(page);
 	};
@@ -160,51 +189,7 @@ const Items = () => {
 		});
 	};
 
-	// Get default price for a variant
-	const getDefaultPrice = (variantId: string) => {
-		const variant = variants?.find((v) => v.id === variantId);
-
-		if (!variant) {
-			return {
-				amount: 0,
-				currency_code: region?.currency_code || 'vnd',
-			};
-		}
-
-		// If calculated_price_type is override or sale, use calculated_price
-		// Otherwise use original_price
-		const priceAmount =
-			variant.calculated_price_type === 'override' ||
-			variant.calculated_price_type === 'sale'
-				? variant.calculated_price
-				: variant.original_price;
-
-		return {
-			amount: priceAmount ?? 0,
-			currency_code: region?.currency_code || 'vnd',
-		};
-	};
-
-	// Get price for a variant (custom or default)
-	const getVariantPrice = (variantId: string): VariantPrice => {
-		const savedPrice = variantPrices.find((p) => p.variantId === variantId);
-
-		// Return custom price if it exists
-		if (savedPrice?.isCustom) {
-			return savedPrice;
-		}
-
-		// Get default price
-		const defaultPrice = getDefaultPrice(variantId);
-		return {
-			variantId,
-			unit_price: defaultPrice.amount,
-			currency_code: defaultPrice.currency_code,
-			isCustom: false,
-		};
-	};
-
-	// Handle price changes with currency
+	// Handle price changes
 	const handlePriceChange = (
 		variantId: string,
 		value: number,
@@ -213,48 +198,60 @@ const Items = () => {
 		setVariantPrices((prev) => {
 			const updated = prev.map((p) =>
 				p.variantId === variantId
-					? { ...p, unit_price: value, currency_code: currency, isCustom: true }
+					? { ...p, unit_price: value, currency_code: currency }
 					: p
 			);
-
-			// Add new price if it doesn't exist
-			if (!prev.some((p) => p.variantId === variantId)) {
-				updated.push({
-					variantId,
-					unit_price: value,
-					currency_code: currency,
-					isCustom: true,
-				});
-			}
-
 			return updated;
 		});
 
-		// Only update form items if variant is selected
-		if (selectedVariantIds.includes(variantId)) {
-			setItems((prevItems) =>
-				prevItems.map((item) =>
-					item.variant_id === variantId
-						? {
-								...item,
-								unit_price: value,
-								currency_code: currency,
-						  }
-						: item
-				)
+		setItems((prevItems) => {
+			return prevItems.map((item) =>
+				item.variant_id === variantId ? { ...item, unit_price: value } : item
 			);
+		});
+	};
+
+	const getVariantPrice = (variant: any, region: Region) => {
+		if (
+			variant.calculated_price_type === 'override' ||
+			variant.calculated_price_type === 'sale'
+		) {
+			return variant.calculated_price ?? 0;
 		}
+
+		// If original_price exists, use it
+		if (variant.original_price) {
+			return variant.original_price;
+		}
+
+		let price = variant?.prices?.find(
+			(p: any) =>
+				p.currency_code.toLowerCase() === region?.currency_code?.toLowerCase()
+		);
+
+		return price?.amount || 0;
 	};
 
 	const columns = productsColumns({
 		currency: region?.currency_code,
-		handleQuantityChange,
-		handlePriceChange,
+		// edit quantity
 		getQuantity: (variantId: string) =>
 			variantQuantities.find((q) => q.variantId === variantId)?.quantity ?? 1,
-		getVariantPrice,
-		isVariantSelected: (variantId: string) =>
-			selectedVariantIds.includes(variantId),
+		handleQuantityChange,
+		// edit price
+		getPrice: (variantId: string) => {
+			const variant = variants?.find((v) => v.id === variantId);
+			const customPrice = variantPrices.find(
+				(p) => p.variantId === variantId
+			)?.unit_price;
+
+			return customPrice && customPrice !== 0
+				? customPrice
+				: variant
+				? getVariantPrice(variant, region as Region)
+				: 0;
+		},
+		handlePriceChange,
 	});
 
 	const handleDisable = (record: any) => {
