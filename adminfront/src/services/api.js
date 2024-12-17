@@ -529,7 +529,7 @@ export default {
 		captureSupplierPayment(paymentId, payload) {
 			const path = `/admin/payments/${paymentId}/capture-supplier-payment`;
 			return medusaRequest('POST', path, payload);
-		}
+		},
 	},
 
 	shippingOptions: {

@@ -6,7 +6,6 @@ import { Flex } from '@/components/Flex';
 import { Modal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
 import { queryClient } from '@/lib/constants/query-client';
-import { useAdminDeleteFile } from '@/lib/hooks';
 import {
 	useAdminSupplierOrderDeleteDocument,
 	useCreateDocument,
@@ -21,7 +20,6 @@ import {
 import { PDFViewer } from '@react-pdf/renderer';
 import { Modal as AntdModal, message } from 'antd';
 import { Paperclip, Plus, Trash2 } from 'lucide-react';
-import { useAdminUploadFile } from 'medusa-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { pdfOrderRes } from '../../supplier-orders-modal';
@@ -29,6 +27,8 @@ import OrderPDF, {
 	generatePdfBlob,
 } from '../../supplier-orders-modal/order-pdf';
 import UploadModal from './modal-upload';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
+import { useAdminDeleteFile } from 'medusa-react';
 
 type Props = {
 	order: SupplierOrder | undefined;
@@ -72,13 +72,17 @@ const Documents = ({ order, isLoading }: Props) => {
 	};
 
 	const getFileName = (url: string) => {
-		const parts = url.split('/');
-		return parts[parts.length - 1];
+		const parts = new URL(url).pathname.slice(1);
+		return parts;
 	};
 
 	const actions = [
 		{
-			label: 'Tạo lại tài liệu PDF',
+			label: 'Thêm tài liệu',
+			onClick: onOpen,
+		},
+		{
+			label: 'Tạo đơn đặt hàng PDF',
 			onClick: onOpenRefreshPdf,
 		},
 	];
@@ -122,14 +126,13 @@ const Documents = ({ order, isLoading }: Props) => {
 				type: 'application/pdf',
 			});
 
-			const formData = new FormData();
-			formData.append('prefix', 'supplier-order/');
-			formData.append('files', files);
-
 			// object form data to binary
 
 			// Upload pdf to s3 using Medusa uploads API
-			const uploadRes = await uploadFile.mutateAsync(files);
+			const uploadRes = await uploadFile.mutateAsync({
+				files,
+				prefix: 'supplier_orders',
+			});
 
 			const pdfUrl = uploadRes.uploads[0].url;
 
@@ -157,12 +160,6 @@ const Documents = ({ order, isLoading }: Props) => {
 					<Flex align="center" justify="space-between" className="pb-2">
 						<Title level={4}>{`Danh sách tài liệu`}</Title>
 						<div className="flex justify-end items-center gap-4">
-							<Button
-								type="text"
-								shape="circle"
-								icon={<Plus size={20} />}
-								onClick={onOpen}
-							/>
 							<ActionAbles actions={actions as any} />
 						</div>
 					</Flex>

@@ -1,9 +1,10 @@
-import { prepareImages } from '@/actions/images';
+import { splitFiles } from '@/actions/images';
 import { ActionAbles } from '@/components/Dropdown';
 import { Modal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
 import { Upload } from '@/components/Upload';
 import { useAdminSupplierOrderCreateDocument } from '@/lib/hooks/api/supplier-order';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 
 import { FormImage } from '@/types/common';
 import { Col, MenuProps, message, Row } from 'antd';
@@ -19,9 +20,9 @@ type Props = {
 };
 
 const UploadModal = ({ state, handleCancel, orderId }: Props) => {
-	// const createDocument = useAdminSupplierOrderCreateDocument(orderId);
 	const createDocument = useAdminSupplierOrderCreateDocument(orderId);
 	const [files, setFiles] = useState<FormImage[]>([]);
+	const uploadFile = useAdminUploadFile();
 
 	const handleFilesChosen = (chosenFiles: File[]) => {
 		if (chosenFiles.length) {
@@ -53,8 +54,12 @@ const UploadModal = ({ state, handleCancel, orderId }: Props) => {
 	const handleOk = async () => {
 		if (!files.length) handleCancel();
 		try {
-			const preppedItem = await prepareImages(files, null);
-			const urls = preppedItem.map((item) => item.url);
+			const { uploadImages } = splitFiles(files, null);
+			const { uploads } = await uploadFile.mutateAsync({
+				files: uploadImages,
+				prefix: 'supplier_orders',
+			});
+			const urls = uploads.map((item) => item.url);
 			await createDocument.mutateAsync({ documents: urls });
 			setFiles([]);
 			handleCancel();
