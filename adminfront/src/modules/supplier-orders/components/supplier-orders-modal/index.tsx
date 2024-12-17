@@ -8,17 +8,14 @@ import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PDFViewer } from '@react-pdf/renderer';
 import { message, Spin } from 'antd';
-import {
-	useAdminRegion,
-	useAdminRegions,
-	useAdminUploadFile,
-} from 'medusa-react';
+import { useAdminRegion, useAdminRegions } from 'medusa-react';
 import { FC, useMemo, useState } from 'react';
 import useSupplierTime from '../../hooks/use-supplier-time';
 import OrderPDF, { generatePdfBlob } from './order-pdf';
 import ProductTotalForm from './product-total/product-total-form';
 import ProductForm from './product/product-form';
 import SupplierForm from './supplier/supplier-form';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 
 type Props = {
 	state: boolean;
@@ -177,7 +174,10 @@ const SupplierOrdersModal: FC<Props> = ({
 			});
 
 			// Upload pdf to s3 using Medusa uploads API
-			const uploadRes = await uploadFile.mutateAsync(files);
+			const uploadRes = await uploadFile.mutateAsync({
+				files,
+				prefix: 'supplier_orders',
+			});
 
 			const pdfUrl = uploadRes.uploads[0].url;
 

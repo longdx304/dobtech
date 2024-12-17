@@ -11,14 +11,15 @@ import _ from 'lodash';
 import { CircleAlert, Highlighter } from 'lucide-react';
 import {
 	useAdminCreateProductCategory,
+	useAdminDeleteFile,
 	useAdminUpdateProductCategory,
 } from 'medusa-react';
 import React, { useEffect } from 'react';
 // import { TCategoryRequest } from '@/types/productCategories';
-import { deleteImages, prepareImages } from '@/actions/images';
+import { splitFiles } from '@/actions/images';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import { getErrorMessage } from '@/lib/utils';
 import { ThumbnailForm } from '@/modules/products/components/products-modal/components';
-import { FormImage } from '@/types/common';
 import { ThumbnailFormType } from '@/types/products';
 import { useMemo } from 'react';
 
@@ -54,6 +55,8 @@ const CategoryModal: React.FC<Props> = ({
 	const createCategory = useAdminCreateProductCategory();
 	const updateCategory = useAdminUpdateProductCategory(category?.id ?? '');
 	const [form] = Form.useForm();
+	const uploadFile = useAdminUploadFile();
+	const deleteFile = useAdminDeleteFile();
 
 	const titleModal = `${
 		_.isEmpty(category) ? 'Thêm mới' : 'Cập nhật'
@@ -109,17 +112,35 @@ const CategoryModal: React.FC<Props> = ({
 	}, [parentCategory, categories]);
 
 	const handleDeleteFile = async (url: string) => {
-		await deleteImages(url);
+		const fileKey = new URL(url).pathname.slice(1);
+		await deleteFile.mutateAsync({ file_key: fileKey });
 	};
 	// Submit form
 	const onFinish: FormProps<TCategoryRequestWithThumbnail>['onFinish'] = async (
 		values
 	) => {
+		let newImages: any = [];
 		// Upload the thumbnail image if it exists
-		let preppedImages: FormImage[] = [];
 		if (values.thumbnail && values.thumbnail.length > 0) {
 			try {
-				preppedImages = await prepareImages(values.thumbnail, null);
+				const oldImg = category?.metadata?.thumbnail
+					? [category.metadata.thumbnail as string]
+					: null;
+				const { uploadImages, existingImages, deleteImages } = splitFiles(
+					values?.thumbnail,
+					oldImg
+				);
+				newImages = [...existingImages];
+				if (uploadImages?.length) {
+					const { uploads } = await uploadFile.mutateAsync({
+						files: uploadImages,
+						prefix: 'categories',
+					});
+					newImages = [...newImages, ...uploads];
+				}
+				if (deleteImages?.length) {
+					await deleteFile.mutateAsync({ file_key: deleteImages });
+				}
 			} catch (error) {
 				message.error('Đã xảy ra lỗi khi tải hình ảnh lên.');
 				return;
@@ -134,7 +155,7 @@ const CategoryModal: React.FC<Props> = ({
 				: parentCategory?.id ?? null,
 			metadata: {
 				...(category?.metadata || {}),
-				thumbnail: preppedImages.length > 0 ? preppedImages[0].url : '',
+				thumbnail: newImages.length > 0 ? newImages[0].url : '',
 			},
 		};
 
