@@ -68,3 +68,45 @@ export const DisplayTotalAmount = ({
 		</div>
 	);
 };
+
+export const DisplayTotalQuantity = ({
+	totalColor = 'text-gray-900 mr-3',
+	variant = 'regular',
+	totalAmount,
+	quantityTitle,
+	productTitle,
+	productQuantity,
+}: any) => {
+	return (
+		<>
+			<div className="mt-4 flex items-center justify-between text-[12px]">
+				<div className="flex flex-col">
+					<div
+						className={clsx('text-gray-900', {
+							'font-normal': variant === 'regular',
+							'font-medium': variant === 'large' || variant === 'bold',
+						})}
+					>
+						{productTitle}
+					</div>
+				</div>
+				<div className="font-medium text-[16px]">
+					{productQuantity + ' '}(sản phẩm)
+				</div>
+			</div>
+			<div className="mt-4 flex items-center justify-between text-[12px]">
+				<div className="flex flex-col">
+					<div
+						className={clsx('text-gray-900', {
+							'font-normal': variant === 'regular',
+							'font-medium': variant === 'large' || variant === 'bold',
+						})}
+					>
+						{quantityTitle}
+					</div>
+				</div>
+				<div className="font-medium text-[16px]">{totalAmount + ' '}(đôi)</div>
+			</div>
+		</>
+	);
+};

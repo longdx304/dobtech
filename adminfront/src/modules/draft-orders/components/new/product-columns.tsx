@@ -3,121 +3,26 @@ import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { ProductVariant } from '@medusajs/medusa';
-import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { InputNumber } from 'antd';
 import Image from 'next/image';
 import { useState } from 'react';
-import { VariantPrice } from './items';
-
-const extractPrice = (variant: ProductVariant) => {
-	// Get the default price (first price in the prices array)
-	const defaultPrice = variant.prices?.[0];
-
-	if (defaultPrice) {
-		return {
-			formatted: formatAmountWithSymbol({
-				currency: defaultPrice.currency_code,
-				amount: defaultPrice.amount,
-			}),
-			amount: defaultPrice.amount,
-			currency_code: defaultPrice.currency_code,
-		};
-	}
-
-	return {
-		formatted: '0',
-		amount: 0,
-		currency_code: 'vnd',
-	};
-};
 
 interface Props {
 	currency: string | undefined;
+	getQuantity: (variantId: string) => number;
 	handleQuantityChange: (value: number, variantId: string) => void;
+	getPrice: (variantId: string) => number;
 	handlePriceChange: (
 		variantId: string,
 		value: number,
 		currency: string
 	) => void;
-	getQuantity: (variantId: string) => number;
-	getVariantPrice: (variantId: string) => VariantPrice;
-	isVariantSelected: (variantId: string) => boolean;
 }
 
 type SelectProduct = Omit<
-	ProductVariant & { quantity: number },
+	ProductVariant & { quantity?: number; unit_price?: number },
 	'beforeInsert'
 >;
-
-const EditablePrice = ({
-	record,
-	handlePriceChange,
-	getVariantPrice,
-	currency,
-	isVariantSelected,
-}: {
-	record: ProductVariant;
-	handlePriceChange: (
-		variantId: string,
-		value: number,
-		currency: string
-	) => void;
-	getVariantPrice: (variantId: string) => VariantPrice;
-	currency: string | undefined;
-	isVariantSelected: (variantId: string) => boolean;
-}) => {
-	const [isEditing, setIsEditing] = useState(false);
-
-	const variantPrice = getVariantPrice(record.id);
-	const isSelected = isVariantSelected(record.id);
-
-	const handleStartEdit = () => {
-		if (isSelected) {
-			setIsEditing(true);
-		}
-	};
-
-	if (isEditing && isSelected) {
-		return (
-			<InputNumber
-				autoFocus
-				defaultValue={variantPrice.unit_price}
-				onBlur={() => setIsEditing(false)}
-				onPressEnter={() => setIsEditing(false)}
-				onChange={(value) => {
-					if (value !== null) {
-						handlePriceChange(record.id, value, variantPrice.currency_code);
-					}
-				}}
-				className="w-32"
-				formatter={(value) =>
-					formatAmountWithSymbol({
-						currency: variantPrice.currency_code,
-						amount: value || 0,
-					})
-				}
-				parser={(value) => {
-					const parsed = value?.replace(/[^\d]/g, '');
-					return parsed ? Number(parsed) : 0;
-				}}
-			/>
-		);
-	}
-
-	return (
-		<Text
-			className={`text-right text-gray-500 ${
-				isSelected ? 'cursor-pointer' : ''
-			}`}
-			onClick={handleStartEdit}
-		>
-			{formatAmountWithSymbol({
-				currency: variantPrice.currency_code,
-				amount: variantPrice.unit_price,
-			})}
-		</Text>
-	);
-};
 
 const EditableQuantity = ({
 	quantity,
@@ -134,12 +39,14 @@ const EditableQuantity = ({
 		<InputNumber
 			autoFocus
 			min={1}
+			max={record.inventory_quantity || 1}
 			defaultValue={quantity || 1}
 			onBlur={() => setIsEditing(false)}
 			onPressEnter={() => setIsEditing(false)}
 			onChange={(value) => {
 				if (value !== null) {
-					handleQuantityChange(value, record?.id as string);
+					const finalValue = Math.min(value, record.inventory_quantity || 1);
+					handleQuantityChange(finalValue, record?.id as string);
 				}
 			}}
 			className="w-20"
@@ -153,14 +60,56 @@ const EditableQuantity = ({
 		</Text>
 	);
 };
+const EditablePrice = ({
+	unitPrice,
+	record,
+	handlePriceChange,
+	currency,
+}: {
+	currency: string | undefined;
+	unitPrice: number;
+	record: SelectProduct;
+	handlePriceChange: (
+		variantId: string,
+		value: number,
+		currency: string
+	) => void;
+}) => {
+	const [isEditing, setIsEditing] = useState(false);
+
+	return isEditing ? (
+		<InputNumber
+			autoFocus
+			min={1}
+			defaultValue={unitPrice || 1}
+			onBlur={() => setIsEditing(false)}
+			onPressEnter={() => setIsEditing(false)}
+			onChange={(value) => {
+				if (value !== null) {
+					handlePriceChange(record?.id, value, currency || 'vnd');
+				}
+			}}
+			className="w-20"
+		/>
+	) : (
+		<Text
+			className="text-right text-gray-500 cursor-pointer"
+			onClick={() => setIsEditing(true)}
+		>
+			{formatAmountWithSymbol({
+				amount: unitPrice,
+				currency: currency || 'vnd',
+			})}
+		</Text>
+	);
+};
 
 const productsColumns = ({
 	currency,
-	handlePriceChange,
-	handleQuantityChange,
 	getQuantity,
-	getVariantPrice,
-	isVariantSelected,
+	handleQuantityChange,
+	getPrice,
+	handlePriceChange,
 }: Props) => {
 	return [
 		{
@@ -206,18 +155,16 @@ const productsColumns = ({
 		},
 		{
 			title: 'Giá tiền',
-			key: 'prices',
-			dataIndex: 'prices',
-			className: 'text-xs',
-			// width: 250,
-			render: (_: ProductVariant['prices'], record: ProductVariant) => {
+			key: 'unit_price',
+			dataIndex: 'unit_price',
+			className: 'text-xs text-center',
+			render: (_: any, record: SelectProduct) => {
 				return (
 					<EditablePrice
+						unitPrice={getPrice(record?.id as string)}
 						record={record}
-						getVariantPrice={getVariantPrice}
 						handlePriceChange={handlePriceChange}
 						currency={currency}
-						isVariantSelected={isVariantSelected}
 					/>
 				);
 			},
@@ -227,7 +174,6 @@ const productsColumns = ({
 			key: 'inventory_quantity',
 			dataIndex: 'inventory_quantity',
 			className: 'text-xs',
-			// width: 100,
 			render: (
 				_: ProductVariant['inventory_quantity'],
 				record: ProductVariant

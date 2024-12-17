@@ -1,5 +1,11 @@
 import { MarkAsFulfilledReq, MarkAsFulfilledRes } from '@/types/supplier';
+import {
+	CreateSupplierOrderDocument,
+	CreateSupplierOrderInput,
+	DeleteSupplierOrderLineItem,
+} from '@/types/supplier-order';
 import { buildOptions } from '@/utils/build-options';
+import { Response } from '@medusajs/medusa-js';
 import {
 	useMutation,
 	UseMutationOptions,
@@ -8,6 +14,10 @@ import {
 import { useMedusa } from 'medusa-react';
 import { supplierOrdersKeys } from './queries';
 
+export type AdminPostDocumentReq = {
+	id: string;
+	document_url: string[];
+};
 export const useMarkAsFulfilledMutation = (
 	id: string,
 	options?:
@@ -30,3 +40,166 @@ export const useMarkAsFulfilledMutation = (
 		)
 	);
 };
+
+export const useCreateDocument = (
+	options?: UseMutationOptions<Response<void>, Error, AdminPostDocumentReq>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminPostDocumentReq) =>
+			client.admin.custom.post(`/admin/supplier-order/document`, payload),
+		buildOptions(
+			queryClient,
+			[supplierOrdersKeys.lists(), supplierOrdersKeys.details()],
+			options
+		)
+	);
+};
+export const useAdminCreateSupplierOrders = (
+	options?: UseMutationOptions<Response<void>, Error, CreateSupplierOrderInput>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: CreateSupplierOrderInput) =>
+			client.admin.custom.post(`/admin/supplier-order`, payload),
+		buildOptions(queryClient, [supplierOrdersKeys.lists()], options)
+	);
+};
+export const useAdminSupplierOrderDeleteLineItem = (
+	id: string,
+	options?: UseMutationOptions<
+		Response<void>,
+		Error,
+		DeleteSupplierOrderLineItem
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: DeleteSupplierOrderLineItem) =>
+			client.admin.custom.post(`/admin/supplier-order/${id}`, payload),
+		buildOptions(
+			queryClient,
+			[supplierOrdersKeys.lists(), supplierOrdersKeys.detail(id)],
+			options
+		)
+	);
+};
+
+export const useAdminSupplierOrderCreateDocument = (
+	id: string,
+	options?: UseMutationOptions<
+		Response<void>,
+		Error,
+		CreateSupplierOrderDocument
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: CreateSupplierOrderDocument) =>
+			client.admin.custom.post(`/admin/supplier-order/${id}/document`, payload),
+		buildOptions(
+			queryClient,
+			[supplierOrdersKeys.lists(), supplierOrdersKeys.detail(id)],
+			options
+		)
+	);
+};
+
+export const useAdminSupplierOrderDeleteDocument = (
+	id: string,
+	options?: UseMutationOptions<Response<void>, Error, string>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(documentId: string) =>
+			client.admin.custom.delete(
+				`/admin/supplier-order/${id}/document/${documentId}`
+			),
+		buildOptions(
+			queryClient,
+			[supplierOrdersKeys.lists(), supplierOrdersKeys.detail(id)],
+			options
+		)
+	);
+};
+
+export const useAdminCancelSupplierOrder = (
+	id: string,
+	options?: UseMutationOptions<Response<void>, Error, void>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		() => client.admin.custom.post(`/admin/supplier-order/${id}/cancel`),
+		buildOptions(
+			queryClient,
+			[supplierOrdersKeys.lists(), supplierOrdersKeys.detail(id)],
+			options
+		)
+	);
+};
+
+export const useAdminSupplierOrderCapturePayment = (
+	id: string,
+	options?: UseMutationOptions<Response<void>, Error, void>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		() => client.admin.custom.post(`/admin/supplier-order/${id}/capture`),
+		buildOptions(
+			queryClient,
+			[supplierOrdersKeys.lists(), supplierOrdersKeys.detail(id)],
+			options
+		)
+	);
+};
+
+export const useAdminSupplierOrderRefundPayment = (
+	id: string,
+	options?: UseMutationOptions<Response<void>, Error, any>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: any) =>
+			client.admin.custom.post(`/admin/supplier-order/${id}/refund`, payload),
+		buildOptions(
+			queryClient,
+			[supplierOrdersKeys.lists(), supplierOrdersKeys.detail(id)],
+			options
+		)
+	);
+};
+
+// export function useAdminSupplierRefundPayment(supplierOrderId: string) {
+// 	const queryClient = useQueryClient();
+
+// 	return useMutation(
+// 		async (data: any) => {
+// 			const response = await api.suplierOrders.refundPayment(supplierOrderId, data);
+// 			return response.data as unknown as any;
+// 		},
+// 		{
+// 			onSuccess: () => {
+// 				queryClient.invalidateQueries([
+// 					'admin-supplier-order',
+// 					supplierOrderId,
+// 				]);
+// 			},
+// 		}
+// 	);
+// }

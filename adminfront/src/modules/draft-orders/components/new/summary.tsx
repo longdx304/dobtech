@@ -1,3 +1,4 @@
+import { Pagination } from '@/components/Pagination';
 import { Title } from '@/components/Typography';
 import { SteppedContext } from '@/lib/providers/stepped-modal-provider';
 import {
@@ -119,14 +120,24 @@ const Summary = () => {
 		setCode('');
 	};
 
+	// Sort items based on the variant product id
+	const sortedItems = [...items].sort((a, b) => {
+		const productIdA = a.variant_id || '';
+		const productIdB = b.variant_id || '';
+		return productIdA.localeCompare(productIdB);
+	});
+
 	return (
 		<div className="min-h-[705px]">
 			<SummarySection title="Sản phẩm" editIndex={2}>
 				<div className="overflow-auto lg:overflow-visible">
 					<Table
-						dataSource={items}
+						dataSource={sortedItems}
 						columns={itemColumns as any}
-						pagination={false}
+						pagination={{
+							defaultPageSize: 10,
+							showSizeChanger: false,
+						}}
 						rowKey="id"
 					/>
 				</div>

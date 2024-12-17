@@ -1,4 +1,5 @@
-import { useAdminAddCustomerAddress } from '@/lib/hooks/api/customer/mutations';
+import { useAdminAddCustomerAddress } from '@/lib/hooks/api/customer';
+import { useAdminDraftOrderTransferOrder } from '@/lib/hooks/api/draft-orders';
 import useIsDesktop from '@/lib/hooks/useIsDesktop';
 import {
 	StepModal,
@@ -10,7 +11,6 @@ import SelectRegion from '@/modules/draft-orders/components/new/select-region';
 import SelectShipping from '@/modules/draft-orders/components/new/select-shipping';
 import ShippingDetails from '@/modules/draft-orders/components/new/shipping-details';
 import Summary from '@/modules/draft-orders/components/new/summary';
-import { useAdminDraftOrderTransferOrder } from '@/modules/draft-orders/hooks';
 import { useNewDraftOrderForm } from '@/modules/draft-orders/hooks/use-new-draft-form';
 import { message } from 'antd';
 import { useAdminCreateDraftOrder, useAdminCustomer } from 'medusa-react';
