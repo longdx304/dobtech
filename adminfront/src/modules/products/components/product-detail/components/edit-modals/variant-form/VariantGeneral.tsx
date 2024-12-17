@@ -18,7 +18,6 @@ const VariantGeneral: FC<Props> = ({ form, options }) => {
 	const _options = Form.useWatch('options', form) || undefined;
 
 	const handleCopyTitle = (indexOption: any) => {
-		console.log('_options[indexOption].values', _options[indexOption]);
 		const value = _options[indexOption].value[0] ?? undefined;
 		if (!value) return;
 		form.setFieldValue('title', value);
