@@ -1,18 +1,19 @@
 'use client';
+import { FloatButton } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import NewDraftOrderFormProvider from '@/modules/draft-orders/hooks/use-new-draft-form';
 import { ERoutes } from '@/types/routes';
+import { TableProps } from 'antd';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
 import { useAdminOrders } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
-import orderColumns from './order-column';
-import { FloatButton } from '@/components/Button';
-import useToggleState from '@/lib/hooks/use-toggle-state';
-import NewDraftOrderFormProvider from '@/modules/draft-orders/hooks/use-new-draft-form';
 import NewOrderModal from '../../components/orders/new-order';
+import orderColumns from './order-column';
 
 type Props = {};
 
@@ -29,6 +30,7 @@ const OrderList: FC<Props> = () => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
+	const [filters, setFilters] = useState<any>({});
 
 	const {
 		state: stateOrderByAdminModal,
@@ -42,6 +44,8 @@ const OrderList: FC<Props> = () => {
 			q: searchValue || undefined,
 			offset,
 			limit: DEFAULT_PAGE_SIZE,
+			payment_status: filters?.payment_status || undefined,
+			fulfillment_status: filters?.fulfillment_status || undefined,
 		},
 		{
 			keepPreviousData: true,
@@ -78,6 +82,24 @@ const OrderList: FC<Props> = () => {
 		closeOrderByAdminModal();
 	};
 
+	const handleOnChange: TableProps<any>['onChange'] = (
+		pagination,
+		filters,
+		sorter,
+		extra
+	) => {
+		const formattedFilters = Object.entries(filters).reduce(
+			(acc, [key, value]) => {
+				if (Array.isArray(value) && value.length > 0) {
+					acc[key] = value.map(String);
+				}
+				return acc;
+			},
+			{} as Record<string, string[]>
+		);
+		setFilters(formattedFilters);
+	};
+
 	return (
 		<div className="w-full">
 			<Flex align="center" justify="flex-end" className="pb-4">
@@ -100,6 +122,7 @@ const OrderList: FC<Props> = () => {
 					onClick: () => handleRowClick(record),
 					className: 'cursor-pointer',
 				})}
+				onChange={handleOnChange}
 				pagination={{
 					total: Math.floor(count ?? 0 / (DEFAULT_PAGE_SIZE ?? 0)),
 					pageSize: DEFAULT_PAGE_SIZE,

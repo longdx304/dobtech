@@ -4,7 +4,7 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Title } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
-import Note from '@/modules/supplier/components/supplier-order-detail/timeline/timeline-events/note';
+import Note from '@/modules/supplier-orders/components/supplier-order-detail/timeline/timeline-events/note';
 import { message } from 'antd';
 import { SendHorizontal } from 'lucide-react';
 import { useAdminCreateNote, useAdminNotes } from 'medusa-react';

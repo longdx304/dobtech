@@ -788,23 +788,23 @@ export default {
 	},
 
 	suplierOrders: {
-		list(search = {}) {
-			const params = Object.keys(search)
-				.map((k) => `${k}=${search[k]}`)
-				.join('&');
-			const path = `/admin/supplier-order${params && `?${params}`}`;
-			return medusaRequest('GET', path);
-		},
+		// list(search = {}) {
+		// 	const params = Object.keys(search)
+		// 		.map((k) => `${k}=${search[k]}`)
+		// 		.join('&');
+		// 	const path = `/admin/supplier-order${params && `?${params}`}`;
+		// 	return medusaRequest('GET', path);
+		// },
 
-		create(data) {
-			const path = `/admin/supplier-order`;
-			return medusaRequest('POST', path, data);
-		},
+		// create(data) {
+		// 	const path = `/admin/supplier-order`;
+		// 	return medusaRequest('POST', path, data);
+		// },
 
-		retrieve(id) {
-			const path = `/admin/supplier-order/${id}`;
-			return medusaRequest('GET', path);
-		},
+		// retrieve(id) {
+		// 	const path = `/admin/supplier-order/${id}`;
+		// 	return medusaRequest('GET', path);
+		// },
 
 		updateLineItem(id, data) {
 			const path = `/admin/supplier-order/${id}`;
