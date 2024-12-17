@@ -72,6 +72,10 @@ const Documents = ({ order, isLoading }: Props) => {
 	};
 
 	const getFileName = (url: string) => {
+		const parts = new URL(url).pathname.split('/').pop();
+		return parts;
+	};
+	const getFileKey = (url: string) => {
 		const parts = new URL(url).pathname.slice(1);
 		return parts;
 	};
@@ -171,7 +175,12 @@ const Documents = ({ order, isLoading }: Props) => {
 								align="center"
 								className="group"
 							>
-								<Flex justify="flex-start" align="center" gap={'small'}>
+								<Flex
+									justify="flex-start"
+									align="center"
+									gap={'small'}
+									className="w-fit"
+								>
 									<Paperclip
 										size={20}
 										// color="#6B7280"
@@ -181,9 +190,9 @@ const Documents = ({ order, isLoading }: Props) => {
 										href={doc.document_url}
 										target="_blank"
 										rel="noopener noreferrer"
-										className="text-gray-500 text-sm text-nowrap group-hover:text-blue-600"
+										className="text-gray-500 text-sm group-hover:text-blue-600 line-clamp-1 w-fit"
 									>
-										{getFileName(doc.document_url)}
+										{getFileKey(doc.document_url)}
 									</Link>
 								</Flex>
 								<Trash2
@@ -191,7 +200,7 @@ const Documents = ({ order, isLoading }: Props) => {
 									color="red"
 									className="hidden group-hover:block cursor-pointer"
 									onClick={() =>
-										handleRemoveDoc(doc.id, getFileName(doc.document_url))
+										handleRemoveDoc(doc.id, getFileKey(doc.document_url))
 									}
 								/>
 							</Flex>
