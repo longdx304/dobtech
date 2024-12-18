@@ -51,7 +51,6 @@ const EditableQuantity = ({
 };
 const productColumns = ({
 	itemQuantities,
-	// handleToAddQuantity,
 	itemPrices,
 	handlePriceChange,
 	handleQuantityChange,

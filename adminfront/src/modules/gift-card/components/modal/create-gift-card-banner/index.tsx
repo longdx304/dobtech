@@ -47,16 +47,16 @@ const NewGiftCard = ({ onClose, open }: NewGiftCardProps) => {
 	const onFinish = async (data: NewGiftCardFormData) => {
 		let images: string[] = [];
 
-		if (thumbnail) {
-			const uploadedImgs = await Medusa.uploads
-				.create([thumbnail.nativeFile])
-				.then(({ data }: { data: any }) => {
-					const uploaded = data.uploads.map(({ url }: any) => url);
-					return uploaded;
-				});
+		// if (thumbnail) {
+		// 	const uploadedImgs = await Medusa.uploads
+		// 		.create([thumbnail.nativeFile])
+		// 		.then(({ data }: { data: any }) => {
+		// 			const uploaded = data.uploads.map(({ url }: any) => url);
+		// 			return uploaded;
+		// 		});
 
-			images = uploadedImgs;
-		}
+		// 	images = uploadedImgs;
+		// }
 
 		mutate(
 			{
