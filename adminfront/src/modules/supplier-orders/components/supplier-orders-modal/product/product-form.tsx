@@ -7,6 +7,7 @@ import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ProductModal } from '@/modules/products/components/products-modal';
 import { Product, Region } from '@medusajs/medusa';
+import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { Col, Row, message } from 'antd';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
@@ -15,7 +16,7 @@ import {
 	useAdminProductCategories,
 	useAdminVariants,
 } from 'medusa-react';
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { ItemPrice, ItemQuantity } from '..';
 import productColumns from './product-columns';
 
@@ -111,7 +112,7 @@ const ProductForm: FC<ProductFormProps> = ({
 
 		// Update selected products
 		setSelectedProducts(selectedRowKeys as string[]);
-		setSelectedRowsProducts(selectedRows);
+		setSelectedRowsProducts(selectedRows as PricedVariant[]);
 	};
 
 	const handleChangeDebounce = _.debounce(
@@ -182,7 +183,6 @@ const ProductForm: FC<ProductFormProps> = ({
 		() =>
 			productColumns({
 				itemQuantities,
-				// handleToAddQuantity,
 				itemPrices,
 				handlePriceChange,
 				handleQuantityChange,
@@ -238,6 +238,22 @@ const ProductForm: FC<ProductFormProps> = ({
 		onClose();
 	};
 
+	// handle region change
+	const handleRegionChange = (value: string) => {
+		setRegionId(value);
+	};
+
+	// get default value region by name
+	const defaultRegion = regions?.find((region) => region.name === 'Vietnam');
+
+	// set default region
+	useEffect(() => {
+		if (defaultRegion) {
+			setRegionId(defaultRegion.id);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [defaultRegion]);
+
 	return (
 		<Row gutter={[16, 16]} className="pt-4">
 			<Col span={24}>
@@ -280,16 +296,18 @@ const ProductForm: FC<ProductFormProps> = ({
 				/>
 			</Col>
 			<Col span={6}>
-				<Select
-					placeholder="Chọn khu vực"
-					onChange={(value) => setRegionId(value)}
-					options={regions?.map((region) => ({
-						label: region.name,
-						value: region.id,
-					}))}
-					defaultValue={regionId}
-					className="w-full"
-				/>
+				{defaultRegion && (
+					<Select
+						placeholder="Chọn khu vực"
+						onChange={handleRegionChange}
+						options={regions?.map((region) => ({
+							label: region.name,
+							value: region.id,
+						}))}
+						value={regionId}
+						className="w-full"
+					/>
+				)}
 			</Col>
 			<Col span={24} id="table-product">
 				<Table
@@ -308,6 +326,7 @@ const ProductForm: FC<ProductFormProps> = ({
 						pageSize: PAGE_SIZE,
 						current: currentPage,
 						onChange: handleChangePage,
+						showSizeChanger: false,
 					}}
 					scroll={{ x: 700 }}
 				/>

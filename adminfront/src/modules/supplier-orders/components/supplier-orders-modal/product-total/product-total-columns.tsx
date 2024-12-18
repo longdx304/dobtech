@@ -3,6 +3,7 @@ import { ProductVariant, Region } from '@medusajs/medusa';
 import Image from 'next/image';
 
 import { Flex } from '@/components/Flex';
+import { Tag } from '@/components/Tag';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
 import { ItemPrice, ItemQuantity } from '../index';
@@ -11,19 +12,27 @@ interface Props {
 	itemQuantities: ItemQuantity[];
 	itemPrices: ItemPrice[];
 	region?: Region;
+	currentPage: number;
 }
-/**
- * productTotalColumns
- * @param {{ itemQuantities: ItemQuantity[]; itemPrices: ItemPrice[] }} props
- * @returns {TableColumnsType<ProductVariant>}
- *
- * A function that returns an array of columns for a table that displays the total of each product variant.
- *
- * @example
- * const columns = productTotalColumns({ itemQuantities, itemPrices });
- * <Table columns={columns} dataSource={data} />
- */
-const productTotalColumns = ({ itemQuantities, itemPrices, region }: Props) => [
+
+const PAGE_SIZE = 10;
+const productTotalColumns = ({
+	itemQuantities,
+	itemPrices,
+	region,
+	currentPage,
+}: Props) => [
+	{
+		title: 'STT',
+		key: 'id',
+		width: 80,
+		dataIndex: 'id',
+		className: 'text-xs',
+		render: (_: any, record: any, index: number) => {
+			const calculatedIndex = (currentPage - 1) * PAGE_SIZE + index + 1;
+			return <Tag bordered={false}>{calculatedIndex}</Tag>;
+		},
+	},
 	{
 		title: 'Tên sản phẩm',
 		key: 'product',

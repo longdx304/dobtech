@@ -348,7 +348,7 @@ function TotalsSection(props: TotalsSectionProps) {
 			<div className="flex justify-between">
 				<span className="text-gray-500">{'Sự khác biệt cần thanh toán'}</span>
 				<span
-					className={clsx('text-gray-900', {
+					className={clsx('', {
 						'text-rose-500': differenceDue < 0,
 						'text-emerald-500': differenceDue >= 0,
 					})}

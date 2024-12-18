@@ -1,29 +1,22 @@
+import { ActionAbles } from '@/components/Dropdown';
+import { InputNumber } from '@/components/Input';
+import { Popconfirm } from '@/components/Popconfirm';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import PlaceholderImage from '@/modules/common/components/placeholder-image';
+import { formatAmountWithSymbol } from '@/utils/prices';
 import { LineItem, OrderItemChange, ProductVariant } from '@medusajs/medusa';
-import clsx from 'clsx';
 import { message } from 'antd';
+import clsx from 'clsx';
+import { CopyPlus, Pencil, RefreshCcw, Trash2 } from 'lucide-react';
 import {
 	useAdminDeleteOrderEditItemChange,
 	useAdminOrderEditAddLineItem,
 	useAdminOrderEditDeleteLineItem,
 	useAdminOrderEditUpdateLineItem,
 } from 'medusa-react';
-import {
-	RefreshCcw,
-	CopyPlus,
-	Trash2,
-	Minus,
-	Plus,
-	Pencil,
-} from 'lucide-react';
 import Image from 'next/image';
-import PlaceholderImage from '@/modules/common/components/placeholder-image';
-import { formatAmountWithSymbol, persistedPrice } from '@/utils/prices';
-import { ActionAbles } from '@/components/Dropdown';
-import AddProductVariant from '../../common/add-product-variant';
-import useToggleState from '@/lib/hooks/use-toggle-state';
-import { Popconfirm } from '@/components/Popconfirm';
-import { InputNumber } from '@/components/Input';
 import { useState } from 'react';
+import AddProductVariant from '../../common/add-product-variant';
 
 type OrderEditLineProps = {
 	item: LineItem;
@@ -47,6 +40,9 @@ const OrderEditLine = ({
 		onClose: closeReplaceProduct,
 	} = useToggleState(false);
 	const [unitPrice, setUnitPrice] = useState<number>(item.unit_price);
+	const [quantity, setQuantity] = useState(item.quantity);
+	const [draftQuantity, setDraftQuantity] = useState(item.quantity);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const isNew = change?.type === 'item_add';
 	const isModified = change?.type === 'item_update';
@@ -70,16 +66,23 @@ const OrderEditLine = ({
 		change?.id as string
 	);
 
-	const onQuantityUpdate = async (newQuantity: number) => {
-		if (isLoading) {
+	const onQuantityUpdate = async () => {
+		if (quantity === draftQuantity || isLoading) {
 			return;
 		}
 
-		isLoading = true;
+		setIsLoading(true);
+
 		try {
-			await updateItem({ quantity: newQuantity });
+			await updateItem({ quantity: draftQuantity });
+			setQuantity(draftQuantity);
+			message.success('Cập nhật số lượng sản phẩm thành công');
+		} catch (error) {
+			message.error('Cập nhật thất bại');
+			console.error('Error updating quantity:', error);
+			setDraftQuantity(quantity);
 		} finally {
-			isLoading = false;
+			setIsLoading(false);
 		}
 	};
 
@@ -133,7 +136,8 @@ const OrderEditLine = ({
 		if (isLoading) {
 			return;
 		}
-		isLoading = true;
+
+		setIsLoading(true);
 		try {
 			await updateItem({
 				quantity: item.quantity,
@@ -145,7 +149,7 @@ const OrderEditLine = ({
 			message.error('Cập nhật thất bại');
 			console.error('Error updating quantity:', error);
 		} finally {
-			isLoading = false;
+			setIsLoading(false);
 		}
 	};
 
@@ -218,33 +222,15 @@ const OrderEditLine = ({
 								'pointer-events-none': isLocked,
 							})}
 						>
-							<Minus
-								className={clsx('cursor-pointer text-gray-400', {
+							<InputNumber
+								placeholder="Thay đổi số lượng"
+								className={clsx('cursor-pointer text-gray-400 w-[80px]', {
 									'pointer-events-none': isLoading,
 								})}
-								onClick={() =>
-									item.quantity > 1 &&
-									!isLocked &&
-									onQuantityUpdate(item.quantity - 1)
-								}
-								size={18}
-							/>
-							<span
-								className={clsx(
-									'min-w-[20px] px-0 sm:px-2 text-center text-gray-900',
-									{
-										'!text-gray-400': isLocked,
-									}
-								)}
-							>
-								{item.quantity}
-							</span>
-							<Plus
-								className={clsx('cursor-pointer text-gray-400', {
-									'pointer-events-none': isLoading,
-								})}
-								onClick={() => onQuantityUpdate(item.quantity + 1)}
-								size={18}
+								value={draftQuantity}
+								onChange={(value) => setDraftQuantity(Number(value))}
+								onBlur={onQuantityUpdate}
+								disabled={isLocked || isLoading}
 							/>
 						</div>
 						{/* Display price */}

@@ -1,15 +1,16 @@
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
-import { Table } from '@/components/Table';
-import { Text, Title } from '@/components/Typography';
-import { Col, Row } from 'antd';
-import { useAdminRegion, useAdminVariants } from 'medusa-react';
-import { FC, useMemo } from 'react';
+// import { Table } from '@/components/Table';
+import { Title } from '@/components/Typography';
+import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
+import { Col, Row, Table } from 'antd';
+import { useAdminRegion } from 'medusa-react';
+import { FC, useMemo, useState } from 'react';
 import { ItemPrice, ItemQuantity } from '..';
 import productTotalColumns from './product-total-columns';
 
 type Props = {
-	selectedProducts: string[];
+	selectedRowProducts: PricedVariant[] | undefined;
 	itemQuantities: ItemQuantity[];
 	itemPrices: ItemPrice[];
 	setCurrentStep: (step: number) => void;
@@ -24,37 +25,34 @@ type Props = {
  * @param setCurrentStep function to set current step
  * @returns JSX element
  */
+
+const PAGE_SIZE = 10;
+
 const ProductTotalForm: FC<Props> = ({
-	selectedProducts,
+	selectedRowProducts,
 	itemQuantities,
 	itemPrices,
 	setCurrentStep,
 	regionId,
 }) => {
-	const { variants } = useAdminVariants({
-		id: selectedProducts,
-		limit: 100,
-	});
-
 	const { region } = useAdminRegion(regionId || '');
+	const [currentPage, setCurrentPage] = useState(1);
 
-	const filterVariants = selectedProducts?.map((id) => {
-		return variants?.find((variant) => variant.id === id);
-	});
-
+	// updated the newest value
 	const columns = useMemo(
 		() =>
 			productTotalColumns({
 				region,
 				itemQuantities,
 				itemPrices,
+				currentPage,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[itemQuantities, itemPrices, filterVariants]
+		[itemQuantities, itemPrices, selectedRowProducts, currentPage]
 	);
 
 	const totalPrice = useMemo(() => {
-		return filterVariants.reduce((total, variant) => {
+		return selectedRowProducts?.reduce((total, variant) => {
 			const quantity =
 				itemQuantities.find((item) => item.variantId === variant?.id)
 					?.quantity || 0;
@@ -63,7 +61,7 @@ const ProductTotalForm: FC<Props> = ({
 				0;
 			return total + quantity * price;
 		}, 0);
-	}, [filterVariants, itemQuantities, itemPrices]);
+	}, [selectedRowProducts, itemQuantities, itemPrices]);
 
 	const handleBack = () => {
 		setCurrentStep(0);
@@ -71,6 +69,14 @@ const ProductTotalForm: FC<Props> = ({
 
 	const handleContinue = () => {
 		setCurrentStep(2);
+	};
+
+	const handleTableChange = (pagination: any, filters: any, sorter: any) => {
+		setCurrentPage(pagination.current);
+	};
+
+	const handleChangePage = (page: number) => {
+		setCurrentPage(page);
 	};
 
 	return (
@@ -90,33 +96,38 @@ const ProductTotalForm: FC<Props> = ({
 				<Flex className="flex-col" gap={12}>
 					<Table
 						columns={columns as any}
-						dataSource={filterVariants.filter(
-							(variant) => variant !== undefined
-						)}
+						dataSource={selectedRowProducts}
 						rowKey="id"
 						scroll={{ x: 700 }}
-						pagination={false}
+						pagination={{
+							current: currentPage,
+							pageSize: PAGE_SIZE,
+							total: selectedRowProducts?.length,
+							showSizeChanger: false,
+							onChange: handleChangePage,
+						}}
+						summary={() => (
+							<Table.Summary fixed>
+								<Table.Summary.Row>
+									<Table.Summary.Cell index={0} />
+									<Table.Summary.Cell index={1}>
+										{selectedRowProducts?.length} (sản phẩm)
+									</Table.Summary.Cell>
+									<Table.Summary.Cell index={2}>
+										{itemQuantities.reduce(
+											(total, item) => total + item.quantity,
+											0
+										)}{' '}
+										(đôi)
+									</Table.Summary.Cell>
+									<Table.Summary.Cell index={3}>
+										{totalPrice?.toLocaleString()}
+										{region?.currency.symbol}
+									</Table.Summary.Cell>
+								</Table.Summary.Row>
+							</Table.Summary>
+						)}
 					/>
-					<Text strong className="mt-4">
-						Tổng sản phẩm:{' '}
-						<span className="font-normal">
-							{filterVariants.length} (sản phẩm)
-						</span>
-					</Text>
-					<Text strong className="mt-4">
-						Tổng số lượng:{' '}
-						<span className="font-normal">
-							{itemQuantities.reduce((total, item) => total + item.quantity, 0)}{' '}
-							(đôi)
-						</span>
-					</Text>
-					<Text strong className="mt-4">
-						Tổng tiền:{' '}
-						<span className="font-normal">
-							{totalPrice.toLocaleString()}
-							{region?.currency.symbol}
-						</span>
-					</Text>
 				</Flex>
 			</Col>
 			<Col span={24}>
