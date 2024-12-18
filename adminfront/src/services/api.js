@@ -349,13 +349,6 @@ export default {
 		},
 	},
 
-	lineItems: {
-		update(lineId, payload) {
-			const path = `/admin/line-items/${lineId}`;
-			return medusaRequest('POST', path, payload);
-		},
-	},
-
 	orders: {
 		create(order) {
 			const path = `/admin/orders`;
@@ -629,21 +622,6 @@ export default {
 		},
 	},
 
-	uploads: {
-		create(files) {
-			const formData = new FormData();
-			for (const f of files) {
-				formData.append('files', f);
-			}
-			return medusaRequest('POST', '/admin/uploads', formData);
-		},
-
-		delete(payload) {
-			const path = `/admin/upload-file`;
-			return medusaRequest('DELETE', path, payload);
-		},
-	},
-
 	draftOrders: {
 		create(draftOrder) {
 			const path = `/admin/draft-orders`;
@@ -753,161 +731,6 @@ export default {
 
 		delete(userId) {
 			const path = `/admin/users/${userId}`;
-			return medusaRequest('DELETE', path);
-		},
-	},
-
-	supplier: {
-		list(search = {}) {
-			const params = Object.keys(search)
-				.map((k) => `${k}=${search[k]}`)
-				.join('&');
-			const path = `/admin/supplier${params && `?${params}`}`;
-			return medusaRequest('GET', path);
-		},
-
-		create(data) {
-			const path = `/admin/supplier`;
-			return medusaRequest('POST', path, data);
-		},
-
-		retrieve(id) {
-			const path = `/admin/supplier/${id}`;
-			return medusaRequest('GET', path);
-		},
-
-		update(id, data) {
-			const path = `/admin/supplier/${id}`;
-			return medusaRequest('PUT', path, data);
-		},
-
-		delete(id) {
-			const path = `/admin/supplier/${id}`;
-			return medusaRequest('DELETE', path);
-		},
-	},
-
-	suplierOrders: {
-		// list(search = {}) {
-		// 	const params = Object.keys(search)
-		// 		.map((k) => `${k}=${search[k]}`)
-		// 		.join('&');
-		// 	const path = `/admin/supplier-order${params && `?${params}`}`;
-		// 	return medusaRequest('GET', path);
-		// },
-
-		// create(data) {
-		// 	const path = `/admin/supplier-order`;
-		// 	return medusaRequest('POST', path, data);
-		// },
-
-		// retrieve(id) {
-		// 	const path = `/admin/supplier-order/${id}`;
-		// 	return medusaRequest('GET', path);
-		// },
-
-		updateLineItem(id, data) {
-			const path = `/admin/supplier-order/${id}`;
-			return medusaRequest('PUT', path, data);
-		},
-
-		delete(id) {
-			const path = `/admin/supplier-order/${id}`;
-			return medusaRequest('DELETE', path);
-		},
-
-		deleteLineItem(supplierOrderId, lineItemId) {
-			const path = `/admin/supplier-order/${supplierOrderId}`;
-			return medusaRequest('DELETE', path, { lineItemId });
-		},
-
-		createDocument(supplierOrderId, documents) {
-			const path = `/admin/supplier-order/${supplierOrderId}/document`;
-			return medusaRequest('POST', path, documents);
-		},
-
-		deleteDocument(supplierOrderId, documentId) {
-			const path = `/admin/supplier-order/${supplierOrderId}/document/${documentId}`;
-			return medusaRequest('DELETE', path);
-		},
-		cancel(id) {
-			const path = `/admin/supplier-order/${id}/cancel`;
-			return medusaRequest('POST', path);
-		},
-
-		capturePayment(id) {
-			const path = `/admin/supplier-order/${id}/capture`;
-			return medusaRequest('POST', path);
-		},
-
-		refundPayment(id, data) {
-			const path = `/admin/supplier-order/${id}/refund`;
-			return medusaRequest('POST', path, data);
-		},
-	},
-
-	supplierOrderEdits: {
-		list(search = {}) {
-			const params = Object.keys(search)
-				.map((k) => `${k}=${search[k]}`)
-				.join('&');
-			const path = `/admin/supplier-order-edits${params && `?${params}`}`;
-			return medusaRequest('GET', path);
-		},
-
-		create(data) {
-			const path = `/admin/supplier-order-edits`;
-			return medusaRequest('POST', path, data);
-		},
-
-		retrieve(id) {
-			const path = `/admin/supplier-order-edits/${id}`;
-			return medusaRequest('GET', path);
-		},
-
-		update(id, data) {
-			const path = `/admin/supplier-order-edits/${id}`;
-			return medusaRequest('PUT', path, data);
-		},
-
-		delete(id) {
-			const path = `/admin/supplier-order-edits/${id}`;
-			return medusaRequest('DELETE', path);
-		},
-
-		requestConfirmation(id) {
-			const path = `/admin/supplier-order-edits/${id}/request`;
-			return medusaRequest('POST', path);
-		},
-
-		cancel(id) {
-			const path = `/admin/supplier-order-edits/${id}/cancel`;
-			return medusaRequest('POST', path);
-		},
-
-		confirm(id) {
-			const path = `/admin/supplier-order-edits/${id}/confirm`;
-			return medusaRequest('POST', path);
-		},
-
-		// crud in line item
-		addLineItem(id, data) {
-			const path = `/admin/supplier-order-edits/${id}/items`;
-			return medusaRequest('POST', path, data);
-		},
-
-		updateLineItem(id, lineItemId, data) {
-			const path = `/admin/supplier-order-edits/${id}/items/${lineItemId}`;
-			return medusaRequest('POST', path, data);
-		},
-
-		deleteLineItem(id, lineItemId) {
-			const path = `/admin/supplier-order-edits/${id}/items/${lineItemId}`;
-			return medusaRequest('DELETE', path);
-		},
-
-		deleteItemChange(id, lineItemId) {
-			const path = `/admin/supplier-order-edits/${id}/changes/${lineItemId}`;
 			return medusaRequest('DELETE', path);
 		},
 	},
