@@ -296,17 +296,18 @@ const ProductForm: FC<ProductFormProps> = ({
 				/>
 			</Col>
 			<Col span={6}>
-				<Select
-					placeholder="Chọn khu vực"
-					// onChange={(value) => setRegionId(value)}
-					onChange={handleRegionChange}
-					options={regions?.map((region) => ({
-						label: region.name,
-						value: region.id,
-					}))}
-					defaultValue={defaultRegion?.id}
-					className="w-full"
-				/>
+				{defaultRegion && (
+					<Select
+						placeholder="Chọn khu vực"
+						onChange={handleRegionChange}
+						options={regions?.map((region) => ({
+							label: region.name,
+							value: region.id,
+						}))}
+						value={regionId}
+						className="w-full"
+					/>
+				)}
 			</Col>
 			<Col span={24} id="table-product">
 				<Table
