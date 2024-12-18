@@ -137,7 +137,7 @@ const SupplierOrdersList: FC<Props> = () => {
 					current: numPages,
 					onChange: handleChangePage,
 					showTotal: (total, range) =>
-						`${range[0]}-${range[1]} trong ${total} nhà cung cấp`,
+						`${range[0]}-${range[1]} trong ${total} đơn hàng`,
 				}}
 			/>
 			<FloatButton

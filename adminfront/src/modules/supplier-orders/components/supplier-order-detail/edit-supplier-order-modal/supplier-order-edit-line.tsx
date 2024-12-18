@@ -38,6 +38,7 @@ const SupplierOrderEditLine = ({
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [quantity, setQuantity] = useState(item.quantity);
+	const [draftQuantity, setDraftQuantity] = useState(item.quantity);
 	const [unitPrice, setUnitPrice] = useState<number>(item.unit_price);
 
 	const { mutateAsync: addLineItem, isLoading: loadingAddLineItem } =
@@ -56,20 +57,21 @@ const SupplierOrderEditLine = ({
 		change?.id as string
 	);
 
-	const onQuantityUpdate = async (newQuantity: number) => {
-		if (isLoading) {
+	const onQuantityUpdate = async () => {
+		if (quantity === draftQuantity || isLoading) {
 			return;
 		}
 
 		setIsLoading(true);
 
 		try {
-			await updateItem({ quantity: newQuantity });
-			setQuantity(newQuantity);
+			await updateItem({ quantity: draftQuantity });
+			setQuantity(draftQuantity);
 			message.success('Cập nhật số lượng sản phẩm thành công');
 		} catch (error) {
 			message.error('Cập nhật thất bại');
 			console.error('Error updating quantity:', error);
+			setDraftQuantity(quantity);
 		} finally {
 			setIsLoading(false);
 		}
@@ -193,12 +195,12 @@ const SupplierOrderEditLine = ({
 						>
 							<InputNumber
 								placeholder="Thay đổi số lượng"
-								// size="small"
 								className={clsx('cursor-pointer text-gray-400 w-[80px]', {
 									'pointer-events-none': isLoading,
 								})}
-								value={quantity}
-								onChange={(value) => onQuantityUpdate(Number(value))}
+								value={draftQuantity}
+								onChange={(value) => setDraftQuantity(Number(value))}
+								onBlur={onQuantityUpdate}
 								disabled={isLocked || isLoading}
 							/>
 						</div>

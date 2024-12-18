@@ -6,6 +6,7 @@ import { useAdminCreateSupplierOrders } from '@/lib/hooks/api/supplier-order';
 import { useUser } from '@/lib/providers/user-provider';
 import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
+import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { PDFViewer } from '@react-pdf/renderer';
 import { message, Spin } from 'antd';
 import { useAdminRegion, useAdminRegions } from 'medusa-react';
@@ -71,7 +72,9 @@ const SupplierOrdersModal: FC<Props> = ({
 	const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
 		null
 	);
-	const [selectedRowsProducts, setSelectedRowsProducts] = useState<any[]>([]);
+	const [selectedRowsProducts, setSelectedRowsProducts] = useState<
+		PricedVariant[]
+	>([]);
 	const [itemQuantities, setItemQuantities] = useState<ItemQuantity[]>([]);
 	const [itemPrices, setItemPrices] = useState<ItemPrice[]>([]);
 	const [showPDF, setShowPDF] = useState(false);
@@ -218,10 +221,6 @@ const SupplierOrdersModal: FC<Props> = ({
 					onClick={() => {
 						setCurrentStep(0);
 						setSelectedSupplier(null);
-						// setSelectedProducts([]);
-						// setItemQuantities([]);
-						// setItemPrices([]);
-						// setRegionId(null);
 					}}
 				>
 					Quay lại
@@ -277,7 +276,7 @@ const SupplierOrdersModal: FC<Props> = ({
 				)}
 				{currentStep === 1 && (
 					<ProductTotalForm
-						selectedProducts={selectedProducts}
+						selectedRowProducts={selectedRowsProducts}
 						itemQuantities={itemQuantities}
 						itemPrices={itemPrices}
 						setCurrentStep={setCurrentStep}
