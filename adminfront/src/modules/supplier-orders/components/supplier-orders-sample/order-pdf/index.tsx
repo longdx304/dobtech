@@ -110,15 +110,6 @@ interface OrderPDFProps {
 }
 
 const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
-	const total = order.lineItems.reduce(
-		(sum, item) => sum + item.quantity * (item.unit_price || 0),
-		0
-	);
-
-	if (!order) {
-		return null;
-	}
-
 	return (
 		<Document>
 			<Page size="A4" style={styles.page}>
@@ -177,29 +168,20 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 					<Text style={styles.title}>Order Items</Text>
 					<View style={styles.tableHeader}>
 						<Text style={styles.tableCell}>#</Text>
-						<Text style={[styles.tableCell, { flex: 2 }]}>Product</Text>
-						<Text style={styles.tableCell}>Unit Price</Text>
+						<Text style={[styles.tableCell, styles.productCell]}>Product</Text>
 						<Text style={styles.tableCell}>Quantity</Text>
-						<Text style={styles.tableCell}>Total</Text>
 					</View>
 
 					{order.lineItems.map((item, index) => {
 						return (
 							<View key={index} style={styles.tableRow}>
 								<Text style={styles.tableCell}>{index + 1}</Text>
-
 								<View style={[styles.tableCell, styles.productCell]}>
 									<Text>{item.title}</Text>
 								</View>
-								<Text style={styles.tableCell}>
-									{item.unit_price?.toLocaleString()} {region?.currency?.symbol}
-								</Text>
+								o
 								<Text style={styles.tableCell}>
 									{formatNumber(item.quantity)}
-								</Text>
-								<Text style={styles.tableCell}>
-									{(item.quantity * (item.unit_price || 0)).toLocaleString()}{' '}
-									{region?.currency?.symbol}
 								</Text>
 							</View>
 						);
@@ -208,15 +190,9 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 					{/* Overview */}
 					<View style={styles.tableRow}>
 						<Text style={styles.tableCell}>{'-'}</Text>
-						<View style={[styles.tableCell, styles.productCell]}>
-							<Text>{'-'}</Text>
-						</View>
-						<Text style={styles.tableCell}>{'-'}</Text>
+						<Text style={[styles.tableCell, styles.productCell]}>{'-'}</Text>
 						<Text style={styles.tableCell}>
 							{formatNumber(order?.quantity ?? 0)}
-						</Text>
-						<Text style={styles.tableCell}>
-							{total.toLocaleString()} {region?.currency?.symbol}
 						</Text>
 					</View>
 				</View>

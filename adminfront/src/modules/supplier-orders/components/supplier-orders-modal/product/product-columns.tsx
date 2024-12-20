@@ -38,11 +38,11 @@ const EditableQuantity = ({
 					handleQuantityChange(value as number, record?.id as string);
 				}
 			}}
-			className="w-20"
+			className="w-full text-center"
 		/>
 	) : (
 		<Text
-			className="text-right text-gray-500 cursor-pointer"
+			className="block w-full text-gray-500 cursor-pointer"
 			onClick={() => setIsEditing(true)}
 		>
 			{quantity || 1}
@@ -85,18 +85,24 @@ const productColumns = ({
 		title: 'Số lượng',
 		key: 'quantity',
 		dataIndex: 'quantity',
-		className: 'text-xs',
+		className: 'text-xs text-center [&>div]:flex [&>div]:items-center',
+		fixed: 'right',
 		editable: true,
 		render: (_: number, record: any) => {
 			const itemQuantity = itemQuantities.find(
 				(item) => item.variantId === record.id
 			);
-			const quantity = itemQuantity ? itemQuantity.quantity : 0;
+			const defaultQuantity = itemQuantity ? itemQuantity.quantity : 1;
 			return (
-				<EditableQuantity
-					quantity={quantity}
-					record={record}
-					handleQuantityChange={handleQuantityChange}
+				<InputNumber
+					min={1}
+					defaultValue={defaultQuantity}
+					onChange={(value) => {
+						if (value !== null) {
+							handleQuantityChange(value as number, record?.id as string);
+						}
+					}}
+					className="w-1/2 flex text-center justify-center"
 				/>
 			);
 		},
@@ -105,7 +111,7 @@ const productColumns = ({
 		title: 'Giá tiền',
 		key: 'price_from_supplier',
 		dataIndex: 'price_from_supplier',
-		className: 'text-xs',
+		className: 'text-xs text-center',
 		width: 250,
 		render: (_: any, record: any) => {
 			const itemPrice = itemPrices.find((item) => item.variantId === record.id);

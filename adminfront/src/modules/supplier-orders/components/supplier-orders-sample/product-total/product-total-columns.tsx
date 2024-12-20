@@ -5,21 +5,17 @@ import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
-import { ItemPrice, ItemQuantity } from '../index';
 import { formatNumber } from '@/lib/utils';
+import { ItemQuantity } from '../index';
 
 interface Props {
 	itemQuantities: ItemQuantity[];
-	itemPrices: ItemPrice[];
-	region?: Region;
 	currentPage: number;
 }
 
 const PAGE_SIZE = 10;
 const productTotalColumns = ({
 	itemQuantities,
-	itemPrices,
-	region,
 	currentPage,
 }: Props) => [
 	{
@@ -69,27 +65,7 @@ const productTotalColumns = ({
 				(item) => item.variantId === record?.id
 			);
 			const quantity = itemQuantity ? itemQuantity?.quantity : 0;
-			// return <Text className="text-xs">{quantity || 0}</Text>;
 			return <Text className="text-xs">{formatNumber(quantity) || 0}</Text>;
-		},
-	},
-	{
-		title: 'Giá đơn hàng',
-		key: 'price',
-		dataIndex: 'price',
-		className: 'text-xs text-center',
-		render: (_: number, record: any) => {
-			const itemPrice = itemPrices?.find(
-				(item) => item?.variantId === record?.id
-			);
-			const price = itemPrice ? itemPrice?.unit_price : 0;
-
-			return (
-				<Text className="text-xs">
-					{price?.toLocaleString()}
-					{region?.currency.symbol}
-				</Text>
-			);
 		},
 	},
 ];
