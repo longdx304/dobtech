@@ -2,20 +2,17 @@ import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 // import { Table } from '@/components/Table';
 import { Title } from '@/components/Typography';
+import { formatNumber } from '@/lib/utils';
 import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { Col, Row, Table } from 'antd';
-import { useAdminRegion } from 'medusa-react';
 import { FC, useMemo, useState } from 'react';
-import { ItemPrice, ItemQuantity } from '..';
+import { ItemQuantity } from '..';
 import productTotalColumns from './product-total-columns';
-import { formatNumber } from '@/lib/utils';
 
 type Props = {
 	selectedRowProducts: PricedVariant[] | undefined;
 	itemQuantities: ItemQuantity[];
-	itemPrices: ItemPrice[];
 	setCurrentStep: (step: number) => void;
-	regionId: string | null;
 };
 
 /**
@@ -32,37 +29,20 @@ const PAGE_SIZE = 10;
 const ProductTotalForm: FC<Props> = ({
 	selectedRowProducts,
 	itemQuantities,
-	itemPrices,
 	setCurrentStep,
-	regionId,
 }) => {
-	const { region } = useAdminRegion(regionId || '', { enabled: !!regionId });
 	const [currentPage, setCurrentPage] = useState(1);
 
 	// updated the newest value
 	const columns = useMemo(
 		() =>
 			productTotalColumns({
-				region,
 				itemQuantities,
-				itemPrices,
 				currentPage,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[itemQuantities, itemPrices, selectedRowProducts, currentPage]
+		[itemQuantities, selectedRowProducts, currentPage]
 	);
-
-	const totalPrice = useMemo(() => {
-		return selectedRowProducts?.reduce((total, variant) => {
-			const quantity =
-				itemQuantities.find((item) => item.variantId === variant?.id)
-					?.quantity || 0;
-			const price =
-				itemPrices.find((item) => item.variantId === variant?.id)?.unit_price ||
-				0;
-			return total + quantity * price;
-		}, 0);
-	}, [selectedRowProducts, itemQuantities, itemPrices]);
 
 	const handleBack = () => {
 		setCurrentStep(0);
@@ -122,10 +102,6 @@ const ProductTotalForm: FC<Props> = ({
 											)
 										)}{' '}
 										(đôi)
-									</Table.Summary.Cell>
-									<Table.Summary.Cell index={3} className="text-center">
-										{totalPrice?.toLocaleString()}
-										{region?.currency.symbol}
 									</Table.Summary.Cell>
 								</Table.Summary.Row>
 							</Table.Summary>

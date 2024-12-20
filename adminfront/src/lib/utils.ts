@@ -1,3 +1,4 @@
+import { currencies } from '@/utils/currencies';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -93,4 +94,18 @@ export const getErrorStatus = (
 	}
 
 	return undefined;
+};
+
+
+/**
+ * Gets the currency info for a given currency code.
+ * @param currencyCode - The currency code
+ * @returns The currency info or undefined if not found
+ */
+export const getCurrencyInfo = (currencyCode?: string) => {
+	if (!currencyCode) {
+		return undefined;
+	}
+	const currencyInfo = currencies[currencyCode.toUpperCase()];
+	return currencyInfo;
 };

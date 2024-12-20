@@ -17,7 +17,7 @@ import {
 	useAdminVariants,
 } from 'medusa-react';
 import React, { FC, useEffect, useMemo, useState } from 'react';
-import { ItemPrice, ItemQuantity } from '..';
+import { ItemQuantity } from '..';
 import productColumns from './product-columns';
 
 type ProductFormProps = {
@@ -27,9 +27,8 @@ type ProductFormProps = {
 	setCurrentStep: (step: number) => void;
 	handleCancel: () => void;
 	itemQuantities: ItemQuantity[];
-	itemPrices: ItemPrice[];
 	setItemQuantities: React.Dispatch<React.SetStateAction<ItemQuantity[]>>;
-	setItemPrices: React.Dispatch<React.SetStateAction<ItemPrice[]>>;
+
 	regions: Region[] | undefined;
 	regionId: string | null;
 	setRegionId: (regionId: string) => void;
@@ -43,9 +42,8 @@ const ProductForm: FC<ProductFormProps> = ({
 	setCurrentStep,
 	handleCancel,
 	itemQuantities,
-	itemPrices,
 	setItemQuantities,
-	setItemPrices,
+
 	regions,
 	regionId,
 	setRegionId,
@@ -71,17 +69,10 @@ const ProductForm: FC<ProductFormProps> = ({
 			)
 		);
 
-		setItemPrices((prevPrices) =>
-			prevPrices.filter((item) => !deselectedProducts.includes(item.variantId))
-		);
-
 		// Add default quantities and prices for newly selected products
 		selectedRowKeys.forEach((productId) => {
 			// Check if this product already has a quantity or price set
 			const existingQuantity = itemQuantities.find(
-				(item) => item.variantId === productId
-			);
-			const existingPrice = itemPrices.find(
 				(item) => item.variantId === productId
 			);
 
@@ -95,17 +86,6 @@ const ProductForm: FC<ProductFormProps> = ({
 				setItemQuantities((prevQuantities) => [
 					...prevQuantities,
 					{ variantId: productId as string, quantity: 1 },
-				]);
-			}
-
-			if (!existingPrice && selectedVariant) {
-				// Set the default price from the variant data if not already present
-				setItemPrices((prevPrices) => [
-					...prevPrices,
-					{
-						variantId: productId as string,
-						unit_price: (selectedVariant as any).supplier_price || 0,
-					},
 				]);
 			}
 		});
@@ -133,38 +113,12 @@ const ProductForm: FC<ProductFormProps> = ({
 		offset: (currentPage - 1) * PAGE_SIZE,
 	});
 
-	const { product_categories } = useAdminProductCategories(
-		{
-			parent_category_id: 'null',
-			include_descendants_tree: true,
-			is_internal: false,
-		},
-		{ enabled: !regionId, keepPreviousData: true }
-	);
-	const { collections } = useAdminCollections(
-		{ limit: 10, offset: 0 },
-		{ enabled: !regionId, keepPreviousData: true }
-	);
-
-	// set item prices
-	const handlePriceChange = (value: number | null, variantId: string) => {
-		setItemPrices((prevPrices) => {
-			const existingItemIndex = prevPrices.findIndex(
-				(item) => item.variantId === variantId
-			);
-
-			if (existingItemIndex !== -1) {
-				const updatedPrices = [...prevPrices];
-				updatedPrices[existingItemIndex] = {
-					...updatedPrices[existingItemIndex],
-					unit_price: value ?? 0,
-				};
-				return updatedPrices;
-			} else {
-				return [...prevPrices, { variantId, unit_price: value ?? 0 }];
-			}
-		});
-	};
+	const { product_categories } = useAdminProductCategories({
+		parent_category_id: 'null',
+		include_descendants_tree: true,
+		is_internal: false,
+	});
+	const { collections } = useAdminCollections();
 
 	const handleQuantityChange = (value: number, variantId: string) => {
 		setItemQuantities((prevQuantities) => {
@@ -189,12 +143,11 @@ const ProductForm: FC<ProductFormProps> = ({
 		() =>
 			productColumns({
 				itemQuantities,
-				itemPrices,
-				handlePriceChange,
+				// handlePriceChange,
 				handleQuantityChange,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[itemQuantities, itemPrices]
+		[itemQuantities]
 	);
 
 	const onSubmit = () => {
@@ -207,11 +160,8 @@ const ProductForm: FC<ProductFormProps> = ({
 		// Check if itemQuantities and itemPrices have entries for all selected products
 		if (
 			itemQuantities.length !== selectedProducts.length ||
-			itemPrices.length !== selectedProducts.length ||
-			!selectedProducts.every(
-				(productId) =>
-					itemQuantities.some((item) => item.variantId === productId) &&
-					itemPrices.some((item) => item.variantId === productId)
+			!selectedProducts.every((productId) =>
+				itemQuantities.some((item) => item.variantId === productId)
 			)
 		) {
 			message.error('Phải nhập số lượng và giá cho tất cả sản phẩm đã chọn');
@@ -221,12 +171,6 @@ const ProductForm: FC<ProductFormProps> = ({
 		// Check if all quantities are greater than 0
 		if (!itemQuantities.every((item) => item.quantity > 0)) {
 			message.error('Số lượng sản phẩm phải lớn hơn 0');
-			return;
-		}
-
-		// Check if all prices are greater than 1000
-		if (!itemPrices.every((item) => item.unit_price >= 1000)) {
-			message.error('Giá sản phẩm phải lớn hơn 1000 đồng');
 			return;
 		}
 

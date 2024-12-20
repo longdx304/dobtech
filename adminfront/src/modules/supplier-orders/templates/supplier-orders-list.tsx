@@ -1,6 +1,5 @@
 'use client';
 
-import { FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
@@ -11,13 +10,15 @@ import { useAdminSupplierOrders } from '@/lib/hooks/api/supplier-order';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ERoutes } from '@/types/routes';
 import { SupplierOrders } from '@/types/supplier';
-import { TableProps } from 'antd';
+import { FloatButton, TableProps } from 'antd';
 import _ from 'lodash';
-import { Plus, Search } from 'lucide-react';
+import { NotepadTextDashed, Plus, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import SupplierOrdersModal from '../components/supplier-orders-modal';
 import supplierOrdersColumn from './supplier-order-column';
+import { Tooltip } from '@/components/Tooltip';
+import SupplierOrdersSample from '../components/supplier-orders-sample';
 
 type Props = {};
 
@@ -28,6 +29,12 @@ const SupplierOrdersList: FC<Props> = () => {
 		state: stateSupplierOrdersModal,
 		onOpen: openSupplierOrdersModal,
 		onClose: closeSupplierOrdersModal,
+	} = useToggleState(false);
+
+	const {
+		state: stateSampleOrderModal,
+		onOpen: openSampleOrderModal,
+		onClose: closeSampleOrderModal,
 	} = useToggleState(false);
 
 	const router = useRouter();
@@ -72,6 +79,10 @@ const SupplierOrdersList: FC<Props> = () => {
 		openSupplierOrdersModal();
 	};
 
+	const handleOpenSampleOrderModal = () => {
+		openSampleOrderModal();
+	};
+
 	const columns = useMemo(() => {
 		return supplierOrdersColumn({
 			supplier: suppliers ?? [],
@@ -82,6 +93,10 @@ const SupplierOrdersList: FC<Props> = () => {
 	const handleCloseModal = () => {
 		closeSupplierOrdersModal();
 		setCurrentSupplierOrders(null);
+	};
+
+	const handleCloseSampleOrderModal = () => {
+		closeSampleOrderModal();
 	};
 
 	const handleRowClick = (record: any) => {
@@ -140,18 +155,39 @@ const SupplierOrdersList: FC<Props> = () => {
 						`${range[0]}-${range[1]} trong ${total} đơn hàng`,
 				}}
 			/>
-			<FloatButton
-				className="absolute"
-				icon={<Plus color="white" size={20} strokeWidth={2} />}
-				type="primary"
-				onClick={handleCreateSupplierOrders}
-				data-testid="btnCreateSupplier"
-			/>
+
+			<FloatButton.Group shape="circle" style={{ insetInlineEnd: 24 }}>
+				<Tooltip title="Tạo đơn đặt hàng" placement="left">
+					<FloatButton
+						icon={<Plus color="white" size={20} strokeWidth={2} />}
+						type="primary"
+						onClick={handleCreateSupplierOrders}
+						data-testid="btnCreateSupplier"
+					/>
+				</Tooltip>
+				<Tooltip title="Tạo bản mẫu đơn đặt hàng" placement="left">
+					<FloatButton
+						icon={<NotepadTextDashed color="black" size={20} strokeWidth={2} />}
+						type="default"
+						onClick={handleOpenSampleOrderModal}
+						data-testid="btnAnotherAction"
+					/>
+				</Tooltip>
+			</FloatButton.Group>
 			{stateSupplierOrdersModal && (
 				<SupplierOrdersModal
 					state={stateSupplierOrdersModal}
 					handleOk={handleCloseModal}
 					handleCancel={handleCloseModal}
+					suppliers={suppliers || []}
+				/>
+			)}
+
+			{stateSampleOrderModal && (
+				<SupplierOrdersSample
+					state={stateSampleOrderModal}
+					handleOk={handleCloseSampleOrderModal}
+					handleCancel={handleCloseSampleOrderModal}
 					suppliers={suppliers || []}
 				/>
 			)}

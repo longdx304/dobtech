@@ -2,10 +2,8 @@ import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
 import { Steps } from '@/components/Steps';
 import { Title } from '@/components/Typography';
-import { useAdminCreateSupplierOrders } from '@/lib/hooks/api/supplier-order';
-import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import { useUser } from '@/lib/providers/user-provider';
-import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
+import { LineItemReq, Supplier } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { PDFViewer } from '@react-pdf/renderer';
@@ -62,7 +60,7 @@ export interface pdfOrderRes {
 	metadata?: Record<string, unknown>;
 }
 
-const SupplierOrdersModal: FC<Props> = ({
+const SupplierOrdersSample: FC<Props> = ({
 	state,
 	handleOk,
 	handleCancel,
@@ -77,18 +75,13 @@ const SupplierOrdersModal: FC<Props> = ({
 		PricedVariant[]
 	>([]);
 	const [itemQuantities, setItemQuantities] = useState<ItemQuantity[]>([]);
-	const [itemPrices, setItemPrices] = useState<ItemPrice[]>([]);
 	const [showPDF, setShowPDF] = useState(false);
 	const [pdfOrder, setPdfOrder] = useState<pdfOrderRes | null>(null);
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const createSupplierOrder = useAdminCreateSupplierOrders();
 	const { regions } = useAdminRegions();
 	const [regionId, setRegionId] = useState<string | null>(null);
 	const [isSendEmail, setIsSendEmail] = useState(false);
 
-	const uploadFile = useAdminUploadFile();
-
-	const { region } = useAdminRegion(regionId || '', { enabled: !!regionId });
+	const { region } = useAdminRegion(regionId || '');
 
 	// supplier date time picker
 	const {
@@ -110,10 +103,6 @@ const SupplierOrdersModal: FC<Props> = ({
 
 	const createPayload = () => {
 		const lineItems: LineItemReq[] = itemQuantities.map((item) => {
-			const priceItem = itemPrices.find(
-				(price) => price.variantId === item.variantId
-			);
-
 			const selectedProduct = selectedRowsProducts?.find(
 				(product) => product?.id === item?.variantId
 			);
@@ -123,7 +112,6 @@ const SupplierOrdersModal: FC<Props> = ({
 			return {
 				variantId: item.variantId,
 				quantity: item.quantity,
-				unit_price: priceItem ? priceItem.unit_price : undefined,
 				title: productTitle ?? '',
 			};
 		});
@@ -165,53 +153,31 @@ const SupplierOrdersModal: FC<Props> = ({
 	};
 
 	const onSubmitOrder = async () => {
-		setIsSubmitting(true);
+		if (!pdfOrder) return;
 
 		try {
-			// Generate pdf blob
-			const pdfBlob = await generatePdfBlob(pdfOrder!);
+			// Generate the PDF Blob
+			const pdfBlob = await generatePdfBlob(pdfOrder);
 
-			// Create a File object
-			const fileName = `purchase-order.pdf`;
+			// Create a temporary link to download the PDF
+			const url = URL.createObjectURL(pdfBlob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = `supplier-order-sample.pdf`;
 
-			// Create a File object
-			const files = new File([pdfBlob], fileName, {
-				type: 'application/pdf',
-			});
+			// Trigger the download
+			link.click();
 
-			// Upload pdf to s3 using Medusa uploads API
-			const uploadRes = await uploadFile.mutateAsync({
-				files,
-				prefix: 'supplier_orders',
-			});
+			// Cleanup the URL
+			URL.revokeObjectURL(url);
 
-			const pdfUrl = uploadRes.uploads[0].url;
-
-			const orderPayload: SupplierOrdersReq = {
-				isSendEmail,
-				lineItems: pdfOrder?.lineItems || [],
-				supplierId: pdfOrder?.supplier?.id || '',
-				userId: pdfOrder?.user?.id || '',
-				email: pdfOrder?.user?.email || '',
-				estimated_production_time:
-					supplierDates.productionDate?.toDate() || new Date(),
-				settlement_time: supplierDates.settlementDate?.toDate() || new Date(),
-				countryCode: region?.countries[0]?.iso_2 || 'vn',
-				region_id: region?.id || '',
-				currency_code: region?.currency_code || 'vnd',
-				document_url: pdfUrl,
-			};
-
-			await createSupplierOrder.mutateAsync(orderPayload as any);
-
-			message.success('Đơn hàng đã đặt và gửi cho nhà cung cấp thành công!');
+			// Close the PDF modal and clear the state
 			setShowPDF(false);
+			setPdfOrder(null);
 			handleCancel();
 		} catch (error) {
-			console.error('Error submitting order:', error);
-			message.error('Đơn đặt đơn đặt thất bại! Vui lòng thử lại.');
-		} finally {
-			setIsSubmitting(false);
+			console.error('Failed to generate or download PDF:', error);
+			message.error('Có lỗi xảy ra khi tạo bản mẫu. Vui lý thử lại.');
 		}
 	};
 
@@ -254,13 +220,12 @@ const SupplierOrdersModal: FC<Props> = ({
 				open={state}
 				handleOk={handleOk}
 				handleCancel={onCancel}
-				width={850}
+				width={800}
 				footer={footer}
 				maskClosable={false}
-				loading={createSupplierOrder.isLoading || isSubmitting}
 			>
 				<Title level={3} className="text-center">
-					Tạo mới đơn đặt hàng
+					Tạo biểu mẫu đơn hàng
 				</Title>
 				<Steps current={currentStep} items={ITEMS_STEP} className="py-4" />
 				{currentStep === 0 && (
@@ -272,8 +237,6 @@ const SupplierOrdersModal: FC<Props> = ({
 						handleCancel={onCancel}
 						itemQuantities={itemQuantities}
 						setItemQuantities={setItemQuantities}
-						itemPrices={itemPrices}
-						setItemPrices={setItemPrices}
 						regions={regions}
 						regionId={regionId}
 						setRegionId={setRegionId}
@@ -283,9 +246,7 @@ const SupplierOrdersModal: FC<Props> = ({
 					<ProductTotalForm
 						selectedRowProducts={selectedRowsProducts}
 						itemQuantities={itemQuantities}
-						itemPrices={itemPrices}
 						setCurrentStep={setCurrentStep}
-						regionId={regionId}
 					/>
 				)}
 				{currentStep === 2 && (
@@ -317,16 +278,10 @@ const SupplierOrdersModal: FC<Props> = ({
 						>
 							Thoát
 						</Button>,
-						<Button
-							key="submit"
-							type="primary"
-							onClick={onSubmitOrder}
-							loading={createSupplierOrder.isLoading || isSubmitting}
-						>
-							Tạo đơn đặt hàng
+						<Button key="submit" type="primary" onClick={onSubmitOrder}>
+							Tạo bản mẫu đơn đặt hàng
 						</Button>,
 					]}
-					loading={createSupplierOrder.isLoading || isSubmitting}
 				>
 					<PDFViewer width="100%" height="600px">
 						<OrderPDF order={pdfOrder} region={region} />
@@ -337,4 +292,4 @@ const SupplierOrdersModal: FC<Props> = ({
 	);
 };
 
-export default SupplierOrdersModal;
+export default SupplierOrdersSample;
