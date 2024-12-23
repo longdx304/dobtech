@@ -13,15 +13,17 @@ import {
 	LayoutList,
 	LogOut,
 	NotebookPen,
+	PackageCheck,
 	PackageMinus,
 	PackagePlus,
 	Settings,
 	ShoppingCart,
 	SquarePercent,
+	Truck,
 	Undo2,
 	User as UserIcon,
 	Users,
-	UsersRound
+	UsersRound,
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -77,7 +79,8 @@ const itemsWarehouse: MenuProps['items'] = [
 	getItem('Nhập kho', 'warehouse-inbound', <PackagePlus />),
 	getItem('Xuất kho', 'warehouse-outbound', <PackageMinus />),
 	getItem('Sổ kho', 'warehouse-transaction', <NotebookPen />),
-	getItem('Đơn hàng của bạn', 'overview-4', <CalendarRange />),
+	getItem('Kiểm hàng', 'warehouse-stock-checker', <PackageCheck />),
+	getItem('Vận chuyển', 'warehouse-ship', <Truck />),
 ];
 
 // Item menu option
@@ -126,24 +129,22 @@ export const menuItems = (
 
 	if (role === 'admin') {
 		permissions = [
-			EPermissions.WarehouseManager,
-			EPermissions.WarehouseStaff,
+			EPermissions.Manager,
+			EPermissions.Warehouse,
 			EPermissions.Driver,
-			EPermissions.InventoryChecker,
-			EPermissions.AssistantDriver,
+			EPermissions.Accountant,
 		];
 	}
 
 	const hasRequiredPermissionsSale = !isEmpty(
-		intersection(permissions, [EPermissions.InventoryChecker])
+		intersection(permissions, [EPermissions.Accountant, EPermissions.Manager])
 	);
 	// Check if user has required permissions for warehouse
 	const hasRequiredPermissionsWarehouse = !isEmpty(
-		intersection(permissions, [
-			EPermissions.WarehouseManager,
-			EPermissions.WarehouseStaff,
-			EPermissions.InventoryChecker,
-		])
+		intersection(permissions, [EPermissions.Manager, EPermissions.Warehouse])
+	);
+	const hasRequiredPermissionsShip = !isEmpty(
+		intersection(permissions, [EPermissions.Manager, EPermissions.Driver])
 	);
 
 	return [
@@ -188,4 +189,6 @@ export const menuRoutes: Record<string, string> = {
 	'warehouse-outbound': ERoutes.WAREHOUSE_OUTBOUND,
 	'warehouse-transaction': ERoutes.WAREHOUSE_TRANSACTIONS,
 	'item-unit': ERoutes.ITEM_UNIT,
+	'warehouse-stock-checker': ERoutes.STOCK_CHECKER,
+	'warehouse-ship': ERoutes.SHIP,
 };

@@ -102,7 +102,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	const items: TabsProps['items'] = [
 		{
 			key: FulfillSupplierOrderStt.DELIVERED,
-			label: 'Đang chờ nhập kho',
+			label: 'Đang thực hiện',
 		},
 		{
 			key: FulfillSupplierOrderStt.INVENTORIED,

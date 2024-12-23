@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Button } from '@/components/Button';
 import { Empty } from '@/components/Empty';
 import { Flex } from '@/components/Flex';
