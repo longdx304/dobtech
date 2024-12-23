@@ -19,6 +19,7 @@ import {
 import OutboundItem from '../components/outbound-item';
 import { FulfillmentStatus, Order } from '@/types/order';
 import { getErrorMessage } from '@/lib/utils';
+import { Switch } from '@/components/Switch';
 
 type Props = {};
 
@@ -31,12 +32,14 @@ const ListOutbound: FC<Props> = ({}) => {
 	const [activeKey, setActiveKey] = useState<string>(
 		FulfillmentStatus.NOT_FULFILLED
 	);
+	const [myOrder, setMyOrder] = useState(false);
 
 	const { orders, isLoading, count } = useAdminProductOutbounds({
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
 		status: activeKey,
+		myOrder: myOrder ? true : undefined,
 	});
 	const productOutboundHandler = useAdminProductOutboundHandler();
 
@@ -91,9 +94,16 @@ const ListOutbound: FC<Props> = ({}) => {
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				<Title level={4}>Theo dõi các đơn hàng</Title>
-				<Flex align="center" justify="flex-end" className="py-4">
+				<Flex align="center" justify="space-between" className="py-4">
+					<Flex align="center" gap={8}>
+						<Text className="text-gray-700 font-medium">Đơn hàng của tôi</Text>
+						<Switch
+							checked={myOrder}
+							onChange={(checked) => setMyOrder(checked)}
+						/>
+					</Flex>
 					<Input
-						placeholder="Tìm kiếm đơn hàng..."
+						placeholder="Tìm kiếm đơn nhập kho..."
 						name="search"
 						prefix={<Search size={16} />}
 						onChange={handleChangeDebounce}

@@ -20,6 +20,7 @@ export type ProductOutboundQueryKeyParams = {
 	offset?: number;
 	limit?: number;
 	status?: string;
+	myOrder?: boolean;
 };
 export type AdminProductOutboundListRes = {
 	orders: Order[];

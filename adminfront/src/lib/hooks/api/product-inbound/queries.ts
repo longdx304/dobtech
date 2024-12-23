@@ -19,6 +19,7 @@ export type ProductInboundQueryKeyParams = {
 	offset?: number;
 	limit?: number;
 	status?: string;
+	myOrder?: boolean;
 };
 export type AdminProductInboundListRes = {
 	supplierOrder: SupplierOrder[];

@@ -17,6 +17,7 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import InboundItem from '../components/inbound-item';
+import { Switch } from '@/components/Switch';
 
 type Props = {};
 
@@ -26,15 +27,17 @@ const ListInbound: FC<Props> = ({}) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
-	const [activeKey, setActiveKey] = useState<FulfillSupplierOrderStt>(
+	const [activeKey, setActiveKey] = useState<FulfillSupplierOrderStt | null>(
 		FulfillSupplierOrderStt.DELIVERED
 	);
+	const [myOrder, setMyOrder] = useState(false);
 
 	const { supplierOrder, isLoading, count } = useAdminProductInbounds({
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		status: activeKey,
+		status: activeKey || undefined,
+		myOrder: myOrder ? true : undefined,
 	});
 	const productInboundHandler = useAdminProductInboundHandler();
 
@@ -51,6 +54,7 @@ const ListInbound: FC<Props> = ({}) => {
 	const handleChangeTab = (key: string) => {
 		setActiveKey(key as FulfillSupplierOrderStt);
 	};
+
 
 	const items: TabsProps['items'] = [
 		{
@@ -89,7 +93,14 @@ const ListInbound: FC<Props> = ({}) => {
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				<Title level={4}>Theo dõi các đơn hàng</Title>
-				<Flex align="center" justify="flex-end" className="py-4">
+				<Flex align="center" justify="space-between" className="py-4">
+					<Flex align="center" gap={8}>
+						<Text className="text-gray-700 font-medium">Đơn hàng của tôi</Text>
+						<Switch
+							checked={myOrder}
+							onChange={(checked) => setMyOrder(checked)}
+						/>
+					</Flex>
 					<Input
 						placeholder="Tìm kiếm đơn nhập kho..."
 						name="search"
@@ -99,7 +110,7 @@ const ListInbound: FC<Props> = ({}) => {
 					/>
 				</Flex>
 				<Tabs
-					defaultActiveKey={activeKey}
+					defaultActiveKey={activeKey as string}
 					items={items}
 					onChange={handleChangeTab}
 					centered
