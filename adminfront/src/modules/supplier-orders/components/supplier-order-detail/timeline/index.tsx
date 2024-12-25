@@ -71,6 +71,8 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 		refetch: refetchSupplierOrder,
 	} = useAdminSupplierOrder(orderId);
 
+	const isOrderCanceled = order?.status === 'canceled';
+
 	if (!events?.length) {
 		return (
 			<Card loading={isLoading || isOrderLoading}>
@@ -150,14 +152,8 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 			label: 'Xác nhận hàng đã về kho',
 			icon: <PackageCheck size={18} />,
 			onClick: handleMarkAsFulfilled,
+			disabled: isOrderCanceled
 		},
-		// order?.fulfillment_status === FulfillSupplierOrderStt.DELIVERED && {
-		// 	key: 'cancel_as_fulfilled',
-		// 	label: 'Đánh dấu huỷ nhận hàng',
-		// 	icon: <PackageX size={18} />,
-		// 	danger: true,
-		// 	onClick: handleCancelAsFulfilled,
-		// },
 		[
 			FulfillSupplierOrderStt.DELIVERED,
 			FulfillSupplierOrderStt.INVENTORIED,
@@ -165,6 +161,7 @@ const Timeline = ({ orderId, isLoading, events, refetch }: Props) => {
 			key: 'inbound_detail',
 			label: 'Trang nhập hàng chi tiết',
 			icon: <ArrowLeft size={18} />,
+			disabled: isOrderCanceled,
 			onClick: () => {
 				router.push(`${ERoutes.WAREHOUSE_INBOUND}/${orderId}`);
 			},

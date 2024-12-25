@@ -3,6 +3,7 @@ import {
 	CreateSupplierOrderDocument,
 	CreateSupplierOrderInput,
 	DeleteSupplierOrderLineItem,
+	UpdateSupplierOrder,
 } from '@/types/supplier-order';
 import { buildOptions } from '@/utils/build-options';
 import { Response } from '@medusajs/medusa-js';
@@ -69,6 +70,25 @@ export const useAdminCreateSupplierOrders = (
 		buildOptions(queryClient, [supplierOrdersKeys.lists()], options)
 	);
 };
+
+export const useAdminUpdateSupplierOrder = (
+	id: string,
+	options?: UseMutationOptions<Response<void>, Error, UpdateSupplierOrder>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: UpdateSupplierOrder) =>
+			client.admin.custom.post(`/admin/supplier-order/${id}`, payload),
+		buildOptions(
+			queryClient,
+			[supplierOrdersKeys.lists(), supplierOrdersKeys.detail(id)],
+			options
+		)
+	);
+};
+
 export const useAdminSupplierOrderDeleteLineItem = (
 	id: string,
 	options?: UseMutationOptions<
