@@ -104,6 +104,12 @@ const nextConfig = withStoreConfig({
 				port: '',
 				pathname: '/**',
 			},
+			{
+				protocol: 'https',
+				hostname: 'medusa-public-images.s3.eu-west-1.amazonaws.com',
+				port: '',
+				pathname: '/**',
+			},
 		],
 	},
 	webpack: (config, { dev, isServer }) => {

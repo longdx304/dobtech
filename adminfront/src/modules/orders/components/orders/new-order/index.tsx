@@ -71,7 +71,6 @@ const NewOrderModal: FC<Props> = ({
 	} = useNewDraftOrderForm();
 	const [isSendEmail, setIsSendEmail] = useState(false);
 
-
 	// Initialize transfer order mutation
 	const transferOrder = useAdminDraftOrderTransferOrder();
 
@@ -127,7 +126,6 @@ const NewOrderModal: FC<Props> = ({
 			countryCode: values.shipping_address.country_code.value,
 			isSendEmail: false,
 		};
-		console.log('pdfReq:', pdfReq);
 
 		// Generate pdf blob
 		const pdfBlob = await generatePdfBlob(pdfReq!);

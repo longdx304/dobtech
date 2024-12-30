@@ -8,6 +8,7 @@ import { Cart, GiftCard, StorePostCartsCartReq } from '@medusajs/medusa';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { ShippingAddressProps } from './components/shipping-address';
+import { count } from 'console';
 
 export async function setAddresses(
 	values: ShippingAddressProps,
@@ -159,7 +160,17 @@ export async function placeOrder(cartId?: string) {
 	}
 
 	if (cart?.type === 'order') {
-		return { redirect: true, url: `/order/confirmed/${cart?.data.id}` };
+		return {
+			redirect: true,
+			url: `/order/confirmed/${cart?.data.id}`,
+			data: {
+				items: cart?.data?.items,
+				shipping_address: cart?.data?.shipping_address,
+				email: cart?.data?.email,
+				region: cart?.data?.region,
+				orderId: cart?.data?.id,
+			},
+		};
 	}
 
 	return { redirect: false, cart };

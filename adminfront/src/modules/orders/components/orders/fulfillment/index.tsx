@@ -1,17 +1,15 @@
-import { BadgeButton, Button } from '@/components/Button';
+import { BadgeButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Title } from '@/components/Typography';
-import { useAdminAsignOrder } from '@/lib/hooks/api/order';
-import { useUser } from '@/lib/providers/user-provider';
 import { getErrorMessage } from '@/lib/utils';
 import StatusIndicator from '@/modules/common/components/status-indicator';
 import { TrackingLink } from '@/modules/orders/components/common';
 import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
+import { ERoutes } from '@/types/routes';
 import {
 	ClaimOrder,
-	LineItem,
 	Order,
 	Swap,
 	Fulfillment as TFulfillment,
@@ -25,10 +23,9 @@ import {
 	useAdminCancelFulfillment,
 	useAdminCancelSwapFulfillment,
 } from 'medusa-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import MarkShippedModal from './mark-shipped-modal';
-import Link from 'next/link';
-import { ERoutes } from '@/types/routes';
 
 type Props = {
 	order: Order & { handler_id?: string; handler?: User };
@@ -94,8 +91,6 @@ const gatherAllFulfillments = (order: Order) => {
 
 const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 	const [fulfillmentToShip, setFulfillmentToShip] = useState(null);
-	// const handlerInventoryOrder = useAdminAsignOrder(order!.id);
-	// const { user } = useUser();
 
 	if (!order || order.id === undefined) {
 		return (
@@ -105,30 +100,7 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 		);
 	}
 
-	// const anyItemsToFulfil = order.items.some(
-	// 	(item: LineItem) => item.quantity > (item.fulfilled_quantity ?? 0)
-	// );
-
 	const allFulfillments = gatherAllFulfillments(order);
-
-	// const handleOkFulfillment = async () => {
-	// 	if (user?.id) {
-	// 		await handlerInventoryOrder.mutateAsync(
-	// 			{
-	// 				handler_id: user!.id,
-	// 			},
-	// 			{
-	// 				onSuccess: () => {
-	// 					message.success('Bạn đã phụ trách đơn hàng này');
-	// 					refetch();
-	// 				},
-	// 				onError: (err) => {
-	// 					message.error(getErrorMessage(err));
-	// 				},
-	// 			}
-	// 		);
-	// 	}
-	// };
 
 	return (
 		<Card loading={isLoading} className="px-4">
