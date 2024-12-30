@@ -32,9 +32,7 @@ const DraftOrderList: FC<Props> = () => {
 	);
 
 	// Mutations api
-	const transferOrder = useAdminDraftOrderTransferOrder(
-		currentDraftOrderId ?? ''
-	);
+	const transferOrder = useAdminDraftOrderTransferOrder();
 	const cancelOrder = useAdminDeleteDraftOrder(currentDraftOrderId ?? '');
 
 	const {
@@ -69,8 +67,7 @@ const DraftOrderList: FC<Props> = () => {
 
 	const handleTransferToOrder = async (id: string) => {
 		try {
-			setCurrentDraftOrderId(id);
-			await transferOrder.mutateAsync();
+			await transferOrder.mutateAsync({ id });
 
 			message.success('Chuyển đơn hàng thành công');
 		} catch (error) {

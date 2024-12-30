@@ -15,13 +15,13 @@ export default function InputNumber({
 }: Readonly<Props>) {
 	const formatter = (value: any) => {
 		if (value) {
-			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 		}
 		return value;
 	};
 
 	const parser = (value: any) => {
-		return value.replace(/\$\s?|(,*)/g, '');
+		return value.replace(/\$\s?|(\.*)/g, '');
 	};
 
 	return (

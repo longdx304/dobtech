@@ -189,6 +189,6 @@ export const menuRoutes: Record<string, string> = {
 	'warehouse-outbound': ERoutes.WAREHOUSE_OUTBOUND,
 	'warehouse-transaction': ERoutes.WAREHOUSE_TRANSACTIONS,
 	'item-unit': ERoutes.ITEM_UNIT,
-	'warehouse-stock-checker': ERoutes.STOCK_CHECKER,
-	'warehouse-ship': ERoutes.SHIP,
+	'warehouse-stock-checker': ERoutes.WAREHOUSE_STOCK_CHECKER,
+	'warehouse-ship': ERoutes.WAREHOUSE_SHIPMENT,
 };
