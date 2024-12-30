@@ -69,6 +69,8 @@ const NewOrderModal: FC<Props> = ({
 		form,
 		context: { items },
 	} = useNewDraftOrderForm();
+	const [isSendEmail, setIsSendEmail] = useState(false);
+
 
 	// Initialize transfer order mutation
 	const transferOrder = useAdminDraftOrderTransferOrder();
@@ -99,7 +101,7 @@ const NewOrderModal: FC<Props> = ({
 		{ title: '', content: <ShippingDetails /> },
 		{ title: '', content: <Items /> },
 		// { title: '', content: <SelectShipping /> },
-		{ title: '', content: <Summary /> },
+		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} /> },
 	];
 
 	const generateFilePdf = async (
@@ -241,7 +243,7 @@ const NewOrderModal: FC<Props> = ({
 			await createDraftOrder(transformedData as any, {
 				onSuccess: async (response) => {
 					transferOrder.mutateAsync(
-						{ id: response.draft_order.id, isSendEmail: false, urlPdf },
+						{ id: response.draft_order.id, isSendEmail: isSendEmail, urlPdf },
 						{
 							onSuccess: () => {
 								refetch();
@@ -264,6 +266,7 @@ const NewOrderModal: FC<Props> = ({
 			console.log('error catch', error);
 		}
 	};
+	console.log('email', isSendEmail);
 
 	return (
 		<StepModalProvider>

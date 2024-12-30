@@ -30,6 +30,7 @@ const DraftOrderList: FC<Props> = () => {
 	const [currentDraftOrderId, setCurrentDraftOrderId] = useState<string | null>(
 		null
 	);
+	const [isSendEmail, setIsSendEmail] = useState(false);
 
 	// Mutations api
 	const transferOrder = useAdminDraftOrderTransferOrder();
@@ -67,7 +68,7 @@ const DraftOrderList: FC<Props> = () => {
 
 	const handleTransferToOrder = async (id: string) => {
 		try {
-			await transferOrder.mutateAsync({ id });
+			await transferOrder.mutateAsync({ id, isSendEmail, urlPdf: '' });
 
 			message.success('Chuyển đơn hàng thành công');
 		} catch (error) {
@@ -159,6 +160,7 @@ const DraftOrderList: FC<Props> = () => {
 						state={stateDraftOrdersModal}
 						handleOk={handleCancelDraftOrder}
 						handleCancel={handleCancelDraftOrder}
+						setIsSendEmail={setIsSendEmail}
 					/>
 				</NewDraftOrderFormProvider>
 			)}
