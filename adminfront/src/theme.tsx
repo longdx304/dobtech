@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { ConfigProvider, ThemeConfig } from 'antd';
+import { ThemeConfig } from 'antd';
 
 const theme: ThemeConfig = {
 	token: {

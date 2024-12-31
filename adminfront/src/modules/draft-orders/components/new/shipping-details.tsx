@@ -29,7 +29,7 @@ const ShippingDetails = () => {
 
 	const customerId = Form.useWatch('customer_id', form);
 	const shippingAddressId = Form.useWatch('shipping_address_id', form);
-	const { customers, isLoading } = useAdminCustomers();
+	const { customers, isLoading, count } = useAdminCustomers();
 
 	// select customer options
 	useEffect(() => {
@@ -173,7 +173,7 @@ const ShippingDetails = () => {
 	};
 
 	return (
-		<div className="flex min-h-[705px] flex-col gap-y-8">
+		<div className="flex h-max flex-col gap-y-8">
 			<Form form={form} layout="vertical">
 				<div className="flex gap-x-2 items-center">
 					<Form.Item
@@ -262,6 +262,7 @@ const ShippingDetails = () => {
 				visible={isCreateModalOpen}
 				onClose={() => setIsCreateModalOpen(false)}
 				onCustomerCreated={handleCustomerCreated}
+				totalCustomers={count || 0}
 			/>
 		</div>
 	);

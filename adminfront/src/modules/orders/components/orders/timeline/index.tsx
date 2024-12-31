@@ -17,6 +17,7 @@ import {
 	ExchangeEvent,
 	ClaimEvent,
 	PaidEvent,
+	AttachmentEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
 import { Order, Region } from '@medusajs/medusa';
 import { Empty } from 'antd';
@@ -43,6 +44,7 @@ import SwapModal from './timeline-events/modal/swap';
 import ClaimModal from './timeline-events/modal/claim';
 import Paid from './timeline-events/paid';
 import ChangedPrice from './timeline-events/order-edit/changed-price';
+import Attachment from './timeline-events/attachment';
 
 type Props = {
 	orderId: Order['id'];
@@ -221,6 +223,8 @@ function switchOnType(
 			return <PaymentRequired event={event as PaymentRequiredEvent} />;
 		case 'change-price':
 			return <ChangedPrice event={event as any} region={region} />;
+		case 'attachment':
+			return <Attachment event={event as AttachmentEvent} />;
 		default:
 			return null;
 	}

@@ -22,6 +22,8 @@ export enum ERoutes {
 	WAREHOUSE_OUTBOUND = '/admin/warehouse/outbound',
 	WAREHOUSE_TRANSACTIONS = '/admin/warehouse/transactions',
 	ITEM_UNIT = '/admin/item-unit',
+	WAREHOUSE_STOCK_CHECKER = '/admin/warehouse/stock-checker',
+	WAREHOUSE_SHIPMENT = '/admin/warehouse/shipment',
 }
 
 export interface TRouteConfig {
@@ -36,31 +38,29 @@ export const routesConfig: TRouteConfig[] = [
 	},
 	{
 		path: ERoutes.ACCOUNTS,
-		mode: [EPermissions.WarehouseManager],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.PRODUCTS,
 		mode: [
-			EPermissions.WarehouseManager,
-			EPermissions.InventoryChecker,
+			EPermissions.Manager,
 			EPermissions.Driver,
-			EPermissions.AssistantDriver,
-			EPermissions.WarehouseStaff,
+			EPermissions.Accountant,
+			EPermissions.Warehouse,
 		],
 	},
 	{
 		path: ERoutes.DASHBOARD,
 		mode: [
-			EPermissions.WarehouseManager,
-			EPermissions.InventoryChecker,
+			EPermissions.Manager,
 			EPermissions.Driver,
-			EPermissions.AssistantDriver,
-			EPermissions.WarehouseStaff,
+			EPermissions.Accountant,
+			EPermissions.Warehouse,
 		],
 	},
 	{
 		path: ERoutes.PRODUCT_CATEGORIES,
-		mode: [EPermissions.WarehouseManager],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.PRICING,
@@ -100,26 +100,22 @@ export const routesConfig: TRouteConfig[] = [
 	},
 	{
 		path: ERoutes.WAREHOUSE_INBOUND,
-		mode: [
-			EPermissions.WarehouseStaff,
-			EPermissions.WarehouseManager,
-			EPermissions.InventoryChecker,
-		],
+		mode: [EPermissions.Warehouse, EPermissions.Manager],
 	},
 	{
 		path: ERoutes.WAREHOUSE_OUTBOUND,
-		mode: [
-			EPermissions.WarehouseStaff,
-			EPermissions.WarehouseManager,
-			EPermissions.InventoryChecker,
-		],
+		mode: [EPermissions.Warehouse, EPermissions.Manager],
 	},
 	{
 		path: ERoutes.WAREHOUSE_TRANSACTIONS,
-		mode: [
-			EPermissions.WarehouseStaff,
-			EPermissions.WarehouseManager,
-			EPermissions.InventoryChecker,
-		],
+		mode: [EPermissions.Warehouse, EPermissions.Manager],
+	},
+	{
+		path: ERoutes.WAREHOUSE_STOCK_CHECKER,
+		mode: [EPermissions.Warehouse, EPermissions.Manager],
+	},
+	{
+		path: ERoutes.WAREHOUSE_SHIPMENT,
+		mode: [EPermissions.Driver, EPermissions.Manager],
 	},
 ];

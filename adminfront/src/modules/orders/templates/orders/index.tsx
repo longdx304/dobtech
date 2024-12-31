@@ -14,6 +14,8 @@ import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import NewOrderModal from '../../components/orders/new-order';
 import orderColumns from './order-column';
+import { Card } from '@/components/Card';
+import { Title } from '@/components/Typography';
 
 type Props = {};
 
@@ -101,7 +103,11 @@ const OrderList: FC<Props> = () => {
 	};
 
 	return (
-		<div className="w-full">
+		// <div className="w-full">
+		<>
+			<Flex align="center" justify="flex-start" className="">
+				<Title level={3}>Đơn hàng</Title>
+			</Flex>
 			<Flex align="center" justify="flex-end" className="pb-4">
 				<Input
 					// size="small"
@@ -149,7 +155,7 @@ const OrderList: FC<Props> = () => {
 					/>
 				</NewDraftOrderFormProvider>
 			)}
-		</div>
+		</>
 	);
 };
 

@@ -2,9 +2,9 @@ import { buildOptions } from '@/utils/build-options';
 import { DraftOrder } from '@medusajs/medusa';
 import { Response } from '@medusajs/medusa-js';
 import {
-  useMutation,
-  UseMutationOptions,
-  useQueryClient,
+	useMutation,
+	UseMutationOptions,
+	useQueryClient,
 } from '@tanstack/react-query';
 import { adminDraftOrderKeys, adminOrderKeys, useMedusa } from 'medusa-react';
 
@@ -12,12 +12,17 @@ export type AdminDraftOrderTransferRes = {
 	draft_order: DraftOrder;
 };
 
+export type AdminDraftOrderTransferReq = {
+	id: string;
+	isSendEmail?: boolean;
+	urlPdf: string;
+};
+
 export const useAdminDraftOrderTransferOrder = (
-	id: string,
 	options?: UseMutationOptions<
 		Response<AdminDraftOrderTransferRes>,
 		Error,
-		void
+		AdminDraftOrderTransferReq
 	>
 ) => {
 	const { client } = useMedusa();
@@ -25,11 +30,15 @@ export const useAdminDraftOrderTransferOrder = (
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		() => client.admin.custom.post(`/admin/draft-orders/${id}/transfer`),
+		(payload: AdminDraftOrderTransferReq) =>
+			client.admin.custom.post(`/admin/draft-orders/${payload.id}/transfer`, {
+				isSendEmail: payload.isSendEmail,
+				urlPdf: payload.urlPdf,
+			}),
 		buildOptions(
 			queryClient,
 			[
-				adminDraftOrderKeys.detail(id),
+				adminDraftOrderKeys.details(),
 				adminDraftOrderKeys.lists(),
 				adminOrderKeys.lists(),
 			],

@@ -6,7 +6,7 @@ type Props = TooltipProps & {
 	className?: string;
 	title: ReactNode;
 	children?: ReactNode;
-}
+};
 
 export default function Tooltip({
 	title,

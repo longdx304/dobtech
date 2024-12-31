@@ -3,13 +3,14 @@ import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Text, Title } from '@/components/Typography';
 import { useAdminCancelSupplierOrder } from '@/lib/hooks/api/supplier-order';
+import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import StatusIndicator from '@/modules/common/components/status-indicator';
 // import { useAdminCancelSupplierOrder } from '@/modules/supplier/hooks';
 import { SupplierOrder } from '@/types/supplier';
 import { Empty, message, Modal as AntdModal } from 'antd';
 import dayjs from 'dayjs';
-import { Ban } from 'lucide-react';
+import { Ban, Pencil } from 'lucide-react';
 
 type Props = {
 	supplierOrder: SupplierOrder | undefined;
@@ -17,7 +18,7 @@ type Props = {
 };
 
 const Information = ({ supplierOrder, isLoading }: Props) => {
-	// const cancelOrder = useAdminCancelSupplierOrder(supplierOrder?.id!);
+	const { state, onOpen, onClose } = useToggleState(false);
 	const cancelOrder = useAdminCancelSupplierOrder(supplierOrder?.id!);
 
 	const handleCancelOrder = () => {
@@ -41,9 +42,15 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 		{
 			label: <span className="w-full">{'Huỷ đơn hàng'}</span>,
 			key: 'cancel',
-			icon: <Ban />,
+			icon: <Ban size={16} />,
 			danger: true,
 			onClick: handleCancelOrder,
+		},
+		{
+			label: <span className="w-full">{'Chỉnh sửa thời gian đơn hàng'}</span>,
+			key: 'edit',
+			icon: <Pencil size={16} />,
+			onClick: onOpen,
 		},
 	];
 
@@ -73,6 +80,25 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 							<Text className="text-gray-500 text-sm">Điện thoại:</Text>
 							<Text className="text-gray-500 text-sm">
 								{supplierOrder?.supplier?.phone ?? '-'}
+							</Text>
+						</Flex>
+						<Flex justify="space-between" align="center">
+							<Text className="text-gray-500 text-sm">
+								Ngày nhận hàng(dự kiến):
+							</Text>
+							<Text className="text-gray-500 text-sm">
+								{dayjs(supplierOrder?.estimated_production_time).format(
+									'DD/MM/YYYY'
+								) ?? '-'}
+							</Text>
+						</Flex>
+						<Flex justify="space-between" align="center">
+							<Text className="text-gray-500 text-sm">
+								Ngày thanh toán(dự kiến):
+							</Text>
+							<Text className="text-gray-500 text-sm">
+								{dayjs(supplierOrder?.settlement_time).format('DD/MM/YYYY') ??
+									'-'}
 							</Text>
 						</Flex>
 					</Flex>
@@ -122,3 +148,10 @@ const OrderStatus = ({ status }: { status: SupplierOrder['status'] }) => {
 			return null;
 	}
 };
+
+type EditModalProps = {
+	state: boolean;
+	close: () => void;
+};
+
+const ModalEditTimeOrder = ({ state, close }: EditModalProps) => {};

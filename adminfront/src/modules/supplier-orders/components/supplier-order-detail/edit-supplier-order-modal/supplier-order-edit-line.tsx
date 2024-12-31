@@ -18,19 +18,16 @@ import { useState } from 'react';
 
 type SupplierOrderEditLineProps = {
 	item: LineItem;
-	customerId: string;
-	regionId: string;
+	customerId?: string;
+	regionId?: string;
 	currencyCode: string;
 	change?: OrderItemChange;
 };
 
-let isLoading = false;
 const SupplierOrderEditLine = ({
 	item,
 	currencyCode,
 	change,
-	customerId,
-	regionId,
 }: SupplierOrderEditLineProps) => {
 	const isNew = change?.type === 'item_add';
 	const isModified = change?.type === 'item_update';

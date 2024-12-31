@@ -7,21 +7,23 @@ type Props = {
 	visible: boolean;
 	onClose: () => void;
 	onCustomerCreated: (customer: any) => void;
+	totalCustomers: number;
 };
 
 const CreateCustomerModal = ({
 	visible,
 	onClose,
 	onCustomerCreated,
+	totalCustomers,
 }: Props) => {
 	const [form] = Form.useForm();
 	const createCustomer = useAdminCreateCustomer();
 
 	const handleSubmit = async (values: any) => {
 		try {
-			const result = await createCustomer.mutate(
+			await createCustomer.mutate(
 				{
-					email: values.email,
+					email: values?.email || `customer_${totalCustomers + 1}@example.com`,
 					first_name: values.first_name,
 					last_name: values.last_name,
 					password: values.password,
@@ -57,7 +59,7 @@ const CreateCustomerModal = ({
 					name="email"
 					label="Email"
 					rules={[
-						{ required: true, message: 'Vui lòng nhập email' },
+						// { required: true, message: 'Vui lòng nhập email' },
 						{ type: 'email', message: 'Email không hợp lệ' },
 					]}
 				>
@@ -85,7 +87,7 @@ const CreateCustomerModal = ({
 					label="Mật khẩu"
 					rules={[
 						{ required: true, message: 'Vui lòng nhập mật khẩu' },
-						{ min: 8, message: 'Mật khẩu phải có ít nhất 8 ký tự' },
+						{ min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự' },
 					]}
 				>
 					<Input.Password placeholder="Nhập mật khẩu" />

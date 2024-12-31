@@ -1,27 +1,48 @@
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
+import { useUser } from '@/lib/providers/user-provider';
 import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
 import dayjs from 'dayjs';
 import { Check, Clock } from 'lucide-react';
 
 type InboundItemProps = {
 	item: SupplierOrder;
+	handleConfirm: (item: SupplierOrder) => void;
 	handleClickDetail: (item: SupplierOrder) => void;
+	handleRemoveHandler: (item: SupplierOrder) => void;
 };
 
 const InboundItem: React.FC<InboundItemProps> = ({
 	item,
 	handleClickDetail,
+	handleConfirm,
+	handleRemoveHandler,
 }) => {
+	const { user } = useUser();
 	const isProcessing =
 		item.fulfillment_status === FulfillSupplierOrderStt.DELIVERED;
 
-	const handleClick = () => {
-		handleClickDetail(item);
-	};
+	const isStart = isProcessing && !item?.handler_id;
+
+	const actions = [
+		{
+			label: <span className="w-full">{'Thực hiện'}</span>,
+			key: 'handle',
+			disabled: !isStart,
+			onClick: () => handleConfirm(item),
+		},
+		{
+			label: <span className="w-full">{'Huỷ bỏ'}</span>,
+			key: 'remove',
+			disabled: user?.id !== item?.handler_id || isStart || !isProcessing,
+			danger: true,
+			onClick: () => handleRemoveHandler(item),
+		},
+	];
 
 	return (
 		<Card className="bg-[#F3F6FF]" rounded>
@@ -30,7 +51,11 @@ const InboundItem: React.FC<InboundItemProps> = ({
 				className="w-fit flex items-center gap-1 p-2 rounded-lg"
 			>
 				<span className="text-[14px] font-semibold">
-					{isProcessing ? 'Đang tiến hành' : 'Đã hoàn thành'}
+					{isStart
+						? 'Chờ xử lý'
+						: isProcessing
+						? 'Đang tiến hành'
+						: 'Đã hoàn thành'}
 				</span>
 				{isProcessing ? <Clock size={16} /> : <Check />}
 			</Tag>
@@ -48,17 +73,16 @@ const InboundItem: React.FC<InboundItemProps> = ({
 				<Text className="text-[14px] text-gray-500">Người xử lý:</Text>
 				<Text className="text-sm font-semibold">
 					{item?.handler_id
-						? `${item.handler?.last_name} ${item.handler?.first_name}`
+						? `${item.handler?.first_name ?? ''}`
 						: 'Chưa xác định'}
 				</Text>
 			</Flex>
-			<Button className="w-full mt-2" onClick={handleClick}>
-				{!item?.handler_id
-					? 'Nhận nhập kho'
-					: isProcessing
-					? 'Nhập kho'
-					: 'Chi tiết'}
-			</Button>
+			<Flex gap={4} align="center" justify="space-between" className="mt-2">
+				<Button className="w-full" onClick={() => handleClickDetail(item)}>
+					{user?.id === item?.handler_id ? 'Nhập kho' : 'Chi tiết'}
+				</Button>
+				<ActionAbles actions={actions as any} />
+			</Flex>
 		</Card>
 	);
 };

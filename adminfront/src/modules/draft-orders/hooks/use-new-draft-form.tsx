@@ -23,7 +23,7 @@ export type NewDraftOrderForm = {
 	region: string | null;
 	items: {
 		quantity: number;
-		variant_id?: string;
+		variant_id: string;
 		title: string;
 		unit_price: number;
 		thumbnail?: string | null;

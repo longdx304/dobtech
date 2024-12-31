@@ -6,18 +6,17 @@ describe('Login spec', () => {
 	const fullName = 'Test create user';
 	const fullNameUpdated = 'Test update user';
 	const permissions = [
-		EPermissions.WarehouseStaff,
-		EPermissions.WarehouseManager,
+		EPermissions.Warehouse,
+		EPermissions.Manager,
 		EPermissions.Driver,
-		EPermissions.InventoryChecker,
-		EPermissions.AssistantDriver,
+		EPermissions.Accountant,
 	];
 
 	beforeEach(() => {
 		cy.login('admin@test.com', '123456');
 		cy.wait(1000);
 		cy.visit('/admin/accounts');
-		
+
 	});
 
 	it('should show new user when successfully created user', () => {
