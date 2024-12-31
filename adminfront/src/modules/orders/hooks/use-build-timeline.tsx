@@ -47,7 +47,13 @@ export interface TimelineEvent {
 		| 'payment-required'
 		| 'refund-required'
 		| 'paid'
-		| 'change-price';
+		| 'change-price'
+		| 'attachment';
+}
+
+export interface AttachmentEvent extends TimelineEvent {
+	url: string;
+	fileName: string;
 }
 
 export interface RefundRequiredEvent extends TimelineEvent {
@@ -350,6 +356,20 @@ export const useBuildTimeline = (orderId: string) => {
 					type: 'change-price',
 					orderId: order.id,
 				} as TimelineEvent);
+			}
+		}
+
+		if ((order.metadata?.files as any[])?.length) {
+			for (const event of order.metadata.files as any[]) {
+				events.push({
+					...event,
+					id: event.url.split('/').pop(),
+					time: event.created_at,
+					type: 'attachment',
+					url: event.url,
+					fileName: event.name,
+					orderId: order.id,
+				} as AttachmentEvent);
 			}
 		}
 

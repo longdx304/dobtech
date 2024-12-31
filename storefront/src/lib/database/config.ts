@@ -10,5 +10,5 @@ if (process.env.NEXT_PUBLIC_BACKEND_URL) {
 
 export const medusaClient = new Medusa({
   baseUrl: BACKEND_URL,
-  maxRetries: 3,
+  maxRetries: 2,
 })

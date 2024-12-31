@@ -14,6 +14,8 @@ import dayjs from 'dayjs';
 import { FC } from 'react';
 import { pdfOrderReq } from '../payment-button';
 import { formatAmount } from '@/lib/utils/prices';
+import { formatNumber } from '@/lib/utils';
+import { format } from 'path';
 
 // Register fonts that supports Vietnamese characters
 Font.register({
@@ -178,14 +180,16 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 									<Text>{item.title}</Text>
 								</View>
 								<Text style={styles.tableCell}>
-									{item.unit_price?.toLocaleString()} {region?.currency?.symbol}
+									{formatAmount({ amount: item.unit_price || 0, region })}
 								</Text>
 								<Text style={styles.tableCell}>
-									{formatAmount({ amount: item.quantity, region })}
+									{formatNumber(item.quantity)}
 								</Text>
 								<Text style={styles.tableCell}>
-									{(item.quantity * (item.unit_price || 0)).toLocaleString()}{' '}
-									{region?.currency?.symbol}
+									{formatAmount({
+										amount: item.quantity * (item.unit_price || 0),
+										region,
+									})}
 								</Text>
 							</View>
 						);
@@ -199,14 +203,10 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 						</View>
 						<Text style={styles.tableCell}>{'-'}</Text>
 						<Text style={styles.tableCell}>
-							{formatAmount({
-								amount: order.totalQuantity,
-								region,
-							})}
-							formatAmount
+							{formatNumber(order.totalQuantity)}
 						</Text>
 						<Text style={styles.tableCell}>
-							{total.toLocaleString()} {region?.currency?.symbol}
+							{formatAmount({ amount: total, region })}
 						</Text>
 					</View>
 				</View>

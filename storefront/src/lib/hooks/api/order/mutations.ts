@@ -6,7 +6,7 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query';
 import { queryKeysFactory, useMedusa } from 'medusa-react';
-
+import medusaRequest from '@/lib/hooks/api/request';
 const ADMIN_ORDER = `admin_order` as const;
 
 export const adminOrderKeys = queryKeysFactory(ADMIN_ORDER);
@@ -21,18 +21,14 @@ interface StoreUpdateOrderReq {
 }
 
 export const useStoreUpdateOrder = (
-	options?: UseMutationOptions<
-		Response<StoreUpdateOrderRes>,
-		Error,
-		StoreUpdateOrderReq
-	>
+	options?: UseMutationOptions<Response<any>, Error, StoreUpdateOrderReq>
 ) => {
-	const { client } = useMedusa();
+	// const { client } = useMedusa();
 	const queryClient = useQueryClient();
 
 	return useMutation((payload: StoreUpdateOrderReq) => {
 		const { id, ...restPayload } = payload;
 		console.log('id, ...restPayload:', id, restPayload);
-		return client.admin.custom.post(`/store/orders/${id}`, restPayload);
+		return medusaRequest('POST', `/store/orders/${id}`, restPayload);
 	}, buildOptions(queryClient, [adminOrderKeys.lists()], options));
 };

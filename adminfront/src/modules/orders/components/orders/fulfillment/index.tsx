@@ -10,7 +10,6 @@ import useStockLocations from '@/modules/orders/hooks/use-stock-locations';
 import { ERoutes } from '@/types/routes';
 import {
 	ClaimOrder,
-	Order,
 	Swap,
 	Fulfillment as TFulfillment,
 	User,
@@ -26,9 +25,10 @@ import {
 import Link from 'next/link';
 import { useState } from 'react';
 import MarkShippedModal from './mark-shipped-modal';
+import { Order } from '@/types/order';
 
 type Props = {
-	order: Order & { handler_id?: string; handler?: User };
+	order: Order;
 	isLoading: boolean;
 	refetch: () => void;
 };
@@ -39,6 +39,15 @@ type OrderDetailFulfillment = {
 	fulfillment: TFulfillment;
 	swap?: Swap;
 	claim?: ClaimOrder;
+	user?: User | null;
+	status?: string;
+};
+
+const shipStatus = {
+	awaiting: 'Chờ gửi hàng',
+	delivering: 'Đang giao',
+	shipped: 'Đã gửi',
+	canceled: 'Đã huỷ',
 };
 
 const gatherAllFulfillments = (order: Order) => {
@@ -50,10 +59,20 @@ const gatherAllFulfillments = (order: Order) => {
 
 	order.fulfillments.forEach((f: any, index: number) => {
 		all.push({
-			title: `Fulfillment #${index + 1}`,
+			title: `Đơn xuất hàng #${index + 1}`,
 			type: 'default',
 			fulfillment: f,
+			user: f?.checker || null,
+			status: 'Đã kiểm hàng',
 		});
+		f?.checker &&
+			all.push({
+				title: `Đơn giao hàng #${index + 1}`,
+				type: 'default',
+				fulfillment: f,
+				user: f?.shipper || null,
+				status: shipStatus[f.status as keyof typeof shipStatus],
+			});
 	});
 
 	if (order.claims?.length) {
@@ -109,18 +128,6 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 					<Title level={4}>{`Fulfillment`}</Title>
 					<div className="flex flex-col-reverse lg:flex-row gap-0 justify-end items-center lg:gap-4">
 						<FulfillmentStatus status={order!.fulfillment_status} />
-						{/* {order.status !== 'canceled' &&
-							anyItemsToFulfil &&
-							!order.handler_id && (
-								<Button
-									type="default"
-									// onClick={onOpen}
-									onClick={handleOkFulfillment}
-									loading={handlerInventoryOrder.isLoading}
-								>
-									{'Thực hiện lấy hàng'}
-								</Button>
-							)} */}
 					</div>
 				</Flex>
 			</div>
@@ -266,7 +273,7 @@ const FormattedFulfillment = ({
 	const cancelSwapFulfillment = useAdminCancelSwapFulfillment(order.id);
 	const cancelClaimFulfillment = useAdminCancelClaimFulfillment(order.id);
 	const { getLocationNameById } = useStockLocations();
-	const { fulfillment } = fulfillmentObj;
+	const { fulfillment, user, status } = fulfillmentObj;
 	const hasLinks = !!fulfillment.tracking_links?.length;
 
 	const getData = () => {
@@ -324,24 +331,22 @@ const FormattedFulfillment = ({
 		<div className="flex w-full justify-between">
 			<div className="flex flex-col py-2">
 				<div className="text-gray-900 text-xs">
-					{fulfillment.canceled_at
-						? 'Thực hiện đã bị hủy'
-						: `${fulfillmentObj.title} Được thực hiện bởi ${_.capitalize(
-								fulfillment.provider_id
-						  )}`}
+					{fulfillmentObj.title}
+					{fulfillment.canceled_at && 'Thực hiện đã bị hủy'}
+					{!fulfillment.canceled_at && user
+						? ` - Thực hiện ${user?.first_name}`
+						: ' - Chưa có'}
 				</div>
 				<div className="text-gray-500 flex text-xs items-center">
-					{!fulfillment.shipped_at ? 'Chưa gửi' : 'Theo dõi đơn'}
-					{hasLinks &&
+					{status}
+					{/* {hasLinks &&
 						fulfillment.tracking_links.map((tl: any, j: any) => (
 							<TrackingLink key={j} trackingLink={tl} />
-						))}
+						))} */}
 				</div>
 				{!fulfillment.canceled_at && fulfillment.location_id && (
 					<div className="flex flex-col">
-						<div className="text-gray-500 font-semibold text-xs">
-							{fulfillment.shipped_at ? 'Gửi từ' : 'Vận chuyển từ'}
-						</div>
+						<div className="text-gray-500 font-semibold text-xs">{status}</div>
 						<div className="flex items-center pt-2 text-xs">
 							<BadgeButton className="mr-2" icon={<Store />} />
 							{getLocationNameById(fulfillment.location_id)}
@@ -349,7 +354,7 @@ const FormattedFulfillment = ({
 					</div>
 				)}
 			</div>
-			{!fulfillment.canceled_at && !fulfillment.shipped_at && (
+			{/* {!fulfillment.canceled_at && !fulfillment.shipped_at && (
 				<div className="flex items-center space-x-2">
 					<ActionAbles
 						actions={[
@@ -369,7 +374,7 @@ const FormattedFulfillment = ({
 						]}
 					/>
 				</div>
-			)}
+			)} */}
 		</div>
 	);
 };
