@@ -40,12 +40,10 @@ const SelectShipping = () => {
 	}, [selectedShippingOption]);
 
 	return (
-		<div className="min-h-[500px]">
-			<h3 className="inter-base-semibold">
+		<div className="min-h-fit">
+			<h3 className="font-medium">
 				Phương thức vận chuyển{' '}
-				<span className="inter-base-regular text-grey-50">
-					(tại {region?.name})
-				</span>
+				<span className="font-medium text-grey-50">(tại {region?.name})</span>
 			</h3>
 
 			{region ? (

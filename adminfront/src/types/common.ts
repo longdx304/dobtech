@@ -25,3 +25,22 @@ export type MetadataFormType = {
   deleted?: string[]
   ignored?: Record<string, any>
 }
+
+export declare class DateComparisonOperator {
+	/**
+	 * The filtered date must be less than this value.
+	 */
+	lt?: Date;
+	/**
+	 * The filtered date must be greater than this value.
+	 */
+	gt?: Date;
+	/**
+	 * The filtered date must be greater than or equal to this value.
+	 */
+	gte?: Date;
+	/**
+	 * The filtered date must be less than or equal to this value.
+	 */
+	lte?: Date;
+}

@@ -180,3 +180,10 @@ export enum FulfillmentStatus {
 	 */
 	REQUIRES_ACTION = 'requires_action',
 }
+
+export interface LineItemReq {
+	variantId: string;
+	quantity: number;
+	unit_price?: number;
+	title?: string;
+}

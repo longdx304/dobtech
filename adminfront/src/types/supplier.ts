@@ -51,6 +51,7 @@ export interface LineItemReq {
 }
 
 export interface SupplierOrdersReq {
+	isSendEmail?: boolean;
 	lineItems: LineItemReq[];
 	supplierId: string;
 	userId: string;

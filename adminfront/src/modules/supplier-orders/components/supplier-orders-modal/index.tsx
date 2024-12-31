@@ -3,12 +3,13 @@ import { Modal } from '@/components/Modal';
 import { Steps } from '@/components/Steps';
 import { Title } from '@/components/Typography';
 import { useAdminCreateSupplierOrders } from '@/lib/hooks/api/supplier-order';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import { useUser } from '@/lib/providers/user-provider';
 import { LineItemReq, Supplier, SupplierOrdersReq } from '@/types/supplier';
 import { User } from '@medusajs/medusa';
 import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { PDFViewer } from '@react-pdf/renderer';
-import { message, Spin } from 'antd';
+import { message } from 'antd';
 import { useAdminRegion, useAdminRegions } from 'medusa-react';
 import { FC, useMemo, useState } from 'react';
 import useSupplierTime from '../../hooks/use-supplier-time';
@@ -16,7 +17,6 @@ import OrderPDF, { generatePdfBlob } from './order-pdf';
 import ProductTotalForm from './product-total/product-total-form';
 import ProductForm from './product/product-form';
 import SupplierForm from './supplier/supplier-form';
-import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 
 type Props = {
 	state: boolean;
@@ -48,6 +48,7 @@ export interface ItemPrice {
 }
 
 export interface pdfOrderRes {
+	isSendEmail?: boolean;
 	lineItems: LineItemReq[];
 	supplierId: string;
 	userId: string;
@@ -83,10 +84,11 @@ const SupplierOrdersModal: FC<Props> = ({
 	const createSupplierOrder = useAdminCreateSupplierOrders();
 	const { regions } = useAdminRegions();
 	const [regionId, setRegionId] = useState<string | null>(null);
+	const [isSendEmail, setIsSendEmail] = useState(false);
 
 	const uploadFile = useAdminUploadFile();
 
-	const { region } = useAdminRegion(regionId || '');
+	const { region } = useAdminRegion(regionId || '', { enabled: !!regionId });
 
 	// supplier date time picker
 	const {
@@ -145,6 +147,7 @@ const SupplierOrdersModal: FC<Props> = ({
 		);
 
 		const supplierOrdersDraft: pdfOrderRes = {
+			isSendEmail,
 			lineItems: payload?.lineItems || [],
 			supplierId: payload?.supplier?.id || '',
 			supplier: payload?.supplier,
@@ -185,6 +188,7 @@ const SupplierOrdersModal: FC<Props> = ({
 			const pdfUrl = uploadRes.uploads[0].url;
 
 			const orderPayload: SupplierOrdersReq = {
+				isSendEmail,
 				lineItems: pdfOrder?.lineItems || [],
 				supplierId: pdfOrder?.supplier?.id || '',
 				userId: pdfOrder?.user?.id || '',
@@ -253,6 +257,7 @@ const SupplierOrdersModal: FC<Props> = ({
 				width={850}
 				footer={footer}
 				maskClosable={false}
+				loading={createSupplierOrder.isLoading || isSubmitting}
 			>
 				<Title level={3} className="text-center">
 					Tạo mới đơn đặt hàng
@@ -292,6 +297,7 @@ const SupplierOrdersModal: FC<Props> = ({
 						handleSettlementDateChange={handleSettlementDateChange}
 						handleProductionDateChange={handleProductionDateChange}
 						updateDatesFromSupplier={updateDatesFromSupplier}
+						setIsSendEmail={setIsSendEmail}
 					/>
 				)}
 			</Modal>
@@ -311,20 +317,22 @@ const SupplierOrdersModal: FC<Props> = ({
 						>
 							Thoát
 						</Button>,
-						<Button key="submit" type="primary" onClick={onSubmitOrder}>
+						<Button
+							key="submit"
+							type="primary"
+							onClick={onSubmitOrder}
+							loading={createSupplierOrder.isLoading || isSubmitting}
+						>
 							Tạo đơn đặt hàng
 						</Button>,
 					]}
-					loading={isSubmitting}
+					loading={createSupplierOrder.isLoading || isSubmitting}
 				>
 					<PDFViewer width="100%" height="600px">
 						<OrderPDF order={pdfOrder} region={region} />
 					</PDFViewer>
 				</Modal>
 			)}
-
-			{/* show loading when submitting pdf */}
-			<Spin spinning={isSubmitting} />
 		</>
 	);
 };

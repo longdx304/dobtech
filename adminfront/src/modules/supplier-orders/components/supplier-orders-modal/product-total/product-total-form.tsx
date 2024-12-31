@@ -8,6 +8,7 @@ import { useAdminRegion } from 'medusa-react';
 import { FC, useMemo, useState } from 'react';
 import { ItemPrice, ItemQuantity } from '..';
 import productTotalColumns from './product-total-columns';
+import { formatNumber } from '@/lib/utils';
 
 type Props = {
 	selectedRowProducts: PricedVariant[] | undefined;
@@ -35,7 +36,7 @@ const ProductTotalForm: FC<Props> = ({
 	setCurrentStep,
 	regionId,
 }) => {
-	const { region } = useAdminRegion(regionId || '');
+	const { region } = useAdminRegion(regionId || '', { enabled: !!regionId });
 	const [currentPage, setCurrentPage] = useState(1);
 
 	// updated the newest value
@@ -113,14 +114,16 @@ const ProductTotalForm: FC<Props> = ({
 									<Table.Summary.Cell index={1}>
 										{selectedRowProducts?.length} (sản phẩm)
 									</Table.Summary.Cell>
-									<Table.Summary.Cell index={2}>
-										{itemQuantities.reduce(
-											(total, item) => total + item.quantity,
-											0
+									<Table.Summary.Cell index={2} className="text-center">
+										{formatNumber(
+											itemQuantities.reduce(
+												(total, item) => total + item.quantity,
+												0
+											)
 										)}{' '}
 										(đôi)
 									</Table.Summary.Cell>
-									<Table.Summary.Cell index={3}>
+									<Table.Summary.Cell index={3} className="text-center">
 										{totalPrice?.toLocaleString()}
 										{region?.currency.symbol}
 									</Table.Summary.Cell>

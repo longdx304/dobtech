@@ -24,6 +24,7 @@ interface StepModalProps {
 	steps: StepModalScreen[];
 	onFinish: () => void;
 	isMobile?: boolean;
+	loading?: boolean;
 }
 
 // Step Context
@@ -119,6 +120,7 @@ export const StepModal: React.FC<StepModalProps> = ({
 	steps,
 	onFinish,
 	isMobile = false,
+	loading = false,
 }) => {
 	const SteppedContext = useStepModal();
 
@@ -183,6 +185,7 @@ export const StepModal: React.FC<StepModalProps> = ({
 				top: isMobile ? 20 : undefined,
 			}}
 			className={isMobile ? 'mobile-step-modal' : ''}
+			loading={loading}
 		>
 			<div className={`mb-6 ${isMobile ? 'px-2' : ''}`}>
 				<Steps

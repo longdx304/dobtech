@@ -14,27 +14,28 @@ const ManageOrders: FC<Props> = ({}) => {
 	const searchParams = useSearchParams();
 	const query = searchParams.get('tab') || 'orders';
 
-	const itemsTab: TabsProps['items'] = [
-		{
-			key: 'orders',
-			label: 'Đơn hàng',
-			children: <OrderList />,
-		},
-		{
-			key: 'draft-orders',
-			label: 'Bản nháp',
-			children: <DraftOrderList />,
-		},
-	];
+	// const itemsTab: TabsProps['items'] = [
+	// 	{
+	// 		key: 'orders',
+	// 		label: 'Đơn hàng',
+	// 		children: <OrderList />,
+	// 	},
+	// 	{
+	// 		key: 'draft-orders',
+	// 		label: 'Bản nháp',
+	// 		children: <DraftOrderList />,
+	// 	},
+	// ];
 
 	// Handle tab change to update the route with the selected tab
-	const handleTabChange = (key: string) => {
-		router.push(`/admin/${key}`);
-	};
+	// const handleTabChange = (key: string) => {
+	// 	router.push(`/admin/${key}`);
+	// };
 
 	return (
 		<Card className="w-full" bordered={false}>
-			<Tabs items={itemsTab} activeKey={query} onChange={handleTabChange} />
+			{/* <Tabs items={itemsTab} activeKey={query} onChange={handleTabChange} /> */}
+			<OrderList />
 		</Card>
 	);
 };

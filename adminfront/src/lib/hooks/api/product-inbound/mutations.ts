@@ -23,6 +23,19 @@ export const useAdminProductInboundHandler = (
 	);
 };
 
+export const useAdminProductInboundRemoveHandler = (
+	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({ id }: { id: string }) =>
+			client.admin.custom.delete(`/admin/product-inbound/${id}/handler`),
+		buildOptions(queryClient, [adminProductInboundKeys.lists()], options)
+	);
+};
+
 type AdminProductInboundConfirmRes = {
 	supplierOrder: SupplierOrder;
 	message: string;
@@ -48,7 +61,6 @@ export const useAdminProductInboundConfirmById = (
 		)
 	);
 };
-
 
 export const useAdminCreateWarehouseAndInventory = (
 	options?: UseMutationOptions<

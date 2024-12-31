@@ -133,12 +133,18 @@ const ProductForm: FC<ProductFormProps> = ({
 		offset: (currentPage - 1) * PAGE_SIZE,
 	});
 
-	const { product_categories } = useAdminProductCategories({
-		parent_category_id: 'null',
-		include_descendants_tree: true,
-		is_internal: false,
-	});
-	const { collections } = useAdminCollections();
+	const { product_categories } = useAdminProductCategories(
+		{
+			parent_category_id: 'null',
+			include_descendants_tree: true,
+			is_internal: false,
+		},
+		{ enabled: !regionId, keepPreviousData: true }
+	);
+	const { collections } = useAdminCollections(
+		{ limit: 10, offset: 0 },
+		{ enabled: !regionId, keepPreviousData: true }
+	);
 
 	// set item prices
 	const handlePriceChange = (value: number | null, variantId: string) => {

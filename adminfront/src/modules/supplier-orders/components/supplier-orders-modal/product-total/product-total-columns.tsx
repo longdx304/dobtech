@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ProductVariant, Region } from '@medusajs/medusa';
 import Image from 'next/image';
 
@@ -7,6 +6,7 @@ import { Tag } from '@/components/Tag';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
 import { ItemPrice, ItemQuantity } from '../index';
+import { formatNumber } from '@/lib/utils';
 
 interface Props {
 	itemQuantities: ItemQuantity[];
@@ -63,20 +63,21 @@ const productTotalColumns = ({
 		title: 'Số lượng',
 		key: 'quantity',
 		dataIndex: 'quantity',
-		className: 'text-xs',
+		className: 'text-xs text-center [&>div]:flex [&>div]:items-center',
 		render: (_: number, record: any) => {
 			const itemQuantity = itemQuantities.find(
 				(item) => item.variantId === record?.id
 			);
 			const quantity = itemQuantity ? itemQuantity?.quantity : 0;
-			return <Text className="text-xs">{quantity || 0}</Text>;
+			// return <Text className="text-xs">{quantity || 0}</Text>;
+			return <Text className="text-xs">{formatNumber(quantity) || 0}</Text>;
 		},
 	},
 	{
 		title: 'Giá đơn hàng',
 		key: 'price',
 		dataIndex: 'price',
-		className: 'text-xs',
+		className: 'text-xs text-center',
 		render: (_: number, record: any) => {
 			const itemPrice = itemPrices?.find(
 				(item) => item?.variantId === record?.id

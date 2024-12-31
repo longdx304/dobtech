@@ -1,11 +1,10 @@
 'use client';
-import { useMemo } from 'react';
 import { Badge } from 'antd';
 import { Bell, Frown, LoaderCircle } from 'lucide-react';
 
-import { usePolling } from '@/lib/providers/polling-provider';
-import { Button, FloatButton } from '@/components/Button';
+import { FloatButton } from '@/components/Button';
 import { Dropdown } from '@/components/Dropdown';
+import { usePolling } from '@/lib/providers/polling-provider';
 import { Empty } from 'antd';
 import BatchJobActivityList from './BatchJobActivityList';
 
@@ -13,8 +12,8 @@ const Notification = ({}) => {
 	return (
 		<Dropdown
 			dropdownRender={(menu) => DropdownRender()}
-			// open={true}
 			trigger={['click']}
+			className="hidden lg:block w-[300px] bg-transparent h-[calc(100%-100px)]"
 			overlayStyle={{
 				backgroundColor: 'transparent',
 				width: '300px',

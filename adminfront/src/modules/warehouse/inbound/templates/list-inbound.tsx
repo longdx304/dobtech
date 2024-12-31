@@ -6,7 +6,10 @@ import { Input } from '@/components/Input';
 import List from '@/components/List';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
-import { useAdminProductInboundHandler } from '@/lib/hooks/api/product-inbound/mutations';
+import {
+	useAdminProductInboundHandler,
+	useAdminProductInboundRemoveHandler,
+} from '@/lib/hooks/api/product-inbound/mutations';
 import { useAdminProductInbounds } from '@/lib/hooks/api/product-inbound/queries';
 import { getErrorMessage } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
@@ -37,6 +40,7 @@ const ListInbound: FC<Props> = ({}) => {
 		status: activeKey,
 	});
 	const productInboundHandler = useAdminProductInboundHandler();
+	const productInboundRemoveHandler = useAdminProductInboundRemoveHandler();
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -55,7 +59,7 @@ const ListInbound: FC<Props> = ({}) => {
 	const items: TabsProps['items'] = [
 		{
 			key: FulfillSupplierOrderStt.DELIVERED,
-			label: 'Đang chờ nhập kho',
+			label: 'Đang thực hiện',
 		},
 		{
 			key: FulfillSupplierOrderStt.INVENTORIED,
@@ -64,15 +68,29 @@ const ListInbound: FC<Props> = ({}) => {
 	];
 
 	const handleClickDetail = async (item: SupplierOrder) => {
-		if (item?.handler_id) {
-			return router.push(`${ERoutes.WAREHOUSE_INBOUND}/${item.id}`);
-		}
+		return router.push(`${ERoutes.WAREHOUSE_INBOUND}/${item.id}`);
+	};
 
+	const handleConfirm = async (item: SupplierOrder) => {
 		await productInboundHandler.mutateAsync(
 			{ id: item.id },
 			{
 				onSuccess: () => {
 					router.push(`${ERoutes.WAREHOUSE_INBOUND}/${item.id}`);
+				},
+				onError: (err) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
+	};
+
+	const handleRemoveHandler = async (item: SupplierOrder) => {
+		await productInboundRemoveHandler.mutateAsync(
+			{ id: item.id },
+			{
+				onSuccess: () => {
+					message.success('Huỷ bỏ xử lý đơn hàng thành công');
 				},
 				onError: (err) => {
 					message.error(getErrorMessage(err));
@@ -110,7 +128,12 @@ const ListInbound: FC<Props> = ({}) => {
 					loading={isLoading || productInboundHandler.isLoading}
 					renderItem={(item: SupplierOrder) => (
 						<List.Item>
-							<InboundItem item={item} handleClickDetail={handleClickDetail} />
+							<InboundItem
+								item={item}
+								handleClickDetail={handleClickDetail}
+								handleConfirm={handleConfirm}
+								handleRemoveHandler={handleRemoveHandler}
+							/>
 						</List.Item>
 					)}
 					pagination={{

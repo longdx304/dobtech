@@ -13,6 +13,7 @@ import {
 import dayjs from 'dayjs';
 import { FC } from 'react';
 import { pdfOrderRes } from '..';
+import { formatNumber } from '@/lib/utils';
 
 // Register fonts that supports Vietnamese characters
 Font.register({
@@ -114,6 +115,10 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 		0
 	);
 
+	if (!order) {
+		return null;
+	}
+
 	return (
 		<Document>
 			<Page size="A4" style={styles.page}>
@@ -189,7 +194,9 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 								<Text style={styles.tableCell}>
 									{item.unit_price?.toLocaleString()} {region?.currency?.symbol}
 								</Text>
-								<Text style={styles.tableCell}>{item.quantity}</Text>
+								<Text style={styles.tableCell}>
+									{formatNumber(item.quantity)}
+								</Text>
 								<Text style={styles.tableCell}>
 									{(item.quantity * (item.unit_price || 0)).toLocaleString()}{' '}
 									{region?.currency?.symbol}
@@ -205,7 +212,9 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 							<Text>{'-'}</Text>
 						</View>
 						<Text style={styles.tableCell}>{'-'}</Text>
-						<Text style={styles.tableCell}>{order.quantity}</Text>
+						<Text style={styles.tableCell}>
+							{formatNumber(order?.quantity ?? 0)}
+						</Text>
 						<Text style={styles.tableCell}>
 							{total.toLocaleString()} {region?.currency?.symbol}
 						</Text>

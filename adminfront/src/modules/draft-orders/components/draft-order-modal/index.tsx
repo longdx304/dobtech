@@ -1,3 +1,4 @@
+import useIsDesktop from '@/lib/hooks/useIsDesktop';
 import {
 	StepModal,
 	StepModalProvider,
@@ -12,15 +13,20 @@ import SelectRegion from '../new/select-region';
 import SelectShipping from '../new/select-shipping';
 import ShippingDetails from '../new/shipping-details';
 import Summary from '../new/summary';
-import useIsDesktop from '@/lib/hooks/useIsDesktop';
 
 type Props = {
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
+	setIsSendEmail: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const DraftOrderModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
+const DraftOrderModal: FC<Props> = ({
+	state,
+	handleOk,
+	handleCancel,
+	setIsSendEmail,
+}) => {
 	const { mutate } = useAdminCreateDraftOrder();
 	const isDesktop = useIsDesktop();
 	const {
@@ -33,7 +39,7 @@ const DraftOrderModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 		{ title: '', content: <ShippingDetails /> },
 		{ title: '', content: <Items /> },
 		{ title: '', content: <SelectShipping /> },
-		{ title: '', content: <Summary /> },
+		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} /> },
 	];
 
 	const handleFinish = async () => {
@@ -94,4 +100,3 @@ const DraftOrderModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 };
 
 export default DraftOrderModal;
-
