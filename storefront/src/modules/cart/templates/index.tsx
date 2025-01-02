@@ -6,12 +6,13 @@ import ProductList from '@/modules/products/components/product-list';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { LineItem } from '@medusajs/medusa';
 import { cookies } from 'next/headers';
-
 import CartPreview from './cart-preview';
+import { cache } from 'react';
 
 type Props = {};
 
-const fetchCart = async () => {
+// Cache the cart fetch to prevent multiple calls within the same render
+const fetchCart = cache(async () => {
 	const cartId = cookies().get('_chamdep_cart_id')?.value;
 
 	if (!cartId) {
@@ -26,6 +27,7 @@ const fetchCart = async () => {
 		return null;
 	}
 
+	// Only enrich items if needed
 	if (cart?.items.length) {
 		const enrichedItems = await enrichLineItems(cart?.items, cart?.region_id);
 		cart.items = enrichedItems as LineItem[];
@@ -34,11 +36,13 @@ const fetchCart = async () => {
 	cart.checkout_step = cart && getCheckoutStep(cart);
 
 	return cart;
-};
+});
 
 const CartTemplate = async ({}: Props) => {
-	const cart = await fetchCart();
-	const customer = await getCustomer();
+	const [cart, customer] = await Promise.all([
+		fetchCart(),
+		getCustomer()
+	]);
 
 	return (
 		<>

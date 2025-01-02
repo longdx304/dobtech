@@ -4,13 +4,14 @@ import { useCart } from '@/lib/providers/cart/cart-provider';
 import { CartWithCheckoutStep } from '@/types/medusa';
 import { Customer } from '@medusajs/medusa';
 import { Spin } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import Overview from './overview';
 
 type Props = {
 	cart: CartWithCheckoutStep;
 	customer: Omit<Customer, 'password_hash'> | null;
 };
+
 const CartPreview = ({ cart, customer }: Props) => {
 	const {
 		currentStep,
@@ -20,12 +21,17 @@ const CartPreview = ({ cart, customer }: Props) => {
 		refreshAllCarts,
 	} = useCart();
 
-	useEffect(() => {
-		refreshAllCarts();
+	const initializeCart = useCallback(() => {
 		setCurrentStep(0);
-		refreshCart();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+		// Only refresh if cart is empty or needs update
+		if (!cart?.items?.length || !cart.payment_session) {
+			refreshCart();
+		}
+	}, [cart?.items?.length, cart?.payment_session, refreshCart, setCurrentStep]);
+
+	useEffect(() => {
+		initializeCart();
+	}, [initializeCart]);
 
 	return (
 		<Spin spinning={isProcessing} tip="Xin vui lòng đợi...">

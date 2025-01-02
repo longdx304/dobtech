@@ -28,7 +28,6 @@ export const useStoreUpdateOrder = (
 
 	return useMutation((payload: StoreUpdateOrderReq) => {
 		const { id, ...restPayload } = payload;
-		console.log('id, ...restPayload:', id, restPayload);
 		return medusaRequest('POST', `/store/orders/${id}`, restPayload);
 	}, buildOptions(queryClient, [adminOrderKeys.lists()], options));
 };
