@@ -8,7 +8,7 @@ import LocalizedClientLink from '@/modules/common/components/localized-client-li
 import Thumbnail from '@/modules/products/components/thumbnail';
 import { ProductPreviewType } from '@/types/product';
 import { Region } from '@medusajs/medusa';
-import PreviewPrice from './price';
+import ProductPrice from './product-price';
 
 interface Props {
 	data: ProductPreviewType;
@@ -47,12 +47,11 @@ const ProductPreview: FC<Props> = async ({ data, region }) => {
 						{data?.title}
 					</Text>
 				</LocalizedClientLink>
-				{cheapestPrice && (
-					<PreviewPrice
-						price={cheapestPrice}
-						productHandle={data.handle || ''}
+				{pricedProduct && region && (
+					<ProductPrice
 						product={pricedProduct}
-						region={region!}
+						region={region}
+						productHandle={data.handle || ''}
 					/>
 				)}
 			</Flex>

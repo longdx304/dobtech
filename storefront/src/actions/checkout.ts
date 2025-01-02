@@ -4,17 +4,20 @@ import { cache } from 'react';
 import medusaError from '@/lib/utils/medusa-error';
 import { removeGuestCart } from '@/modules/checkout/actions';
 
-export async function createPaymentSessions(cartId: string) {
+// Cache the payment session creation to prevent multiple calls
+export const createPaymentSessions = cache(async (cartId: string) => {
+	if (!cartId) return null;
+	
 	const headers = await getMedusaHeaders(['cart']);
-
-	return medusaClient.carts
-		.createPaymentSessions(cartId, headers)
-		.then(({ cart }) => cart)
-		.catch((err) => {
-			console.log(err);
-			return null;
-		});
-}
+	
+	try {
+		const { cart } = await medusaClient.carts.createPaymentSessions(cartId, headers);
+		return cart;
+	} catch (err) {
+		console.error('Error creating payment sessions:', err);
+		return null;
+	}
+});
 
 export async function deletePaymentSession(
 	cartId: string,
