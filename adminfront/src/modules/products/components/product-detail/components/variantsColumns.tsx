@@ -43,6 +43,15 @@ const variantsColumns = ({
 		},
 	},
 	{
+		title: 'Giá vốn',
+		dataIndex: 'cogs_price',
+		width: 120,
+		key: 'cogs_price',
+		render: (_: any) => {
+			return formatAmountWithSymbol({ amount: _, currency: 'vnd' });
+		},
+	},
+	{
 		title: 'Định lượng đôi',
 		dataIndex: 'allowed_quantities',
 		width: 100,
