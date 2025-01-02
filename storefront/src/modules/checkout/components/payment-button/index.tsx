@@ -1,5 +1,7 @@
 'use client';
 import { Button } from '@/components/Button';
+import { useStoreUpdateOrder } from '@/lib/hooks/api/order';
+import { useStoreUploadFile } from '@/lib/hooks/api/uploads';
 import { useCart } from '@/lib/providers/cart/cart-provider';
 import { useCustomer } from '@/lib/providers/user/user-provider';
 import { deleteLineItem } from '@/modules/cart/action';
@@ -11,8 +13,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { placeOrder, removeGuestCart } from '../../actions';
 import { generatePdfBlob } from '../order-pdf';
-import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
-import { useStoreUpdateOrder } from '@/lib/hooks/api/order';
 
 type Props = {
 	data: Omit<Cart, 'refundable_amount' | 'refunded_total'>;
@@ -51,7 +51,7 @@ const PaymentButton = ({ data }: Props) => {
 	const checkoutCartVariants = data?.items.map((item) => item.variant_id);
 	const mainCartVariant = cart?.items.map((item) => item.variant_id);
 
-	const uploadFile = useAdminUploadFile();
+	const uploadFile = useStoreUploadFile();
 	const uploadOrder = useStoreUpdateOrder();
 
 	const _intersection = mainCartVariant
@@ -136,10 +136,8 @@ const PaymentButton = ({ data }: Props) => {
 	const onPaymentCompleted = async () => {
 		try {
 			const result = await placeOrder(cartId);
-			console.log('result cart:', result);
 			if (result?.data) {
 				const urlPdf = await generateFilePdf(result.data);
-				console.log('urlPdf:', urlPdf);
 				await uploadOrder.mutateAsync({
 					id: result.data.orderId,
 					metadata: {
