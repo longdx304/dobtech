@@ -1,20 +1,18 @@
-import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 // import { Table } from '@/components/Table';
 import { Title } from '@/components/Typography';
+import { formatNumber } from '@/lib/utils';
 import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { Col, Row, Table } from 'antd';
 import { useAdminRegion } from 'medusa-react';
 import { FC, useMemo, useState } from 'react';
 import { ItemPrice, ItemQuantity } from '..';
 import productTotalColumns from './product-total-columns';
-import { formatNumber } from '@/lib/utils';
 
 type Props = {
 	selectedRowProducts: PricedVariant[] | undefined;
 	itemQuantities: ItemQuantity[];
 	itemPrices: ItemPrice[];
-	setCurrentStep: (step: number) => void;
 	regionId: string | null;
 };
 
@@ -33,7 +31,6 @@ const ProductTotalForm: FC<Props> = ({
 	selectedRowProducts,
 	itemQuantities,
 	itemPrices,
-	setCurrentStep,
 	regionId,
 }) => {
 	const { region } = useAdminRegion(regionId || '', { enabled: !!regionId });
@@ -63,18 +60,6 @@ const ProductTotalForm: FC<Props> = ({
 			return total + quantity * price;
 		}, 0);
 	}, [selectedRowProducts, itemQuantities, itemPrices]);
-
-	const handleBack = () => {
-		setCurrentStep(0);
-	};
-
-	const handleContinue = () => {
-		setCurrentStep(2);
-	};
-
-	const handleTableChange = (pagination: any, filters: any, sorter: any) => {
-		setCurrentPage(pagination.current);
-	};
 
 	const handleChangePage = (page: number) => {
 		setCurrentPage(page);
@@ -131,16 +116,6 @@ const ProductTotalForm: FC<Props> = ({
 							</Table.Summary>
 						)}
 					/>
-				</Flex>
-			</Col>
-			<Col span={24}>
-				<Flex justify="flex-end" gap="small" className="mt-4">
-					<Button type="default" onClick={handleBack}>
-						Quay lại
-					</Button>
-					<Button onClick={handleContinue} data-testid="next-step">
-						Tiếp tục
-					</Button>
 				</Flex>
 			</Col>
 		</Row>

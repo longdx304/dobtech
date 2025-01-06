@@ -3,12 +3,13 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { Table } from '@/components/Table';
+import { Tabs } from '@/components/Tabs';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ProductModal } from '@/modules/products/components/products-modal';
 import { Product, Region } from '@medusajs/medusa';
 import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
-import { Col, Row, message } from 'antd';
+import { Col, Row, TabsProps } from 'antd';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
 import {
@@ -24,8 +25,6 @@ type ProductFormProps = {
 	selectedProducts: string[];
 	setSelectedProducts: (products: string[]) => void;
 	setSelectedRowsProducts: (products: any) => void;
-	setCurrentStep: (step: number) => void;
-	handleCancel: () => void;
 	itemQuantities: ItemQuantity[];
 	itemPrices: ItemPrice[];
 	setItemQuantities: React.Dispatch<React.SetStateAction<ItemQuantity[]>>;
@@ -33,6 +32,7 @@ type ProductFormProps = {
 	regions: Region[] | undefined;
 	regionId: string | null;
 	setRegionId: (regionId: string) => void;
+	selectedRowProducts: PricedVariant[] | undefined;
 };
 const PAGE_SIZE = 10;
 
@@ -40,8 +40,6 @@ const ProductForm: FC<ProductFormProps> = ({
 	selectedProducts,
 	setSelectedProducts,
 	setSelectedRowsProducts,
-	setCurrentStep,
-	handleCancel,
 	itemQuantities,
 	itemPrices,
 	setItemQuantities,
@@ -49,10 +47,12 @@ const ProductForm: FC<ProductFormProps> = ({
 	regions,
 	regionId,
 	setRegionId,
+	selectedRowProducts,
 }) => {
 	const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [activeTab, setActiveTab] = useState<string>('list');
 	const { state, onOpen, onClose } = useToggleState(false);
 
 	const handleRowSelectionChange = (
@@ -197,48 +197,6 @@ const ProductForm: FC<ProductFormProps> = ({
 		[itemQuantities, itemPrices]
 	);
 
-	const onSubmit = () => {
-		// Check if any selected product exists
-		if (selectedProducts.length === 0) {
-			message.error('Phải chọn ít nhất một sản phẩm');
-			return;
-		}
-
-		// Check if itemQuantities and itemPrices have entries for all selected products
-		if (
-			itemQuantities.length !== selectedProducts.length ||
-			itemPrices.length !== selectedProducts.length ||
-			!selectedProducts.every(
-				(productId) =>
-					itemQuantities.some((item) => item.variantId === productId) &&
-					itemPrices.some((item) => item.variantId === productId)
-			)
-		) {
-			message.error('Phải nhập số lượng và giá cho tất cả sản phẩm đã chọn');
-			return;
-		}
-
-		// Check if all quantities are greater than 0
-		if (!itemQuantities.every((item) => item.quantity > 0)) {
-			message.error('Số lượng sản phẩm phải lớn hơn 0');
-			return;
-		}
-
-		// Check if all prices are greater than 1000
-		if (!itemPrices.every((item) => item.unit_price >= 1000)) {
-			message.error('Giá sản phẩm phải lớn hơn 1000 đồng');
-			return;
-		}
-
-		// Check the selected region is checked
-		if (!regionId) {
-			message.error('Vui lòng chọn khu vực');
-			return;
-		}
-
-		setCurrentStep(1);
-	};
-
 	const handleCloseModal = () => {
 		setCurrentProduct(null);
 		onClose();
@@ -259,6 +217,20 @@ const ProductForm: FC<ProductFormProps> = ({
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [defaultRegion]);
+
+	const itemTabs: TabsProps['items'] = [
+		{
+			key: 'list',
+			label: 'Danh sách',
+		},
+		{
+			key: 'checked',
+			label: 'Đã chọn',
+		},
+	];
+	const handleTabChange = (key: string) => {
+		setActiveTab(key);
+	};
 
 	return (
 		<Row gutter={[16, 16]} className="pt-4">
@@ -316,6 +288,12 @@ const ProductForm: FC<ProductFormProps> = ({
 				)}
 			</Col>
 			<Col span={24} id="table-product">
+				<div className="flex justify-center">
+					<Tabs items={itemTabs} onChange={handleTabChange} />
+				</div>
+				<div className="flex justify-end">{`Đã chọn : ${
+					selectedRowProducts?.length ?? 0
+				} biến thể`}</div>
 				<Table
 					loading={isLoading}
 					rowSelection={{
@@ -325,27 +303,23 @@ const ProductForm: FC<ProductFormProps> = ({
 						preserveSelectedRowKeys: true,
 					}}
 					columns={columns as any}
-					dataSource={variants ?? []}
+					dataSource={
+						(activeTab === 'list' ? variants : selectedRowProducts) ?? []
+					}
 					rowKey="id"
-					pagination={{
-						total: count,
-						pageSize: PAGE_SIZE,
-						current: currentPage,
-						onChange: handleChangePage,
-						showSizeChanger: false,
-					}}
+					pagination={
+						activeTab === 'list'
+							? {
+									total: count,
+									pageSize: PAGE_SIZE,
+									current: currentPage,
+									onChange: handleChangePage,
+									showSizeChanger: false,
+							  }
+							: false
+					}
 					scroll={{ x: 700 }}
 				/>
-			</Col>
-			<Col span={24}>
-				<Flex justify="flex-end" gap="small" className="mt-4">
-					<Button type="default" onClick={handleCancel}>
-						Huỷ
-					</Button>
-					<Button onClick={onSubmit} data-testid="next-step">
-						Tiếp tục
-					</Button>
-				</Flex>
 			</Col>
 		</Row>
 	);
