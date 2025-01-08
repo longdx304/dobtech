@@ -4,7 +4,6 @@ import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
 import { useAdminSupplierOrderRefundPayment } from '@/lib/hooks/api/supplier-order';
 import { getErrorMessage } from '@/lib/utils';
-// import { useAdminSupplierRefundPayment } from '@/modules/supplier/hooks';
 import { currencies } from '@/types/currencies';
 import { SupplierOrder } from '@/types/supplier';
 import { normalizeAmount, persistedPrice } from '@/utils/prices';
@@ -46,7 +45,9 @@ const RefundModal = ({
 	refetch,
 }: Props) => {
 	const [form] = Form.useForm();
-	const { mutateAsync, isLoading } = useAdminSupplierOrderRefundPayment(supplierOrder.id);
+	const { mutateAsync, isLoading } = useAdminSupplierOrderRefundPayment(
+		supplierOrder.id
+	);
 
 	const refundable = useMemo(() => {
 		return supplierOrder.paid_total - 1000;

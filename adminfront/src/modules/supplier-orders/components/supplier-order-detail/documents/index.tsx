@@ -48,6 +48,8 @@ const Documents = ({ order, isLoading }: Props) => {
 	const createDocument = useCreateDocument();
 	const uploadFile = useAdminUploadFile();
 
+	const isOrderCanceled = order?.status === 'canceled';
+
 	const handleRemoveDoc = async (docId: string, docName: string) => {
 		AntdModal.confirm({
 			title: 'Xác nhận xoá tài liệu',
@@ -84,10 +86,12 @@ const Documents = ({ order, isLoading }: Props) => {
 		{
 			label: 'Thêm tài liệu',
 			onClick: onOpen,
+			disabled: isOrderCanceled
 		},
 		{
 			label: 'Tạo đơn đặt hàng PDF',
 			onClick: onOpenRefreshPdf,
+			disabled: isOrderCanceled
 		},
 	];
 

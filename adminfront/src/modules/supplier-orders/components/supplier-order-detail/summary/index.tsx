@@ -1,18 +1,21 @@
 import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
-import { Text, Title } from '@/components/Typography';
-import { DisplayTotal, DisplayTotalQuantity } from '@/modules/supplier-orders/common';
+import { Input } from '@/components/Input';
+import { Pagination } from '@/components/Pagination';
+import { Title } from '@/components/Typography';
+import {
+	DisplayTotal,
+	DisplayTotalQuantity,
+} from '@/modules/supplier-orders/common';
 import { SupplierOrder } from '@/types/supplier';
 import { ReservationItemDTO } from '@medusajs/types';
 import { Divider, Empty } from 'antd';
+import _ from 'lodash';
 import { Pencil, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useSupplierOrderEdit } from '../edit-supplier-order-modal/context';
 import OrderLine from './order-line';
-import { Pagination } from '@/components/Pagination';
-import { Input } from '@/components/Input';
-import _ from 'lodash';
 
 type Props = {
 	supplierOrder: SupplierOrder | undefined;
@@ -33,6 +36,8 @@ const Summary = ({
 	const [currentPage, setCurrentPage] = useState(1);
 	const [pageSize, setPageSize] = useState(PAGE_SIZE);
 	const [searchValue, setSearchValue] = useState('');
+
+	const isCancelled = supplierOrder?.status === 'canceled';
 
 	const reservationItemsMap = useMemo(() => {
 		if (!reservations?.length) {
@@ -61,8 +66,8 @@ const Summary = ({
 			onClick: () => {
 				showModal();
 			},
+			disabled: isCancelled,
 		});
-		// }
 		return actionAbles;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -163,7 +168,7 @@ const Summary = ({
 						/>
 					</div>
 				)}
-				
+
 				<Divider className="my-2" />
 				<DisplayTotalQuantity
 					productTitle={'Tổng sản phẩm'}
