@@ -1,5 +1,5 @@
 import { Pagination } from '@/components/Pagination';
-import { Title } from '@/components/Typography';
+import { Text, Title } from '@/components/Typography';
 import { SteppedContext } from '@/lib/providers/stepped-modal-provider';
 import {
 	displayAmount,
@@ -14,8 +14,14 @@ import {
 import Image from 'next/image';
 import { useContext, useMemo, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
+import { Flex } from '@/components/Flex';
+import { Tooltip } from '@/components/Tooltip';
+import { Switch } from '@/components/Switch';
 
-const Summary = () => {
+type Props = {
+	setIsSendEmail: React.Dispatch<React.SetStateAction<boolean>>;
+};
+const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 	const [showAddDiscount, setShowAddDiscount] = useState(false);
 	const [discError, setDiscError] = useState(undefined);
 	const [code, setCode] = useState<string>('');
@@ -127,8 +133,21 @@ const Summary = () => {
 		return productIdA.localeCompare(productIdB);
 	});
 
+	const titleContent =
+		'Click để xác nhận gửi thông báo đến khách hàng với thông tin đơn hàng';
+
+	const handleOnChange = (value: boolean) => {
+		setIsSendEmail(value);
+	};
+
 	return (
 		<div className="min-h-[705px]">
+			<Flex className="flex items-center gap-2">
+				<Tooltip title={titleContent}>
+					<Text strong>Gửi email:</Text>
+				</Tooltip>
+				<Switch onChange={handleOnChange} />
+			</Flex>
 			<SummarySection title="Sản phẩm" editIndex={2}>
 				<div className="overflow-auto lg:overflow-visible">
 					<Table

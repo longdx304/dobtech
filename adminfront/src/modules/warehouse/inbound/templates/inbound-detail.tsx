@@ -60,10 +60,14 @@ const InboundDetail: FC<Props> = ({ id }) => {
 
 	const isPermission = useMemo(() => {
 		if (!user) return false;
+		if (
+			supplierOrder?.fulfillment_status === FulfillSupplierOrderStt.INVENTORIED
+		)
+			return false;
 		if (user.role === 'admin' || supplierOrder?.handler_id === user.id)
 			return true;
 		return false;
-	}, [user, supplierOrder?.handler_id]);
+	}, [user, supplierOrder]);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -102,7 +106,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	const items: TabsProps['items'] = [
 		{
 			key: FulfillSupplierOrderStt.DELIVERED,
-			label: 'Đang chờ nhập kho',
+			label: 'Đang thực hiện',
 		},
 		{
 			key: FulfillSupplierOrderStt.INVENTORIED,

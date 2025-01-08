@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import { ERoutes } from '@/types/routes';
 import {
 	useAdminProductOutboundHandler,
+	useAdminProductOutboundRemoveHandler,
 	useAdminProductOutbounds,
 } from '@/lib/hooks/api/product-outbound';
 import OutboundItem from '../components/outbound-item';
@@ -42,6 +43,7 @@ const ListOutbound: FC<Props> = ({}) => {
 		myOrder: myOrder ? true : undefined,
 	});
 	const productOutboundHandler = useAdminProductOutboundHandler();
+	const productOutboundRemoveHandler = useAdminProductOutboundRemoveHandler();
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -69,15 +71,29 @@ const ListOutbound: FC<Props> = ({}) => {
 	];
 
 	const handleClickDetail = async (item: Order) => {
-		if (item?.handler_id) {
-			return router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${item.id}`);
-		}
+		return router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${item.id}`);
+	};
 
+	const handleConfirm = async (item: Order) => {
 		await productOutboundHandler.mutateAsync(
 			{ id: item.id },
 			{
 				onSuccess: () => {
 					router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${item.id}`);
+				},
+				onError: (err) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
+	};
+
+	const handleRemoveHandler = async (item: Order) => {
+		await productOutboundRemoveHandler.mutateAsync(
+			{ id: item.id },
+			{
+				onSuccess: () => {
+					message.success('Huỷ bỏ xử lý đơn hàng thành công');
 				},
 				onError: (err) => {
 					message.error(getErrorMessage(err));
@@ -122,7 +138,12 @@ const ListOutbound: FC<Props> = ({}) => {
 					loading={isLoading}
 					renderItem={(item: Order) => (
 						<List.Item>
-							<OutboundItem item={item} handleClickDetail={handleClickDetail} />
+							<OutboundItem
+								item={item}
+								handleClickDetail={handleClickDetail}
+								handleConfirm={handleConfirm}
+								handleRemoveHandler={handleRemoveHandler}
+							/>
 						</List.Item>
 					)}
 					pagination={{

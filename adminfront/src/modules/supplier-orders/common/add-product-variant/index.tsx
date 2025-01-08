@@ -39,7 +39,6 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 	const {
 		isReplace,
 		regionId,
-		currencyCode,
 		customerId,
 		itemPrices,
 		itemQuantities,

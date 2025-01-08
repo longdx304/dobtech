@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Cart() {
+
 	return (
 		<div className="w-full pt-[6rem] lg:pt-[4rem]">
 			<Suspense fallback={<CartSkeleton />}>

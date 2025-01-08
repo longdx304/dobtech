@@ -35,7 +35,8 @@ const SelectRegion = () => {
 	};
 
 	return (
-		<div className="flex lg:min-h-[705px] min-h-[500px] flex-col">
+		<div className="flex flex-col">
+			<h3 className="font-medium">Chọn khu vực</h3>
 			<Form.Item
 				name="region"
 				label="Quốc gia"

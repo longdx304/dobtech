@@ -1,9 +1,10 @@
 import { Flex } from '@/components/Flex';
+import { InputNumber } from '@/components/Input';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { ProductVariant } from '@medusajs/medusa';
-import { InputNumber } from 'antd';
+// import { InputNumber } from 'antd';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -45,7 +46,7 @@ const EditableQuantity = ({
 			onPressEnter={() => setIsEditing(false)}
 			onChange={(value) => {
 				if (value !== null) {
-					const finalValue = Math.min(value, record.inventory_quantity || 1);
+					const finalValue = Math.min(+value, record.inventory_quantity || 1);
 					handleQuantityChange(finalValue, record?.id as string);
 				}
 			}}
@@ -86,7 +87,7 @@ const EditablePrice = ({
 			onPressEnter={() => setIsEditing(false)}
 			onChange={(value) => {
 				if (value !== null) {
-					handlePriceChange(record?.id, value, currency || 'vnd');
+					handlePriceChange(record?.id, +value, currency || 'vnd');
 				}
 			}}
 			className="w-20"

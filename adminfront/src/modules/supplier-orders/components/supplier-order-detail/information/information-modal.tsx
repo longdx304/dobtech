@@ -72,6 +72,7 @@ const InformationModal: React.FC<Props> = ({
 			<div className="flex flex-col gap-2">
 				<Text className="font-medium">Đơn hàng:</Text>
 				<Input
+					placeholder='Nhập tên đơn hàng (VD: "No.ADDA123")'
 					value={formData.displayName}
 					onChange={(e) => handleInputChange('displayName', e.target.value)}
 				/>

@@ -215,30 +215,82 @@ const SupplierOrdersModal: FC<Props> = ({
 		}
 	};
 
+	const handleStep0 = () => {
+		// Check if any selected product exists
+		if (selectedProducts.length === 0) {
+			message.error('Phải chọn ít nhất một sản phẩm');
+			return;
+		}
+
+		// Check if itemQuantities and itemPrices have entries for all selected products
+		if (
+			itemQuantities.length !== selectedProducts.length ||
+			itemPrices.length !== selectedProducts.length ||
+			!selectedProducts.every(
+				(productId) =>
+					itemQuantities.some((item) => item.variantId === productId) &&
+					itemPrices.some((item) => item.variantId === productId)
+			)
+		) {
+			message.error('Phải nhập số lượng và giá cho tất cả sản phẩm đã chọn');
+			return;
+		}
+
+		// Check if all quantities are greater than 0
+		if (!itemQuantities.every((item) => item.quantity > 0)) {
+			message.error('Số lượng sản phẩm phải lớn hơn 0');
+			return;
+		}
+
+		// Check if all prices are greater than 1000
+		if (!itemPrices.every((item) => item.unit_price >= 1000)) {
+			message.error('Giá sản phẩm phải lớn hơn 1000 đồng');
+			return;
+		}
+
+		// Check the selected region is checked
+		if (!regionId) {
+			message.error('Vui lòng chọn khu vực');
+			return;
+		}
+
+		setCurrentStep(1);
+	};
+
+	const handleContinueOrSubmit = () => {
+		if (currentStep === 0) {
+			handleStep0();
+		} else if (currentStep === 1) {
+			setCurrentStep(2);
+		} else if (currentStep === 2) {
+			onSaveOrder();
+		}
+	};
+
+	const handleBackOrClose = () => {
+		if (currentStep === 0) {
+			onCancel();
+		} else if (currentStep === 1) {
+			setCurrentStep(0);
+		} else if (currentStep === 2) {
+			setCurrentStep(1);
+		}
+	};
+
 	// footer
 	const footer = useMemo(() => {
-		if (currentStep === 2) {
-			return [
-				<Button
-					key="1"
-					type="default"
-					onClick={() => {
-						setCurrentStep(0);
-						setSelectedSupplier(null);
-					}}
-				>
-					Quay lại
-				</Button>,
-				<Button
-					key="2"
-					onClick={onSaveOrder}
-					data-testid="submit-supplier-order"
-				>
-					Kiểm tra đơn đặt hàng
-				</Button>,
-			];
-		}
-		return [];
+		return [
+			<Button key="1" type="default" onClick={handleBackOrClose}>
+				{currentStep !== 0 ? 'Quay lại' : 'Đóng'}
+			</Button>,
+			<Button
+				key="2"
+				onClick={handleContinueOrSubmit}
+				data-testid="submit-supplier-order"
+			>
+				{currentStep !== 2 ? 'Tiếp tục' : 'Kiểm tra đơn đặt hàng'}
+			</Button>,
+		];
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentStep, selectedProducts, selectedSupplier, supplierDates]);
 
@@ -268,8 +320,6 @@ const SupplierOrdersModal: FC<Props> = ({
 						selectedProducts={selectedProducts}
 						setSelectedProducts={setSelectedProducts}
 						setSelectedRowsProducts={setSelectedRowsProducts}
-						setCurrentStep={setCurrentStep}
-						handleCancel={onCancel}
 						itemQuantities={itemQuantities}
 						setItemQuantities={setItemQuantities}
 						itemPrices={itemPrices}
@@ -277,6 +327,7 @@ const SupplierOrdersModal: FC<Props> = ({
 						regions={regions}
 						regionId={regionId}
 						setRegionId={setRegionId}
+						selectedRowProducts={selectedRowsProducts}
 					/>
 				)}
 				{currentStep === 1 && (
@@ -284,7 +335,6 @@ const SupplierOrdersModal: FC<Props> = ({
 						selectedRowProducts={selectedRowsProducts}
 						itemQuantities={itemQuantities}
 						itemPrices={itemPrices}
-						setCurrentStep={setCurrentStep}
 						regionId={regionId}
 					/>
 				)}

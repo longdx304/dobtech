@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Button } from '@/components/Button';
 import { Empty } from '@/components/Empty';
 import { Flex } from '@/components/Flex';
@@ -14,7 +13,11 @@ import {
 } from '@/lib/hooks/api/supplier-order-edits';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import AddProductVariant from '@/modules/supplier-orders/common/add-product-variant';
-import { AddOrderEditLineItemInput } from '@/types/supplier';
+import {
+	AddOrderEditLineItemInput,
+	SupplierOrder,
+	SupplierOrderEdit,
+} from '@/types/supplier';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { ProductVariant } from '@medusajs/medusa';
 import { message } from 'antd';
@@ -23,6 +26,8 @@ import { Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSupplierOrderEdit } from './context';
 import SupplierOrderEditLine from './supplier-order-edit-line';
+import { ItemPrice, ItemQuantity } from '../../supplier-orders-modal';
+import debounce from 'lodash/debounce';
 
 type SupplierOrderEditModalContainerProps = {
 	supplierOrder: SupplierOrder | null;
@@ -33,14 +38,8 @@ const SupplierOrderEditModalContainer = (
 ) => {
 	const { supplierOrder } = props;
 
-	const {
-		isModalVisible,
-		hideModal,
-		orderEdits,
-		supplierOrderEdits,
-		activeOrderEditId,
-		setActiveOrderEditId,
-	} = useSupplierOrderEdit();
+	const { isModalVisible, hideModal, supplierOrderEdits, activeOrderEditId } =
+		useSupplierOrderEdit();
 
 	const supplierOrderEdit = supplierOrderEdits?.find(
 		(oe) => oe.id === activeOrderEditId
@@ -64,7 +63,7 @@ const SupplierOrderEditModalContainer = (
 			customerId={supplierOrder?.user?.id}
 			currencyCode={supplierOrder?.currency_code}
 			paidTotal={supplierOrder?.paid_total}
-			refundedTotal={supplierOrder.refunded_total}
+			refundedTotal={supplierOrder?.refunded_total}
 		/>
 	);
 };
@@ -84,7 +83,7 @@ type SupplierOrderEditModalProps = {
 };
 
 const PAGE_SIZE = 10;
-const SupplierOrderEditModal = (props: OrderEditModalProps) => {
+const SupplierOrderEditModal = (props: SupplierOrderEditModalProps) => {
 	const {
 		state,
 		close,
@@ -103,7 +102,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 		onClose: closeAddProduct,
 	} = useToggleState(false);
 
-	const filterRef = useRef();
+	const filterRef = useRef<HTMLInputElement>(null);
 	const [note, setNote] = useState<string | undefined>();
 	const [showFilter, setShowFilter] = useState(false);
 	const [filterTerm, setFilterTerm] = useState<string>('');
@@ -132,7 +131,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 
 	const onSave = async () => {
 		try {
-			await requestConfirmation();
+			await requestConfirmation(undefined);
 			if (note) {
 				await updateOrderEdit({ internal_note: note });
 			}
@@ -145,7 +144,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 
 	const onCancel = async () => {
 		// NOTE: has to be this order of ops
-		await deleteOrderEdit();
+		await deleteOrderEdit(undefined);
 		close();
 	};
 
@@ -155,7 +154,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 		}
 	}, [showFilter]);
 
-	const onAddVariants = async (selectedVariants: ProductVariant['id']) => {
+	const onAddVariants = async (selectedVariants: ProductVariant['id'][]) => {
 		// Creating the lineItems array by merging quantities and prices
 		const lineItems: AddOrderEditLineItemInput[] = selectedVariants?.map(
 			(variantId) => {
@@ -202,7 +201,9 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 	displayItems = displayItems.sort((a, b) => {
 		const createdAtA = a?.created_at || '';
 		const createdAtB = b?.created_at || '';
-		return createdAtB.localeCompare(createdAtA);
+		return new Date(createdAtB)
+			.toISOString()
+			.localeCompare(new Date(createdAtA).toISOString());
 	});
 
 	if (filterTerm) {
@@ -219,7 +220,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 	const paginatedItems = displayItems?.slice(startIndex, startIndex + pageSize);
 
 	// Search items
-	const handleChangeDebounce = _.debounce(
+	const handleChangeDebounce = debounce(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			setCurrentPage(1);
 			setFilterTerm(e.target.value);
@@ -263,9 +264,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 						<SupplierOrderEditLine
 							key={oi.id}
 							item={oi}
-							customerId={customerId}
-							regionId={regionId}
-							currencyCode={currencyCode}
+							currencyCode={currencyCode ?? ''}
 							change={
 								supplierOrderEdit?.changes?.find(
 									(change) =>
@@ -296,11 +295,11 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 				{showTotals && (
 					// <TotalsSection currencyCode={currencyCode} amountPaid={paidTotal} />
 					<TotalsSection
-						currencyCode={currencyCode}
-						amountPaid={paidTotal - refundedTotal}
+						currencyCode={currencyCode ?? 'vnd'}
+						amountPaid={(paidTotal ?? 0) - (refundedTotal ?? 0)}
 						newTotal={supplierOrderEdit.total}
 						differenceDue={
-							supplierOrderEdit.total - paidTotal // (orderEdit_total - refunded_total) - (paidTotal - refundedTotal)
+							supplierOrderEdit.total - (paidTotal ?? 0) // (orderEdit_total - refunded_total) - (paidTotal - refundedTotal)
 						}
 					/>
 				)}
@@ -323,7 +322,7 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 				state={stateAddProduct}
 				onClose={closeAddProduct}
 				onSubmit={onAddVariants}
-				customerId={customerId}
+				customerId={customerId ?? ''}
 				regionId={regionId}
 				currencyCode={currencyCode}
 				isLoading={loadingAddLineItem}
@@ -340,6 +339,8 @@ const SupplierOrderEditModal = (props: OrderEditModalProps) => {
 type TotalsSectionProps = {
 	amountPaid: number;
 	currencyCode: string;
+	newTotal: number;
+	differenceDue: number;
 };
 
 /**

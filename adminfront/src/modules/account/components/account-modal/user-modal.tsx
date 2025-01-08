@@ -44,11 +44,10 @@ export default function UserModal({
 			phone: user?.phone ?? '',
 			fullName: user?.first_name ?? '',
 			permissions: user?.permissions?.split(',') ?? [
-				EPermissions.WarehouseStaff,
-				EPermissions.WarehouseManager,
+				EPermissions.Warehouse,
+				EPermissions.Manager,
 				EPermissions.Driver,
-				EPermissions.InventoryChecker,
-				EPermissions.AssistantDriver,
+				EPermissions.Accountant,
 			],
 		});
 	}, [user, form]);

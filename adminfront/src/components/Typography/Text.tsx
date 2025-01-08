@@ -9,6 +9,7 @@ type Props = TextProps & {
 	children?: ReactNode | string | number;
 	strong?: boolean;
 	tooltip?: boolean;
+	classNameText?: string;
 };
 
 const { Text: AntdText } = Typography;
@@ -18,13 +19,18 @@ export default function Text({
 	strong,
 	tooltip = false,
 	children,
+	classNameText,
 	...props
 }: Props) {
 	const strongText = strong ? 'font-semibold' : '';
-	const tooltipText = typeof children === 'string' ? children : '';
+	const tooltipText = typeof ['string', 'number'].includes(typeof children) ? (
+		<span className={classNameText || className}>{children}</span>
+	) : (
+		''
+	);
 	return (
-		<AntdText className={cn('m-0', className, strongText)} {...props}>
-			{tooltip ? <Tooltip title={tooltipText}>{children}</Tooltip> : children}
+		<AntdText className={cn('m-0', strongText)} {...props}>
+			<Tooltip title={tooltip && tooltipText}>{tooltipText}</Tooltip>
 		</AntdText>
 	);
 }

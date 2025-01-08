@@ -25,19 +25,18 @@ export enum ERole {
 }
 
 export enum EPermissions {
-	WarehouseManager = 'warehouse-manager',
-	WarehouseStaff = 'warehouse-staff',
+	Manager = 'manager',
+	Warehouse = 'Warehouse',
 	Driver = 'driver',
-	AssistantDriver = 'assistant-driver',
-	InventoryChecker = 'inventory-checker',
+	Accountant = 'accountant',
 }
 
+// Quản lý, Nhân viên kho, Tài xế, Kế toán
 export const rolesEmployee = Object.freeze([
-	{ label: 'Quản lý kho', value: EPermissions.WarehouseManager },
-	{ label: 'Nhân viên kho', value: EPermissions.WarehouseStaff },
+	{ label: 'Quản lý', value: EPermissions.Manager },
+	{ label: 'Nhân viên kho', value: EPermissions.Warehouse },
 	{ label: 'Tài xế', value: EPermissions.Driver },
-	{ label: 'Kiểm hàng', value: EPermissions.InventoryChecker },
-	{ label: 'Phụ xe', value: EPermissions.AssistantDriver },
+	{ label: 'Kế toán', value: EPermissions.Accountant },
 ]);
 
 export type IUserRequest = {

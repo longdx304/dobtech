@@ -2,9 +2,7 @@ import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Text, Title } from '@/components/Typography';
-import {
-	useAdminCancelSupplierOrder
-} from '@/lib/hooks/api/supplier-order';
+import { useAdminCancelSupplierOrder } from '@/lib/hooks/api/supplier-order';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import StatusIndicator from '@/modules/common/components/status-indicator';
@@ -12,7 +10,7 @@ import StatusIndicator from '@/modules/common/components/status-indicator';
 import { SupplierOrder } from '@/types/supplier';
 import { Modal as AntdModal, Empty, message } from 'antd';
 import dayjs from 'dayjs';
-import { Ban, SquarePen } from 'lucide-react';
+import { Ban, Pencil, SquarePen } from 'lucide-react';
 import InformationModal from './information-modal';
 
 type Props = {
@@ -22,7 +20,6 @@ type Props = {
 
 const Information = ({ supplierOrder, isLoading }: Props) => {
 	const { state, onOpen, onClose } = useToggleState(false);
-
 	const cancelOrder = useAdminCancelSupplierOrder(supplierOrder?.id!);
 
 	const isCancelled = supplierOrder?.status === 'canceled';
@@ -55,7 +52,7 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 		{
 			label: <span className="w-full">{'Huỷ đơn hàng'}</span>,
 			key: 'cancel',
-			icon: <Ban />,
+			icon: <Ban size={16} />,
 			danger: true,
 			onClick: handleCancelOrder,
 			disabled: isCancelled,
@@ -167,3 +164,10 @@ const OrderStatus = ({ status }: { status: SupplierOrder['status'] }) => {
 			return null;
 	}
 };
+
+type EditModalProps = {
+	state: boolean;
+	close: () => void;
+};
+
+const ModalEditTimeOrder = ({ state, close }: EditModalProps) => {};

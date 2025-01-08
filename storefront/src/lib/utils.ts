@@ -40,3 +40,15 @@ export const updateSearchQuery = (
 	}
 	return newSearchParams.toString();
 };
+
+/**
+ * @param num
+ * @param option
+ * @returns format price number
+ */
+export const formatNumber = (
+	num: number,
+	option?: Intl.NumberFormatOptions
+) => {
+	return num?.toLocaleString('vi-VN', option);
+};

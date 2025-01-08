@@ -24,8 +24,6 @@ const ItemGroup = () => {
 		} 
 	};
 
-	console.log('customer', customer);
-
 	const onCloseDrawer = () => {
 		router.refresh();
 		onClose();

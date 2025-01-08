@@ -8,11 +8,10 @@ import { Text } from '@/components/Typography';
 import { IAdminResponse, rolesEmployee } from '@/types/account';
 
 const COLOR_PERMISSION = {
-	'warehouse-manager': 'red',
-	'warehouse-staff': 'orange',
+	manager: 'red',
+	Warehouse: 'orange',
 	driver: 'lime',
-	'assistant-driver': 'blue',
-	'inventory-checker': 'purple',
+	accountant: 'blue',
 };
 
 interface Props {
