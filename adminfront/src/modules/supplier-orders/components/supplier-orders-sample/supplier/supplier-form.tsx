@@ -1,10 +1,11 @@
 import { Collapse } from '@/components/Collapse';
 import { Flex } from '@/components/Flex';
+import { DateField } from '@/modules/supplier-orders/hooks/use-supplier-time';
 import { Supplier } from '@/types/supplier';
 import { CollapseProps } from 'antd';
 import { Dayjs } from 'dayjs';
 import { Minus, Plus } from 'lucide-react';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import General from './general';
 import SupplierInfo from './supplier-info';
 
@@ -15,9 +16,11 @@ type SupplierFormProps = {
 	supplierDates: {
 		settlementDate: Dayjs | null;
 		productionDate: Dayjs | null;
+		completePaymentDate: Dayjs | null;
+		warehouseEntryDate: Dayjs | null;
+		shippingDate: Dayjs | null;
 	};
-	handleSettlementDateChange: (date: Dayjs | null) => void;
-	handleProductionDateChange: (date: Dayjs | null) => void;
+	handleDateChange: (field: DateField) => (date: Dayjs | null) => void;
 	updateDatesFromSupplier: (supplier: Supplier | null) => void;
 	setIsSendEmail: (value: boolean) => void;
 };
@@ -27,8 +30,7 @@ const SupplierForm: FC<SupplierFormProps> = ({
 	selectedSupplier,
 	setSelectedSupplier,
 	supplierDates,
-	handleSettlementDateChange,
-	handleProductionDateChange,
+	handleDateChange,
 	updateDatesFromSupplier,
 	setIsSendEmail,
 }) => {
@@ -46,8 +48,7 @@ const SupplierForm: FC<SupplierFormProps> = ({
 					selectedSupplier={selectedSupplier}
 					setSelectedSupplier={setSelectedSupplier}
 					supplierDates={supplierDates}
-					handleSettlementDateChange={handleSettlementDateChange}
-					handleProductionDateChange={handleProductionDateChange}
+					handleDateChange={handleDateChange}
 					updateDatesFromSupplier={updateDatesFromSupplier}
 				/>
 			),
@@ -59,7 +60,7 @@ const SupplierForm: FC<SupplierFormProps> = ({
 					<div className="mr-1">{'Thông tin cơ bản'}</div>
 				</Flex>
 			),
-			children: <General setIsSendEmail={setIsSendEmail}/>,
+			children: <General setIsSendEmail={setIsSendEmail} />,
 		},
 	];
 

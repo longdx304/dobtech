@@ -59,6 +59,9 @@ export interface pdfOrderRes {
 	countryCode?: string;
 	estimated_production_time: string | Date;
 	settlement_time: string | Date;
+	shipping_started_date?: string | Date;
+	warehouse_entry_date?: string | Date;
+	completed_payment_date?: string | Date;
 	metadata?: Record<string, unknown>;
 }
 
@@ -91,12 +94,8 @@ const SupplierOrdersModal: FC<Props> = ({
 	const { region } = useAdminRegion(regionId || '', { enabled: !!regionId });
 
 	// supplier date time picker
-	const {
-		supplierDates,
-		handleSettlementDateChange,
-		handleProductionDateChange,
-		updateDatesFromSupplier,
-	} = useSupplierTime();
+	const { supplierDates, handleDateChange, updateDatesFromSupplier } =
+		useSupplierTime();
 
 	const { user: selectedAdmin } = useUser();
 
@@ -139,6 +138,8 @@ const SupplierOrdersModal: FC<Props> = ({
 		const payload = createPayload();
 		const productionDate = supplierDates.productionDate?.toDate();
 		const settlementDate = supplierDates.settlementDate?.toDate();
+		const warehouseEntryDate = supplierDates.warehouseEntryDate?.toDate();
+		const completedPaymentDate = supplierDates.completePaymentDate?.toDate();
 
 		// Get all quantity inside lineItems
 		const totalQuantity = payload?.lineItems?.reduce(
@@ -157,6 +158,9 @@ const SupplierOrdersModal: FC<Props> = ({
 			email: payload?.user?.email || '',
 			estimated_production_time: productionDate || new Date(),
 			settlement_time: settlementDate || new Date(),
+			shipping_started_date: new Date(),
+			warehouse_entry_date: warehouseEntryDate || new Date(),
+			completed_payment_date: completedPaymentDate || new Date(),
 			countryCode: region?.countries[0].iso_2 || 'vn',
 		};
 
@@ -196,6 +200,9 @@ const SupplierOrdersModal: FC<Props> = ({
 				estimated_production_time:
 					supplierDates.productionDate?.toDate() || new Date(),
 				settlement_time: supplierDates.settlementDate?.toDate() || new Date(),
+				shipping_started_date: supplierDates.shippingDate?.toDate() || new Date(),
+				warehouse_entry_date: supplierDates.warehouseEntryDate?.toDate() || new Date(),
+				completed_payment_date: supplierDates.completePaymentDate?.toDate() || new Date(),
 				countryCode: region?.countries[0]?.iso_2 || 'vn',
 				region_id: region?.id || '',
 				currency_code: region?.currency_code || 'vnd',
@@ -215,7 +222,7 @@ const SupplierOrdersModal: FC<Props> = ({
 		}
 	};
 
-	const handleStep0 = () => {
+	const handleStep = () => {
 		// Check if any selected product exists
 		if (selectedProducts.length === 0) {
 			message.error('Phải chọn ít nhất một sản phẩm');
@@ -259,7 +266,7 @@ const SupplierOrdersModal: FC<Props> = ({
 
 	const handleContinueOrSubmit = () => {
 		if (currentStep === 0) {
-			handleStep0();
+			handleStep();
 		} else if (currentStep === 1) {
 			setCurrentStep(2);
 		} else if (currentStep === 2) {
@@ -292,11 +299,19 @@ const SupplierOrdersModal: FC<Props> = ({
 			</Button>,
 		];
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentStep, selectedProducts, selectedSupplier, supplierDates]);
+	}, [
+		currentStep,
+		selectedProducts,
+		selectedSupplier,
+		supplierDates,
+		itemQuantities,
+		itemPrices,
+	]);
 
 	// handle supplier form
 	const handleSupplierForm = (supplier: Supplier | null) => {
 		setSelectedSupplier(supplier);
+
 		updateDatesFromSupplier(supplier);
 	};
 
@@ -344,8 +359,7 @@ const SupplierOrdersModal: FC<Props> = ({
 						selectedSupplier={selectedSupplier}
 						setSelectedSupplier={handleSupplierForm}
 						supplierDates={supplierDates}
-						handleSettlementDateChange={handleSettlementDateChange}
-						handleProductionDateChange={handleProductionDateChange}
+						handleDateChange={handleDateChange}
 						updateDatesFromSupplier={updateDatesFromSupplier}
 						setIsSendEmail={setIsSendEmail}
 					/>

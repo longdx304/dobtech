@@ -41,7 +41,6 @@ const ListShipment: FC<Props> = ({}) => {
 		isDone: true,
 		status: activeKey,
 	});
-	console.log('fulfillments:', fulfillments);
 
 	const updateFulfillment = useAdminAssignShipment();
 

@@ -16,6 +16,9 @@ export interface Supplier {
 	address: string;
 	estimated_production_time: number;
 	settlement_time: number;
+	completed_payment_date: number;
+	warehouse_entry_date: number;
+	shipping_started_date: number;
 	metadata: Record<string, any>;
 	created_at: string;
 	updated_at: string;
@@ -31,15 +34,7 @@ export interface SupplierResponse {
 	supplier: Supplier;
 }
 
-export type CreateSupplierInput = {
-	email: string;
-	supplier_name: string;
-	phone?: string;
-	address?: string;
-	estimated_production_time: number;
-	settlement_time: number;
-	metadata?: Record<string, unknown>;
-};
+export type CreateSupplierInput = Partial<Supplier>;
 
 export type UpdateSupplierInput = Partial<CreateSupplierInput>;
 
@@ -61,6 +56,9 @@ export interface SupplierOrdersReq {
 	currency_code: string;
 	estimated_production_time: Date;
 	settlement_time: Date;
+	shipping_started_date: Date;
+	warehouse_entry_date: Date;
+	completed_payment_date: Date;
 	document_url: string;
 	metadata?: Record<string, unknown>;
 }
@@ -137,6 +135,9 @@ export interface SupplierOrder {
 	fulfillment_status: FulfillSupplierOrderStt;
 	estimated_production_time: string;
 	settlement_time: string;
+	shipping_started_date?: string | Date;
+	warehouse_entry_date?: string | Date;
+	completed_payment_date?: string | Date;
 	items: LineItem[];
 	tax_rate: number;
 	metadata: Record<string, any>;
