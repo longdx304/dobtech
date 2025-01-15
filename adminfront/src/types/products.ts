@@ -1,3 +1,5 @@
+import { ProductVariant as MedusaProductVariant } from '@medusajs/medusa';
+
 export interface IProductResponse {
 	id: string;
 	created_at: string;
@@ -124,10 +126,10 @@ export type CustomsFormType = {
 
 export type FormImage = {
 	id: string;
-  url: string;
-  name?: string;
-  size?: number;
-  nativeFile?: File;
+	url: string;
+	name?: string;
+	size?: number;
+	nativeFile?: File;
 	selected?: boolean;
 };
 
@@ -157,3 +159,8 @@ export enum ProductStatus {
 	PUBLISHED = 'published',
 	REJECTED = 'rejected',
 }
+
+export type ProductVariant = MedusaProductVariant & {
+	supplier_price: number;
+	cogs_price: number;
+};

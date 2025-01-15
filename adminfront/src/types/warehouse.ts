@@ -1,5 +1,6 @@
-import { User } from '@medusajs/medusa';
+import { PaginatedResponse, User } from '@medusajs/medusa';
 import { ItemUnit } from './item-unit';
+import { ProductVariant } from './products';
 
 export interface Warehouse {
 	id: string;
@@ -7,11 +8,22 @@ export interface Warehouse {
 	capacity: number;
 	created_at: string;
 	updated_at: string;
+	inventories: WarehouseInventory[];
 }
 
 export interface AdminPostWarehouseReq {
 	location: string;
 	capacity?: number;
+}
+
+export interface AdminPostManageWarehouseVariantReq {
+	location: string;
+	variant_id: string;
+	warehouse_id: string;
+	quantity: number;
+	unit_id: string;
+	type: string;
+	note?: string;
 }
 
 type AdminPostWarehouseRes = {
@@ -47,7 +59,7 @@ export type AdminWarehouseRes = {
 	warehouse: Warehouse;
 };
 
-export type AdminWarehousesListRes = {
+export type AdminWarehousesListRes = PaginatedResponse & {
 	warehouse: Warehouse[];
 };
 
@@ -66,6 +78,7 @@ export type WarehouseInventory = {
 	quantity: number;
 	unit_id: string;
 	item_unit: ItemUnit;
+	variant: ProductVariant;
 	warehouse: Warehouse;
 	created_at: string;
 	updated_at: string;
@@ -82,6 +95,15 @@ export interface AdminPostInboundInventoryReq {
 	line_item_id: string;
 	order_id?: string;
 	type?: string;
+	note?: string;
+}
+export interface AdminPostManageInventoryWarehouseReq {
+	id?: string;
+	warehouse_id?: string;
+	variant_id: string;
+	quantity: number;
+	unit_id: string;
+	note?: string;
 }
 
 export interface AdminPostRemmoveInventoryReq {
