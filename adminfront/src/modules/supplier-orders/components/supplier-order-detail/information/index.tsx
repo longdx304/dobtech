@@ -8,9 +8,10 @@ import { getErrorMessage } from '@/lib/utils';
 import StatusIndicator from '@/modules/common/components/status-indicator';
 // import { useAdminCancelSupplierOrder } from '@/modules/supplier/hooks';
 import { SupplierOrder } from '@/types/supplier';
-import { Empty, message, Modal as AntdModal } from 'antd';
+import { Modal as AntdModal, Empty, message } from 'antd';
 import dayjs from 'dayjs';
-import { Ban, Pencil } from 'lucide-react';
+import { Ban, Pencil, SquarePen } from 'lucide-react';
+import InformationModal from './information-modal';
 
 type Props = {
 	supplierOrder: SupplierOrder | undefined;
@@ -20,6 +21,8 @@ type Props = {
 const Information = ({ supplierOrder, isLoading }: Props) => {
 	const { state, onOpen, onClose } = useToggleState(false);
 	const cancelOrder = useAdminCancelSupplierOrder(supplierOrder?.id!);
+
+	const isCancelled = supplierOrder?.status === 'canceled';
 
 	const handleCancelOrder = () => {
 		AntdModal.confirm({
@@ -40,17 +43,19 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 
 	const actions = [
 		{
+			label: <span className="w-full">{'Chỉnh sửa thông tin'}</span>,
+			key: 'detail',
+			icon: <SquarePen />,
+			onClick: onOpen,
+			disabled: isCancelled,
+		},
+		{
 			label: <span className="w-full">{'Huỷ đơn hàng'}</span>,
 			key: 'cancel',
 			icon: <Ban size={16} />,
 			danger: true,
 			onClick: handleCancelOrder,
-		},
-		{
-			label: <span className="w-full">{'Chỉnh sửa thời gian đơn hàng'}</span>,
-			key: 'edit',
-			icon: <Pencil size={16} />,
-			onClick: onOpen,
+			disabled: isCancelled,
 		},
 	];
 
@@ -60,7 +65,9 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 			{supplierOrder && (
 				<div>
 					<Flex align="center" justify="space-between" className="pb-2">
-						<Title level={4}>{`Đơn hàng #${supplierOrder?.display_id}`}</Title>
+						<Title level={4}>{`Đơn hàng #${
+							supplierOrder?.display_name || supplierOrder?.display_id
+						}`}</Title>
 						<div className="flex justify-end items-center gap-4">
 							<OrderStatus status={supplierOrder!.status as any} />
 							<ActionAbles actions={actions} />
@@ -69,7 +76,7 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 					<span className="text-gray-500 text-xs">
 						{dayjs(supplierOrder.created_at).format('hh:mm D/MM/YYYY')}
 					</span>
-					<Flex vertical gap={4} className="pt-8">
+					<Flex vertical gap={8} className="pt-6">
 						<Flex justify="space-between" align="center">
 							<Text className="text-gray-500 text-sm">Email:</Text>
 							<Text className="text-gray-500 text-sm">
@@ -84,7 +91,7 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 						</Flex>
 						<Flex justify="space-between" align="center">
 							<Text className="text-gray-500 text-sm">
-								Ngày nhận hàng(dự kiến):
+								Ngày hoàn thành dự kiến:
 							</Text>
 							<Text className="text-gray-500 text-sm">
 								{dayjs(supplierOrder?.estimated_production_time).format(
@@ -94,7 +101,7 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 						</Flex>
 						<Flex justify="space-between" align="center">
 							<Text className="text-gray-500 text-sm">
-								Ngày thanh toán(dự kiến):
+								Ngày thanh toán dự kiến:
 							</Text>
 							<Text className="text-gray-500 text-sm">
 								{dayjs(supplierOrder?.settlement_time).format('DD/MM/YYYY') ??
@@ -103,6 +110,15 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 						</Flex>
 					</Flex>
 				</div>
+			)}
+			{/* Modal Update */}
+			{supplierOrder && (
+				<InformationModal
+					state={state}
+					handleOk={onClose}
+					handleCancel={onClose}
+					supplierOrder={supplierOrder}
+				/>
 			)}
 		</Card>
 	);

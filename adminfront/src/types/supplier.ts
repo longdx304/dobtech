@@ -122,6 +122,7 @@ export interface SupplierOrder {
 	cart_id: string;
 	cart: Cart;
 	display_id: number;
+	display_name?: string;
 	supplier_id: string;
 	supplier: Supplier;
 	documents: SupplierOrderDocument[];

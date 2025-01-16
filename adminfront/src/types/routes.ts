@@ -24,6 +24,8 @@ export enum ERoutes {
 	ITEM_UNIT = '/admin/item-unit',
 	WAREHOUSE_STOCK_CHECKER = '/admin/warehouse/stock-checker',
 	WAREHOUSE_SHIPMENT = '/admin/warehouse/shipment',
+	WAREHOUSE_MANAGE = '/admin/warehouse/manage',
+	WAREHOUSE_INVENTORY_CHECKER = '/admin/warehouse/inventory-checker',
 }
 
 export interface TRouteConfig {
@@ -116,6 +118,14 @@ export const routesConfig: TRouteConfig[] = [
 	},
 	{
 		path: ERoutes.WAREHOUSE_SHIPMENT,
+		mode: [EPermissions.Driver, EPermissions.Manager],
+	},
+	{
+		path: ERoutes.WAREHOUSE_MANAGE,
+		mode: [EPermissions.Driver, EPermissions.Manager],
+	},
+	{
+		path: ERoutes.WAREHOUSE_INVENTORY_CHECKER,
 		mode: [EPermissions.Driver, EPermissions.Manager],
 	},
 ];
