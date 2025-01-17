@@ -24,7 +24,7 @@ import { expandedColumns, warehouseColumns } from './columns';
 
 type Props = {};
 
-const DEFAULT_PAGE_SIZE = 50;
+const DEFAULT_PAGE_SIZE = 20;
 
 const WarehouseManage: FC<Props> = ({}) => {
 	const deleteWarehouse = useAdminDeleteWarehouse();
