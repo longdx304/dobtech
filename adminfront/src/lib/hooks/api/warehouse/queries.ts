@@ -38,6 +38,27 @@ export const useAdminWarehouses = (
 	return { ...data, ...rest } as const;
 };
 
+export const useAdminWarehousesInventoryVariant = (
+	/**
+	 * Filters and pagination configurations to apply on retrieved currencies.
+	 */
+	query?: Record<string, unknown>,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<WarehouseQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+	const params = query && generateParams(query);
+	const { data, ...rest } = useQuery(
+		adminWarehouseKeys.list(query),
+		() => client.admin.custom.get(`/admin/warehouse/manage/inventory-variants${params}`),
+		options
+	);
+	return { ...data, ...rest } as const;
+};
+
 export const useAdminWarehouse = (id: string) => {
 	const { client } = useMedusa();
 	const { data, ...rest } = useQuery(

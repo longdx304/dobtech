@@ -1,18 +1,18 @@
 import { Flex } from '@/components/Flex';
-import ListShipment from '@/modules/warehouse/shipment/templates/list-shipment';
+import InventoryChecker from '@/modules/warehouse/inventory-checker/templates/inventory';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Quản lý kho hàng',
-	description: 'Trang quản lý kho hàng.',
+	title: 'Quản lý kiểm kho',
+	description: 'Trang quản lý kiểm kho hàng.',
 };
 
 interface Props {}
 
-export default async function Ship({}: Props) {
+export default async function InventoryCheckerPage({}: Props) {
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
-			<ListShipment />
+			<InventoryChecker />
 		</Flex>
 	);
 }
