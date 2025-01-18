@@ -45,15 +45,19 @@ export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
 
 	const optionItemUnits = useMemo(() => {
 		if (!item_units) return [];
-		return item_units
-			.filter((item) => item.id !== 'default')
-			.map((item) => ({
-				value: item.id,
-				label: item.unit,
-			}));
+		return (
+			item_units
+				// .filter((item) => item.id !== 'default')
+				.map((item) => ({
+					value: item.id,
+					label: item.unit,
+				}))
+		);
 	}, [item_units]);
 
-	const defaultUnit = item_units?.find((item) => item.quantity === 6)?.id || '';
+	const defaultUnit =
+		item_units?.find((item) => item.unit === 'bịch 6' || item.quantity === 6)
+			?.id || '';
 
 	const getSelectedUnitData = () => {
 		const findUnit = item_units?.find((item) => item.id === selectedUnit);

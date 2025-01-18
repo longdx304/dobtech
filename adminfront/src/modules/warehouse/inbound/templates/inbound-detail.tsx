@@ -7,7 +7,7 @@ import { Flex } from '@/components/Flex';
 import { Input, TextArea } from '@/components/Input';
 import List from '@/components/List';
 import { Tabs } from '@/components/Tabs';
-import { Title } from '@/components/Typography';
+import { Text, Title } from '@/components/Typography';
 import { useAdminProductInboundConfirmById } from '@/lib/hooks/api/product-inbound';
 import { useAdminProductInbound } from '@/lib/hooks/api/product-inbound/queries';
 import useToggleState from '@/lib/hooks/use-toggle-state';
@@ -208,6 +208,10 @@ const InboundDetail: FC<Props> = ({ id }) => {
 		},
 	];
 
+	const handler = supplierOrder?.handler
+		? `${supplierOrder?.handler?.last_name} ${supplierOrder?.handler?.first_name}`
+		: 'Chưa xác định';
+
 	return (
 		<Flex vertical>
 			<Flex vertical align="flex-start" className="">
@@ -226,6 +230,9 @@ const InboundDetail: FC<Props> = ({ id }) => {
 						<Title
 							level={4}
 						>{`Đơn nhập hàng #${supplierOrder?.display_id}`}</Title>
+						<Text className="text-gray-600">
+							{`Người phụ trách: ${handler}`}
+						</Text>
 					</Flex>
 					<ActionAbles actions={actions as any} />
 				</Flex>
