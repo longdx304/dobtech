@@ -221,18 +221,15 @@ const NewOrderModal: FC<Props> = ({
 
 			const address = `${values.shipping_address.address_1}, ${values.shipping_address.address_2}, ${values.shipping_address.province}, ${values.shipping_address.city}, ${values.shipping_address.country_code.label}`;
 
-			// const urlPdf = await generateFilePdf(
-			// 	{
-			// 		last_name: values.shipping_address.last_name,
-			// 		first_name: values.shipping_address.first_name,
-			// 		email: values.email,
-			// 		phone: values.shipping_address.phone,
-			// 	},
-			// 	address
-			// );
-			const urlPdf =
-				'https://dob-ecommerce.s3.ap-southeast-1.amazonaws.com/orders/purchase-order-135620_30122024.pdf';
-			console.log('urlPdf:', urlPdf);
+			const urlPdf = await generateFilePdf(
+				{
+					last_name: values.shipping_address.last_name,
+					first_name: values.shipping_address.first_name,
+					email: values.email,
+					phone: values.shipping_address.phone,
+				},
+				address
+			);
 
 			// for create draft order by admin
 			const transformedData = generateTransferOrderData();
