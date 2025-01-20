@@ -10,7 +10,6 @@ import { FC } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 import Items from '../new/items';
 import SelectRegion from '../new/select-region';
-import SelectShipping from '../new/select-shipping';
 import ShippingDetails from '../new/shipping-details';
 import Summary from '../new/summary';
 
@@ -38,7 +37,6 @@ const DraftOrderModal: FC<Props> = ({
 		{ title: '', content: <SelectRegion /> },
 		{ title: '', content: <ShippingDetails /> },
 		{ title: '', content: <Items /> },
-		{ title: '', content: <SelectShipping /> },
 		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} /> },
 	];
 

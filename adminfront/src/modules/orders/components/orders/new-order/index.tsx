@@ -10,7 +10,6 @@ import { useUser } from '@/lib/providers/user-provider';
 import { getErrorMessage } from '@/lib/utils';
 import Items from '@/modules/draft-orders/components/new/items';
 import SelectRegion from '@/modules/draft-orders/components/new/select-region';
-import SelectShipping from '@/modules/draft-orders/components/new/select-shipping';
 import ShippingDetails from '@/modules/draft-orders/components/new/shipping-details';
 import Summary from '@/modules/draft-orders/components/new/summary';
 import { useNewDraftOrderForm } from '@/modules/draft-orders/hooks/use-new-draft-form';
@@ -91,13 +90,12 @@ const NewOrderModal: FC<Props> = ({
 			content: (
 				<div className="flex flex-col">
 					<SelectRegion />
-					<SelectShipping />
+					{/* <SelectShipping /> */}
 				</div>
 			),
 		},
 		{ title: '', content: <ShippingDetails /> },
 		{ title: '', content: <Items /> },
-		// { title: '', content: <SelectShipping /> },
 		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} /> },
 	];
 
@@ -159,9 +157,10 @@ const NewOrderModal: FC<Props> = ({
 			company: values.shipping_address.company,
 			province: values.shipping_address.province,
 			postal_code: values.shipping_address.postal_code,
-			country_code: values.shipping_address.country_code.value,
+			country_code: values.shipping_address.country_code,
 			metadata: { is_default: true },
 		};
+		console.log('shipping_addresses', shipping_addresses);
 
 		await adminAddCustomerAddress.mutateAsync(shipping_addresses, {
 			onSuccess: (response) => {
@@ -189,11 +188,11 @@ const NewOrderModal: FC<Props> = ({
 			shipping_methods: [{ option_id: values.shipping_option }],
 			shipping_address: values.shipping_address_id || {
 				...values.shipping_address,
-				country_code: values.shipping_address?.country_code?.value || 'vn',
+				country_code: values.shipping_address?.country_code || 'vn',
 			},
 			billing_address: values.billing_address_id || {
 				...values.billing_address,
-				country_code: values.billing_address?.country_code?.value || 'vn',
+				country_code: values.billing_address?.country_code.value || 'vn',
 			},
 			customer_id: values.customer_id,
 			discounts: values.discount_code

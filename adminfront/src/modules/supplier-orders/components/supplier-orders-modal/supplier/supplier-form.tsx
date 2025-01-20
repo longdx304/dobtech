@@ -7,6 +7,7 @@ import { Minus, Plus } from 'lucide-react';
 import { FC, useState } from 'react';
 import General from './general';
 import SupplierInfo from './supplier-info';
+import { DateField } from '@/modules/supplier-orders/hooks/use-supplier-time';
 
 type SupplierFormProps = {
 	suppliers: Supplier[];
@@ -15,9 +16,11 @@ type SupplierFormProps = {
 	supplierDates: {
 		settlementDate: Dayjs | null;
 		productionDate: Dayjs | null;
-	};
-	handleSettlementDateChange: (date: Dayjs | null) => void;
-	handleProductionDateChange: (date: Dayjs | null) => void;
+		completePaymentDate: Dayjs | null;
+		warehouseEntryDate: Dayjs | null;
+		shippingDate: Dayjs | null;
+	}
+	handleDateChange: (field: DateField) => (date: Dayjs | null) => void;
 	updateDatesFromSupplier: (supplier: Supplier | null) => void;
 	setIsSendEmail: (value: boolean) => void;
 };
@@ -27,8 +30,7 @@ const SupplierForm: FC<SupplierFormProps> = ({
 	selectedSupplier,
 	setSelectedSupplier,
 	supplierDates,
-	handleSettlementDateChange,
-	handleProductionDateChange,
+	handleDateChange,
 	updateDatesFromSupplier,
 	setIsSendEmail,
 }) => {
@@ -46,8 +48,7 @@ const SupplierForm: FC<SupplierFormProps> = ({
 					selectedSupplier={selectedSupplier}
 					setSelectedSupplier={setSelectedSupplier}
 					supplierDates={supplierDates}
-					handleSettlementDateChange={handleSettlementDateChange}
-					handleProductionDateChange={handleProductionDateChange}
+					handleDateChange={handleDateChange}
 					updateDatesFromSupplier={updateDatesFromSupplier}
 				/>
 			),

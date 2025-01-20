@@ -154,7 +154,7 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 								<div>
 									{shipping.address_1}, {shipping.address_2}
 								</div>
-								<div>{`${shipping.postal_code} ${shipping.city}, ${shipping.country_code?.label}`}</div>
+								<div>{`${shipping.postal_code} ${shipping.city}, ${shipping.province}`}</div>
 							</div>
 						)}
 						{regionObj && (
@@ -192,7 +192,7 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 					<div>
 						{billing.address_1}, {billing.address_2}
 					</div>
-					<div>{`${billing.postal_code} ${billing.city}, ${billing.country_code.label}`}</div>
+					<div>{`${billing.postal_code} ${billing.city}, ${billing.province}`}</div>
 				</SummarySection>
 			)}
 		</div>

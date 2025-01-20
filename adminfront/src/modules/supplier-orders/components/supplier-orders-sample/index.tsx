@@ -84,12 +84,8 @@ const SupplierOrdersSample: FC<Props> = ({
 	const { region } = useAdminRegion(regionId || '');
 
 	// supplier date time picker
-	const {
-		supplierDates,
-		handleSettlementDateChange,
-		handleProductionDateChange,
-		updateDatesFromSupplier,
-	} = useSupplierTime();
+	const { supplierDates, handleDateChange, updateDatesFromSupplier } =
+		useSupplierTime();
 
 	const { user: selectedAdmin } = useUser();
 
@@ -249,14 +245,14 @@ const SupplierOrdersSample: FC<Props> = ({
 						setCurrentStep={setCurrentStep}
 					/>
 				)}
+				
 				{currentStep === 2 && (
 					<SupplierForm
 						suppliers={suppliers as Supplier[]}
 						selectedSupplier={selectedSupplier}
 						setSelectedSupplier={handleSupplierForm}
 						supplierDates={supplierDates}
-						handleSettlementDateChange={handleSettlementDateChange}
-						handleProductionDateChange={handleProductionDateChange}
+						handleDateChange={handleDateChange}
 						updateDatesFromSupplier={updateDatesFromSupplier}
 						setIsSendEmail={setIsSendEmail}
 					/>

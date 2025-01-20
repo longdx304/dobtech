@@ -84,6 +84,7 @@ const SupplierModal: FC<Props> = ({
 				isEditing ? updateSupplier.isLoading : createSupplier.isLoading
 			}
 			form={form}
+			maskClosable={false}
 		>
 			<Form form={form} onFinish={onFinish} layout="vertical">
 				<Row gutter={[16, 8]} className="pt-4">
@@ -152,6 +153,35 @@ const SupplierModal: FC<Props> = ({
 							]}
 						>
 							<InputNumber placeholder="7" />
+						</Form.Item>
+					</Col>
+					<Col xs={24} sm={12}>
+						<Form.Item
+							name="completed_payment_date"
+							label="Ngày cần quyết toán hoàn tất đơn hàng"
+							rules={[
+								{
+									required: true,
+									message: 'Vui lòng nhập ngày cần quyết toán hoàn tất đơn hàng',
+								},
+								{ type: 'number', min: 1, message: 'Thời gian phải lớn hơn 0' },
+							]}
+						>
+							<InputNumber placeholder="5" />
+						</Form.Item>
+					</Col>
+					<Col xs={24} sm={12}>
+						<Form.Item
+							name="warehouse_entry_date"
+							label="Ngày nhập hàng vào kho (dự kiến)"
+							rules={[
+								{
+									required: true,
+									message: 'Vui lòng nhập ngày nhập hàng vào kho (dự kiến)',
+								},
+							]}
+						>
+							<InputNumber placeholder="5" />
 						</Form.Item>
 					</Col>
 				</Row>

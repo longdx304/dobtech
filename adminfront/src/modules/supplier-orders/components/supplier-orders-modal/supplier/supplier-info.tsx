@@ -3,6 +3,7 @@ import { Card } from '@/components/Card';
 import DatePicker from '@/components/Input/DatePicker';
 import { Modal } from '@/components/Modal';
 import { Table } from '@/components/Table';
+import { DateField } from '@/modules/supplier-orders/hooks/use-supplier-time';
 import { Supplier } from '@/types/supplier';
 import { ColumnsType } from 'antd/es/table';
 import dayjs, { Dayjs } from 'dayjs';
@@ -15,9 +16,11 @@ type SupplierInfoProps = {
 	supplierDates: {
 		settlementDate: Dayjs | null;
 		productionDate: Dayjs | null;
+		completePaymentDate: Dayjs | null;
+		warehouseEntryDate: Dayjs | null;
+		shippingDate: Dayjs | null;
 	};
-	handleSettlementDateChange: (date: Dayjs | null) => void;
-	handleProductionDateChange: (date: Dayjs | null) => void;
+	handleDateChange: (field: DateField) => (date: Dayjs | null) => void;
 	updateDatesFromSupplier: (supplier: Supplier | null) => void;
 };
 
@@ -26,8 +29,7 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 	selectedSupplier,
 	setSelectedSupplier,
 	supplierDates,
-	handleSettlementDateChange,
-	handleProductionDateChange,
+	handleDateChange,
 	updateDatesFromSupplier,
 }) => {
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -54,7 +56,6 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 	];
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
-		// select rowkey = select supplier id
 		setSelectedRowKeys(selectedRowKeys);
 		const selected = suppliers.find(
 			(supplier) => supplier.id === selectedRowKeys[0]
@@ -90,7 +91,7 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 							defaultValue={supplierDates.productionDate}
 							placeholder="Chọn ngày bắt đầu"
 							className="w-[180px]"
-							onChange={handleProductionDateChange}
+							onChange={handleDateChange('productionDate')}
 						/>
 					</p>
 					<p>
@@ -101,9 +102,43 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 							defaultValue={supplierDates.settlementDate}
 							placeholder="Chọn ngày bắt đầu"
 							className="w-[180px]"
-							onChange={handleSettlementDateChange}
+							onChange={handleDateChange('settlementDate')}
 						/>
 					</p>
+					<p>
+						<strong>Ngày bắt đầu chuyển hàng:</strong>{' '}
+						<DatePicker
+							format="DD-MM-YYYY"
+							minDate={dayjs()}
+							defaultValue={supplierDates.shippingDate}
+							placeholder="Chọn ngày bắt đầu"
+							className="w-[180px]"
+							onChange={handleDateChange('shippingDate')}
+						/>
+					</p>
+					<p>
+						<strong>Ngày nhập hàng vào kho:</strong>{' '}
+						<DatePicker
+							format="DD-MM-YYYY"
+							minDate={dayjs()}
+							defaultValue={supplierDates.warehouseEntryDate}
+							placeholder="Chọn ngày bắt đầu"
+							className="w-[180px]"
+							onChange={handleDateChange('warehouseEntryDate')}
+						/>
+					</p>
+					<p>
+						<strong>Ngày tất toán đơn hàng:</strong>{' '}
+						<DatePicker
+							format="DD-MM-YYYY"
+							minDate={dayjs()}
+							defaultValue={supplierDates.completePaymentDate}
+							placeholder="Chọn ngày bắt đầu"
+							className="w-[180px]"
+							onChange={handleDateChange('completePaymentDate')}
+						/>
+					</p>
+
 					{/* Option to change supplier */}
 					<Button onClick={openModal}>Đổi nhà cung cấp</Button>
 				</Card>

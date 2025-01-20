@@ -38,13 +38,33 @@ const supplierColumn = ({
 		},
 	},
 	{
-		title: 'Thời gian quyết toán',
+		title: 'Thời gian quyết toán dự kiến',
 		dataIndex: 'settlement_time',
 		key: 'settlement_time',
 		width: 150,
 		className: 'text-xs',
 		render: (_: Supplier['settlement_time']) => {
 			return _ + ' ngày';
+		},
+	},
+	{
+		title: 'Thời gian hoàn tất thanh toán',
+		dataIndex: 'completed_payment_date',
+		key: 'completed_payment_date',
+		width: 150,
+		className: 'text-xs',
+		render: (_: Supplier['completed_payment_date']) => {
+			return (_ || '-') + ' ngày' ;
+		},
+	},
+	{
+		title: 'Thời gian nhập hàng vào kho',
+		dataIndex: 'warehouse_entry_date',
+		key: 'warehouse_entry_date',
+		width: 150,
+		className: 'text-xs',
+		render: (_: Supplier['warehouse_entry_date']) => {
+			return (_ || '-') + ' ngày';
 		},
 	},
 	{
