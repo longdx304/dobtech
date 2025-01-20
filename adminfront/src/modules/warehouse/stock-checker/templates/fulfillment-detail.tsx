@@ -103,7 +103,6 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 				files: uploadImages,
 				prefix: 'warehouse/stock-checker',
 			});
-			console.log('uploads:', uploads);
 			updateFulfillment.mutateAsync(
 				{
 					checker_url: uploads.map((item) => item.url).join(','),

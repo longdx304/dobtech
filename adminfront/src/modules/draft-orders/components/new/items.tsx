@@ -1,12 +1,14 @@
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
-import { Table } from '@/components/Table';
+import { Tabs } from '@/components/Tabs';
 import { useStepModal } from '@/lib/providers/stepped-modal-provider';
+import { formatNumber } from '@/lib/utils';
 import { ProductVariant, Region } from '@medusajs/medusa';
+import { Table, TabsProps } from 'antd';
 import _ from 'lodash';
 import { Search } from 'lucide-react';
 import { useAdminVariants } from 'medusa-react';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 import productsColumns from './product-columns';
 
@@ -35,12 +37,14 @@ const Items = () => {
 
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [activeTab, setActiveTab] = useState<TabsProps['activeKey']>('list');
 	const {
-		context: { region, items, setItems },
+		context: { region, setItems, items },
 		form,
 	} = useNewDraftOrderForm();
 	const { enableNext, disableNext } = useStepModal();
 
+	// Fetch variants
 	const { isLoading, count, variants } = useAdminVariants({
 		q: searchValue,
 		limit: PAGE_SIZE,
@@ -48,6 +52,20 @@ const Items = () => {
 		region_id: region?.id,
 		customer_id: form.getFieldValue('customer_id'),
 	});
+
+	// Separate query to fetch selected variants
+	const { variants: selectedVariantsData } = useAdminVariants(
+		items?.length > 0
+			? {
+					id: items.map((item) => item.variant_id),
+					region_id: region?.id,
+					customer_id: form.getFieldValue('customer_id'),
+			  }
+			: undefined,
+		{
+			enabled: !!items?.length,
+		}
+	);
 
 	// Get default price for a variant
 	const getDefaultPrice = (variant: any) => {
@@ -121,9 +139,7 @@ const Items = () => {
 		setVariantPrices(updatedPrices);
 
 		// Wait for pricedVariants to be available before updating form items
-		// if (newVariants?.length > 0) {
 		updateFormItems(selectedRows, updatedQuantities, updatedPrices);
-		// }
 	};
 
 	const updateFormItems = (
@@ -165,13 +181,18 @@ const Items = () => {
 	};
 
 	useEffect(() => {
+		if (variantPrices.some((p) => p.unit_price === 0)) {
+			disableNext();
+			return;
+		}
+
 		if (selectedVariants.length > 0) {
 			enableNext();
 		} else {
 			disableNext();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectedVariants]);
+	}, [selectedVariants, variantPrices]);
 
 	// Handle quantity changes
 	const handleQuantityChange = (value: number, variantId: string) => {
@@ -261,6 +282,60 @@ const Items = () => {
 		return true;
 	};
 
+	const itemTabs: TabsProps['items'] = [
+		{
+			key: 'list',
+			label: 'Danh sách',
+		},
+		{
+			key: 'checked',
+			label: 'Đã chọn',
+		},
+	];
+
+	const handleTabChange = (key: string) => {
+		setActiveTab(key);
+	};
+
+	// Sync selected variants with prices and quantities with items context
+	useEffect(() => {
+		if (items?.length > 0 && selectedVariantsData) {
+			// Get variant IDs from items
+			const itemVariantIds = items.map((item) => item.variant_id);
+			setSelectedVariantIds(itemVariantIds);
+
+			// Use selectedVariantsData instead of filtered variants
+			setSelectedVariants(selectedVariantsData as any);
+
+			// Sync quantities
+			const quantities = items.map((item) => ({
+				variantId: item.variant_id,
+				quantity: item.quantity,
+			}));
+			setVariantQuantities(quantities);
+
+			// Sync prices
+			const prices = items.map((item) => ({
+				variantId: item.variant_id,
+				unit_price: item.unit_price,
+			}));
+			setVariantPrices(prices);
+		}
+	}, [items, selectedVariantsData]);
+
+	const totalPrice = useMemo(() => {
+		return variantPrices.reduce((total, item) => {
+			const quantity =
+				variantQuantities.find((q) => q.variantId === item.variantId)
+					?.quantity || 0;
+			return total + item.unit_price * quantity;
+		}, 0);
+	}, [variantPrices, variantQuantities]);
+
+	const totalQuantity = useMemo(() => {
+		return variantQuantities.reduce((total, item) => total + item.quantity, 0);
+	}, [variantQuantities]);
+
 	return (
 		<>
 			<Flex
@@ -276,6 +351,12 @@ const Items = () => {
 					onChange={handleChangeDebounce}
 				/>
 			</Flex>
+			<div className="flex justify-center">
+				<Tabs items={itemTabs} onChange={handleTabChange} />
+			</div>
+			<div className="flex justify-end">{`Đã chọn : ${
+				selectedVariants?.length ?? 0
+			} biến thể`}</div>
 			<Table
 				rowSelection={{
 					selectedRowKeys: selectedVariantIds,
@@ -287,16 +368,41 @@ const Items = () => {
 				}}
 				loading={isLoading}
 				columns={columns as any}
-				dataSource={variants ?? []}
+				dataSource={(activeTab === 'list' ? variants : selectedVariants) ?? []}
 				rowKey="id"
-				pagination={{
-					total: Math.floor(count ?? 0 / (PAGE_SIZE ?? 0)),
-					pageSize: PAGE_SIZE,
-					current: currentPage as number,
-					onChange: handleChangePage,
-					showTotal: (total, range) =>
-						`${range[0]}-${range[1]} trong ${total} biến thể sản phẩm`,
-				}}
+				scroll={{ x: 700 }}
+				pagination={
+					activeTab === 'list'
+						? {
+								total: count,
+								pageSize: PAGE_SIZE,
+								current: currentPage,
+								onChange: handleChangePage,
+								showSizeChanger: false,
+						  }
+						: false
+				}
+				summary={() => (
+					<>
+						{activeTab === 'checked' && (
+							<Table.Summary fixed>
+								<Table.Summary.Row>
+									<Table.Summary.Cell index={0} />
+									<Table.Summary.Cell index={1}>
+										{selectedVariants?.length} (sản phẩm)
+									</Table.Summary.Cell>
+									<Table.Summary.Cell index={2} className="text-center">
+										{totalQuantity} (đôi)
+									</Table.Summary.Cell>
+									<Table.Summary.Cell index={3} className="text-center">
+										{formatNumber(totalPrice)}
+										{region?.currency.symbol}
+									</Table.Summary.Cell>
+								</Table.Summary.Row>
+							</Table.Summary>
+						)}
+					</>
+				)}
 			/>
 		</>
 	);

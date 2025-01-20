@@ -3,42 +3,63 @@ import dayjs from 'dayjs';
 import { useState } from 'react';
 import { Supplier } from '@/types/supplier';
 
+export type DateField =
+	| 'settlementDate'
+	| 'productionDate'
+	| 'completePaymentDate'
+	| 'warehouseEntryDate'
+  | 'shippingDate';
+type SupplierDates = Record<DateField, Dayjs | null>;
+
+const INITIAL_DATES: SupplierDates = {
+	settlementDate: null,
+	productionDate: null,
+	completePaymentDate: null,
+	warehouseEntryDate: null,
+  shippingDate: null
+};
+
+const SUPPLIER_DATE_MAPPINGS = {
+	settlementDate: 'settlement_time',
+	productionDate: 'estimated_production_time',
+	completePaymentDate: 'completed_payment_date',
+	warehouseEntryDate: 'warehouse_entry_date',
+  shippingDate: 'shipping_started_date'
+} as const;
+
 const useSupplierTime = () => {
-	const [supplierDates, setSupplierDates] = useState<{
-		settlementDate: Dayjs | null;
-		productionDate: Dayjs | null;
-	}>({
-		settlementDate: null,
-		productionDate: null,
-	});
+	const [supplierDates, setSupplierDates] =
+		useState<SupplierDates>(INITIAL_DATES);
 
-	const handleSettlementDateChange = (date: Dayjs | null) => {
-		setSupplierDates((prev) => ({ ...prev, settlementDate: date }));
-	};
-
-	const handleProductionDateChange = (date: Dayjs | null) => {
-		setSupplierDates((prev) => ({ ...prev, productionDate: date }));
+	const handleDateChange = (field: DateField) => (date: Dayjs | null) => {
+		setSupplierDates((prev) => ({ ...prev, [field]: date }));
 	};
 
 	const updateDatesFromSupplier = (supplier: Supplier | null) => {
-		if (supplier) {
-			setSupplierDates({
-				settlementDate: dayjs().add(supplier.settlement_time, 'day'),
-				productionDate: dayjs().add(supplier.estimated_production_time, 'day'),
-			});
-		} else {
-			setSupplierDates({
-				settlementDate: null,
-				productionDate: null,
-			});
+		if (!supplier) {
+			setSupplierDates(INITIAL_DATES);
+			return;
+		}		
+
+		const newDates = Object.entries(SUPPLIER_DATE_MAPPINGS).reduce(
+			(acc, [dateField, supplierField]) => ({
+				...acc,
+				[dateField]: dayjs().add(supplier[supplierField], 'day'),
+			}),
+			{} as SupplierDates
+		);
+
+		const updateNewDates: SupplierDates = {
+			...newDates,
+			shippingDate: dayjs().add(1, 'day'),
 		}
+		setSupplierDates(updateNewDates);
 	};
 
 	return {
 		supplierDates,
 		setSupplierDates,
-		handleSettlementDateChange,
-		handleProductionDateChange,
+		handleDateChange,
 		updateDatesFromSupplier,
 	};
 };
