@@ -1,5 +1,6 @@
 import { useAdminAddCustomerAddress } from '@/lib/hooks/api/customer';
 import { useAdminDraftOrderTransferOrder } from '@/lib/hooks/api/draft-orders';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import useIsDesktop from '@/lib/hooks/useIsDesktop';
 import {
 	StepModal,
@@ -15,13 +16,10 @@ import Summary from '@/modules/draft-orders/components/new/summary';
 import { useNewDraftOrderForm } from '@/modules/draft-orders/hooks/use-new-draft-form';
 import { LineItemReq } from '@/types/order';
 import { Customer, User } from '@medusajs/medusa';
-import { pdf } from '@react-pdf/renderer';
 import { message } from 'antd';
-import { create } from 'lodash';
 import { useAdminCreateDraftOrder, useAdminCustomer } from 'medusa-react';
 import { FC, useState } from 'react';
 import { generatePdfBlob } from './order-pdf';
-import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 
 export interface pdfOrderRes {
 	isSendEmail?: boolean;
@@ -109,7 +107,6 @@ const NewOrderModal: FC<Props> = ({
 	): Promise<string> => {
 		const values = form.getFieldsValue(true);
 		let pdfReq = {} as pdfOrderRes;
-
 		pdfReq = {
 			email: values.email,
 			userId: user!.id,
@@ -120,7 +117,7 @@ const NewOrderModal: FC<Props> = ({
 				variantId: i.variant_id,
 				quantity: i.quantity,
 				unit_price: i.unit_price,
-				title: i.title,
+				title: `${i.product_title} - ${i.title}`,
 			})),
 			totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
 			countryCode: values.shipping_address.country_code.value,
@@ -143,7 +140,6 @@ const NewOrderModal: FC<Props> = ({
 			files,
 			prefix: 'orders',
 		});
-		console.log('uploadRes:', uploadRes);
 
 		const pdfUrl = uploadRes.uploads[0].url;
 
@@ -216,8 +212,6 @@ const NewOrderModal: FC<Props> = ({
 			if (customer && customer.shipping_addresses.length === 0) {
 				await addCustomerAddress();
 			}
-			console.log('values', values);
-			console.log('items', items);
 
 			const address = `${values.shipping_address.address_1}, ${values.shipping_address.address_2}, ${values.shipping_address.province}, ${values.shipping_address.city}, ${values.shipping_address.country_code.label}`;
 
@@ -261,7 +255,6 @@ const NewOrderModal: FC<Props> = ({
 			console.log('error catch', error);
 		}
 	};
-	console.log('email', isSendEmail);
 
 	return (
 		<StepModalProvider>
