@@ -132,7 +132,6 @@ export const StepModal: React.FC<StepModalProps> = ({
 	const handleNext = () => {
 		if (SteppedContext.currentStep === steps.length - 1) {
 			onFinish();
-			// handleClose();
 		} else {
 			SteppedContext.goToNext();
 		}
