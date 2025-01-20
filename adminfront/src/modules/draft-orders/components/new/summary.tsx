@@ -1,4 +1,6 @@
-import { Pagination } from '@/components/Pagination';
+import { Flex } from '@/components/Flex';
+import { Switch } from '@/components/Switch';
+import { Tooltip } from '@/components/Tooltip';
 import { Text, Title } from '@/components/Typography';
 import { SteppedContext } from '@/lib/providers/stepped-modal-provider';
 import {
@@ -7,25 +9,15 @@ import {
 	formatAmountWithSymbol,
 } from '@/utils/prices';
 import { Avatar, Button, Table } from 'antd';
-import {
-	useAdminGetDiscountByCode,
-	useAdminShippingOptions,
-} from 'medusa-react';
+import { useAdminShippingOptions } from 'medusa-react';
 import Image from 'next/image';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
-import { Flex } from '@/components/Flex';
-import { Tooltip } from '@/components/Tooltip';
-import { Switch } from '@/components/Switch';
 
 type Props = {
 	setIsSendEmail: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
-	const [showAddDiscount, setShowAddDiscount] = useState(false);
-	const [discError, setDiscError] = useState(undefined);
-	const [code, setCode] = useState<string>('');
-
 	const {
 		form,
 		context: { items, region: regionObj, selectedShippingOption },
@@ -35,17 +27,9 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 	const billing = form.getFieldValue('billing_address');
 	const region = form.getFieldValue('region');
 	const email = form.getFieldValue('email');
-	const discountCode = form.getFieldValue('discount_code');
 	const shippingOption = form.getFieldValue('shipping_option');
 
 	const customShippingPrice = form.getFieldValue('custom_shipping_price');
-
-	const { discount, status, isFetching } = useAdminGetDiscountByCode(
-		discountCode!,
-		{
-			enabled: !!discountCode,
-		}
-	);
 
 	const { shipping_options } = useAdminShippingOptions(
 		{ region_id: region?.value },
@@ -115,16 +99,6 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 			},
 		},
 	];
-
-	const handleAddDiscount = async () => {
-		form.setFieldValue('discount_code', code);
-	};
-
-	const onDiscountRemove = () => {
-		form.setFieldValue('discount_code', undefined);
-		setShowAddDiscount(false);
-		setCode('');
-	};
 
 	// Sort items based on the variant product id
 	const sortedItems = [...items].sort((a, b) => {
