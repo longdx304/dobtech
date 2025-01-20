@@ -3,6 +3,7 @@ import { Card } from '@/components/Card';
 import DatePicker from '@/components/Input/DatePicker';
 import { Modal } from '@/components/Modal';
 import { Table } from '@/components/Table';
+import { DateField } from '@/modules/supplier-orders/hooks/use-supplier-time';
 import { Supplier } from '@/types/supplier';
 import { ColumnsType } from 'antd/es/table';
 import dayjs, { Dayjs } from 'dayjs';
@@ -15,9 +16,11 @@ type SupplierInfoProps = {
 	supplierDates: {
 		settlementDate: Dayjs | null;
 		productionDate: Dayjs | null;
+		completePaymentDate: Dayjs | null;
+		warehouseEntryDate: Dayjs | null;
+		shippingDate: Dayjs | null;
 	};
-	handleSettlementDateChange: (date: Dayjs | null) => void;
-	handleProductionDateChange: (date: Dayjs | null) => void;
+	handleDateChange: (field: DateField) => (date: Dayjs | null) => void;
 	updateDatesFromSupplier: (supplier: Supplier | null) => void;
 };
 
@@ -26,8 +29,7 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 	selectedSupplier,
 	setSelectedSupplier,
 	supplierDates,
-	handleSettlementDateChange,
-	handleProductionDateChange,
+	handleDateChange,
 	updateDatesFromSupplier,
 }) => {
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -90,7 +92,7 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 							defaultValue={supplierDates.productionDate}
 							placeholder="Chọn ngày bắt đầu"
 							className="w-[180px]"
-							onChange={handleProductionDateChange}
+							onChange={handleDateChange('productionDate')}
 						/>
 					</p>
 					<p>
@@ -101,7 +103,7 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 							defaultValue={supplierDates.settlementDate}
 							placeholder="Chọn ngày bắt đầu"
 							className="w-[180px]"
-							onChange={handleSettlementDateChange}
+							onChange={handleDateChange('settlementDate')}
 						/>
 					</p>
 					{/* Option to change supplier */}

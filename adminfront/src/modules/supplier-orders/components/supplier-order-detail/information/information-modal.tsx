@@ -1,6 +1,7 @@
 import { Input } from '@/components/Input';
 import DatePicker from '@/components/Input/DatePicker';
 import { Modal } from '@/components/Modal';
+import { Tooltip } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
 import { queryClient } from '@/lib/constants/query-client';
 import {
@@ -35,6 +36,15 @@ const InformationModal: React.FC<Props> = ({
 		settlementTime: supplierOrder?.settlement_time
 			? dayjs(supplierOrder.settlement_time).format('YYYY-MM-DD')
 			: '',
+		shippingStartedDate: supplierOrder?.shipping_started_date ? 
+			dayjs(supplierOrder.shipping_started_date).format('YYYY-MM-DD') :
+			'',
+		warehouseEntryDate: supplierOrder?.warehouse_entry_date ?
+			dayjs(supplierOrder.warehouse_entry_date).format('YYYY-MM-DD') :
+			'',
+		completedPaymentDate: supplierOrder?.completed_payment_date ?
+			dayjs(supplierOrder.completed_payment_date).format('YYYY-MM-DD') :
+			'',
 	});
 
 	const handleInputChange = (field: string, value: string) => {
@@ -52,6 +62,15 @@ const InformationModal: React.FC<Props> = ({
 					formData.estimatedProductionTime
 				).toISOString(),
 				settlement_time: dayjs(formData.settlementTime).toISOString(),
+				shipping_started_date: dayjs(
+					formData.shippingStartedDate
+				).toISOString(),
+				warehouse_entry_date: dayjs(
+					formData.warehouseEntryDate
+				).toISOString(),
+				completed_payment_date: dayjs(
+					formData.completedPaymentDate
+				).toISOString(),
 			});
 
 			queryClient.invalidateQueries([supplierOrdersKeys, 'detail']);
@@ -100,6 +119,50 @@ const InformationModal: React.FC<Props> = ({
 					onChange={(date) =>
 						handleInputChange(
 							'settlementTime',
+							date?.format('YYYY-MM-DD') || ''
+						)
+					}
+				/>
+
+				<Tooltip title={'Ngày tàu chạy'} className="font-medium">
+					<Text className="font-medium">Ngày bắt đầu chuyển hàng:</Text>
+				</Tooltip>
+				<DatePicker
+					format="DD-MM-YYYY"
+					minDate={dayjs()}
+					value={dayjs(formData.shippingStartedDate)}
+					placeholder="Chọn ngày bắt đầu chuyển hàng"
+					onChange={(date) =>
+						handleInputChange(
+							'shippingStartedDate',
+							date?.format('YYYY-MM-DD') || ''
+						)
+					}
+				/>
+
+				<Text className="font-medium">Ngày nhập hàng vào kho:</Text>
+				<DatePicker
+					format="DD-MM-YYYY"
+					minDate={dayjs()}
+					value={dayjs(formData.warehouseEntryDate)}
+					placeholder="Chọn ngày nhập hàng vào kho"
+					onChange={(date) =>
+						handleInputChange(
+							'warehouseEntryDate',
+							date?.format('YYYY-MM-DD') || ''
+						)
+					}
+				/>
+
+				<Text className="font-medium">Ngày tất toán đơn hàng:</Text>
+				<DatePicker
+					format="DD-MM-YYYY"
+					minDate={dayjs()}
+					value={dayjs(formData.completedPaymentDate)}
+					placeholder="Chọn ngày tất toán đơn hàng"
+					onChange={(date) =>
+						handleInputChange(
+							'completedPaymentDate',
 							date?.format('YYYY-MM-DD') || ''
 						)
 					}

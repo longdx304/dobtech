@@ -23,7 +23,7 @@ const ShippingDetails = () => {
 	const [sameAsShipping, setSameAsShipping] = useState(true);
 
 	const {
-		context: { validCountries },
+		context: { validCountries, region },
 		form,
 	} = useNewDraftOrderForm();
 
@@ -151,6 +151,21 @@ const ShippingDetails = () => {
 			postal_code: '',
 		});
 		form.setFieldValue('shipping_address_id', null);
+
+		if (customer) {
+			form.setFieldValue('shipping_address', {
+				first_name: customer.first_name,
+				last_name: customer.last_name,
+				phone: customer.phone,
+				company: 'Chưa có',
+				address_1: '',
+				address_2: '',
+				city: '',
+				province: '',
+				country_code: 'vn',
+				postal_code: '70000',
+			});
+		}
 		// eslint-disable-next-line
 	}, [customerId, addNew, validAddresses]);
 
@@ -236,6 +251,7 @@ const ShippingDetails = () => {
 							form={form}
 							countryOptions={validCountries}
 							type={AddressType.SHIPPING}
+							customer={customer}
 						/>
 
 						{!sameAsShipping && (
@@ -243,6 +259,7 @@ const ShippingDetails = () => {
 								form={form}
 								countryOptions={validCountries}
 								type={AddressType.BILLING}
+								customer={customer}
 							/>
 						)}
 					</div>

@@ -77,7 +77,6 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 				files: uploadImages,
 				prefix: 'warehouse/shipment',
 			});
-			console.log('uploads:', uploads);
 			updateFulfillment.mutateAsync(
 				{
 					shipped_url: uploads.map((item) => item.url).join(','),

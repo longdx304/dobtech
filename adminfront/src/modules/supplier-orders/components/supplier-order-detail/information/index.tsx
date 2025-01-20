@@ -6,11 +6,10 @@ import { useAdminCancelSupplierOrder } from '@/lib/hooks/api/supplier-order';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import StatusIndicator from '@/modules/common/components/status-indicator';
-// import { useAdminCancelSupplierOrder } from '@/modules/supplier/hooks';
 import { SupplierOrder } from '@/types/supplier';
 import { Modal as AntdModal, Empty, message } from 'antd';
 import dayjs from 'dayjs';
-import { Ban, Pencil, SquarePen } from 'lucide-react';
+import { Ban, SquarePen } from 'lucide-react';
 import InformationModal from './information-modal';
 
 type Props = {
@@ -105,6 +104,33 @@ const Information = ({ supplierOrder, isLoading }: Props) => {
 							</Text>
 							<Text className="text-gray-500 text-sm">
 								{dayjs(supplierOrder?.settlement_time).format('DD/MM/YYYY') ??
+									'-'}
+							</Text>
+						</Flex>
+						<Flex justify="space-between" align="center">
+							<Text className="text-gray-500 text-sm">
+								Ngày bắt đầu chuyển hàng:
+							</Text>
+							<Text className="text-gray-500 text-sm">
+								{dayjs(supplierOrder?.shipping_started_date).format('DD/MM/YYYY') ??
+									'-'}
+							</Text>
+						</Flex>
+						<Flex justify="space-between" align="center">
+							<Text className="text-gray-500 text-sm">
+								Ngày nhập hàng vào kho:
+							</Text>
+							<Text className="text-gray-500 text-sm">
+								{dayjs(supplierOrder?.warehouse_entry_date).format('DD/MM/YYYY') ??
+									'-'}
+							</Text>
+						</Flex>
+						<Flex justify="space-between" align="center">
+							<Text className="text-gray-500 text-sm">
+								Ngày tất toán đơn hàng:
+							</Text>
+							<Text className="text-gray-500 text-sm">
+								{dayjs(supplierOrder?.completed_payment_date).format('DD/MM/YYYY') ??
 									'-'}
 							</Text>
 						</Flex>

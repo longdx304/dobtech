@@ -1,5 +1,6 @@
 import { useAdminAddCustomerAddress } from '@/lib/hooks/api/customer';
 import { useAdminDraftOrderTransferOrder } from '@/lib/hooks/api/draft-orders';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import useIsDesktop from '@/lib/hooks/useIsDesktop';
 import {
 	StepModal,
@@ -9,19 +10,15 @@ import { useUser } from '@/lib/providers/user-provider';
 import { getErrorMessage } from '@/lib/utils';
 import Items from '@/modules/draft-orders/components/new/items';
 import SelectRegion from '@/modules/draft-orders/components/new/select-region';
-import SelectShipping from '@/modules/draft-orders/components/new/select-shipping';
 import ShippingDetails from '@/modules/draft-orders/components/new/shipping-details';
 import Summary from '@/modules/draft-orders/components/new/summary';
 import { useNewDraftOrderForm } from '@/modules/draft-orders/hooks/use-new-draft-form';
 import { LineItemReq } from '@/types/order';
 import { Customer, User } from '@medusajs/medusa';
-import { pdf } from '@react-pdf/renderer';
 import { message } from 'antd';
-import { create } from 'lodash';
 import { useAdminCreateDraftOrder, useAdminCustomer } from 'medusa-react';
 import { FC, useState } from 'react';
 import { generatePdfBlob } from './order-pdf';
-import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 
 export interface pdfOrderRes {
 	isSendEmail?: boolean;
@@ -93,13 +90,12 @@ const NewOrderModal: FC<Props> = ({
 			content: (
 				<div className="flex flex-col">
 					<SelectRegion />
-					<SelectShipping />
+					{/* <SelectShipping /> */}
 				</div>
 			),
 		},
 		{ title: '', content: <ShippingDetails /> },
 		{ title: '', content: <Items /> },
-		// { title: '', content: <SelectShipping /> },
 		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} /> },
 	];
 
@@ -143,7 +139,6 @@ const NewOrderModal: FC<Props> = ({
 			files,
 			prefix: 'orders',
 		});
-		console.log('uploadRes:', uploadRes);
 
 		const pdfUrl = uploadRes.uploads[0].url;
 
@@ -163,9 +158,10 @@ const NewOrderModal: FC<Props> = ({
 			company: values.shipping_address.company,
 			province: values.shipping_address.province,
 			postal_code: values.shipping_address.postal_code,
-			country_code: values.shipping_address.country_code.value,
+			country_code: values.shipping_address.country_code,
 			metadata: { is_default: true },
 		};
+		console.log('shipping_addresses', shipping_addresses);
 
 		await adminAddCustomerAddress.mutateAsync(shipping_addresses, {
 			onSuccess: (response) => {
@@ -193,11 +189,11 @@ const NewOrderModal: FC<Props> = ({
 			shipping_methods: [{ option_id: values.shipping_option }],
 			shipping_address: values.shipping_address_id || {
 				...values.shipping_address,
-				country_code: values.shipping_address?.country_code?.value || 'vn',
+				country_code: values.shipping_address?.country_code || 'vn',
 			},
 			billing_address: values.billing_address_id || {
 				...values.billing_address,
-				country_code: values.billing_address?.country_code?.value || 'vn',
+				country_code: values.billing_address?.country_code.value || 'vn',
 			},
 			customer_id: values.customer_id,
 			discounts: values.discount_code
@@ -216,8 +212,6 @@ const NewOrderModal: FC<Props> = ({
 			if (customer && customer.shipping_addresses.length === 0) {
 				await addCustomerAddress();
 			}
-			console.log('values', values);
-			console.log('items', items);
 
 			const address = `${values.shipping_address.address_1}, ${values.shipping_address.address_2}, ${values.shipping_address.province}, ${values.shipping_address.city}, ${values.shipping_address.country_code.label}`;
 
@@ -261,7 +255,6 @@ const NewOrderModal: FC<Props> = ({
 			console.log('error catch', error);
 		}
 	};
-	console.log('email', isSendEmail);
 
 	return (
 		<StepModalProvider>

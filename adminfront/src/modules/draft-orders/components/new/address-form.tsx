@@ -2,6 +2,7 @@ import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { Title } from '@/components/Typography';
 import { Option } from '@/types/shared';
+import { Customer } from '@medusajs/medusa';
 import { Checkbox, Col, Divider, Form, Row } from 'antd';
 import React, { useEffect } from 'react';
 
@@ -29,6 +30,7 @@ type AddressFormProps = {
 	countryOptions: Option[];
 	type: AddressType;
 	noTitle?: boolean;
+	customer?: Customer;
 };
 
 const AddressForm = ({
@@ -36,6 +38,7 @@ const AddressForm = ({
 	countryOptions,
 	type,
 	noTitle = false,
+	customer,
 }: AddressFormProps) => {
 	const [sameAsShipping, setSameAsShipping] = React.useState(true);
 
@@ -71,7 +74,7 @@ const AddressForm = ({
 			layout="vertical"
 			initialValues={{ country_code: countryOptions[0]?.value }}
 		>
-			{type === AddressType.SHIPPING && (
+			{/* {type === AddressType.SHIPPING && (
 				<>
 					<Title level={2}>Chung</Title>
 					<Divider />
@@ -130,7 +133,7 @@ const AddressForm = ({
 						</Col>
 					</Row>
 				</>
-			)}
+			)} */}
 
 			<Divider />
 
@@ -177,17 +180,17 @@ const AddressForm = ({
 				</Col>
 				<Col xs={24} md={12}>
 					<Form.Item
-						label="Khu vực"
+						label="Xã/Phường"
 						name={[
 							type === AddressType.SHIPPING
 								? 'shipping_address'
 								: 'billing_address',
 							'address_2',
 						]}
-						rules={[{ required: true, message: 'Vui lòng chọn khu vực' }]}
+						rules={[{ required: true, message: 'Vui lòng chọn xã/phường' }]}
 					>
 						<Input
-							placeholder="Chọn khu vực"
+							placeholder="Chọn xã/phường"
 							disabled={type === AddressType.BILLING && sameAsShipping}
 						/>
 					</Form.Item>
@@ -195,7 +198,7 @@ const AddressForm = ({
 			</Row>
 
 			<Row gutter={16}>
-				<Col xs={24} md={12}>
+				{/* <Col xs={24} md={12}>
 					<Form.Item
 						label="Mã bưu điện"
 						name={[
@@ -204,7 +207,7 @@ const AddressForm = ({
 								: 'billing_address',
 							'postal_code',
 						]}
-						rules={[{ required: true, message: 'Vui lòng chọn mã bưu điện' }]}
+						// rules={[{ required: true, message: 'Vui lòng chọn mã bưu điện' }]}
 					>
 						<Input
 							placeholder="Chọn mã bưu điện"
@@ -212,7 +215,7 @@ const AddressForm = ({
 							disabled={type === AddressType.BILLING && sameAsShipping}
 						/>
 					</Form.Item>
-				</Col>
+				</Col> */}
 				<Col xs={24} md={12}>
 					<Form.Item
 						label="Quận/Huyện"
@@ -230,9 +233,6 @@ const AddressForm = ({
 						/>
 					</Form.Item>
 				</Col>
-			</Row>
-
-			<Row gutter={16}>
 				<Col xs={24} md={12}>
 					<Form.Item
 						label="Tỉnh/Thành phố"
@@ -252,6 +252,9 @@ const AddressForm = ({
 						/>
 					</Form.Item>
 				</Col>
+			</Row>
+
+			{/* <Row gutter={16}>
 				<Col xs={24} md={12}>
 					<Form.Item
 						label="Quốc gia"
@@ -271,7 +274,7 @@ const AddressForm = ({
 						/>
 					</Form.Item>
 				</Col>
-			</Row>
+			</Row> */}
 		</Form>
 	);
 };
