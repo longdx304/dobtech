@@ -8,7 +8,7 @@ import { Table, TabsProps } from 'antd';
 import _ from 'lodash';
 import { Search } from 'lucide-react';
 import { useAdminVariants } from 'medusa-react';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 import productsColumns from './product-columns';
 
@@ -39,11 +39,12 @@ const Items = () => {
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [activeTab, setActiveTab] = useState<TabsProps['activeKey']>('list');
 	const {
-		context: { region, items, setItems },
+		context: { region, setItems, items },
 		form,
 	} = useNewDraftOrderForm();
 	const { enableNext, disableNext } = useStepModal();
 
+	// Fetch variants
 	const { isLoading, count, variants } = useAdminVariants({
 		q: searchValue,
 		limit: PAGE_SIZE,
@@ -51,6 +52,20 @@ const Items = () => {
 		region_id: region?.id,
 		customer_id: form.getFieldValue('customer_id'),
 	});
+
+	// Separate query to fetch selected variants
+	const { variants: selectedVariantsData } = useAdminVariants(
+		items?.length > 0
+			? {
+					id: items.map((item) => item.variant_id),
+					region_id: region?.id,
+					customer_id: form.getFieldValue('customer_id'),
+			  }
+			: undefined,
+		{
+			enabled: !!items?.length,
+		}
+	);
 
 	// Get default price for a variant
 	const getDefaultPrice = (variant: any) => {
@@ -124,9 +139,7 @@ const Items = () => {
 		setVariantPrices(updatedPrices);
 
 		// Wait for pricedVariants to be available before updating form items
-		// if (newVariants?.length > 0) {
 		updateFormItems(selectedRows, updatedQuantities, updatedPrices);
-		// }
 	};
 
 	const updateFormItems = (
@@ -283,6 +296,46 @@ const Items = () => {
 	const handleTabChange = (key: string) => {
 		setActiveTab(key);
 	};
+
+	// Sync selected variants with prices and quantities with items context
+	useEffect(() => {
+		if (items?.length > 0 && selectedVariantsData) {
+			// Get variant IDs from items
+			const itemVariantIds = items.map((item) => item.variant_id);
+			setSelectedVariantIds(itemVariantIds);
+
+			// Use selectedVariantsData instead of filtered variants
+			setSelectedVariants(selectedVariantsData as any);
+
+			// Sync quantities
+			const quantities = items.map((item) => ({
+				variantId: item.variant_id,
+				quantity: item.quantity,
+			}));
+			setVariantQuantities(quantities);
+
+			// Sync prices
+			const prices = items.map((item) => ({
+				variantId: item.variant_id,
+				unit_price: item.unit_price,
+			}));
+			setVariantPrices(prices);
+		}
+	}, [items, selectedVariantsData]);
+
+	const totalPrice = useMemo(() => {
+		return variantPrices.reduce((total, item) => {
+			const quantity =
+				variantQuantities.find((q) => q.variantId === item.variantId)
+					?.quantity || 0;
+			return total + item.unit_price * quantity;
+		}, 0);
+	}, [variantPrices, variantQuantities]);
+
+	const totalQuantity = useMemo(() => {
+		return variantQuantities.reduce((total, item) => total + item.quantity, 0);
+	}, [variantQuantities]);
+
 	return (
 		<>
 			<Flex
@@ -339,21 +392,10 @@ const Items = () => {
 										{selectedVariants?.length} (sản phẩm)
 									</Table.Summary.Cell>
 									<Table.Summary.Cell index={2} className="text-center">
-										{formatNumber(
-											variantQuantities.reduce(
-												(total, item) => total + item.quantity,
-												0
-											)
-										)}{' '}
-										(đôi)
+										{totalQuantity} (đôi)
 									</Table.Summary.Cell>
 									<Table.Summary.Cell index={3} className="text-center">
-										{formatNumber(
-											variantPrices.reduce(
-												(total, item) => total + item.unit_price,
-												0
-											)
-										)}
+										{formatNumber(totalPrice)}
 										{region?.currency.symbol}
 									</Table.Summary.Cell>
 								</Table.Summary.Row>

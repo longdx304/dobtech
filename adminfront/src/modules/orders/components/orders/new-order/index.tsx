@@ -90,7 +90,6 @@ const NewOrderModal: FC<Props> = ({
 			content: (
 				<div className="flex flex-col">
 					<SelectRegion />
-					{/* <SelectShipping /> */}
 				</div>
 			),
 		},
@@ -161,7 +160,6 @@ const NewOrderModal: FC<Props> = ({
 			country_code: values.shipping_address.country_code,
 			metadata: { is_default: true },
 		};
-		console.log('shipping_addresses', shipping_addresses);
 
 		await adminAddCustomerAddress.mutateAsync(shipping_addresses, {
 			onSuccess: (response) => {

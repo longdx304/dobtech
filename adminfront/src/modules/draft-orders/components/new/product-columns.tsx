@@ -4,7 +4,6 @@ import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { ProductVariant } from '@medusajs/medusa';
-// import { InputNumber } from 'antd';
 import Image from 'next/image';
 import { useState } from 'react';
 
