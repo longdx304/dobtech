@@ -19,10 +19,16 @@ import {
 	PaidEvent,
 	AttachmentEvent,
 } from '@/modules/orders/hooks/use-build-timeline';
-import { Order, Region } from '@medusajs/medusa';
-import { Empty } from 'antd';
-import { CircleAlert, RefreshCcw, RotateCcw } from 'lucide-react';
-import { useAdminOrder } from 'medusa-react';
+import {
+	AdminPostOrdersOrderReq,
+	Customer,
+	LineItem,
+	Order,
+	Region,
+} from '@medusajs/medusa';
+import { Empty, message } from 'antd';
+import { CircleAlert, FileDown, RefreshCcw, RotateCcw } from 'lucide-react';
+import { useAdminOrder, useAdminUpdateOrder } from 'medusa-react';
 import useOrdersExpandParam from '../utils/use-admin-expand-parameter';
 import ItemsFulfilled from './timeline-events/items-fulfilled';
 import ItemsShipped from './timeline-events/items-shipped';
@@ -45,6 +51,12 @@ import ClaimModal from './timeline-events/modal/claim';
 import Paid from './timeline-events/paid';
 import ChangedPrice from './timeline-events/order-edit/changed-price';
 import Attachment from './timeline-events/attachment';
+import { pdfOrderRes } from '../new-order';
+import { generatePdfBlob } from '../new-order/order-pdf';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
+import { isEmpty } from 'lodash';
+import { useUser } from '@/lib/providers/user-provider';
+import { getErrorMessage } from '@/lib/utils';
 
 type Props = {
 	orderId: Order['id'];
@@ -61,8 +73,10 @@ const Timeline = ({
 	events,
 	refetch,
 }: Props) => {
+	const { user } = useUser();
 	const { orderRelations } = useOrdersExpandParam();
-	// const { events, refetch } = useBuildTimeline(orderId!);
+	const uploadFile = useAdminUploadFile();
+	const updateOrder = useAdminUpdateOrder(orderId);
 	const [showRequestReturn, setShowRequestReturn] = useState<boolean>(false);
 	const [showCreateSwap, setShowCreateSwap] = useState<boolean>(false);
 	const [showRegisterClaim, setShowRegisterClaim] = useState<boolean>(false);
@@ -76,24 +90,116 @@ const Timeline = ({
 		}
 	);
 
+	const generateFilePdf = async (): Promise<string> => {
+		let pdfUrl = '';
+		let pdfReq = {} as pdfOrderRes;
+		if (!isEmpty(order)) {
+			const { items, shipping_address } = order!;
+			const address = `${shipping_address.address_1}, ${shipping_address.address_2}, ${shipping_address.province}, ${shipping_address.city}, ${shipping_address.country_code}`;
+
+			pdfReq = {
+				email: order!.customer.email,
+				userId: user!.id,
+				user: user,
+				customer: {
+					first_name: order!.customer.first_name,
+					last_name: order!.customer.last_name,
+					email: order!.customer.email,
+					phone: order!.customer.phone,
+				},
+				address,
+				lineItems:
+					items?.map((i: LineItem) => ({
+						variantId: i.variant_id ?? '',
+						quantity: i.quantity,
+						unit_price: i.unit_price,
+						title: `${i.title} - ${i.description}`,
+					})) ?? [],
+				totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
+				countryCode: shipping_address!.country_code!,
+				isSendEmail: false,
+			};
+
+			// Generate pdf blob
+			const pdfBlob = await generatePdfBlob(pdfReq!);
+
+			// Create a File object
+			const fileName = `purchase-order.pdf`;
+
+			// Create a File object
+			const files = new File([pdfBlob], fileName, {
+				type: 'application/pdf',
+			});
+
+			// Upload pdf to s3 using Medusa uploads API
+			const uploadRes = await uploadFile.mutateAsync({
+				files,
+				prefix: 'orders',
+			});
+
+			pdfUrl = uploadRes.uploads[0].url;
+		}
+
+		return pdfUrl;
+	};
+
+	const updateDocFileOrder = async () => {
+		message.loading('Đang cập nhật file order...');
+		const pdfUrl = await generateFilePdf();
+
+		let files: any[] = Array.isArray(order?.metadata?.files)
+			? order.metadata.files
+			: [];
+
+		await updateOrder.mutateAsync(
+			{
+				metadata: {
+					files: [
+						...files,
+						{
+							url: pdfUrl,
+							name: 'Order PDF',
+							created_at: new Date().toISOString(),
+						},
+					],
+				},
+			} as AdminPostOrdersOrderReq & { metadata: { files: any[] } },
+			{
+				onSuccess: () => {
+					refetchOrder();
+					message.success('Cập nhật file order thành công');
+				},
+				onError: (err: any) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
+	};
+
 	const actions = [
 		{
 			label: <span className="w-full">{'Yêu cầu trả hàng'}</span>,
 			key: 'require_return',
-			icon: <RotateCcw />,
+			icon: <RotateCcw size={18} />,
 			onClick: () => setShowRequestReturn(true),
 		},
 		{
 			label: <span className="w-full">{'Đăng ký trao đổi'}</span>,
 			key: 'exchange',
-			icon: <RefreshCcw />,
+			icon: <RefreshCcw size={18} />,
 			onClick: () => setShowCreateSwap(true),
 		},
 		{
 			label: <span className="w-full">{'Đăng ký đòi hỏi'}</span>,
 			key: 'claim',
-			icon: <CircleAlert />,
+			icon: <CircleAlert size={18} />,
 			onClick: () => setShowRegisterClaim(true),
+		},
+		{
+			label: <span className="w-full">{'Cập nhật file order'}</span>,
+			key: 'update-file',
+			icon: <FileDown size={18} />,
+			onClick: updateDocFileOrder,
 		},
 	];
 

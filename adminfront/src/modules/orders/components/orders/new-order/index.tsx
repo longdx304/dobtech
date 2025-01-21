@@ -104,7 +104,6 @@ const NewOrderModal: FC<Props> = ({
 	): Promise<string> => {
 		const values = form.getFieldsValue(true);
 		let pdfReq = {} as pdfOrderRes;
-
 		pdfReq = {
 			email: values.email,
 			userId: user!.id,
@@ -115,7 +114,7 @@ const NewOrderModal: FC<Props> = ({
 				variantId: i.variant_id,
 				quantity: i.quantity,
 				unit_price: i.unit_price,
-				title: i.title,
+				title: `${i.product_title} - ${i.title}`,
 			})),
 			totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
 			countryCode: values.shipping_address.country_code.value,

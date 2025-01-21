@@ -16,7 +16,7 @@ export const useAdminProductOutboundHandler = (
 	return useMutation(
 		({ id }: { id: string }) =>
 			client.admin.custom.post(`/admin/product-outbound/${id}/handler`),
-		buildOptions(queryClient, [adminProductOutboundKeys.lists()], options)
+		buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()], options)
 	);
 };
 
@@ -29,6 +29,6 @@ export const useAdminProductOutboundRemoveHandler = (
 	return useMutation(
 		({ id }: { id: string }) =>
 			client.admin.custom.delete(`/admin/product-outbound/${id}/handler`),
-		buildOptions(queryClient, [adminProductOutboundKeys.lists()], options)
+		buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()], options)
 	);
 };

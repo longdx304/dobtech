@@ -4,7 +4,6 @@ import {
 	BadgeDollarSign,
 	Boxes,
 	Building,
-	CalendarRange,
 	CircleDollarSign,
 	Container,
 	Earth,
@@ -13,6 +12,7 @@ import {
 	LayoutList,
 	LogOut,
 	NotebookPen,
+	Package,
 	PackageCheck,
 	PackageMinus,
 	PackagePlus,
@@ -24,6 +24,7 @@ import {
 	User as UserIcon,
 	Users,
 	UsersRound,
+	Warehouse,
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -76,17 +77,19 @@ const itemPurchases = [
 
 // Item menu warehouse
 const itemsWarehouse: MenuProps['items'] = [
+	getItem('Quản lý kho', 'warehouse-manage', <Warehouse />),
+
+	getItem('Kiểm kho', 'warehouse-inventory-checker', <Package />),
 	getItem('Nhập kho', 'warehouse-inbound', <PackagePlus />),
 	getItem('Xuất kho', 'warehouse-outbound', <PackageMinus />),
-	getItem('Sổ kho', 'warehouse-transaction', <NotebookPen />),
 	getItem('Kiểm hàng', 'warehouse-stock-checker', <PackageCheck />),
 	getItem('Vận chuyển', 'warehouse-ship', <Truck />),
+	getItem('Sổ kho', 'warehouse-transaction', <NotebookPen />),
 ];
 
 // Item menu option
 const itemsAdmin: MenuProps['items'] = [
 	getItem('Quản lý nhân viên', 'accounts', <Users />),
-
 	getItem('Cài đặt', 'setting', <Settings />, [
 		getItem('Khu vực', 'regions', <Earth />),
 		getItem('Đơn vị hàng', 'item-unit', <Boxes />),
@@ -191,4 +194,6 @@ export const menuRoutes: Record<string, string> = {
 	'item-unit': ERoutes.ITEM_UNIT,
 	'warehouse-stock-checker': ERoutes.WAREHOUSE_STOCK_CHECKER,
 	'warehouse-ship': ERoutes.WAREHOUSE_SHIPMENT,
+	'warehouse-manage': ERoutes.WAREHOUSE_MANAGE,
+	'warehouse-inventory-checker': ERoutes.WAREHOUSE_INVENTORY_CHECKER,
 };

@@ -212,6 +212,10 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 		},
 	];
 
+	const handler = order?.handler
+		? `${order?.handler?.first_name}`
+		: 'Chưa xác định';
+
 	return (
 		<Flex vertical gap={12}>
 			<Flex vertical align="flex-start" className="">
@@ -229,7 +233,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					<Flex vertical>
 						<Title level={4}>{`Đơn hàng #${order?.display_id}`}</Title>
 						<Text className="text-gray-600">
-							{`Người phụ trách: ${order?.handler?.last_name} ${order?.handler?.first_name}`}
+							{`Người phụ trách: ${handler}`}
 						</Text>
 					</Flex>
 					<ActionAbles actions={actions as any} />
