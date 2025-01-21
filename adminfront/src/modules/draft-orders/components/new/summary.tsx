@@ -114,6 +114,8 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 		setIsSendEmail(value);
 	};
 
+	console.log('items', items);
+
 	return (
 		<div className="min-h-[705px]">
 			<Flex className="flex items-center gap-2">
