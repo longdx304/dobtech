@@ -213,7 +213,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	];
 
 	const handler = order?.handler
-		? `${order?.handler?.last_name} ${order?.handler?.first_name}`
+		? `${order?.handler?.first_name}`
 		: 'Chưa xác định';
 
 	return (

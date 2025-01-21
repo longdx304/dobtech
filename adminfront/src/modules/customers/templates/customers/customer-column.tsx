@@ -17,7 +17,7 @@ const customerColumns = ({ handleEditCustomer, handleViewOrder }: Props) => [
 		width: 150,
 		className: 'text-xs',
 		render: (_: string, record: Customer) => {
-			return `${record.first_name} ${record.last_name}`;
+			return `${record?.last_name || ''} ${record?.first_name} `;
 		},
 	},
 	{
