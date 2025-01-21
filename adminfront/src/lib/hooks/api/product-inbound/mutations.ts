@@ -19,7 +19,7 @@ export const useAdminProductInboundHandler = (
 	return useMutation(
 		({ id }: { id: string }) =>
 			client.admin.custom.post(`/admin/product-inbound/${id}/handler`),
-		buildOptions(queryClient, [adminProductInboundKeys.lists()], options)
+		buildOptions(queryClient, [adminProductInboundKeys.lists(), adminProductInboundKeys.details()], options)
 	);
 };
 
@@ -32,7 +32,7 @@ export const useAdminProductInboundRemoveHandler = (
 	return useMutation(
 		({ id }: { id: string }) =>
 			client.admin.custom.delete(`/admin/product-inbound/${id}/handler`),
-		buildOptions(queryClient, [adminProductInboundKeys.lists()], options)
+		buildOptions(queryClient, [adminProductInboundKeys.lists(), adminProductInboundKeys.details()], options)
 	);
 };
 

@@ -209,7 +209,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	];
 
 	const handler = supplierOrder?.handler
-		? `${supplierOrder?.handler?.last_name} ${supplierOrder?.handler?.first_name}`
+		? `${supplierOrder?.handler?.first_name}`
 		: 'Chưa xác định';
 
 	return (
