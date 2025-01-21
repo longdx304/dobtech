@@ -114,8 +114,6 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 		setIsSendEmail(value);
 	};
 
-	console.log('items', items);
-
 	return (
 		<div className="min-h-[705px]">
 			<Flex className="flex items-center gap-2">
@@ -154,9 +152,11 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 							<div className="border-r pr-6">
 								<div className="text-gray-500">Địa chỉ</div>
 								<div>
-									{shipping.address_1}, {shipping.address_2}
+									{shipping.address_1 || ''}, {shipping.address_2 || ''}
 								</div>
-								<div>{`${shipping.postal_code} ${shipping.city}, ${shipping.province}`}</div>
+								<div>{`${shipping.postal_code || ''} ${shipping.city || ''} ${
+									shipping.province || ''
+								}`}</div>
 							</div>
 						)}
 						{regionObj && (
@@ -192,9 +192,11 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 				<SummarySection title="Chi tiết thanh toán" editIndex={1}>
 					<div className="text-gray-500">Địa chỉ</div>
 					<div>
-						{billing.address_1}, {billing.address_2}
+						{billing.address_1 || ''}, {billing.address_2 || ''}
 					</div>
-					<div>{`${billing.postal_code} ${billing.city}, ${billing.province}`}</div>
+					<div>{`${billing.postal_code || ''} ${billing.city || ''} ${
+						billing.province || ''
+					}`}</div>
 				</SummarySection>
 			)}
 		</div>

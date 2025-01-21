@@ -17,7 +17,7 @@ const customerColumns = ({ handleEditCustomer, handleViewOrder }: Props) => [
 		width: 150,
 		className: 'text-xs',
 		render: (_: string, record: Customer) => {
-			return `${record?.last_name || ''} ${record?.first_name} `;
+			return `${record.first_name || ''} ${record.last_name || ''}`;
 		},
 	},
 	{
@@ -26,6 +26,16 @@ const customerColumns = ({ handleEditCustomer, handleViewOrder }: Props) => [
 		key: 'email',
 		width: 150,
 		className: 'text-xs',
+	},
+	{
+		title: 'Số điện thoại',
+		dataIndex: 'phone',
+		key: 'phone',
+		width: 150,
+		className: 'text-xs',
+		render: (_: string) => {
+			return `${_ || '-'} `;
+		},
 	},
 	{
 		title: 'Đơn hàng',
