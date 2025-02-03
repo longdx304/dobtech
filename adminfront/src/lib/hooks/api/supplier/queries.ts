@@ -14,7 +14,7 @@ import {
 	UseQueryOptionsWrapper,
 } from 'medusa-react';
 
-const SUPPLIER_LIST = `admin-supplier` as const;
+export const SUPPLIER_LIST = `admin-supplier` as const;
 
 export const supplierKeys = queryKeysFactory(SUPPLIER_LIST);
 
