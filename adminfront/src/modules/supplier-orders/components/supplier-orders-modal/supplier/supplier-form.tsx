@@ -19,7 +19,7 @@ type SupplierFormProps = {
 		completePaymentDate: Dayjs | null;
 		warehouseEntryDate: Dayjs | null;
 		shippingDate: Dayjs | null;
-	}
+	};
 	handleDateChange: (field: DateField) => (date: Dayjs | null) => void;
 	updateDatesFromSupplier: (supplier: Supplier | null) => void;
 	setIsSendEmail: (value: boolean) => void;
@@ -39,7 +39,7 @@ const SupplierForm: FC<SupplierFormProps> = ({
 			key: 'info',
 			label: (
 				<Flex>
-					<div className="mr-1">{'Thống tin nhà cung cấp'}</div>
+					<div className="mr-1">{'Thông tin nhà cung cấp'}</div>
 				</Flex>
 			),
 			children: (
@@ -60,7 +60,7 @@ const SupplierForm: FC<SupplierFormProps> = ({
 					<div className="mr-1">{'Thông tin cơ bản'}</div>
 				</Flex>
 			),
-			children: <General setIsSendEmail={setIsSendEmail}/>,
+			children: <General setIsSendEmail={setIsSendEmail} />,
 		},
 	];
 

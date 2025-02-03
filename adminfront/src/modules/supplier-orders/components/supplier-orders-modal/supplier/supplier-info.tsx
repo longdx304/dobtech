@@ -3,6 +3,8 @@ import { Card } from '@/components/Card';
 import DatePicker from '@/components/Input/DatePicker';
 import { Modal } from '@/components/Modal';
 import { Table } from '@/components/Table';
+import { queryClient } from '@/lib/constants/query-client';
+import { SUPPLIER_LIST } from '@/lib/hooks/api/supplier';
 import { DateField } from '@/modules/supplier-orders/hooks/use-supplier-time';
 import { Supplier } from '@/types/supplier';
 import { ColumnsType } from 'antd/es/table';
@@ -40,6 +42,7 @@ const SupplierInfo: FC<SupplierInfoProps> = ({
 		setIsModalVisible(true);
 		setSelectedSupplier(null);
 		updateDatesFromSupplier(null);
+		queryClient.invalidateQueries([SUPPLIER_LIST, 'list']);
 	};
 
 	const columns: ColumnsType<Supplier> = [
