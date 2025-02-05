@@ -15,7 +15,7 @@ import { getErrorMessage } from '@/lib/utils';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import { Modal as AntdModal, message } from 'antd';
 import debounce from 'lodash/debounce';
-import { CircleX, Plus, Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { ChangeEvent, FC, useState } from 'react';
 import ModalAddVariantWarehouse from '../components/modal-add-variant-warehouse';
 import ModalAddWarehouse from '../components/modal-add-warehouse';
@@ -52,7 +52,6 @@ const WarehouseManage: FC<Props> = ({}) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
-	const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
 	const {
 		warehouse,
@@ -165,22 +164,15 @@ const WarehouseManage: FC<Props> = ({}) => {
 						className="w-[300px]"
 					/>
 				</Flex>
-				<Flex align="center" justify="flex-end" className="py-4">
-					<CircleX
-						className="cursor-pointer"
-						color="#a7a7a7"
-						onClick={() => setExpandedRowKeys([])}
-					/>
-				</Flex>
 				<Table
 					dataSource={warehouse}
 					expandable={{
+						defaultExpandAllRows: true,
 						expandedRowRender: expandedRowRender as any,
-						defaultExpandedRowKeys: ['0'],
-						expandedRowKeys,
-						onExpandedRowsChange: (expandedRowKeys) => {
-							setExpandedRowKeys(expandedRowKeys as string[]);
-						},
+						// expandedRowKeys,
+						// onExpandedRowsChange: (expandedRowKeys) => {
+						// 	setExpandedRowKeys(expandedRowKeys as string[]);
+						// },
 						expandedRowClassName: 'bg-gray-200',
 					}}
 					loading={warehouseLoading}
