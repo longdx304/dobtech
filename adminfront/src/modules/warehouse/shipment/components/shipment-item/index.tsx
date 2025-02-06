@@ -29,7 +29,11 @@ const ShipmentItem: React.FC<ShipmentItemProps> = ({
 	].includes(item?.status);
 	const isStart = !item?.shipped_id;
 
-	const address = `${item.order.shipping_address?.address_2}, ${item.order.shipping_address?.city}, ${item.order.shipping_address?.address_1}, ${item.order.shipping_address?.province}, ${item.order.shipping_address?.country_code}`;
+	const address = `${item.order.shipping_address?.address_2 ?? ''}, ${
+		item.order.shipping_address?.city ?? ''
+	}, ${item.order.shipping_address?.address_1 ?? ''}, ${
+		item.order.shipping_address?.province ?? ''
+	}, ${item.order.shipping_address?.country_code ?? ''}`;
 
 	const shipper = item.shipper?.first_name || 'Chưa có người giao hàng';
 	const actions = [
@@ -98,7 +102,9 @@ const ShipmentItem: React.FC<ShipmentItemProps> = ({
 					<div className="flex items-center">
 						<User size={18} color="#6b7280" />
 					</div>
-					<Text className="text-sm font-semibold">{`${item.order.customer.last_name} ${item.order.customer.first_name}`}</Text>
+					<Text className="text-sm font-semibold">{`${
+						item.order.customer.last_name ?? ''
+					} ${item.order.customer.first_name ?? ''}`}</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">
 					<div className="flex items-center">

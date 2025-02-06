@@ -125,13 +125,13 @@ const orderColumns = ({}: Props) => [
 		dataIndex: 'shipping_address',
 		key: 'shipping_address',
 		fixed: 'center',
-		className: 'text-xs text-center',
+		className: 'text-xs text-center text-wrap',
 		render: (_: Order['shipping_address'], record: Order) => {
 			let name = null;
 			if (_?.first_name || _?.last_name) {
-				name = `${_?.last_name} ${_?.first_name}`;
+				name = `${_?.last_name || ''} ${_?.first_name || ''}`;
 			} else if (record?.customer?.first_name || record?.customer?.last_name) {
-				name = `${record?.customer?.last_name} ${record?.customer?.first_name}`;
+				name = `${record?.customer?.last_name || ''} ${record?.customer?.first_name || ''}`;
 			} else {
 				name = `${record.email}`;
 			}

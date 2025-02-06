@@ -13,6 +13,7 @@ import { useAdminShippingOptions } from 'medusa-react';
 import Image from 'next/image';
 import { useContext, useMemo } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
+import { formatNumber } from '@/lib/utils';
 
 type Props = {
 	setIsSendEmail: React.Dispatch<React.SetStateAction<boolean>>;
@@ -114,6 +115,21 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 		setIsSendEmail(value);
 	};
 
+	console.log('sortedItems', sortedItems);
+
+	const totalQuantity = useMemo(() => {
+		return sortedItems.reduce((acc, item) => acc + item.quantity, 0);
+	}, [sortedItems]);
+
+	const totalAmount = useMemo(() => {
+		return sortedItems.reduce(
+			(acc, item) => acc + item.unit_price * item.quantity,
+			0
+		);
+	}, [sortedItems]);
+
+	console.log('totalQuantity', totalQuantity);
+	console.log('totalAmount', totalAmount);
 	return (
 		<div className="min-h-[705px]">
 			<Flex className="flex items-center gap-2">
@@ -132,6 +148,26 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 							showSizeChanger: false,
 						}}
 						rowKey="id"
+						summary={() => (
+							<>
+								<Table.Summary fixed>
+									<Table.Summary.Row>
+										<Table.Summary.Cell index={0}>
+											<span className="font-semibold">Tổng</span>
+										</Table.Summary.Cell>
+										<Table.Summary.Cell index={1} className="text-right">
+											{totalQuantity}
+										</Table.Summary.Cell>
+										<Table.Summary.Cell index={2} className="text-right">
+											{formatAmountWithSymbol({
+												currency: regionObj?.currency_code as string,
+												amount: totalAmount,
+											})}
+										</Table.Summary.Cell>
+									</Table.Summary.Row>
+								</Table.Summary>
+							</>
+						)}
 					/>
 				</div>
 			</SummarySection>

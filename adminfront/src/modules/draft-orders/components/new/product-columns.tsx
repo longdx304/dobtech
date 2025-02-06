@@ -1,5 +1,5 @@
 import { Flex } from '@/components/Flex';
-import { InputNumber } from '@/components/Input';
+import { InputNumber, Popover, Radio, RadioChangeEvent, Space } from 'antd';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
 import { formatAmountWithSymbol } from '@/utils/prices';
@@ -24,6 +24,11 @@ type SelectProduct = Omit<
 	'beforeInsert'
 >;
 
+enum Unit {
+	Đối = 'đôi',
+	Giỏ = 'giỏ',
+}
+
 const EditableQuantity = ({
 	quantity,
 	record,
@@ -34,32 +39,65 @@ const EditableQuantity = ({
 	handleQuantityChange: (value: number, variantId: string) => void;
 }) => {
 	const [isEditing, setIsEditing] = useState(false);
+	const [selectedUnit, setSelectedUnit] = useState<Unit>(Unit.Đối);
+	const [inputValue, setInputValue] = useState<number>(quantity || 1);
 
-	return isEditing ? (
-		<InputNumber
-			autoFocus
-			min={1}
-			max={record.inventory_quantity || 1}
-			defaultValue={quantity || 1}
-			onBlur={() => setIsEditing(false)}
-			onPressEnter={() => setIsEditing(false)}
-			onChange={(value) => {
-				if (value !== null) {
-					const finalValue = Math.min(+value, record.inventory_quantity || 1);
-					handleQuantityChange(finalValue, record?.id as string);
-				}
-			}}
-			className="w-20"
-		/>
-	) : (
-		<Text
-			className="text-right text-gray-500 cursor-pointer"
-			onClick={() => setIsEditing(true)}
+	const handleUnitChange = (e: RadioChangeEvent) => {
+		setSelectedUnit(e.target.value as Unit);
+	};
+
+	const handleValueChange = (value: number | null) => {
+		if (value !== null) {
+			const maxInCurrentUnit = selectedUnit === Unit.Đối
+				? (record.inventory_quantity || 1)
+				: Math.floor((record.inventory_quantity || 1) / 24);
+			
+			const finalInputValue = Math.min(value, maxInCurrentUnit);
+			setInputValue(finalInputValue);
+			
+			// Convert to đôi before sending to parent
+			const finalQuantity = selectedUnit === Unit.Giỏ ? finalInputValue * 24 : finalInputValue;
+			handleQuantityChange(finalQuantity, record?.id as string);
+		}
+	};
+
+	const popoverContent = (
+		<Space direction="vertical" className="w-full">
+			<Radio.Group value={selectedUnit} onChange={handleUnitChange}>
+				<Space direction="vertical">
+					<Radio value={Unit.Đối}>Đôi</Radio>
+					<Radio value={Unit.Giỏ}>Giỏ (1 giỏ = 24 đôi)</Radio>
+				</Space>
+			</Radio.Group>
+			<InputNumber
+				autoFocus
+				min={1}
+				max={selectedUnit === Unit.Đối
+					? (record.inventory_quantity || 1)
+					: Math.floor((record.inventory_quantity || 1) / 24)}
+				value={inputValue}
+				onChange={handleValueChange}
+				onBlur={() => setIsEditing(false)}
+				onPressEnter={() => setIsEditing(false)}
+				className="w-full"
+			/>
+		</Space>
+	);
+
+	return (
+		<Popover
+			content={popoverContent}
+			trigger="click"
+			open={isEditing}
+			onOpenChange={setIsEditing}
 		>
-			{quantity || 1}
-		</Text>
+			<Text className="text-right text-gray-500 cursor-pointer">
+				{quantity || 1}
+			</Text>
+		</Popover>
 	);
 };
+
 const EditablePrice = ({
 	unitPrice,
 	record,
@@ -128,8 +166,8 @@ const productsColumns = ({
 						className="rounded-md cursor-pointer"
 					/>
 					<Flex vertical className="">
-						<Tooltip title={_.title}>
-							<Text className="text-xs line-clamp-2">{_.title}</Text>
+						<Tooltip title={_?.title ?? ''}>
+							<Text className="text-xs line-clamp-2">{_?.title ?? ''}</Text>
 						</Tooltip>
 						<span className="text-gray-500">{record.title}</span>
 					</Flex>

@@ -203,7 +203,7 @@ const Items = () => {
 			return updated;
 		});
 
-		setItems((prevItems) => {
+		setItems((prevItems = []) => {
 			return prevItems.map((item) =>
 				item.variant_id === variantId ? { ...item, quantity: value } : item
 			);

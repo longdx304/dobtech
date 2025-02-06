@@ -38,6 +38,16 @@ const SelectRegion = () => {
 		form.setFieldValue('region', value);
 	};
 
+	// Get default region id with value is VN
+	const defaultRegionId = regionOptions.find((option) => option.label === 'Vietnam')?.value;
+
+	useEffect(() => {
+		if (defaultRegionId) {
+			handleRegionChange(defaultRegionId);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	return (
 		<>
 			{/* Region */}

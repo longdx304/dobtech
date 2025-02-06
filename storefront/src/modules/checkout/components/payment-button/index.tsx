@@ -80,7 +80,11 @@ const PaymentButton = ({ data }: Props) => {
 	const lineItemIds = findLineItemId(_intersection as string[]);
 
 	const generateFilePdf = async (data: any) => {
-		const address = `${data.shipping_address?.address_2}, ${data.shipping_address?.city}, ${data.shipping_address?.province}, ${data.shipping_address?.province}`;
+		const address = `${data.shipping_address?.address_2 ?? ''}, ${
+			data.shipping_address?.city ?? ''
+		}, ${data.shipping_address?.province ?? ''}, ${
+			data.shipping_address?.country_code ?? ''
+		}`;
 
 		const pdfReq = {
 			isSendEmail: false,

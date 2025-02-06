@@ -1,4 +1,5 @@
 'use client';
+import { splitFiles } from '@/actions/images';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
@@ -11,6 +12,8 @@ import {
 	useAdminFulfillment,
 	useAdminUpdateFulfillment,
 } from '@/lib/hooks/api/fulfullment';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
+import { getErrorMessage } from '@/lib/utils';
 import { FormImage } from '@/types/common';
 import { Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
@@ -22,16 +25,11 @@ import {
 	Clock,
 	Hash,
 	MapPin,
-	Phone,
-	Search,
-	User,
+	Search
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import fulfillmentColumns from './columns';
-import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
-import { splitFiles } from '@/actions/images';
-import { getErrorMessage } from '@/lib/utils';
 
 type FulfillmentDetailProps = {
 	id: string;
@@ -201,7 +199,11 @@ const OrderInfo = ({
 	order: Order;
 	isProcessing: boolean;
 }) => {
-	const address = `${order.shipping_address?.address_2}, ${order.shipping_address?.city}, ${order.shipping_address?.address_1}, ${order.shipping_address?.province}, ${order.shipping_address?.country_code}`;
+	const address = `${order.shipping_address?.address_2 ?? ''}, ${
+		order.shipping_address?.city ?? ''
+	}, ${order.shipping_address?.address_1 ?? ''}, ${
+		order.shipping_address?.province ?? ''
+	}, ${order.shipping_address?.country_code ?? ''}`;
 
 	return (
 		<div>
@@ -220,7 +222,9 @@ const OrderInfo = ({
 						<Hash size={14} color="#6b7280" />
 					</div>
 					<Text className="text-sm font-semibold">
-						{`${order?.display_id} - ${order.customer.last_name} ${order.customer.first_name} - ${order.customer.phone}`}
+						{`${order?.display_id} - ${order.customer.last_name ?? ''} ${
+							order.customer.first_name ?? ''
+						} - ${order.customer.phone ?? ''}`}
 					</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">
