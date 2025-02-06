@@ -14,11 +14,11 @@ type StockItemProps = {
 const StockItem: React.FC<StockItemProps> = ({ item, handleClickDetail }) => {
 	const isProcessing = !item?.checked_at;
 
-	const address = `${item.order.shipping_address?.address_2 ?? ''}, ${
+	const address = `${item.order.shipping_address?.address_2 ?? ''} ${
 		item.order.shipping_address?.city ?? ''
-	}, ${item.order.shipping_address?.address_1 ?? ''}, ${
+	} ${item.order.shipping_address?.address_1 ?? ''} ${
 		item.order.shipping_address?.province ?? ''
-	}, ${item.order.shipping_address?.country_code ?? ''}`;
+	} ${item.order.shipping_address?.country_code ?? ''}`;
 
 	return (
 		<Card className="bg-[#F3F6FF]" rounded>

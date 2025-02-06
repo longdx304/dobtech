@@ -24,7 +24,6 @@ const SelectRegion = () => {
 		}));
 	}, [regions]);
 
-
 	useEffect(() => {
 		if (!reg || !selectedShippingOption) {
 			disableNext();
@@ -39,7 +38,9 @@ const SelectRegion = () => {
 	};
 
 	// Get default region id with value is VN
-	const defaultRegionId = regionOptions.find((option) => option.label === 'Vietnam')?.value;
+	const defaultRegionId = regionOptions.find(
+		(option) => option.label === 'Vietnam'
+	)?.value;
 
 	useEffect(() => {
 		if (defaultRegionId) {
@@ -58,7 +59,11 @@ const SelectRegion = () => {
 					label="Quốc gia"
 					rules={[{ required: true, message: 'Please select a region' }]}
 				>
-					<Select placeholder="Chọn quốc gia" onChange={handleRegionChange}>
+					<Select
+						placeholder="Chọn quốc gia"
+						onChange={handleRegionChange}
+						defaultValue={defaultRegionId}
+					>
 						{regionOptions.map((option) => {
 							return (
 								<Option key={option.value} value={option.value}>

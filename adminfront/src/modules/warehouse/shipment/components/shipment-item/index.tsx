@@ -29,11 +29,11 @@ const ShipmentItem: React.FC<ShipmentItemProps> = ({
 	].includes(item?.status);
 	const isStart = !item?.shipped_id;
 
-	const address = `${item.order.shipping_address?.address_2 ?? ''}, ${
+	const address = `${item.order.shipping_address?.address_2 ?? ''} ${
 		item.order.shipping_address?.city ?? ''
-	}, ${item.order.shipping_address?.address_1 ?? ''}, ${
+	} ${item.order.shipping_address?.address_1 ?? ''} ${
 		item.order.shipping_address?.province ?? ''
-	}, ${item.order.shipping_address?.country_code ?? ''}`;
+	} ${item.order.shipping_address?.country_code ?? ''}`;
 
 	const shipper = item.shipper?.first_name || 'Chưa có người giao hàng';
 	const actions = [

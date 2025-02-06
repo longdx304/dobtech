@@ -115,8 +115,6 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 		setIsSendEmail(value);
 	};
 
-	console.log('sortedItems', sortedItems);
-
 	const totalQuantity = useMemo(() => {
 		return sortedItems.reduce((acc, item) => acc + item.quantity, 0);
 	}, [sortedItems]);
@@ -128,8 +126,6 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 		);
 	}, [sortedItems]);
 
-	console.log('totalQuantity', totalQuantity);
-	console.log('totalAmount', totalAmount);
 	return (
 		<div className="min-h-[705px]">
 			<Flex className="flex items-center gap-2">

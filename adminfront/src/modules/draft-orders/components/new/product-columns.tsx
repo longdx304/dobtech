@@ -25,7 +25,7 @@ type SelectProduct = Omit<
 >;
 
 enum Unit {
-	Đối = 'đôi',
+	Đôi = 'đôi',
 	Giỏ = 'giỏ',
 }
 
@@ -39,7 +39,7 @@ const EditableQuantity = ({
 	handleQuantityChange: (value: number, variantId: string) => void;
 }) => {
 	const [isEditing, setIsEditing] = useState(false);
-	const [selectedUnit, setSelectedUnit] = useState<Unit>(Unit.Đối);
+	const [selectedUnit, setSelectedUnit] = useState<Unit>(Unit.Đôi);
 	const [inputValue, setInputValue] = useState<number>(quantity || 1);
 
 	const handleUnitChange = (e: RadioChangeEvent) => {
@@ -48,15 +48,22 @@ const EditableQuantity = ({
 
 	const handleValueChange = (value: number | null) => {
 		if (value !== null) {
-			const maxInCurrentUnit = selectedUnit === Unit.Đối
-				? (record.inventory_quantity || 1)
-				: Math.floor((record.inventory_quantity || 1) / 24);
-			
-			const finalInputValue = Math.min(value, maxInCurrentUnit);
+			const maxInCurrentUnit =
+				selectedUnit === Unit.Đôi
+					? record.inventory_quantity
+					: Math.floor(record.inventory_quantity / 24);
+
+			const finalInputValue = Math.min(
+				value,
+				!record.allow_backorder
+					? maxInCurrentUnit
+					: Number.MAX_SAFE_INTEGER
+			);
 			setInputValue(finalInputValue);
-			
+
 			// Convert to đôi before sending to parent
-			const finalQuantity = selectedUnit === Unit.Giỏ ? finalInputValue * 24 : finalInputValue;
+			const finalQuantity =
+				selectedUnit === Unit.Giỏ ? finalInputValue * 24 : finalInputValue;
 			handleQuantityChange(finalQuantity, record?.id as string);
 		}
 	};
@@ -65,16 +72,21 @@ const EditableQuantity = ({
 		<Space direction="vertical" className="w-full">
 			<Radio.Group value={selectedUnit} onChange={handleUnitChange}>
 				<Space direction="vertical">
-					<Radio value={Unit.Đối}>Đôi</Radio>
+					<Radio value={Unit.Đôi}>Đôi</Radio>
 					<Radio value={Unit.Giỏ}>Giỏ (1 giỏ = 24 đôi)</Radio>
 				</Space>
 			</Radio.Group>
 			<InputNumber
 				autoFocus
 				min={1}
-				max={selectedUnit === Unit.Đối
-					? (record.inventory_quantity || 1)
-					: Math.floor((record.inventory_quantity || 1) / 24)}
+				// max={selectedUnit === Unit.Đôi
+				// 	? (record.inventory_quantity)
+				// 	: Math.floor((record.inventory_quantity || 1) / 24)}
+				max={
+					!record.allow_backorder
+						? record.inventory_quantity
+						: Number.MAX_SAFE_INTEGER
+				}
 				value={inputValue}
 				onChange={handleValueChange}
 				onBlur={() => setIsEditing(false)}

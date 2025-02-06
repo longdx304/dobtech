@@ -208,11 +208,11 @@ const OrderInfo = ({
 
 	const shipper = fulfillment.shipper?.first_name || 'Chưa có người giao hàng';
 
-	const address = `${order.shipping_address?.address_2 ?? ''}, ${
+	const address = `${order.shipping_address?.address_2 ?? ''} ${
 		order.shipping_address?.city ?? ''
-	}, ${order.shipping_address?.address_1 ?? ''}, ${
+	} ${order.shipping_address?.address_1 ?? ''} ${
 		order.shipping_address?.province ?? ''
-	}, ${order.shipping_address?.country_code ?? ''}`;
+	} ${order.shipping_address?.country_code ?? ''}`;
 
 	return (
 		<div>

@@ -143,10 +143,12 @@ const WarehouseManage: FC<Props> = ({}) => {
 	});
 
 	const expandedRowRender = (record: Warehouse) => {
+		if (!record.inventories?.length) return null;
+
 		return (
 			<Table
 				columns={expandColumns as any}
-				dataSource={record?.inventories ?? []}
+				dataSource={record.inventories}
 				rowKey="id"
 				pagination={false}
 			/>
@@ -162,7 +164,7 @@ const WarehouseManage: FC<Props> = ({}) => {
 				</Text>
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
-				<Title level={4}>Vị trí kho</Title>
+				{/* <Title level={4}>Vị trí kho</Title> */}
 				<Flex align="center" justify="flex-end" className="py-4">
 					<Input
 						placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
@@ -185,7 +187,6 @@ const WarehouseManage: FC<Props> = ({}) => {
 				<Table
 					dataSource={warehouse}
 					expandable={{
-						defaultExpandAllRows: true,
 						expandedRowRender: expandedRowRender as any,
 						expandedRowKeys: expandedKeys,
 						onExpandedRowsChange: (keys) => {
