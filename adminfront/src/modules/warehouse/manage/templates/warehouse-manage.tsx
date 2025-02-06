@@ -16,7 +16,7 @@ import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import { Modal as AntdModal, message } from 'antd';
 import debounce from 'lodash/debounce';
 import { Plus, Search } from 'lucide-react';
-import { ChangeEvent, FC, useState } from 'react';
+import { ChangeEvent, FC, useCallback, useMemo, useState } from 'react';
 import ModalAddVariantWarehouse from '../components/modal-add-variant-warehouse';
 import ModalAddWarehouse from '../components/modal-add-warehouse';
 import ModalVariantInventory from '../components/modal-variant-inventory';
@@ -52,6 +52,7 @@ const WarehouseManage: FC<Props> = ({}) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
+	const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
 	const {
 		warehouse,
@@ -135,10 +136,12 @@ const WarehouseManage: FC<Props> = ({}) => {
 	});
 
 	const expandedRowRender = (record: Warehouse) => {
+		if (!record.inventories?.length) return null;
+
 		return (
 			<Table
 				columns={expandColumns as any}
-				dataSource={record?.inventories ?? []}
+				dataSource={record.inventories}
 				rowKey="id"
 				pagination={false}
 			/>
@@ -154,7 +157,7 @@ const WarehouseManage: FC<Props> = ({}) => {
 				</Text>
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
-				<Title level={4}>Vị trí kho</Title>
+				{/* <Title level={4}>Vị trí kho</Title> */}
 				<Flex align="center" justify="flex-end" className="py-4">
 					<Input
 						placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
@@ -167,12 +170,9 @@ const WarehouseManage: FC<Props> = ({}) => {
 				<Table
 					dataSource={warehouse}
 					expandable={{
-						defaultExpandAllRows: true,
 						expandedRowRender: expandedRowRender as any,
-						// expandedRowKeys,
-						// onExpandedRowsChange: (expandedRowKeys) => {
-						// 	setExpandedRowKeys(expandedRowKeys as string[]);
-						// },
+						defaultExpandAllRows: true,
+						// expandedRowKey
 						expandedRowClassName: 'bg-gray-200',
 					}}
 					loading={warehouseLoading}

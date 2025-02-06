@@ -52,6 +52,7 @@ const Upload: FC<Props> = ({
 				// If dropped items aren't files, reject them
 				if (e.dataTransfer.items[i].kind === 'file') {
 					const file = e.dataTransfer.items[i].getAsFile();
+					console.log('e.dataTransfer.items:', file);
 					if (file && filetypes.indexOf(file.type) > -1) {
 						files.push(file);
 					}
@@ -65,6 +66,7 @@ const Upload: FC<Props> = ({
 				}
 			}
 		}
+		console.log('files:', files);
 		if (files.length === 1) {
 			onFileChosen(files);
 		} else {
@@ -82,14 +84,14 @@ const Upload: FC<Props> = ({
 				className
 			)}
 		>
-			<div className="flex flex-col w-full items-center gap-2 px-2">
+			<div className="flex flex-col w-full items-center gap-2">
 				<span className="text-center text-xs lg:text-sm">{text}</span>
 				<UploadIcon size={24} />
 				<span className="text-center text-xs lg:text-sm">{placeholder}</span>
 			</div>
 			{fileUploadError && (
 				<span className="text-[#E11D48]">
-					{errorMessage || 'Vui lòng tải lên một tập tin hình ảnh.'}
+					{errorMessage || 'Vui lòng tải lên một tập tin đúng định dạng.'}
 				</span>
 			)}
 			<input
