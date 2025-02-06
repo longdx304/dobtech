@@ -62,7 +62,6 @@ const Items = () => {
 		region_id: region?.id,
 		customer_id: form.getFieldValue('customer_id'),
 	});
-	console.log('variants:', variants);
 
 	const { variants: variantsBySku } = useAdminVariantsSku(
 		{
@@ -74,7 +73,6 @@ const Items = () => {
 			enabled: dataFromExcel.length > 0,
 		}
 	);
-	console.log('variantsBySku:', variantsBySku);
 
 	// Separate query to fetch selected variants
 	const { variants: selectedVariantsData } = useAdminVariants(
@@ -226,7 +224,7 @@ const Items = () => {
 			return updated;
 		});
 
-		setItems((prevItems) => {
+		setItems((prevItems = []) => {
 			return prevItems.map((item) =>
 				item.variant_id === variantId ? { ...item, quantity: value } : item
 			);

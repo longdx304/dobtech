@@ -32,7 +32,7 @@ const warehouseColumns = ({
 		title: 'Hiện có (sản phẩm)',
 		key: 'inventories',
 		dataIndex: 'inventories',
-		className: 'text-xs',
+		className: 'text-xs text-center text-bold',
 		render: (_: Warehouse['inventories']) => {
 			return _?.length ?? 0;
 		},

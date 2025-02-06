@@ -95,7 +95,11 @@ const Timeline = ({
 		let pdfReq = {} as pdfOrderRes;
 		if (!isEmpty(order)) {
 			const { items, shipping_address } = order!;
-			const address = `${shipping_address.address_1}, ${shipping_address.address_2}, ${shipping_address.province}, ${shipping_address.city}, ${shipping_address.country_code}`;
+			const address = `${shipping_address?.address_1 ?? ''}, ${
+				shipping_address?.address_2 ?? ''
+			}, ${shipping_address?.province ?? ''}, ${
+				shipping_address?.city ?? ''
+			}, ${shipping_address?.country_code ?? ''}`;
 
 			pdfReq = {
 				email: order!.customer.email,

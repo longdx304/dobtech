@@ -52,7 +52,6 @@ const Upload: FC<Props> = ({
 				// If dropped items aren't files, reject them
 				if (e.dataTransfer.items[i].kind === 'file') {
 					const file = e.dataTransfer.items[i].getAsFile();
-					console.log('e.dataTransfer.items:', file);
 					if (file && filetypes.indexOf(file.type) > -1) {
 						files.push(file);
 					}
@@ -66,7 +65,6 @@ const Upload: FC<Props> = ({
 				}
 			}
 		}
-		console.log('files:', files);
 		if (files.length === 1) {
 			onFileChosen(files);
 		} else {

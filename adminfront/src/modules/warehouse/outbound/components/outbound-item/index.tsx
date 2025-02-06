@@ -65,6 +65,12 @@ const OutboundItem: React.FC<OutboundItemProps> = ({
 				<Text className="text-sm font-semibold">{`#${item.display_id}`}</Text>
 			</Flex>
 			<Flex gap={4} className="" align="center">
+				<Text className="text-[14px] text-gray-500">Người đặt hàng:</Text>
+				<Text className="text-sm font-semibold text-wrap">{`${
+					item.customer?.first_name || ''
+				} ${item.customer?.last_name || ''}`}</Text>
+			</Flex>
+			<Flex gap={4} className="" align="center">
 				<Text className="text-[14px] text-gray-500">Ngày đặt hàng:</Text>
 				<Text className="text-sm font-semibold">
 					{dayjs(item.created_at).format('DD/MM/YYYY')}

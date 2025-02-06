@@ -38,11 +38,11 @@ const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
 				<Tooltip title={tooltipContent}>
 					<div className="flex max-w-[185px] flex-col justify-center text-[12px]">
 						<span className="font-normal text-gray-900 truncate">
-							{item.title}
+							{item.title} x {item.quantity}
 						</span>
 						{item?.variant && (
 							<span className="font-normal text-gray-500 truncate">
-								{`${item.variant.title}`} x {item.quantity}
+								{`${item.variant.title}`} 
 							</span>
 						)}
 					</div>
