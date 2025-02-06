@@ -1,16 +1,22 @@
+import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Tabs } from '@/components/Tabs';
+import { Tooltip } from '@/components/Tooltip';
+import { useAdminVariantsSku } from '@/lib/hooks/api/variants';
+import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useStepModal } from '@/lib/providers/stepped-modal-provider';
 import { formatNumber } from '@/lib/utils';
 import { ProductVariant, Region } from '@medusajs/medusa';
 import { Table, TabsProps } from 'antd';
-import _ from 'lodash';
-import { Search } from 'lucide-react';
+import _, { differenceBy } from 'lodash';
+import { CircleCheck, CircleX, Search, Upload } from 'lucide-react';
 import { useAdminVariants } from 'medusa-react';
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
+import UploadModal from './modal-upload';
 import productsColumns from './product-columns';
+import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 
 const PAGE_SIZE = 10;
 
@@ -26,6 +32,8 @@ export interface VariantPrice {
 }
 
 const Items = () => {
+	const { state, onOpen, onClose } = useToggleState();
+
 	const [selectedVariantIds, setSelectedVariantIds] = useState<string[]>([]);
 	const [selectedVariants, setSelectedVariants] = useState<ProductVariant[]>(
 		[]
@@ -38,8 +46,10 @@ const Items = () => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [activeTab, setActiveTab] = useState<TabsProps['activeKey']>('list');
+	// const [dataFromExcel, setDataFromExcel] = useState<any[]>([]);
+
 	const {
-		context: { region, setItems, items },
+		context: { region, setItems, items, dataFromExcel, setDataFromExcel },
 		form,
 	} = useNewDraftOrderForm();
 	const { enableNext, disableNext } = useStepModal();
@@ -52,6 +62,19 @@ const Items = () => {
 		region_id: region?.id,
 		customer_id: form.getFieldValue('customer_id'),
 	});
+	console.log('variants:', variants);
+
+	const { variants: variantsBySku } = useAdminVariantsSku(
+		{
+			sku: dataFromExcel.map((item) => item.sku),
+			region_id: region?.id,
+			customer_id: form.getFieldValue('customer_id'),
+		},
+		{
+			enabled: dataFromExcel.length > 0,
+		}
+	);
+	console.log('variantsBySku:', variantsBySku);
 
 	// Separate query to fetch selected variants
 	const { variants: selectedVariantsData } = useAdminVariants(
@@ -275,8 +298,8 @@ const Items = () => {
 		handlePriceChange,
 	});
 
-	const handleDisable = (record: any) => {
-		if (record?.inventory_quantity || record?.original_price_incl_tax) {
+	const handleDisable = (record: PricedVariant) => {
+		if ((record?.inventory_quantity || 0) > 0 || record?.allow_backorder) {
 			return false;
 		}
 		return true;
@@ -336,13 +359,115 @@ const Items = () => {
 		return variantQuantities.reduce((total, item) => total + item.quantity, 0);
 	}, [variantQuantities]);
 
+	const dataFromExcelError = useMemo(() => {
+		if (!variantsBySku?.length) {
+			return [];
+		}
+		const errors = differenceBy(dataFromExcel, variantsBySku, 'sku');
+		return errors;
+	}, [dataFromExcel, variantsBySku]);
+
+	useEffect(() => {
+		if (!variantsBySku?.length) return;
+
+		const selectedRowKeys = variantsBySku.map((variant) => variant.id);
+		setSelectedVariantIds(selectedRowKeys as string[]);
+		setSelectedVariants(variantsBySku as ProductVariant[]);
+
+		// Initialize quantities for newly selected variants
+		const newQuantities = variantsBySku.map((variant) => {
+			const findVaraintExcel = dataFromExcel.find(
+				(item) => item.sku === variant.sku
+			);
+			return {
+				variantId: variant.id,
+				quantity: findVaraintExcel.quantity || 1,
+			};
+		});
+
+		// Preserve existing quantities for previously selected variants
+		const updatedQuantities = newQuantities.map((newQuant) => {
+			const existing = variantQuantities.find(
+				(q) => q.variantId === newQuant.variantId
+			);
+			return existing || newQuant;
+		});
+
+		setVariantQuantities(updatedQuantities);
+
+		// Initialize prices for newly selected variants
+		const newPrices = variantsBySku.map((variant) => {
+			const findVaraintExcel = dataFromExcel.find(
+				(item) => item.sku === variant.sku
+			);
+
+			return {
+				variantId: variant.id,
+				unit_price: findVaraintExcel?.price || getDefaultPrice(variant).amount,
+			};
+		});
+
+		// Preserve existing prices for previously selected variants
+		const updatedPrices = newPrices.map((newPrice) => {
+			const existing = variantPrices.find(
+				(p) => p.variantId === newPrice.variantId
+			);
+			return existing || newPrice;
+		});
+
+		setVariantPrices(updatedPrices);
+
+		// Wait for pricedVariants to be available before updating form items
+		updateFormItems(variantsBySku, updatedQuantities, updatedPrices);
+	}, [variantsBySku]);
+
 	return (
 		<>
 			<Flex
 				align="center"
-				justify="flex-end"
+				justify="space-between"
 				className="p-4 border-0 border-b border-solid border-gray-200"
 			>
+				<div>
+					<Button
+						icon={<Upload />}
+						onClick={() => {
+							onOpen();
+							setSelectedVariantIds([]);
+							setSelectedVariants([]);
+							setVariantQuantities([]);
+							setVariantPrices([]);
+							setDataFromExcel([]);
+							setItems([]);
+						}}
+					/>
+					{dataFromExcel.length > 0 && (
+						<Flex className="gap-x-2 mt-1">
+							<Flex align="center" className="gap-x-1 text-xs">
+								<CircleCheck size={16} color="green" />
+								<span>{variantsBySku?.length} sản phẩm</span>
+							</Flex>
+							<Tooltip
+								title={
+									<pre>
+										{dataFromExcelError
+											.map((item, index) => `${index + 1}. ${item.sku}`)
+											.join('\n')}
+									</pre>
+								}
+								placement="top"
+							>
+								<Flex align="center" className="gap-x-1 text-xs">
+									<CircleX size={16} color="red" />
+									<span>
+										{dataFromExcel.length - (variantsBySku?.length || 0)} sản
+										phẩm
+									</span>
+								</Flex>
+							</Tooltip>
+						</Flex>
+					)}
+				</div>
 				<Input
 					placeholder="Nhập tên sản phẩm"
 					className="w-[200px] text-xs"
@@ -404,6 +529,13 @@ const Items = () => {
 					</>
 				)}
 			/>
+			{state && (
+				<UploadModal
+					state={state}
+					handleCancel={onClose}
+					setDataFromExcel={setDataFromExcel}
+				/>
+			)}
 		</>
 	);
 };

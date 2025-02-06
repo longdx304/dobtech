@@ -39,13 +39,22 @@ const EditableQuantity = ({
 		<InputNumber
 			autoFocus
 			min={1}
-			max={record.inventory_quantity || 1}
+			max={
+				!record.allow_backorder
+					? record.inventory_quantity
+					: Number.MAX_SAFE_INTEGER
+			}
 			defaultValue={quantity || 1}
 			onBlur={() => setIsEditing(false)}
 			onPressEnter={() => setIsEditing(false)}
 			onChange={(value) => {
 				if (value !== null) {
-					const finalValue = Math.min(+value, record.inventory_quantity || 1);
+					const finalValue = Math.min(
+						+value,
+						!record.allow_backorder
+							? record.inventory_quantity
+							: Number.MAX_SAFE_INTEGER
+					);
 					handleQuantityChange(finalValue, record?.id as string);
 				}
 			}}
@@ -128,8 +137,8 @@ const productsColumns = ({
 						className="rounded-md cursor-pointer"
 					/>
 					<Flex vertical className="">
-						<Tooltip title={_.title}>
-							<Text className="text-xs line-clamp-2">{_.title}</Text>
+						<Tooltip title={_?.title}>
+							<Text className="text-xs line-clamp-2">{_?.title}</Text>
 						</Tooltip>
 						<span className="text-gray-500">{record.title}</span>
 					</Flex>
