@@ -82,14 +82,14 @@ const Upload: FC<Props> = ({
 				className
 			)}
 		>
-			<div className="flex flex-col w-full items-center gap-2 px-2">
+			<div className="flex flex-col w-full items-center gap-2">
 				<span className="text-center text-xs lg:text-sm">{text}</span>
 				<UploadIcon size={24} />
 				<span className="text-center text-xs lg:text-sm">{placeholder}</span>
 			</div>
 			{fileUploadError && (
 				<span className="text-[#E11D48]">
-					{errorMessage || 'Vui lòng tải lên một tập tin hình ảnh.'}
+					{errorMessage || 'Vui lòng tải lên một tập tin đúng định dạng.'}
 				</span>
 			)}
 			<input

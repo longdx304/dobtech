@@ -45,7 +45,7 @@ const OutboundDetailItem: React.FC<InboundItemProps> = ({
 					<Text className="text-[14px] text-gray-500">Tên sản phẩm:</Text>
 					<Text className="text-sm font-medium">{`${item.title}`}</Text>
 					<Tag
-						className="text-sm mt-1"
+						className="text-sm mt-1 text-wrap"
 						color="blue"
 					>{`${item.description}`}</Tag>
 				</Flex>

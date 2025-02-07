@@ -1,5 +1,5 @@
 'use client';
-import { FloatButton } from '@/components/Button';
+import { Button, FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
@@ -16,7 +16,7 @@ import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import { Modal as AntdModal, message } from 'antd';
 import debounce from 'lodash/debounce';
 import { Plus, Search } from 'lucide-react';
-import { ChangeEvent, FC, useState } from 'react';
+import { ChangeEvent, FC, useState, useEffect } from 'react';
 import ModalAddVariantWarehouse from '../components/modal-add-variant-warehouse';
 import ModalAddWarehouse from '../components/modal-add-warehouse';
 import ModalVariantInventory from '../components/modal-variant-inventory';
@@ -52,6 +52,7 @@ const WarehouseManage: FC<Props> = ({}) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
+	const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
 	const {
 		warehouse,
@@ -65,6 +66,13 @@ const WarehouseManage: FC<Props> = ({}) => {
 		offset,
 		order: '-inventories.updated_at',
 	});
+
+	useEffect(() => {
+		if (warehouse?.length) {
+			const keys = warehouse.map((item) => item.id);
+			setExpandedKeys(keys);
+		}
+	}, [warehouse]);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -135,10 +143,12 @@ const WarehouseManage: FC<Props> = ({}) => {
 	});
 
 	const expandedRowRender = (record: Warehouse) => {
+		if (!record.inventories?.length) return null;
+
 		return (
 			<Table
 				columns={expandColumns as any}
-				dataSource={record?.inventories ?? []}
+				dataSource={record.inventories}
 				rowKey="id"
 				pagination={false}
 			/>
@@ -154,26 +164,34 @@ const WarehouseManage: FC<Props> = ({}) => {
 				</Text>
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
-				<Title level={4}>Vị trí kho</Title>
+				{/* <Title level={4}>Vị trí kho</Title> */}
 				<Flex align="center" justify="flex-end" className="py-4">
 					<Input
 						placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
 						name="search"
 						prefix={<Search size={16} />}
 						onChange={handleChangeDebounce}
-						className="w-[300px]"
+						className="w-[300px] mr-2"
 					/>
+					<Button
+						type="dashed"
+						onClick={() => {
+							setExpandedKeys(prev =>
+								prev.length ? [] : warehouse?.map(item => item.id) || []
+							);
+						}}
+					>
+						{expandedKeys.length ? 'Ẩn vị trí' : 'Hiển thị vị trí'}
+					</Button>
 				</Flex>
 				<Table
 					dataSource={warehouse}
 					expandable={{
-						defaultExpandAllRows: true,
 						expandedRowRender: expandedRowRender as any,
-						// expandedRowKeys,
-						// onExpandedRowsChange: (expandedRowKeys) => {
-						// 	setExpandedRowKeys(expandedRowKeys as string[]);
-						// },
-						expandedRowClassName: 'bg-gray-200',
+						expandedRowKeys: expandedKeys,
+						onExpandedRowsChange: (keys) => {
+							setExpandedKeys(keys as string[]);
+						},
 					}}
 					loading={warehouseLoading}
 					rowKey="id"
@@ -190,7 +208,6 @@ const WarehouseManage: FC<Props> = ({}) => {
 					}
 				/>
 				<FloatButton
-					// className="absolute"
 					icon={<Plus color="white" size={20} strokeWidth={2} />}
 					type="primary"
 					onClick={openWarehouse}

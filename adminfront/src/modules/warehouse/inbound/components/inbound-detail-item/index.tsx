@@ -38,7 +38,7 @@ const InboundDetailItem: React.FC<InboundItemProps> = ({
 				<Flex vertical align="flex-start">
 					<Text className="text-[14px] text-gray-500">Tên sản phẩm:</Text>
 					<Text className="text-sm font-medium">{`${item.title}`}</Text>
-					<Tag className="text-sm mt-1" color="blue">
+					<Tag className="text-sm mt-1 text-wrap" color="blue">
 						<Tooltip
 							title={item.description}
 							color="white"

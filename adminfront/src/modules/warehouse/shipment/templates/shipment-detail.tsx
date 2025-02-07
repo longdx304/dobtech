@@ -15,9 +15,10 @@ import {
 import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import { getErrorMessage } from '@/lib/utils';
 import { FormImage } from '@/types/common';
-import { Order } from '@/types/order';
+import { Fulfillment, FulfullmentStatus } from '@/types/fulfillments';
 import { ERoutes } from '@/types/routes';
 import { Divider, message } from 'antd';
+import clsx from 'clsx';
 import debounce from 'lodash/debounce';
 import {
 	ArrowLeft,
@@ -29,10 +30,8 @@ import {
 	Search,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useMemo, useState } from 'react';
 import fulfillmentColumns from './columns';
-import { Fulfillment, FulfullmentStatus } from '@/types/fulfillments';
-import clsx from 'clsx';
 
 type ShipmentDetailProps = {
 	id: string;
@@ -209,7 +208,11 @@ const OrderInfo = ({
 
 	const shipper = fulfillment.shipper?.first_name || 'Chưa có người giao hàng';
 
-	const address = `${order.shipping_address?.address_2}, ${order.shipping_address?.city}, ${order.shipping_address?.address_1}, ${order.shipping_address?.province}, ${order.shipping_address?.country_code}`;
+	const address = `${order.shipping_address?.address_2 ?? ''} ${
+		order.shipping_address?.city ?? ''
+	} ${order.shipping_address?.address_1 ?? ''} ${
+		order.shipping_address?.province ?? ''
+	} ${order.shipping_address?.country_code ?? ''}`;
 
 	return (
 		<div>
@@ -226,7 +229,9 @@ const OrderInfo = ({
 						<Hash size={14} color="#6b7280" />
 					</div>
 					<Text className="text-sm font-semibold">
-						{`${order?.display_id} - ${order.customer.last_name} ${order.customer.first_name} - ${order.customer.phone}`}
+						{`${order?.display_id} - ${order.customer.last_name ?? ''} ${
+							order.customer.first_name ?? ''
+						} - ${order.customer.phone}`}
 					</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">

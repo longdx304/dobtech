@@ -43,7 +43,8 @@ type NewDraftOrderContextValue = {
 	selectedShippingOption: ShippingOption | undefined;
 	items: NewDraftOrderForm['items'];
 	shippingOptions: ShippingOption[];
-
+	setDataFromExcel: (data: any[]) => void;
+	dataFromExcel: any[];
 	setItems: React.Dispatch<React.SetStateAction<NewDraftOrderForm['items']>>;
 };
 
@@ -59,6 +60,8 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 	const [itemsSelected, setItemsSelected] = useState<
 		NewDraftOrderForm['items']
 	>([]);
+	const [dataFromExcel, setDataFromExcel] = useState<any[]>([]);
+
 	const { region } = useAdminRegion(selectedRegionId!, {
 		enabled: !!selectedRegionId,
 	});
@@ -146,7 +149,8 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 			selectedShippingOption: cachedShippingOption,
 			items: itemsSelected,
 			shippingOptions: validShippingOptions,
-
+			setDataFromExcel,
+			dataFromExcel,
 			setItems: setItemsSelected,
 		}),
 		[
@@ -156,6 +160,8 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 			itemsSelected,
 			validShippingOptions,
 			setItemsSelected,
+			setDataFromExcel,
+			dataFromExcel,
 		]
 	);
 
