@@ -79,7 +79,8 @@ const BatchJobActivityCard = (props: { batchJob: BatchJob }) => {
 	const { mutateAsync: createPresignedUrl } =
 		useAdminCreatePresignedDownloadUrl();
 
-	const fileName = batchJob.result?.file_key ?? `${batchJob.type}.csv`;
+	const fileName =
+		batchJob.result?.file_key?.split('/').pop() ?? `${batchJob.type}.csv`;
 	const relativeTimeElapsed = getRelativeTime({
 		from: new Date(),
 		to: batchJob.created_at,

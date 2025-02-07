@@ -27,6 +27,7 @@ import { ERoutes } from '@/types/routes';
 import { getErrorMessage } from '@/lib/utils';
 import { usePolling } from '@/lib/providers/polling-provider';
 import ImportModal from './import-modal';
+import { ActionAbles } from '@/components/Dropdown';
 const PAGE_SIZE = 10;
 
 interface Props {}
@@ -152,6 +153,36 @@ const ProductList = (props: Props) => {
 			},
 		});
 	};
+	const handleCreateExportInventory = () => {
+		const reqObj = {
+			type: 'export-products-inventory',
+			context: {},
+			dry_run: false,
+		};
+
+		createBatchJob.mutate(reqObj, {
+			onSuccess: () => {
+				resetInterval();
+				message.success('Khởi tạo file sản phẩm thành công!');
+			},
+			onError: (err) => {
+				message.error(getErrorMessage(err));
+			},
+		});
+	};
+
+	const actions = [
+		{
+			label: 'Xuất file sản phẩm',
+			// icon: <Pointer size={20} />,
+			onClick: handleCreateExport,
+		},
+		{
+			label: 'Xuất file kiểm kê vật tư',
+			// icon: <Pointer size={20} />,
+			onClick: handleCreateExportInventory,
+		},
+	];
 
 	const handleRowClick = (record: any) => {
 		router.push(`${ERoutes.PRODUCTS}/${record.id}`);
@@ -182,15 +213,10 @@ const ProductList = (props: Props) => {
 				>
 					{'Nhập file sản phẩm'}
 				</Button>
-				<Button
-					type="default"
-					icon={<Download size={18} />}
-					className="flex items-center text-sm h-[34px]"
-					onClick={handleCreateExport}
-					loading={createBatchJob?.isLoading}
-				>
-					{'Xuất file sản phẩm'}
-				</Button>
+				<ActionAbles
+					actions={actions as any}
+					icon={<Download size={20} color="#6B7280" />}
+				/>
 			</Flex>
 			<Table
 				loading={
