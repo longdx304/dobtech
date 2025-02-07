@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 
 import { Flex } from '@/components/Flex';
-import { ProductUnitProvider } from '@/lib/providers/product-unit-provider';
-import OutboundDetail from '@/modules/warehouse/outbound/templates/outbound-detail';
 import FulfillmentDetail from '@/modules/warehouse/stock-checker/templates/fulfillment-detail';
 
 export const metadata: Metadata = {
