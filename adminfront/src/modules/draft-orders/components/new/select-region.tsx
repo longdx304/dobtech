@@ -25,29 +25,37 @@ const SelectRegion = () => {
 	}, [regions]);
 
 	useEffect(() => {
+		// Set default region when component mounts
+		if (regions?.length && !reg) {
+			const defaultRegion = regions.find((r) => r.name === 'Vietnam');
+			if (defaultRegion) {
+				form.setFieldValue('region', defaultRegion.id);
+			}
+		}
+	}, [regions, form, reg]);
+
+	useEffect(() => {
+		// Set default shipping option when region changes
+		if (reg && shippingOptions?.length) {
+			const defaultOption = shippingOptions.find((option) => option.region_id === reg);
+			if (defaultOption && !selectedShippingOption) {
+				form.setFieldValue('shipping_option', defaultOption.id);
+			}
+		}
+
+		// Handle next button state
 		if (!reg || !selectedShippingOption) {
 			disableNext();
 		} else {
 			enableNext();
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [reg, selectedShippingOption]);
+	}, [reg, shippingOptions, selectedShippingOption, form, enableNext, disableNext]);
 
 	const handleRegionChange = (value: string) => {
 		form.setFieldValue('region', value);
+		// Reset shipping option when region changes
+		form.setFieldValue('shipping_option', null);
 	};
-
-	// Get default region id with value is VN
-	const defaultRegionId = regionOptions.find(
-		(option) => option.label === 'Vietnam'
-	)?.value;
-
-	useEffect(() => {
-		if (defaultRegionId) {
-			handleRegionChange(defaultRegionId);
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
 
 	return (
 		<>
@@ -62,7 +70,6 @@ const SelectRegion = () => {
 					<Select
 						placeholder="Chọn quốc gia"
 						onChange={handleRegionChange}
-						defaultValue={defaultRegionId}
 					>
 						{regionOptions.map((option) => {
 							return (

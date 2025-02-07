@@ -19,14 +19,7 @@ import { Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
 import { Divider, message } from 'antd';
 import debounce from 'lodash/debounce';
-import {
-	ArrowLeft,
-	Check,
-	Clock,
-	Hash,
-	MapPin,
-	Search
-} from 'lucide-react';
+import { ArrowLeft, Check, Clock, Hash, MapPin, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import fulfillmentColumns from './columns';
@@ -199,11 +192,12 @@ const OrderInfo = ({
 	order: Order;
 	isProcessing: boolean;
 }) => {
-	const address = `${order.shipping_address?.address_2 ?? ''}, ${
+	
+	const address = `${order.shipping_address?.address_2 ?? ''} ${
 		order.shipping_address?.city ?? ''
-	}, ${order.shipping_address?.address_1 ?? ''}, ${
+	} ${order.shipping_address?.address_1 ?? ''} ${
 		order.shipping_address?.province ?? ''
-	}, ${order.shipping_address?.country_code ?? ''}`;
+	} ${order.shipping_address?.country_code ?? ''}`;
 
 	return (
 		<div>
