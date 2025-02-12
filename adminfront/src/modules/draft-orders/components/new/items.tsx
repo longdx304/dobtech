@@ -175,13 +175,25 @@ const Items = () => {
 			const selectedPrice =
 				prices?.find((p) => p.variantId === variant.id)?.unit_price || 0;
 
+			const variantImages = variant?.product?.metadata?.variant_images
+				? JSON.parse(variant?.product?.metadata?.variant_images as string)
+				: [];
+
+			const variantImage = variantImages.find(
+				(image: any) => image.variant_value === variant.title
+			);
+
+			const thumbnail = variantImage?.image_url
+				? variantImage?.image_url
+				: variant?.product?.thumbnail ?? '/images/product-img.png';
+
 			return {
 				quantity: selectedQuantity,
 				unit_price: selectedPrice,
 				variant_id: variant.id,
 				title: variant?.title as string,
 				product_title: variant?.product?.title,
-				thumbnail: variant?.product?.thumbnail,
+				thumbnail: thumbnail,
 			};
 		});
 
@@ -192,6 +204,7 @@ const Items = () => {
 		(e: ChangeEvent<HTMLInputElement>) => {
 			const { value: inputValue } = e.target;
 			setSearchValue(inputValue);
+			setCurrentPage(1);
 		},
 		500
 	);
@@ -417,6 +430,8 @@ const Items = () => {
 
 		// Wait for pricedVariants to be available before updating form items
 		updateFormItems(variantsBySku, updatedQuantities, updatedPrices);
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [variantsBySku]);
 
 	return (

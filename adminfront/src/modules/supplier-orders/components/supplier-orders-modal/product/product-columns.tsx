@@ -62,20 +62,33 @@ const productColumns = ({
 		className: 'text-xs',
 		fixed: 'left',
 		render: (_: any, record: ProductVariant) => {
+			const variantImages = _?.metadata?.variant_images
+				? JSON.parse(_?.metadata?.variant_images)
+				: [];
+
+			const variantImage = variantImages.find(
+				(image: any) => image.variant_value === record.title
+			);
+
+			const thumbnail = variantImage?.image_url
+				? variantImage?.image_url
+				: _?.thumbnail ?? '/images/product-img.png';
+
 			return (
 				<Flex className="flex items-center gap-3">
 					<Image
-						src={_?.thumbnail ?? '/images/product-img.png'}
+						// src={_?.thumbnail ?? '/images/product-img.png'}
+						src={thumbnail}
 						alt="Product variant Thumbnail"
 						width={30}
 						height={40}
 						className="rounded-md cursor-pointer"
 					/>
 					<Flex vertical className="">
-						<Tooltip title={_.title}>
-							<Text className="text-xs line-clamp-2">{_.title}</Text>
+						<Tooltip title={_.title || ''}>
+							<Text className="text-xs line-clamp-2">{_.title || ''}</Text>
 						</Tooltip>
-						<span className="text-gray-500">{record.title}</span>
+						<span className="text-gray-500">{record.title || ''}</span>
 					</Flex>
 				</Flex>
 			);
