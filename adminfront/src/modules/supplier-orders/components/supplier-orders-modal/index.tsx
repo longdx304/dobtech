@@ -200,9 +200,12 @@ const SupplierOrdersModal: FC<Props> = ({
 				estimated_production_time:
 					supplierDates.productionDate?.toDate() || new Date(),
 				settlement_time: supplierDates.settlementDate?.toDate() || new Date(),
-				shipping_started_date: supplierDates.shippingDate?.toDate() || new Date(),
-				warehouse_entry_date: supplierDates.warehouseEntryDate?.toDate() || new Date(),
-				completed_payment_date: supplierDates.completePaymentDate?.toDate() || new Date(),
+				shipping_started_date:
+					supplierDates.shippingDate?.toDate() || new Date(),
+				warehouse_entry_date:
+					supplierDates.warehouseEntryDate?.toDate() || new Date(),
+				completed_payment_date:
+					supplierDates.completePaymentDate?.toDate() || new Date(),
 				countryCode: region?.countries[0]?.iso_2 || 'vn',
 				region_id: region?.id || '',
 				currency_code: region?.currency_code || 'vnd',
@@ -342,7 +345,6 @@ const SupplierOrdersModal: FC<Props> = ({
 						regions={regions}
 						regionId={regionId}
 						setRegionId={setRegionId}
-						selectedRowProducts={selectedRowsProducts}
 					/>
 				)}
 				{currentStep === 1 && (
