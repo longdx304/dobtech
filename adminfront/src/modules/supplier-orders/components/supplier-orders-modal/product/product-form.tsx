@@ -7,7 +7,7 @@ import { Tabs } from '@/components/Tabs';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ProductModal } from '@/modules/products/components/products-modal';
-import { Product, ProductVariant, Region } from '@medusajs/medusa';
+import { Product, Region } from '@medusajs/medusa';
 import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { Col, Row, TabsProps } from 'antd';
 import _ from 'lodash';
@@ -32,7 +32,6 @@ type ProductFormProps = {
 	regions: Region[] | undefined;
 	regionId: string | null;
 	setRegionId: (regionId: string) => void;
-	selectedRowProducts: PricedVariant[] | undefined;
 };
 const PAGE_SIZE = 10;
 
@@ -47,7 +46,6 @@ const ProductForm: FC<ProductFormProps> = ({
 	regions,
 	regionId,
 	setRegionId,
-	selectedRowProducts,
 }) => {
 	const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
 	const [searchValue, setSearchValue] = useState<string>('');
@@ -55,90 +53,85 @@ const ProductForm: FC<ProductFormProps> = ({
 	const [activeTab, setActiveTab] = useState<string>('list');
 	const { state, onOpen, onClose } = useToggleState(false);
 
-	const handleRowSelectionChange = (
-		selectedRowKeys: React.Key[],
-		selectedRows: PricedVariant[] | ProductVariant[]
-	) => {
-		// Create a map of all known variants for quick lookup
-		const variantMap = new Map([
-			...(variants?.map((v) => [v.id, v]) || []),
-			...(selectedRowProducts?.map((v) => [v.id, v]) || []),
-		] as [string, PricedVariant | ProductVariant][]);
+	// Separate query to fetch selected variants
+	const { variants: selectedVariantsData, count: countVariant } =
+		useAdminVariants(
+			{
+				id: selectedProducts,
+				limit: selectedProducts?.length || 0,
+			},
+			{
+				enabled: !!selectedProducts?.length,
+				keepPreviousData: true,
+			}
+		);
 
-		// Update selected products
-		const newSelectedProducts = selectedRowKeys as string[];
-		setSelectedProducts(newSelectedProducts);
-
-		// Update selected rows products, preserving existing data
-		const newSelectedRowsProducts = newSelectedProducts
-			.map((productId) => {
-				// Try to find the variant in the current page data
-				const currentPageVariant = selectedRows.find(
-					(row) => row?.id === productId
-				);
-				if (currentPageVariant) return currentPageVariant;
-
-				// If not in current page, try to find in our variant map
-				const existingVariant = variantMap.get(productId);
-				if (existingVariant) return existingVariant;
-
-				// If we still can't find it, try to find in variants
-				return variants?.find((variant) => variant.id === productId);
-			})
-			.filter((product): product is PricedVariant => product !== undefined);
-
-		setSelectedRowsProducts(newSelectedRowsProducts);
-
-		// Handle quantities and prices
+	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
+		// Identify deselected products
 		const deselectedProducts = selectedProducts.filter(
 			(productId) => !selectedRowKeys.includes(productId)
 		);
 
-		// Remove quantities and prices for deselected products
+		// Clear quantities and prices for deselected products
 		setItemQuantities((prevQuantities) =>
 			prevQuantities.filter(
 				(item) => !deselectedProducts.includes(item.variantId)
 			)
 		);
+
 		setItemPrices((prevPrices) =>
 			prevPrices.filter((item) => !deselectedProducts.includes(item.variantId))
 		);
 
 		// Add default quantities and prices for newly selected products
-		newSelectedProducts.forEach((productId) => {
-			const hasQuantity = itemQuantities.some(
+		selectedRowKeys.forEach((productId) => {
+			// Check if this product already has a quantity or price set
+			const existingQuantity = itemQuantities.find(
 				(item) => item.variantId === productId
 			);
-			const hasPrice = itemPrices.some((item) => item.variantId === productId);
+			const existingPrice = itemPrices.find(
+				(item) => item.variantId === productId
+			);
 
-			const selectedVariant = newSelectedRowsProducts.find(
+			// Find the selected product variant to get its default price
+			const selectedVariant = variants?.find(
 				(variant) => variant.id === productId
 			);
 
-			if (!hasQuantity) {
-				setItemQuantities((prev) => [
-					...prev,
-					{ variantId: productId, quantity: 1 },
+			if (!existingQuantity) {
+				// Set default quantity to 1 if not already present
+				setItemQuantities((prevQuantities) => [
+					...prevQuantities,
+					{ variantId: productId as string, quantity: 1 },
 				]);
 			}
 
-			if (!hasPrice && selectedVariant?.original_price) {
-				setItemPrices((prev) => [
-					...prev,
+			if (!existingPrice && selectedVariant) {
+				// Set the default price from the variant data if not already present
+				setItemPrices((prevPrices) => [
+					...prevPrices,
 					{
-						variantId: productId,
-						unit_price: selectedVariant.original_price || 0,
+						variantId: productId as string,
+						unit_price: (selectedVariant as any).supplier_price || 0,
 					},
 				]);
 			}
 		});
+
+		// Update selected products
+		setSelectedProducts(selectedRowKeys as string[]);
 	};
+
+	useEffect(() => {
+		if (selectedVariantsData?.length)
+			setSelectedRowsProducts(selectedVariantsData as PricedVariant[]);
+		//eslint-disable-next-line
+	}, [selectedVariantsData]);
 
 	const handleChangeDebounce = _.debounce(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const { value: inputValue } = e.target;
 			setSearchValue(inputValue);
-			setCurrentPage(1);
 		},
 		500
 	);
@@ -147,16 +140,11 @@ const ProductForm: FC<ProductFormProps> = ({
 		setCurrentPage(page);
 	};
 
-	const { variants, count, isLoading } = useAdminVariants(
-		{
-			q: searchValue,
-			limit: PAGE_SIZE,
-			offset: (currentPage - 1) * PAGE_SIZE,
-		},
-		{
-			keepPreviousData: true,
-		}
-	);
+	const { variants, count, isLoading } = useAdminVariants({
+		q: searchValue,
+		limit: PAGE_SIZE,
+		offset: (currentPage - 1) * PAGE_SIZE,
+	});
 
 	const { product_categories } = useAdminProductCategories(
 		{
@@ -317,19 +305,19 @@ const ProductForm: FC<ProductFormProps> = ({
 					<Tabs items={itemTabs} onChange={handleTabChange} />
 				</div>
 				<div className="flex justify-end">{`Đã chọn : ${
-					selectedRowProducts?.length ?? 0
+					countVariant ?? 0
 				} biến thể`}</div>
 				<Table
 					loading={isLoading}
 					rowSelection={{
 						type: 'checkbox',
 						selectedRowKeys: selectedProducts,
-						onChange: handleRowSelectionChange as any,
+						onChange: handleRowSelectionChange,
 						preserveSelectedRowKeys: true,
 					}}
 					columns={columns as any}
 					dataSource={
-						(activeTab === 'list' ? variants : selectedRowProducts) ?? []
+						(activeTab === 'list' ? variants : selectedVariantsData) ?? []
 					}
 					rowKey="id"
 					pagination={
