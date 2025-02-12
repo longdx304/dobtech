@@ -102,8 +102,8 @@ const Items = () => {
 		const priceAmount =
 			variant.calculated_price_type === 'override' ||
 			variant.calculated_price_type === 'sale'
-				? variant.calculated_price
-				: variant.original_price;
+				? variant.calculated_price_incl_tax
+				: variant.original_price_incl_tax;
 
 		return {
 			amount: priceAmount ?? 0,
@@ -258,12 +258,12 @@ const Items = () => {
 			variant.calculated_price_type === 'override' ||
 			variant.calculated_price_type === 'sale'
 		) {
-			return variant.calculated_price ?? 0;
+			return variant.calculated_price_incl_tax ?? 0;
 		}
 
 		// If original_price exists, use it
-		if (variant.original_price) {
-			return variant.original_price;
+		if (variant.original_price_incl_tax) {
+			return variant.original_price_incl_tax;
 		}
 
 		let price = variant?.prices?.find(
@@ -417,6 +417,7 @@ const Items = () => {
 
 		// Wait for pricedVariants to be available before updating form items
 		updateFormItems(variantsBySku, updatedQuantities, updatedPrices);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [variantsBySku]);
 
 	return (

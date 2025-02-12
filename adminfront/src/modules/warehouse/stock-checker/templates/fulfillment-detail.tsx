@@ -171,7 +171,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					<Button
 						disabled={!isProcessing}
 						onClick={onConfirm}
-						loading={updateFulfillment.isLoading}
+						loading={updateFulfillment.isLoading || uploadFile.isLoading}
 						type="primary"
 						className="w-full sm:w-[200px]"
 					>
@@ -192,7 +192,6 @@ const OrderInfo = ({
 	order: Order;
 	isProcessing: boolean;
 }) => {
-	
 	const address = `${order.shipping_address?.address_2 ?? ''} ${
 		order.shipping_address?.city ?? ''
 	} ${order.shipping_address?.address_1 ?? ''} ${
