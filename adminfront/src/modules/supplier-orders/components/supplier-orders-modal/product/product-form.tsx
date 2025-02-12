@@ -7,7 +7,7 @@ import { Tabs } from '@/components/Tabs';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ProductModal } from '@/modules/products/components/products-modal';
-import { Product, Region } from '@medusajs/medusa';
+import { Product, ProductVariant, Region } from '@medusajs/medusa';
 import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { Col, Row, TabsProps } from 'antd';
 import _ from 'lodash';
@@ -57,68 +57,88 @@ const ProductForm: FC<ProductFormProps> = ({
 
 	const handleRowSelectionChange = (
 		selectedRowKeys: React.Key[],
-		selectedRows: any
+		selectedRows: PricedVariant[] | ProductVariant[]
 	) => {
-		// Identify deselected products
+		// Create a map of all known variants for quick lookup
+		const variantMap = new Map([
+			...(variants?.map((v) => [v.id, v]) || []),
+			...(selectedRowProducts?.map((v) => [v.id, v]) || []),
+		] as [string, PricedVariant | ProductVariant][]);
+
+		// Update selected products
+		const newSelectedProducts = selectedRowKeys as string[];
+		setSelectedProducts(newSelectedProducts);
+
+		// Update selected rows products, preserving existing data
+		const newSelectedRowsProducts = newSelectedProducts
+			.map((productId) => {
+				// Try to find the variant in the current page data
+				const currentPageVariant = selectedRows.find(
+					(row) => row?.id === productId
+				);
+				if (currentPageVariant) return currentPageVariant;
+
+				// If not in current page, try to find in our variant map
+				const existingVariant = variantMap.get(productId);
+				if (existingVariant) return existingVariant;
+
+				// If we still can't find it, try to find in variants
+				return variants?.find((variant) => variant.id === productId);
+			})
+			.filter((product): product is PricedVariant => product !== undefined);
+
+		setSelectedRowsProducts(newSelectedRowsProducts);
+
+		// Handle quantities and prices
 		const deselectedProducts = selectedProducts.filter(
 			(productId) => !selectedRowKeys.includes(productId)
 		);
 
-		// Clear quantities and prices for deselected products
+		// Remove quantities and prices for deselected products
 		setItemQuantities((prevQuantities) =>
 			prevQuantities.filter(
 				(item) => !deselectedProducts.includes(item.variantId)
 			)
 		);
-
 		setItemPrices((prevPrices) =>
 			prevPrices.filter((item) => !deselectedProducts.includes(item.variantId))
 		);
 
 		// Add default quantities and prices for newly selected products
-		selectedRowKeys.forEach((productId) => {
-			// Check if this product already has a quantity or price set
-			const existingQuantity = itemQuantities.find(
+		newSelectedProducts.forEach((productId) => {
+			const hasQuantity = itemQuantities.some(
 				(item) => item.variantId === productId
 			);
-			const existingPrice = itemPrices.find(
-				(item) => item.variantId === productId
-			);
+			const hasPrice = itemPrices.some((item) => item.variantId === productId);
 
-			// Find the selected product variant to get its default price
-			const selectedVariant = variants?.find(
+			const selectedVariant = newSelectedRowsProducts.find(
 				(variant) => variant.id === productId
 			);
 
-			if (!existingQuantity) {
-				// Set default quantity to 1 if not already present
-				setItemQuantities((prevQuantities) => [
-					...prevQuantities,
-					{ variantId: productId as string, quantity: 1 },
+			if (!hasQuantity) {
+				setItemQuantities((prev) => [
+					...prev,
+					{ variantId: productId, quantity: 1 },
 				]);
 			}
 
-			if (!existingPrice && selectedVariant) {
-				// Set the default price from the variant data if not already present
-				setItemPrices((prevPrices) => [
-					...prevPrices,
+			if (!hasPrice && selectedVariant?.original_price) {
+				setItemPrices((prev) => [
+					...prev,
 					{
-						variantId: productId as string,
-						unit_price: (selectedVariant as any).supplier_price || 0,
+						variantId: productId,
+						unit_price: selectedVariant.original_price || 0,
 					},
 				]);
 			}
 		});
-
-		// Update selected products
-		setSelectedProducts(selectedRowKeys as string[]);
-		setSelectedRowsProducts(selectedRows as PricedVariant[]);
 	};
 
 	const handleChangeDebounce = _.debounce(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const { value: inputValue } = e.target;
 			setSearchValue(inputValue);
+			setCurrentPage(1);
 		},
 		500
 	);
@@ -127,11 +147,16 @@ const ProductForm: FC<ProductFormProps> = ({
 		setCurrentPage(page);
 	};
 
-	const { variants, count, isLoading } = useAdminVariants({
-		q: searchValue,
-		limit: PAGE_SIZE,
-		offset: (currentPage - 1) * PAGE_SIZE,
-	});
+	const { variants, count, isLoading } = useAdminVariants(
+		{
+			q: searchValue,
+			limit: PAGE_SIZE,
+			offset: (currentPage - 1) * PAGE_SIZE,
+		},
+		{
+			keepPreviousData: true,
+		}
+	);
 
 	const { product_categories } = useAdminProductCategories(
 		{
@@ -299,7 +324,7 @@ const ProductForm: FC<ProductFormProps> = ({
 					rowSelection={{
 						type: 'checkbox',
 						selectedRowKeys: selectedProducts,
-						onChange: handleRowSelectionChange,
+						onChange: handleRowSelectionChange as any,
 						preserveSelectedRowKeys: true,
 					}}
 					columns={columns as any}

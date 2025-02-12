@@ -55,9 +55,7 @@ const EditableQuantity = ({
 
 			const finalInputValue = Math.min(
 				value,
-				!record.allow_backorder
-					? maxInCurrentUnit
-					: Number.MAX_SAFE_INTEGER
+				!record.allow_backorder ? maxInCurrentUnit : Number.MAX_SAFE_INTEGER
 			);
 			setInputValue(finalInputValue);
 
@@ -168,23 +166,37 @@ const productsColumns = ({
 			dataIndex: 'product',
 			className: 'text-xs',
 			fixed: 'left',
-			render: (_: any, record: ProductVariant) => (
-				<Flex className="flex items-center gap-3">
-					<Image
-						src={_?.thumbnail ?? '/images/product-img.png'}
-						alt="Product variant Thumbnail"
-						width={30}
-						height={40}
-						className="rounded-md cursor-pointer"
-					/>
-					<Flex vertical className="">
-						<Tooltip title={_?.title ?? ''}>
-							<Text className="text-xs line-clamp-2">{_?.title ?? ''}</Text>
-						</Tooltip>
-						<span className="text-gray-500">{record.title}</span>
+			render: (_: any, record: ProductVariant) => {
+				const variantImages = _?.metadata?.variant_images
+					? JSON.parse(_?.metadata?.variant_images)
+					: [];
+
+				const variantImage = variantImages.find(
+					(image: any) => image.variant_value === record.title
+				);
+
+				const thumbnail = variantImage?.image_url
+					? variantImage?.image_url
+					: _?.thumbnail ?? '/images/product-img.png';
+
+				return (
+					<Flex className="flex items-center gap-3">
+						<Image
+							src={thumbnail}
+							alt="Product variant Thumbnail"
+							width={30}
+							height={40}
+							className="rounded-md cursor-pointer"
+						/>
+						<Flex vertical className="">
+							<Tooltip title={_?.title ?? ''}>
+								<Text className="text-xs line-clamp-2">{_?.title ?? ''}</Text>
+							</Tooltip>
+							<span className="text-gray-500">{record.title}</span>
+						</Flex>
 					</Flex>
-				</Flex>
-			),
+				);
+			},
 		},
 		{
 			title: 'Số lượng',
