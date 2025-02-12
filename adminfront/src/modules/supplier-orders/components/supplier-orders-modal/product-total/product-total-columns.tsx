@@ -40,10 +40,21 @@ const productTotalColumns = ({
 		className: 'text-xs',
 		fixed: 'left',
 		render: (_: any, record: ProductVariant) => {
+			const variantImages = _?.metadata?.variant_images
+				? JSON.parse(_?.metadata?.variant_images)
+				: [];
+
+			const variantImage = variantImages.find(
+				(image: any) => image.variant_value === record.title
+			);
+
+			const thumbnail = variantImage?.image_url
+				? variantImage?.image_url
+				: _?.thumbnail ?? '/images/product-img.png';
 			return (
 				<Flex className="flex items-center gap-3">
 					<Image
-						src={_?.thumbnail ?? '/images/product-img.png'}
+						src={thumbnail}
 						alt="Product variant Thumbnail"
 						width={30}
 						height={40}

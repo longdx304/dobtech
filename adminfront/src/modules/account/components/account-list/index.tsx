@@ -100,6 +100,7 @@ const AccountList = ({}: Props) => {
 
 		// Update search query
 		setSearchValue(inputValue);
+		setCurrentPage(1);
 	}, 500);
 
 	return (

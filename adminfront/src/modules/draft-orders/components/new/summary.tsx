@@ -13,7 +13,6 @@ import { useAdminShippingOptions } from 'medusa-react';
 import Image from 'next/image';
 import { useContext, useMemo } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
-import { formatNumber } from '@/lib/utils';
 
 type Props = {
 	setIsSendEmail: React.Dispatch<React.SetStateAction<boolean>>;
@@ -59,27 +58,29 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 			title: 'Chi tiết',
 			dataIndex: 'details',
 			key: 'details',
-			render: (_: any, record: any) => (
-				<div className="flex min-w-[240px] py-2">
-					<div className="h-[40px] w-[30px]">
-						{record.thumbnail ? (
-							<Image
-								className="rounded object-cover"
-								src={record.thumbnail}
-								alt={record.product_title}
-								width={30}
-								height={40}
-							/>
-						) : (
-							<div className="h-full w-full bg-gray-200 rounded" />
-						)}
+			render: (_: any, record: any) => {
+				return (
+					<div className="flex min-w-[240px] py-2">
+						<div className="h-[40px] w-[30px]">
+							{record.thumbnail ? (
+								<Image
+									className="rounded object-cover"
+									src={record.thumbnail}
+									alt={record.product_title}
+									width={30}
+									height={40}
+								/>
+							) : (
+								<div className="h-full w-full bg-gray-200 rounded" />
+							)}
+						</div>
+						<div className="ml-4 flex flex-col">
+							<span className="font-medium">{record.product_title}</span>
+							<span className="text-gray-500">{record.title}</span>
+						</div>
 					</div>
-					<div className="ml-4 flex flex-col">
-						<span className="font-medium">{record.product_title}</span>
-						<span className="text-gray-500">{record.title}</span>
-					</div>
-				</div>
-			),
+				);
+			},
 		},
 		{
 			title: 'Số lượng',
