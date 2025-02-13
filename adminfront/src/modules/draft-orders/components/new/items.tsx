@@ -75,7 +75,7 @@ const Items = () => {
 	);
 
 	// Separate query to fetch selected variants
-	const { variants: selectedVariantsData } = useAdminVariants(
+	const { variants: selectedVariantsData, count: selectedVariantsCount } = useAdminVariants(
 		items?.length > 0
 			? {
 					id: items.map((item) => item.variant_id),
@@ -493,7 +493,7 @@ const Items = () => {
 				<Tabs items={itemTabs} onChange={handleTabChange} />
 			</div>
 			<div className="flex justify-end">{`Đã chọn : ${
-				selectedVariants?.length ?? 0
+				selectedVariantsCount ?? 0
 			} biến thể`}</div>
 			<Table
 				rowSelection={{

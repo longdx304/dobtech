@@ -210,11 +210,11 @@ const NewOrderModal: FC<Props> = ({
 				await addCustomerAddress();
 			}
 
-			const address = `${values.shipping_address.address_1 ?? ''}, ${
+			const address = `${values.shipping_address.address_1 ?? ''} ${
 				values.shipping_address.address_2 ?? ''
-			}, ${values.shipping_address.province ?? ''}, ${
+			} ${values.shipping_address.province ?? ''} ${
 				values.shipping_address.city ?? ''
-			}, ${values.shipping_address.country_code?.label ?? ''}`;
+			}`;
 
 			const urlPdf = await generateFilePdf(
 				{
