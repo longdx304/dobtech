@@ -119,6 +119,13 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 		return null;
 	}
 
+	// Sort items based on the variant product id
+	const sortedItems = [...order.lineItems].sort((a, b) => {
+		const productIdA = a.variantId || '';
+		const productIdB = b.variantId || '';
+		return productIdA.localeCompare(productIdB);
+	});
+
 	return (
 		<Document>
 			<Page size="A4" style={styles.page}>
@@ -185,7 +192,7 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 						<Text style={styles.tableCell}>Total</Text>
 					</View>
 
-					{order.lineItems.map((item, index) => {
+					{sortedItems.map((item, index) => {
 						return (
 							<View key={index} style={styles.tableRow}>
 								<Text style={styles.tableCell}>{index + 1}</Text>
