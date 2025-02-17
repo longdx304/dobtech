@@ -155,6 +155,7 @@ export const StepModal: React.FC<StepModalProps> = ({
 			open={open}
 			onCancel={handleClose}
 			title={renderTitle()}
+			maskClosable={false}
 			footer={[
 				<Button
 					key="back"
