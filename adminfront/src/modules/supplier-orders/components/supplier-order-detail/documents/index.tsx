@@ -10,6 +10,7 @@ import {
 	useAdminSupplierOrderDeleteDocument,
 	useCreateDocument,
 } from '@/lib/hooks/api/supplier-order';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import {
@@ -19,7 +20,8 @@ import {
 } from '@/types/supplier';
 import { PDFViewer } from '@react-pdf/renderer';
 import { Modal as AntdModal, message } from 'antd';
-import { Paperclip, Plus, Trash2 } from 'lucide-react';
+import { Paperclip, Trash2 } from 'lucide-react';
+import { useAdminDeleteFile } from 'medusa-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { pdfOrderRes } from '../../supplier-orders-modal';
@@ -27,8 +29,6 @@ import OrderPDF, {
 	generatePdfBlob,
 } from '../../supplier-orders-modal/order-pdf';
 import UploadModal from './modal-upload';
-import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
-import { useAdminDeleteFile } from 'medusa-react';
 
 type Props = {
 	order: SupplierOrder | undefined;
@@ -86,12 +86,12 @@ const Documents = ({ order, isLoading }: Props) => {
 		{
 			label: 'Thêm tài liệu',
 			onClick: onOpen,
-			disabled: isOrderCanceled
+			disabled: isOrderCanceled,
 		},
 		{
 			label: 'Tạo đơn đặt hàng PDF',
 			onClick: onOpenRefreshPdf,
-			disabled: isOrderCanceled
+			disabled: isOrderCanceled,
 		},
 	];
 
@@ -100,7 +100,7 @@ const Documents = ({ order, isLoading }: Props) => {
 			variantId: item.variant_id,
 			quantity: item.quantity,
 			unit_price: item.unit_price,
-			title: item.title + ' - ' + item.variant.title,
+			title: item?.title + ' - ' + item.variant?.title,
 		};
 	}) as LineItemReq[];
 
