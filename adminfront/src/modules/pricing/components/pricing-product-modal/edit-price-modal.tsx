@@ -3,11 +3,11 @@ import { Modal } from '@/components/Modal';
 import { getErrorMessage } from '@/lib/utils';
 import { PricePayload } from '@/types/price';
 import { MoneyAmount, Product } from '@medusajs/medusa';
-import { message, Modal as AntdModal } from 'antd';
-import { CircleAlert } from 'lucide-react';
-import { useAdminUpdatePriceList } from 'medusa-react';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { Modal as AntdModal, message } from 'antd';
 import _ from 'lodash';
+import { CircleAlert } from 'lucide-react';
+import { useAdminRegions, useAdminUpdatePriceList } from 'medusa-react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import PriceForm from '../pricing-modal/price-form';
 
 type Props = {
@@ -28,6 +28,9 @@ const EditPriceModal: FC<Props> = ({
 	const [productForm, setProductForm] = useState<string[] | null>(null);
 	const [productsData, setProductsData] = useState<any>(null);
 
+	const { regions: storeRegions } = useAdminRegions({
+		limit: 1000,
+	});
 	const { mutateAsync, isLoading: isSubmitting } =
 		useAdminUpdatePriceList(priceListId);
 
@@ -48,9 +51,14 @@ const EditPriceModal: FC<Props> = ({
 						);
 						priceKeys.forEach((priceKey) => {
 							if (variant.pricesFormatEdit[priceKey]) {
+								const taxRegion = storeRegions?.find(
+									(region) => region.currency_code === priceKey
+								);
+								const taxRate: number = taxRegion ? taxRegion.tax_rate : 0;
 								pricesPayload.push({
 									currency_code: priceKey,
-									amount: variant.pricesFormatEdit[priceKey],
+									amount:
+										variant.pricesFormatEdit[priceKey] / (1 + taxRate / 100),
 									variant_id: variant.id,
 									id: variant.pricesFormatEdit[`${priceKey}_id`],
 								});

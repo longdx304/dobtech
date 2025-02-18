@@ -19,7 +19,7 @@ export interface AdminPostWarehouseReq {
 export interface AdminPostManageWarehouseVariantReq {
 	location: string;
 	variant_id: string;
-	warehouse_id: string;
+	warehouse_id?: string;
 	quantity: number;
 	unit_id: string;
 	type: string;

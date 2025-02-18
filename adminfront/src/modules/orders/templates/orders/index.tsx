@@ -3,6 +3,7 @@ import { FloatButton } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
+import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import NewDraftOrderFormProvider from '@/modules/draft-orders/hooks/use-new-draft-form';
 import { ERoutes } from '@/types/routes';
@@ -14,8 +15,6 @@ import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import NewOrderModal from '../../components/orders/new-order';
 import orderColumns from './order-column';
-import { Card } from '@/components/Card';
-import { Title } from '@/components/Typography';
 
 type Props = {};
 

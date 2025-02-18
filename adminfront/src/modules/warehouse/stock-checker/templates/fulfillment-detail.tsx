@@ -205,7 +205,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					<Button
 						disabled={!isProcessing}
 						onClick={onConfirm}
-						loading={updateFulfillment.isLoading}
+						loading={updateFulfillment.isLoading || uploadFile.isLoading}
 						type="primary"
 						className="w-full sm:w-[200px]"
 					>

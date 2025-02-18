@@ -42,8 +42,8 @@ const CaptureModal = ({
 
 	const paidAble = useMemo(() => {
 		return (
-			payment.amount -
-			payment.amount_refunded -
+			Math.round(payment.amount) -
+			Math.round(payment.amount_refunded) -
 			((payment?.data?.paid_total as number) ?? 0)
 		);
 	}, [payment]);
@@ -114,17 +114,6 @@ const CaptureModal = ({
 								required: true,
 								message: 'Vui lòng nhập số tiền thu',
 							},
-							// () => ({
-							// 	validator(_, value) {
-							// 		if (!value) {
-							// 			return Promise.reject();
-							// 		}
-							// 		if (value > refundable) {
-							// 			return Promise.reject("Số tiền hoàn trả không thể lớn hơn số tiền cần thành toán");
-							// 		}
-							// 		return Promise.resolve();
-							// 	},
-							// }),
 						]}
 					>
 						<InputNumber

@@ -90,7 +90,13 @@ const EditPricesTable: FC<Props> = ({
 		variants.forEach((variant: any) => {
 			variant.pricesFormat = variant.prices.reduce(
 				(acc: Record<string, number>, price: any) => {
-					acc[price.currency_code] = price.amount;
+					const taxRegion = storeRegions?.find(
+						(region) => region.currency_code === price.currency_code
+					);
+					const taxRate: number = taxRegion ? taxRegion.tax_rate : 0;
+					acc[price.currency_code] = Math.round(
+						price.amount * (1 + taxRate / 100)
+					);
 					return acc;
 				},
 				{}

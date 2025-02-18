@@ -242,6 +242,8 @@ const SupplierOrdersModal: FC<Props> = ({
 					itemPrices.some((item) => item.variantId === productId)
 			)
 		) {
+			console.log('selectedProducts:', selectedProducts);
+			console.log('itemQuantities:', itemQuantities, itemPrices);
 			message.error('Phải nhập số lượng và giá cho tất cả sản phẩm đã chọn');
 			return;
 		}
