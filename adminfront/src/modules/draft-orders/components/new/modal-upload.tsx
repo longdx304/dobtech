@@ -92,8 +92,11 @@ const UploadModal = ({ state, handleCancel, setDataFromExcel }: Props) => {
 						sku: row[1],
 						title: row[3],
 						quantity: row[7] * (row[6] === 'Giỏ' ? 24 : 1),
-						price: Math.round((row[8] * 1.08) / (row[6] === 'Giỏ' ? 24 : 1)),
+						price: Math.round(
+							(row[11] + row[15]) / (row[7] * (row[6] === 'Giỏ' ? 24 : 1))
+						),
 					}));
+
 				setDataFromExcel(productData);
 			};
 
