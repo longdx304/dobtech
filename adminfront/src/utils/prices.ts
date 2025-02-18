@@ -4,7 +4,7 @@ import { currencies } from './currencies';
 
 export function normalizeAmount(currency: string, amount: number): number {
 	const divisor = getDecimalDigits(currency);
-	return Math.floor(amount) / divisor;
+	return amount / divisor;
 }
 
 export function displayAmount(currency: string, amount: number) {
@@ -138,10 +138,11 @@ export function formatAmountWithSymbol({
 	digits = digits ?? currencies[currency?.toUpperCase()]?.decimal_digits;
 
 	const normalizedAmount = normalizeAmount(currency, amount);
+	console.log("normalizedAmount:", normalizedAmount)
 
 	const taxRate =
 		tax instanceof Array ? tax.reduce((acc, curr) => acc + curr.rate, 0) : tax;
-
+console.log('normalizedAmount * (1 + taxRate / 100)', normalizedAmount * (1 + taxRate / 100))
 	return (
 		currency &&
 		new Intl.NumberFormat(locale, {

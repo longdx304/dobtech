@@ -39,7 +39,9 @@ const OrderEditLine = ({
 		onOpen: openReplaceProduct,
 		onClose: closeReplaceProduct,
 	} = useToggleState(false);
-	const [unitPrice, setUnitPrice] = useState<number>(item.original_total!);
+	const [unitPrice, setUnitPrice] = useState<number>(
+		Math.round(item.original_total!) / item.quantity
+	);
 	const [quantity, setQuantity] = useState(item.quantity);
 	const [draftQuantity, setDraftQuantity] = useState(item.quantity);
 	const [isLoading, setIsLoading] = useState(false);
@@ -175,7 +177,7 @@ const OrderEditLine = ({
 			icon: <Trash2 size={20} />,
 		},
 	].filter(Boolean);
-	console.log('item', item);
+
 	return (
 		<div className="hover:bg-gray-50 rounded-md mx-[-5px] mb-1 flex min-h-[64px] justify-between px-[5px] cursor-pointer">
 			<div className="flex justify-center items-center space-x-4">
@@ -276,7 +278,7 @@ const OrderEditLine = ({
 									})}
 								>
 									{formatAmountWithSymbol({
-										amount: Math.round(item.unit_price),
+										amount: item.unit_price,
 										currency: currencyCode,
 										tax: item.includes_tax ? 0 : item.tax_lines,
 									})}
@@ -294,7 +296,7 @@ const OrderEditLine = ({
 								>
 									{' = ' +
 										formatAmountWithSymbol({
-											amount: Math.round(item.unit_price) * item.quantity,
+											amount: item.unit_price * item.quantity,
 											currency: currencyCode,
 											tax: item.includes_tax ? 0 : item.tax_lines,
 										})}
