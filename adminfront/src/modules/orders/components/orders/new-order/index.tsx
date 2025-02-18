@@ -173,7 +173,7 @@ const NewOrderModal: FC<Props> = ({
 	const generateTransferOrderData = (tax: number) => {
 		console.log('tax:', tax);
 		const values = form.getFieldsValue(true);
-
+		const taxRate = region?.tax_rate || 0;
 		// for create draft order by admin
 		const transformedData = {
 			email: values.email,
@@ -182,9 +182,9 @@ const NewOrderModal: FC<Props> = ({
 				...(i.variant_id
 					? {
 							variant_id: i.variant_id,
-							unit_price: i.unit_price / (1 + tax / 100),
+							unit_price: i.unit_price / (1 + taxRate / 100),
 					  }
-					: { title: i.title, unit_price: i.unit_price / (1 + tax / 100) }),
+					: { title: i.title, unit_price: i.unit_price / (1 + taxRate / 100) }),
 			})),
 			region_id: values.region,
 			shipping_methods: [{ option_id: values.shipping_option }],

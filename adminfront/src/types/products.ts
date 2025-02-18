@@ -105,6 +105,7 @@ export type VariantFormType = {
 	hs_code?: string;
 	origin_country?: string;
 	supplier_price?: number;
+	cogs_price?: number;
 	prices?: {
 		amount?: number;
 		currency_code?: string;

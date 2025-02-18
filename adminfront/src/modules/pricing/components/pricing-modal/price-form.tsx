@@ -11,6 +11,7 @@ import { Button } from '@/components/Button';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { Product } from '@medusajs/medusa';
 import PricesModal from './edit-price-modal';
+import usePrices from '@/modules/products/components/manage-product/hooks/usePrices';
 
 type Props = {
 	productForm: string[] | null;
@@ -29,6 +30,7 @@ const PriceForm: FC<Props> = ({
 	const { state, onOpen, onClose } = useToggleState(false);
 	const [product, setProduct] = useState<any>(null);
 	const [discountPercent, setDiscountPercent] = useState<number>(0);
+	const { storeRegions } = usePrices(product!);
 
 	const { products, isLoading, isError } = useAdminProducts(
 		{
@@ -54,7 +56,11 @@ const PriceForm: FC<Props> = ({
 					variant.pricesFormat = variant.prices.reduce(
 						(acc: Record<string, number>, price: any) => {
 							if (!price?.price_list_id) {
-								acc[price.currency_code] = price.amount;
+								const taxRegion = storeRegions?.find(
+									(region) => region.currency_code === price.currency_code
+								);
+								const taxRate: number = taxRegion ? taxRegion.tax_rate : 0;
+								acc[price.currency_code] = price.amount * (1 + taxRate / 100);
 								return acc;
 							}
 							return acc;
@@ -68,7 +74,11 @@ const PriceForm: FC<Props> = ({
 								(priceListId && price?.price_list_id === priceListId) ||
 								(!priceListId && !price?.price_list_id)
 							) {
-								const amount = price.amount;
+								const taxRegion = storeRegions?.find(
+									(region) => region.currency_code === price.currency_code
+								);
+								const taxRate: number = taxRegion ? taxRegion.tax_rate : 0;
+								const amount = price.amount * (1 + taxRate / 100);
 								const discountValue = (amount * discountPercent) / 100 || 0;
 								const priceValue = amount ? amount - discountValue : 0;
 								acc[price.currency_code] = Math.floor(priceValue);

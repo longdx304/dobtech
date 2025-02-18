@@ -39,7 +39,7 @@ const OrderEditLine = ({
 		onOpen: openReplaceProduct,
 		onClose: closeReplaceProduct,
 	} = useToggleState(false);
-	const [unitPrice, setUnitPrice] = useState<number>(item.unit_price);
+	const [unitPrice, setUnitPrice] = useState<number>(item.original_total!);
 	const [quantity, setQuantity] = useState(item.quantity);
 	const [draftQuantity, setDraftQuantity] = useState(item.quantity);
 	const [isLoading, setIsLoading] = useState(false);
@@ -137,11 +137,15 @@ const OrderEditLine = ({
 			return;
 		}
 
+		const taxRate = item.includes_tax
+			? 0
+			: item.tax_lines.find((item) => item.code === 'default')?.rate ?? 0;
+
 		setIsLoading(true);
 		try {
 			await updateItem({
 				quantity: item.quantity,
-				unit_price: unitPrice,
+				unit_price: unitPrice / (1 + taxRate / 100),
 			} as any);
 			setUnitPrice(unitPrice);
 			message.success('Cập nhật giá tiền thành công');
@@ -171,7 +175,7 @@ const OrderEditLine = ({
 			icon: <Trash2 size={20} />,
 		},
 	].filter(Boolean);
-
+	console.log('item', item);
 	return (
 		<div className="hover:bg-gray-50 rounded-md mx-[-5px] mb-1 flex min-h-[64px] justify-between px-[5px] cursor-pointer">
 			<div className="flex justify-center items-center space-x-4">
@@ -254,7 +258,7 @@ const OrderEditLine = ({
 													'pointer-events-none': isLoading,
 												}
 											)}
-											value={unitPrice}
+											value={Math.round(unitPrice)}
 											onChange={(value) => setUnitPrice(Number(value))}
 											disabled={isLocked || isLoading}
 										/>
@@ -272,7 +276,7 @@ const OrderEditLine = ({
 									})}
 								>
 									{formatAmountWithSymbol({
-										amount: item.unit_price,
+										amount: Math.round(item.unit_price),
 										currency: currencyCode,
 										tax: item.includes_tax ? 0 : item.tax_lines,
 									})}
@@ -290,7 +294,7 @@ const OrderEditLine = ({
 								>
 									{' = ' +
 										formatAmountWithSymbol({
-											amount: item.unit_price * item.quantity,
+											amount: Math.round(item.unit_price) * item.quantity,
 											currency: currencyCode,
 											tax: item.includes_tax ? 0 : item.tax_lines,
 										})}

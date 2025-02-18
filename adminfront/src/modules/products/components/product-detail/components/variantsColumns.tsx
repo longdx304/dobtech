@@ -1,9 +1,9 @@
 import { Copy, Pencil, Trash2 } from 'lucide-react';
 
 import { ActionAbles } from '@/components/Dropdown';
-import { ProductVariant } from '@medusajs/medusa';
 import { MenuProps } from 'antd';
 import { formatAmountWithSymbol } from '@/utils/prices';
+import { ProductVariant } from '@/types/products';
 
 interface Props {
 	handleDeleteVariant: (variantId: ProductVariant['id']) => void;

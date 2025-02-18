@@ -3,7 +3,7 @@ import { FC, useMemo, useState } from 'react';
 import { Row, Col, Empty, Modal, message, MenuProps } from 'antd';
 import { Plus, CircleDollarSign, Settings, CircleAlert } from 'lucide-react';
 import { useAdminDeleteVariant } from 'medusa-react';
-import { ProductVariant, Product } from '@medusajs/medusa';
+import { Product } from '@medusajs/medusa';
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -17,6 +17,7 @@ import { Table } from '@/components/Table';
 import PricesModal from './edit-modals/prices-modal';
 import OptionModal from './edit-modals/OptionModal';
 import AddVariantModal from './edit-modals/variant-form/AddVariantModal';
+import { ProductVariant } from '@/types/products';
 
 type Props = {
 	product: Product;

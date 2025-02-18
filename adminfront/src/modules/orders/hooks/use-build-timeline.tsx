@@ -253,7 +253,7 @@ export const useBuildTimeline = (orderId: string) => {
 					type: 'edit-created',
 					edit: edit,
 					currency_code: order.currency_code,
-					taxRate: order.tax_rate ?? 0,
+					taxRate: order.region.tax_rate ?? 0,
 				} as OrderEditEvent);
 
 				if (edit.requested_at) {

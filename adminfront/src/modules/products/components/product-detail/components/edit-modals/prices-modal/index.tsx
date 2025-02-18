@@ -1,16 +1,16 @@
+import { MoneyAmount, Product } from '@medusajs/medusa';
 import { message } from 'antd';
-import { useRef, useState } from 'react';
-import { MoneyAmount, Product, Region } from '@medusajs/medusa';
 import _ from 'lodash';
-import { useAdminRegions, useAdminUpdateVariant } from 'medusa-react';
+import { useAdminUpdateVariant } from 'medusa-react';
+import { useRef, useState } from 'react';
 
 import { Flex } from '@/components/Flex';
 import { Modal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
 import usePrices from '@/modules/products/components/manage-product/hooks/usePrices';
+import { persistedPrice } from '@/utils/prices';
 import EditPricesActions from './EditPricesAction';
 import EditPricesTable from './EditPricesTable';
-import { persistedPrice } from '@/utils/prices';
 
 type Props = {
 	product?: Product;
@@ -49,20 +49,29 @@ const PricesModal = ({ product, state, handleOk, handleCancel }: Props) => {
 					variant?.prices?.find(
 						(item: any) => item.currency_code === priceKey
 					) || {};
+
+				const taxRegion = storeRegions?.find(
+					(region) => region.currency_code === priceKey
+				);
+				const taxRate: number = taxRegion ? taxRegion.tax_rate : 0;
+
+				const amount =
+					persistedPrice(priceKey, variant.pricesFormat[priceKey]) /
+					(1 + taxRate / 100);
 				// Check if price is not empty
 				if (!_.isEmpty(findPrice)) {
 					// Check if price is different from current price
 					if (variant.pricesFormat[priceKey] !== findPrice.amount) {
 						pricesPayload.push({
 							...findPrice,
-							amount: persistedPrice(priceKey, variant.pricesFormat[priceKey]),
+							amount,
 						});
 					}
 				} else {
 					// If price is empty
 					pricesPayload.push({
 						currency_code: priceKey,
-						amount: persistedPrice(priceKey, variant.pricesFormat[priceKey]),
+						amount,
 					});
 				}
 			});

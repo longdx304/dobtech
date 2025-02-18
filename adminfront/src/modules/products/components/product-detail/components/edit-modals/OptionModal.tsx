@@ -182,13 +182,12 @@ const OptionForm: FC<OptionFormProps> = ({ form }) => {
 								</Col>
 								<Col flex="40px">
 									{fields.length > 0 ? (
-										<div className="h-full">
-											<Button
-												type="text"
-												danger
-												icon={<Trash2 size={18} className="stroke-2" />}
+										<div className="h-full flex items-center justify-center">
+											<Trash2
+												size={18}
+												className="stroke-2"
+												color="#FF4D4F"
 												onClick={() => remove(field.name)}
-												className="h-[46px]"
 											/>
 										</div>
 									) : null}

@@ -8,6 +8,7 @@ import { ActionAbles } from '@/components/Dropdown';
 import { Upload } from '@/components/Upload';
 import { FormImage } from '@/types/common';
 import { Text } from '../Typography';
+import { Image, ImageGroup } from '../Image';
 
 interface Props {
 	files: FormImage[];
@@ -75,11 +76,11 @@ const UploadTemplate: FC<Props> = ({
 						>
 							Upload
 						</Text>
-						<div className="gap-y-2xsmall flex flex-col">
+						<ImageGroup className="gap-y-2xsmall flex flex-col">
 							{files.map((file: FormImage, index: number) => {
 								return (
 									// eslint-disable-next-line jsx-a11y/alt-text
-									<Image
+									<ImageWrapper
 										key={index}
 										image={file}
 										index={index}
@@ -88,7 +89,7 @@ const UploadTemplate: FC<Props> = ({
 									/>
 								);
 							})}
-						</div>
+						</ImageGroup>
 					</div>
 				)}
 			</div>
@@ -105,7 +106,7 @@ type ThumbnailProps = {
 	hiddenUpload?: boolean;
 };
 
-const Image = ({
+const ImageWrapper = ({
 	image,
 	index,
 	remove,
@@ -131,9 +132,10 @@ const Image = ({
 	return (
 		<div className="px-2 py-2 cursor-pointer hover:bg-gray-200 rounded-md group flex items-center justify-between">
 			<div className="gap-x-6 flex items-center">
-				<div className="flex h-16 w-16 items-center justify-center">
-					<img
+				<div className="flex items-center justify-center">
+					<Image
 						src={image.url}
+						height={64}
 						alt={image.name || 'Uploaded image'}
 						className="rounded-[10px] max-h-[64px] max-w-[64px]"
 					/>
