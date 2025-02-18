@@ -1,11 +1,11 @@
 import { Flex } from '@/components/Flex';
-import { InputNumber, Popover, Radio, RadioChangeEvent, Space } from 'antd';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { ProductVariant } from '@medusajs/medusa';
+import { InputNumber, Popover, Radio, RadioChangeEvent, Space } from 'antd';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
 	currency: string | undefined;
@@ -42,8 +42,17 @@ const EditableQuantity = ({
 	const [selectedUnit, setSelectedUnit] = useState<Unit>(Unit.Đôi);
 	const [inputValue, setInputValue] = useState<number>(quantity || 1);
 
+	// Convert quantity to appropriate unit when unit changes
 	const handleUnitChange = (e: RadioChangeEvent) => {
-		setSelectedUnit(e.target.value as Unit);
+		const newUnit = e.target.value as Unit;
+		setSelectedUnit(newUnit);
+
+		// Convert current inputValue to the new unit
+		if (newUnit === Unit.Giỏ && selectedUnit === Unit.Đôi) {
+			setInputValue(Math.floor(inputValue / 24));
+		} else if (newUnit === Unit.Đôi && selectedUnit === Unit.Giỏ) {
+			setInputValue(inputValue * 24);
+		}
 	};
 
 	const handleValueChange = (value: number | null) => {
@@ -66,6 +75,14 @@ const EditableQuantity = ({
 		}
 	};
 
+	// Update inputValue when quantity prop changes
+	useEffect(() => {
+		const newValue = quantity || 1;
+		setInputValue(
+			selectedUnit === Unit.Giỏ ? Math.floor(newValue / 24) : newValue
+		);
+	}, [quantity, selectedUnit]);
+
 	const popoverContent = (
 		<Space direction="vertical" className="w-full">
 			<Radio.Group value={selectedUnit} onChange={handleUnitChange}>
@@ -77,12 +94,11 @@ const EditableQuantity = ({
 			<InputNumber
 				autoFocus
 				min={1}
-				// max={selectedUnit === Unit.Đôi
-				// 	? (record.inventory_quantity)
-				// 	: Math.floor((record.inventory_quantity || 1) / 24)}
 				max={
 					!record.allow_backorder
-						? record.inventory_quantity
+						? selectedUnit === Unit.Đôi
+							? record.inventory_quantity
+							: Math.floor(record.inventory_quantity / 24)
 						: Number.MAX_SAFE_INTEGER
 				}
 				value={inputValue}
@@ -192,7 +208,7 @@ const productsColumns = ({
 							<Tooltip title={_?.title ?? ''}>
 								<Text className="text-xs line-clamp-2">{_?.title ?? ''}</Text>
 							</Tooltip>
-							<span className="text-gray-500">{record.title}</span>
+							<span className="text-gray-500">{record?.title ?? ''}</span>
 						</Flex>
 					</Flex>
 				);
