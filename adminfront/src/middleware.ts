@@ -28,6 +28,7 @@ export async function middleware(request: NextRequest) {
 		const res = NextResponse.next();
 		// Get pathname of current routes
 		const pathname = request.nextUrl.pathname;
+
 		const isPublicRoute = publicRoutes.includes(pathname);
 
 		// Decrypt the session from the cookie
@@ -37,12 +38,6 @@ export async function middleware(request: NextRequest) {
 
 		// If route is public, program executing
 		if (isPublicRoute || pathname === ERoutes.LOGIN) {
-			if (!isEmpty(data)) {
-				return NextResponse.redirect(
-					new URL(ERoutes.DASHBOARD, request.url),
-					307
-				);
-			}
 			return res;
 		}
 
@@ -63,7 +58,10 @@ export async function middleware(request: NextRequest) {
 
 		// Routes mode isn't exists program executing
 		if (!routesMode || routesMode?.length === 0) {
-			return res;
+			return NextResponse.redirect(
+				new URL(ERoutes.DASHBOARD, request.url),
+				307
+			);;
 		}
 
 		// Check current user has permission into routes
