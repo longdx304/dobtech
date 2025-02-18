@@ -121,7 +121,7 @@ const Payment = ({ order, isLoading, refetch }: Props) => {
 					<div key={payment.id} className="flex flex-col">
 						<DisplayTotal
 							currency={order.currency_code}
-							totalAmount={payment.amount}
+							totalAmount={Math.round(payment.amount)}
 							totalTitle={payment.id}
 							subtitle={`${dayjs(payment.created_at).format(
 								'hh:mm DD MMM YYYY'
@@ -141,7 +141,7 @@ const Payment = ({ order, isLoading, refetch }: Props) => {
 									<div className="font-normal text-gray-900 mr-3">
 										-
 										{formatAmountWithSymbol({
-											amount: payment.amount_refunded as number,
+											amount: Math.round(payment.amount_refunded) as number,
 											currency: order.currency_code,
 										})}
 									</div>
@@ -161,7 +161,9 @@ const Payment = ({ order, isLoading, refetch }: Props) => {
 									<div className="flex">
 										<div className="font-semibold text-gray-900 mr-3">
 											{formatAmountWithSymbol({
-												amount: (payment?.data?.paid_total as number) ?? 0,
+												amount: payment?.data?.paid_total
+													? Math.round(payment!.data!.paid_total as number)
+													: 0,
 												currency: order.currency_code,
 											})}
 										</div>
@@ -178,8 +180,10 @@ const Payment = ({ order, isLoading, refetch }: Props) => {
 										<div className="font-semibold text-gray-900 mr-3">
 											{formatAmountWithSymbol({
 												amount:
-													(payment?.amount as number) -
-													((payment?.data?.paid_total as number) ?? 0),
+													Math.round(payment?.amount) -
+													(payment?.data?.paid_total
+														? Math.round(payment!.data!.paid_total as number)
+														: 0),
 												currency: order.currency_code,
 											})}
 										</div>
@@ -200,7 +204,9 @@ const Payment = ({ order, isLoading, refetch }: Props) => {
 						<div className="flex">
 							<div className="font-semibold text-gray-900 mr-3">
 								{formatAmountWithSymbol({
-									amount: order.paid_total - order.refunded_total,
+									amount:
+										Math.round(order.paid_total) -
+										Math.round(order.refunded_total),
 									currency: order.currency_code,
 								})}
 							</div>

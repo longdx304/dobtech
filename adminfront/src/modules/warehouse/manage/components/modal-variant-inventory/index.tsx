@@ -15,6 +15,7 @@ interface Props {
 	onClose: () => void;
 	inventoryType: string;
 	warehouseInventory: WarehouseInventory;
+	refetch?: () => void;
 }
 
 const ModalVariantInventory: FC<Props> = ({
@@ -22,6 +23,7 @@ const ModalVariantInventory: FC<Props> = ({
 	onClose,
 	inventoryType,
 	warehouseInventory,
+	refetch = () => {},
 }) => {
 	const { getSelectedUnitData, onReset } = useProductUnit();
 	const unitData = getSelectedUnitData();
@@ -49,6 +51,7 @@ const ModalVariantInventory: FC<Props> = ({
 			onReset();
 			await addInventoryToWarehouse.mutateAsync(itemData, {
 				onSuccess: () => {
+					refetch();
 					message.success(`Đã nhập hàng thành công`);
 				},
 				onError: (error: any) => {
@@ -68,6 +71,7 @@ const ModalVariantInventory: FC<Props> = ({
 			onReset();
 			await removeInventoryToWarehouse.mutateAsync(itemData, {
 				onSuccess: () => {
+					refetch();
 					message.success(`Đã xuất hàng thành công`);
 				},
 				onError: (error: any) => {

@@ -37,7 +37,9 @@ const SelectRegion = () => {
 	useEffect(() => {
 		// Set default shipping option when region changes
 		if (reg && shippingOptions?.length) {
-			const defaultOption = shippingOptions.find((option) => option.region_id === reg);
+			const defaultOption = shippingOptions.find(
+				(option) => option.region_id === reg
+			);
 			if (defaultOption && !selectedShippingOption) {
 				form.setFieldValue('shipping_option', defaultOption.id);
 			}
@@ -49,7 +51,14 @@ const SelectRegion = () => {
 		} else {
 			enableNext();
 		}
-	}, [reg, shippingOptions, selectedShippingOption, form, enableNext, disableNext]);
+	}, [
+		reg,
+		shippingOptions,
+		selectedShippingOption,
+		form,
+		// enableNext,
+		// disableNext,
+	]);
 
 	const handleRegionChange = (value: string) => {
 		form.setFieldValue('region', value);
@@ -67,10 +76,7 @@ const SelectRegion = () => {
 					label="Quốc gia"
 					rules={[{ required: true, message: 'Please select a region' }]}
 				>
-					<Select
-						placeholder="Chọn quốc gia"
-						onChange={handleRegionChange}
-					>
+					<Select placeholder="Chọn quốc gia" onChange={handleRegionChange}>
 						{regionOptions.map((option) => {
 							return (
 								<Option key={option.value} value={option.value}>

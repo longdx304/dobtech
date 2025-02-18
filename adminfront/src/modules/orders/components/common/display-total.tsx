@@ -32,7 +32,7 @@ export const DisplayTotal = ({
 				)}
 			</div>
 			<DisplayTotalAmount
-				totalAmount={totalAmount}
+				totalAmount={Math.round(totalAmount)}
 				currency={currency}
 				variant={variant}
 				totalColor={totalColor}

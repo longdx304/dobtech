@@ -1,8 +1,5 @@
-import { message } from 'antd';
-import { useRef, useState, useEffect } from 'react';
-import { MoneyAmount, Product } from '@medusajs/medusa';
-import _ from 'lodash';
-import { useAdminUpdateVariant } from 'medusa-react';
+import { Product } from '@medusajs/medusa';
+import { useEffect, useRef, useState } from 'react';
 
 import { Flex } from '@/components/Flex';
 import { Modal } from '@/components/Modal';
@@ -29,8 +26,6 @@ const PricesModal = ({
 	discountPercent,
 }: Props) => {
 	const editedPrices = useRef<any>([]);
-	const { mutateAsync, isLoading } = useAdminUpdateVariant(product?.id || '');
-	const [messageApi, contextHolder] = message.useMessage();
 
 	const {
 		selectedCurrencies,
@@ -53,6 +48,8 @@ const PricesModal = ({
 			setDataSource([]);
 			return;
 		}
+		// Format price with tax rate
+
 		setDataSource(variants as any);
 		return;
 	};
@@ -76,14 +73,7 @@ const PricesModal = ({
 	};
 
 	return (
-		<Modal
-			open={state}
-			handleOk={onFinish}
-			isLoading={isLoading}
-			handleCancel={onCancel}
-			width={800}
-		>
-			{contextHolder}
+		<Modal open={state} handleOk={onFinish} handleCancel={onCancel} width={800}>
 			<Title level={3} className="text-center">
 				{`Chỉnh sửa giá tiền`}
 			</Title>

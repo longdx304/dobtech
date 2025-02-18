@@ -5,10 +5,11 @@ import {
 	Product,
 	ProductCategory,
 	ProductCollection,
+	Region,
 } from '@medusajs/medusa';
 import { Form, message, type CollapseProps, type FormProps } from 'antd';
 import { Minus, Plus } from 'lucide-react';
-import { useAdminCreateProduct } from 'medusa-react';
+import { useAdminCreateProduct, useAdminRegions } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 
 import { splitFiles } from '@/actions/images';
@@ -58,6 +59,10 @@ export default function ProductModal({
 	const [form] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 
+	const { regions: storeRegions } = useAdminRegions({
+		limit: 1000,
+	});
+
 	const titleModal = 'Thêm mới sản phẩm';
 
 	// handle form submit
@@ -66,7 +71,8 @@ export default function ProductModal({
 		const payload = createPayload(
 			values,
 			true,
-			isFeatureEnabled('sales_channels')
+			isFeatureEnabled('sales_channels'),
+			storeRegions || []
 		);
 
 		// Prepped images thumbnail
@@ -114,7 +120,6 @@ export default function ProductModal({
 			);
 		}
 
-		console.log('payload', payload);
 		await mutateAsync(payload, {
 			onSuccess: ({ product }) => {
 				messageApi.open({
@@ -231,7 +236,8 @@ export default function ProductModal({
 const createPayload = (
 	data: NewProductForm,
 	publish = true,
-	salesChannelsEnabled = false
+	salesChannelsEnabled = false,
+	storeRegions: Region[]
 ): AdminPostProductsReq => {
 	const payload: AdminPostProductsReq = {
 		// General
@@ -285,13 +291,22 @@ const createPayload = (
 			mid_code: v?.mid_code || undefined,
 			origin_country: v?.origin_country || undefined,
 			supplier_price: +persistedPrice('vnd', v?.supplier_price ?? 0),
-			prices: v?.prices?.map((price) => ({
-				amount: +persistedPrice(
-					price?.currency_code ?? 'vnd',
-					price?.amount ?? 0
-				),
-				currency_code: price?.currency_code ?? 'vnd',
-			})) as any,
+			prices: v?.prices?.length
+				? (v?.prices?.map((price) => {
+						if (typeof price.amount !== 'number') {
+							return null;
+						}
+						const taxRegion = storeRegions?.find(
+							(region) => region.currency_code === price.currency_code
+						);
+						const taxRate: number = taxRegion ? taxRegion.tax_rate : 0;
+						const amount = price.amount / (1 + taxRate / 100);
+						return {
+							amount: +persistedPrice(price?.currency_code ?? 'vnd', amount),
+							currency_code: price?.currency_code ?? 'vnd',
+						};
+				  }) as any)
+				: [],
 		})),
 		// Dimensions
 		width: data?.dimensions?.width || undefined,

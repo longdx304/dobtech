@@ -89,7 +89,6 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 		}
 
 		const { uploadImages } = splitFiles(files);
-		console.log('uploadImages', uploadImages);
 
 		// Split images into chunks of maximum 5 images each
 		const CHUNK_SIZE = 10;
@@ -205,7 +204,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					<Button
 						disabled={!isProcessing}
 						onClick={onConfirm}
-						loading={updateFulfillment.isLoading}
+						loading={updateFulfillment.isLoading || uploadFile.isLoading}
 						type="primary"
 						className="w-full sm:w-[200px]"
 					>

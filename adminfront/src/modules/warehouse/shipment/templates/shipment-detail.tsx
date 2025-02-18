@@ -190,7 +190,7 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 
 					<Button
 						disabled={!isProcessing}
-						loading={updateFulfillment.isLoading}
+						loading={updateFulfillment.isLoading || uploadFile.isLoading}
 						onClick={onConfirm}
 						type="primary"
 						className="w-full sm:w-[200px]"

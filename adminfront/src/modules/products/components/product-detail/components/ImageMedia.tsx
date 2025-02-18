@@ -7,7 +7,7 @@ import { FC } from 'react';
 import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
-import { Image } from '@/components/Image';
+import { Image, ImageGroup } from '@/components/Image';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import MediaModal from './edit-modals/MediaModal';
@@ -68,20 +68,22 @@ const ImageMedia: FC<Props> = ({ product, loadingProduct }) => {
 						className="w-full overflow-x-auto"
 					>
 						{product?.images?.length ? (
-							product?.images?.map((image) => (
-								<div
-									key={image.id}
-									className="flex aspect-square items-center justify-center"
-								>
-									<Image
-										src={image?.url}
-										alt={`Product Image ${image.id}`}
-										width={120}
-										height={120}
-										className="rounded-md hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer"
-									/>
-								</div>
-							))
+							<ImageGroup>
+								{product?.images?.map((image) => (
+									<div
+										key={image.id}
+										className="flex aspect-square items-center justify-center"
+									>
+										<Image
+											src={image?.url}
+											alt={`Product Image ${image.id}`}
+											width={120}
+											height={120}
+											className="rounded-md hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer"
+										/>
+									</div>
+								))}
+							</ImageGroup>
 						) : (
 							<Empty
 								image={Empty.PRESENTED_IMAGE_SIMPLE}
