@@ -160,7 +160,7 @@ const Items = () => {
 		setVariantPrices(updatedPrices as any);
 
 		// Wait for pricedVariants to be available before updating form items
-		updateFormItems(selectedRows as any, variantQuantities, variantPrices);
+		updateFormItems(selectedRows as any, variantQuantities, updatedPrices);
 	};
 
 	const updateFormItems = (
@@ -218,7 +218,6 @@ const Items = () => {
 			disableNext();
 			return;
 		}
-
 		if (selectedVariants.length > 0) {
 			enableNext();
 		} else {
@@ -354,6 +353,7 @@ const Items = () => {
 				variantId: item.variant_id,
 				unit_price: item.unit_price,
 			}));
+
 			setVariantPrices(prices);
 		}
 	}, [items, selectedVariantsData]);
