@@ -89,7 +89,6 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 		}
 
 		const { uploadImages } = splitFiles(files);
-		console.log('uploadImages', uploadImages);
 
 		// Split images into chunks of maximum 5 images each
 		const CHUNK_SIZE = 10;
