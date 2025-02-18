@@ -209,7 +209,7 @@ const Summary = ({
 				/>
 				<DisplayTotal
 					currency={order.currency_code}
-					totalAmount={order.subtotal}
+					totalAmount={Math.round(order.subtotal)}
 					totalTitle={'Tạm tính'}
 				/>
 				{order?.discounts?.map((discount, index) => (
@@ -256,13 +256,13 @@ const Summary = ({
 				/>
 				<DisplayTotal
 					currency={order.currency_code}
-					totalAmount={order.tax_total}
+					totalAmount={Math.round(order.tax_total ?? 0)}
 					totalTitle={'Thuế'}
 				/>
 				<DisplayTotal
 					variant={'large'}
 					currency={order.currency_code}
-					totalAmount={order.total}
+					totalAmount={Math.round(order.total)}
 					totalTitle={hasMovements ? 'Tổng ban đầu' : 'Tổng cộng'}
 				/>
 				<Divider className="my-2" />

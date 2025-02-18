@@ -102,8 +102,8 @@ const Items = () => {
 		const priceAmount =
 			variant.calculated_price_type === 'override' ||
 			variant.calculated_price_type === 'sale'
-				? variant.calculated_price
-				: variant.original_price;
+				? Math.round(variant.calculated_price_incl_tax)
+				: Math.round(variant.original_price_incl_tax);
 
 		return {
 			amount: priceAmount ?? 0,
@@ -271,12 +271,12 @@ const Items = () => {
 			variant.calculated_price_type === 'override' ||
 			variant.calculated_price_type === 'sale'
 		) {
-			return variant.calculated_price ?? 0;
+			return Math.round(variant.calculated_price_incl_tax) ?? 0;
 		}
 
 		// If original_price exists, use it
 		if (variant.original_price) {
-			return variant.original_price;
+			return Math.round(variant.original_price_incl_tax);
 		}
 
 		let price = variant?.prices?.find(
@@ -284,7 +284,9 @@ const Items = () => {
 				p.currency_code.toLowerCase() === region?.currency_code?.toLowerCase()
 		);
 
-		return price?.amount || 0;
+		const taxRate = region?.tax_rate ?? 0;
+
+		return price?.amount * (1 + taxRate / 100) || 0;
 	};
 
 	const columns = productsColumns({

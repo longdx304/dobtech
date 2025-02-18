@@ -42,7 +42,7 @@ const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
 						</span>
 						{item?.variant && (
 							<span className="font-normal text-gray-500 truncate">
-								{`${item.variant.title}`} 
+								{`${item.variant.title}`}
 							</span>
 						)}
 					</div>
@@ -52,14 +52,14 @@ const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
 				<div className="space-x-2 lg:space-x-4 2xl:space-x-6 flex flex-col items-end text-[12px]">
 					<div className="flex items-center gap-2 font-normal text-gray-500">
 						{formatAmountWithSymbol({
-							amount: (item?.total ?? 0) / item.quantity,
+							amount: Math.round(item?.total ?? 0) / item.quantity,
 							currency: currencyCode,
 							tax: [],
 						})}
 					</div>
 					<div className="font-normal text-gray-900 min-w-[55px] text-right">
 						{formatAmountWithSymbol({
-							amount: item.total ?? 0,
+							amount: Math.round(item.total ?? 0),
 							currency: currencyCode,
 							tax: [],
 						})}

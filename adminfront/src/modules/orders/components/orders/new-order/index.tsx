@@ -64,7 +64,7 @@ const NewOrderModal: FC<Props> = ({
 	const isDesktop = useIsDesktop();
 	const {
 		form,
-		context: { items },
+		context: { items, region },
 	} = useNewDraftOrderForm();
 	const [isSendEmail, setIsSendEmail] = useState(false);
 
@@ -172,15 +172,18 @@ const NewOrderModal: FC<Props> = ({
 
 	const generateTransferOrderData = () => {
 		const values = form.getFieldsValue(true);
-
+		const taxRate = region?.tax_rate || 0;
 		// for create draft order by admin
 		const transformedData = {
 			email: values.email,
 			items: items.map((i: any) => ({
 				quantity: i.quantity,
 				...(i.variant_id
-					? { variant_id: i.variant_id, unit_price: i.unit_price }
-					: { title: i.title, unit_price: i.unit_price }),
+					? {
+							variant_id: i.variant_id,
+							unit_price: i.unit_price / (1 + taxRate / 100),
+					  }
+					: { title: i.title, unit_price: i.unit_price / (1 + taxRate / 100) }),
 			})),
 			region_id: values.region,
 			shipping_methods: [{ option_id: values.shipping_option }],

@@ -5,7 +5,6 @@ import { useAdminCreateVariant, useAdminUpdateVariant } from 'medusa-react';
 import {
 	AdminPostProductsProductVariantsReq,
 	Product,
-	ProductVariant,
 	AdminPostProductsProductVariantsVariantReq,
 } from '@medusajs/medusa';
 
@@ -16,7 +15,7 @@ import { Title } from '@/components/Typography';
 import VariantGeneral from './VariantGeneral';
 import VariantStock from './VariantStock';
 import VariantShipping from './VariantShipping';
-import { VariantFormType } from '@/types/products';
+import { ProductVariant, VariantFormType } from '@/types/products';
 import { normalizeAmount, persistedPrice } from '@/utils/prices';
 
 type Props = {
@@ -24,7 +23,7 @@ type Props = {
 	handleOk: () => void;
 	handleCancel: () => void;
 	product: Product;
-	variant?: ProductVariant & { supplier_price?: number };
+	variant?: ProductVariant;
 	typeVariant: 'CREATE' | 'UPDATE' | 'COPY' | null;
 };
 
@@ -74,6 +73,7 @@ const AddVariantModal: FC<Props> = ({
 				form.setFieldsValue({
 					...variant,
 					supplier_price: normalizeAmount('vnd', variant?.supplier_price ?? 0),
+					cogs_price: normalizeAmount('vnd', variant?.cogs_price ?? 0),
 					options: variant.options.map((option) => ({
 						option_id: option.option_id,
 						value: [option.value],
@@ -201,8 +201,7 @@ const createAddPayload = (
 					value: option.value[0],
 				} as any)
 		),
-		// inventory_quantity: data?.inventory_quantity ?? 0,
-		prices: [],
 		supplier_price: +persistedPrice('vnd', data?.supplier_price ?? 0),
+		cogs_price: +persistedPrice('vnd', data?.cogs_price ?? 0),
 	} as any;
 };

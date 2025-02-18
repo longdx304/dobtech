@@ -277,7 +277,7 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 						newTotal={orderEdit.total}
 						differenceDue={
 							// TODO: more correct would be to have => diff_due = orderEdit_total_of_items_user_is_getting - paid_total + refunded_total
-							orderEdit.total - paidTotal // (orderEdit_total - refunded_total) - (paidTotal - refundedTotal)
+							Math.round(orderEdit.total) - Math.round(paidTotal) // (orderEdit_total - refunded_total) - (paidTotal - refundedTotal)
 						}
 					/>
 				)}
@@ -328,7 +328,7 @@ function TotalsSection(props: TotalsSectionProps) {
 				<span className="text-gray-500">{'Số tiền đã thanh toán'}</span>
 				<span className="text-gray-900">
 					{formatAmountWithSymbol({
-						amount: amountPaid,
+						amount: Math.round(amountPaid),
 						currency: currencyCode,
 					})}
 					<span className="text-gray-400"> {currencyCode.toUpperCase()}</span>
@@ -339,7 +339,7 @@ function TotalsSection(props: TotalsSectionProps) {
 				<span className="font-semibold text-gray-900">{'Tổng mới'}</span>
 				<span className="text-2xl font-semibold">
 					{formatAmountWithSymbol({
-						amount: newTotal,
+						amount: Math.round(newTotal),
 						currency: currencyCode,
 					})}
 				</span>

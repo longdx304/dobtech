@@ -48,6 +48,16 @@ const VariantGeneral: FC<Props> = ({ form, options }) => {
 					<InputNumber className="w-full" placeholder="0" min={0} allowClear />
 				</Form.Item>
 			</Col>
+			<Col xs={24} sm={12}>
+				<Form.Item
+					labelCol={{ span: 24 }}
+					name="cogs_price"
+					label="Giá vốn"
+					className="mb-2"
+				>
+					<InputNumber className="w-full" placeholder="0" min={0} allowClear />
+				</Form.Item>
+			</Col>
 
 			<Col xs={24} sm={12}>
 				<Form.Item
