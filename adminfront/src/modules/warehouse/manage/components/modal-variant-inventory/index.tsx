@@ -23,7 +23,7 @@ const ModalVariantInventory: FC<Props> = ({
 	onClose,
 	inventoryType,
 	warehouseInventory,
-	refetch,
+	refetch = () => {},
 }) => {
 	const { getSelectedUnitData, onReset } = useProductUnit();
 	const unitData = getSelectedUnitData();
