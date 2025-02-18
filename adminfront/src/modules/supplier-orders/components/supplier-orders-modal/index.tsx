@@ -347,7 +347,6 @@ const SupplierOrdersModal: FC<Props> = ({
 						regions={regions}
 						regionId={regionId}
 						setRegionId={setRegionId}
-						selectedRowProducts={selectedRowsProducts}
 					/>
 				)}
 				{currentStep === 1 && (

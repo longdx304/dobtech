@@ -88,15 +88,45 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 			return;
 		}
 
+		const { uploadImages } = splitFiles(files);
+		console.log('uploadImages', uploadImages);
+
+		// Split images into chunks of maximum 5 images each
+		const CHUNK_SIZE = 10;
+		const chunks: File[][] = [];
+
+		for (let i = 0; i < uploadImages.length; i += CHUNK_SIZE) {
+			chunks.push(uploadImages.slice(i, i + CHUNK_SIZE));
+		}
+
+		// Create an array of upload promises
+		const uploadPromises = chunks.map(async (chunk) => {
+			try {
+				const { uploads } = await uploadFile.mutateAsync({
+					files: chunk,
+					prefix: 'warehouse/stock-checker',
+				});
+				return uploads.map((item) => item.url);
+			} catch (error) {
+				console.error('Error uploading chunk:', error);
+				throw error;
+			}
+		});
+
+		// Show loading message
+		const loadingMessage = message.loading('Đang tải lên hình ảnh...', 0);
+
 		try {
-			const { uploadImages } = splitFiles(files);
-			const { uploads } = await uploadFile.mutateAsync({
-				files: uploadImages,
-				prefix: 'warehouse/stock-checker',
-			});
-			updateFulfillment.mutateAsync(
+			// Wait for all chunks to be uploaded
+			const results = await Promise.all(uploadPromises);
+
+			// Flatten the array of URLs
+			const allUrls = results.flat();
+
+			// Update fulfillment with all URLs
+			await updateFulfillment.mutateAsync(
 				{
-					checker_url: uploads.map((item) => item.url).join(','),
+					checker_url: allUrls.join(','),
 				},
 				{
 					onSuccess: () => {
@@ -107,10 +137,14 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					},
 				}
 			);
-			return;
-		} catch (error) {}
-
-		// do something
+		} catch (error) {
+			message.error('Có lỗi xảy ra khi tải lên hình ảnh');
+			console.error('Upload error:', error);
+		} finally {
+			// Close loading message
+			loadingMessage();
+		}
+		return;
 	};
 
 	if (!fulfillment) return null;

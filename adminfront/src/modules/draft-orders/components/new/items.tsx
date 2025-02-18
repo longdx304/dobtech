@@ -8,6 +8,7 @@ import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useStepModal } from '@/lib/providers/stepped-modal-provider';
 import { formatNumber } from '@/lib/utils';
 import { ProductVariant, Region } from '@medusajs/medusa';
+import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { Table, TabsProps } from 'antd';
 import _, { differenceBy } from 'lodash';
 import { CircleCheck, CircleX, Search, Upload } from 'lucide-react';
@@ -16,7 +17,6 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 import UploadModal from './modal-upload';
 import productsColumns from './product-columns';
-import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 
 const PAGE_SIZE = 10;
 
@@ -46,7 +46,6 @@ const Items = () => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [activeTab, setActiveTab] = useState<TabsProps['activeKey']>('list');
-	// const [dataFromExcel, setDataFromExcel] = useState<any[]>([]);
 
 	const {
 		context: { region, setItems, items, dataFromExcel, setDataFromExcel },
@@ -75,18 +74,19 @@ const Items = () => {
 	);
 
 	// Separate query to fetch selected variants
-	const { variants: selectedVariantsData } = useAdminVariants(
-		items?.length > 0
-			? {
-					id: items.map((item) => item.variant_id),
-					region_id: region?.id,
-					customer_id: form.getFieldValue('customer_id'),
-			  }
-			: undefined,
-		{
-			enabled: !!items?.length,
-		}
-	);
+	const { variants: selectedVariantsData, count: selectedVariantsCount } =
+		useAdminVariants(
+			items?.length > 0
+				? {
+						id: items.map((item) => item.variant_id),
+						region_id: region?.id,
+						customer_id: form.getFieldValue('customer_id'),
+				  }
+				: undefined,
+			{
+				enabled: !!items?.length,
+			}
+		);
 
 	// Get default price for a variant
 	const getDefaultPrice = (variant: any) => {
@@ -128,39 +128,39 @@ const Items = () => {
 		setSelectedVariants(selectedRows as ProductVariant[]);
 
 		// Initialize quantities for newly selected variants
-		const newQuantities = selectedRows.map((variant) => ({
-			variantId: variant.id,
+		const newQuantities = selectedRows?.map((variant) => ({
+			variantId: variant?.id,
 			quantity: 1,
 		}));
 
 		// Preserve existing quantities for previously selected variants
-		const updatedQuantities = newQuantities.map((newQuant) => {
+		const updatedQuantities = newQuantities?.map((newQuant) => {
 			const existing = variantQuantities.find(
 				(q) => q.variantId === newQuant.variantId
 			);
 			return existing || newQuant;
 		});
 
-		setVariantQuantities(updatedQuantities);
+		setVariantQuantities(updatedQuantities as any);
 
 		// Initialize prices for newly selected variants
-		const newPrices = selectedRows.map((variant) => ({
-			variantId: variant.id,
+		const newPrices = selectedRows?.map((variant) => ({
+			variantId: variant?.id,
 			unit_price: getDefaultPrice(variant).amount,
 		}));
 
 		// Preserve existing prices for previously selected variants
-		const updatedPrices = newPrices.map((newPrice) => {
+		const updatedPrices = newPrices?.map((newPrice) => {
 			const existing = variantPrices.find(
 				(p) => p.variantId === newPrice.variantId
 			);
 			return existing || newPrice;
 		});
 
-		setVariantPrices(updatedPrices);
+		setVariantPrices(updatedPrices as any);
 
 		// Wait for pricedVariants to be available before updating form items
-		updateFormItems(selectedRows, updatedQuantities, updatedPrices);
+		updateFormItems(selectedRows as any, variantQuantities, variantPrices);
 	};
 
 	const updateFormItems = (
@@ -170,10 +170,10 @@ const Items = () => {
 	) => {
 		const formItems = variants.map((variant) => {
 			const selectedQuantity =
-				quantities.find((q) => q.variantId === variant.id)?.quantity || 1;
+				quantities.find((q) => q.variantId === variant?.id)?.quantity || 1;
 
 			const selectedPrice =
-				prices?.find((p) => p.variantId === variant.id)?.unit_price || 0;
+				prices?.find((p) => p.variantId === variant?.id)?.unit_price || 0;
 
 			const variantImages = variant?.product?.metadata?.variant_images
 				? JSON.parse(variant?.product?.metadata?.variant_images as string)
@@ -190,13 +190,12 @@ const Items = () => {
 			return {
 				quantity: selectedQuantity,
 				unit_price: selectedPrice,
-				variant_id: variant.id,
+				variant_id: variant?.id,
 				title: variant?.title as string,
 				product_title: variant?.product?.title,
 				thumbnail: thumbnail,
 			};
 		});
-
 		setItems(formItems);
 	};
 
@@ -366,10 +365,12 @@ const Items = () => {
 		}, 0);
 	}, [variantPrices, variantQuantities]);
 
+	// Total quantity
 	const totalQuantity = useMemo(() => {
 		return variantQuantities.reduce((total, item) => total + item.quantity, 0);
 	}, [variantQuantities]);
 
+	// Find variants not in dataFromExcel
 	const dataFromExcelError = useMemo(() => {
 		if (!variantsBySku?.length) {
 			return [];
@@ -378,21 +379,44 @@ const Items = () => {
 		return errors;
 	}, [dataFromExcel, variantsBySku]);
 
+	// Find duplicates in dataFromExcel
+	const dataFromExcelDuplicate = useMemo(() => {
+		if (!dataFromExcel?.length) return [];
+
+		// Group items by SKU
+		const grouped = _.groupBy(dataFromExcel, 'sku');
+
+		// Filter groups that have more than 1 item (duplicates)
+		return Object.entries(grouped)
+			.filter(([_, items]) => items.length > 1)
+			.map(([sku, items]) => ({
+				sku,
+				count: items.length,
+				items,
+			}));
+	}, [dataFromExcel]);
+
+	console.log('dataFromExcelDuplicate', dataFromExcelDuplicate);
+	// Select all variants from Excel
 	useEffect(() => {
 		if (!variantsBySku?.length) return;
 
-		const selectedRowKeys = variantsBySku.map((variant) => variant.id);
-		setSelectedVariantIds(selectedRowKeys as string[]);
-		setSelectedVariants(variantsBySku as ProductVariant[]);
-
 		// Initialize quantities for newly selected variants
 		const newQuantities = variantsBySku.map((variant) => {
-			const findVaraintExcel = dataFromExcel.find(
+			// Find all items in Excel with matching SKU
+			const excelItems = dataFromExcel.filter(
 				(item) => item.sku === variant.sku
 			);
+
+			// Sum up quantities if there are multiple items with the same SKU
+			const totalQuantity = excelItems.reduce(
+				(sum, item) => sum + (item.quantity || 0),
+				0
+			);
+
 			return {
 				variantId: variant.id,
-				quantity: findVaraintExcel.quantity || 1,
+				quantity: totalQuantity || 1, // Use 1 as fallback if no quantity found
 			};
 		});
 
@@ -433,6 +457,16 @@ const Items = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [variantsBySku]);
 
+	const handleExcelOpen = () => {
+		setActiveTab('checked');
+		onOpen();
+		setSelectedVariantIds([]);
+		setSelectedVariants([]);
+		setVariantQuantities([]);
+		setVariantPrices([]);
+		setDataFromExcel([]);
+		setItems([]);
+	};
 	return (
 		<>
 			<Flex
@@ -441,18 +475,7 @@ const Items = () => {
 				className="p-4 border-0 border-b border-solid border-gray-200"
 			>
 				<div>
-					<Button
-						icon={<Upload />}
-						onClick={() => {
-							onOpen();
-							setSelectedVariantIds([]);
-							setSelectedVariants([]);
-							setVariantQuantities([]);
-							setVariantPrices([]);
-							setDataFromExcel([]);
-							setItems([]);
-						}}
-					/>
+					<Button icon={<Upload />} onClick={handleExcelOpen} />
 					{dataFromExcel.length > 0 && (
 						<Flex className="gap-x-2 mt-1">
 							<Flex align="center" className="gap-x-1 text-xs">
@@ -461,20 +484,38 @@ const Items = () => {
 							</Flex>
 							<Tooltip
 								title={
-									<pre>
-										{dataFromExcelError
-											.map((item, index) => `${index + 1}. ${item.sku}`)
-											.join('\n')}
+									<pre className="max-w-xs whitespace-pre-wrap break-words">
+										{dataFromExcelError.length > 0 && (
+											<>
+												Không tìm thấy SKU:
+												{'\n'}
+												{dataFromExcelError
+													.map((item, index) => `${index + 1}. ${item.sku}`)
+													.join('\n')}
+											</>
+										)}
+										{dataFromExcelError.length > 0 &&
+											dataFromExcelDuplicate.length > 0 &&
+											'\n\n'}
+										{dataFromExcelDuplicate.length > 0 && (
+											<>
+												SKU trùng lặp:
+												{'\n'}
+												{dataFromExcelDuplicate
+													.map(
+														(item, index) =>
+															`${index + 1}. ${item.sku} (${item.count} lần)`
+													)
+													.join('\n')}
+											</>
+										)}
 									</pre>
 								}
 								placement="top"
 							>
 								<Flex align="center" className="gap-x-1 text-xs">
 									<CircleX size={16} color="red" />
-									<span>
-										{dataFromExcel.length - (variantsBySku?.length || 0)} sản
-										phẩm
-									</span>
+									<span>{dataFromExcelError.length} sản phẩm</span>
 								</Flex>
 							</Tooltip>
 						</Flex>
@@ -489,10 +530,14 @@ const Items = () => {
 				/>
 			</Flex>
 			<div className="flex justify-center">
-				<Tabs items={itemTabs} onChange={handleTabChange} />
+				<Tabs
+					items={itemTabs}
+					onChange={handleTabChange}
+					activeKey={activeTab}
+				/>
 			</div>
 			<div className="flex justify-end">{`Đã chọn : ${
-				selectedVariants?.length ?? 0
+				selectedVariantsCount ?? 0
 			} biến thể`}</div>
 			<Table
 				rowSelection={{

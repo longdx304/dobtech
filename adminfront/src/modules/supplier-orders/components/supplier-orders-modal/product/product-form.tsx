@@ -32,7 +32,6 @@ type ProductFormProps = {
 	regions: Region[] | undefined;
 	regionId: string | null;
 	setRegionId: (regionId: string) => void;
-	selectedRowProducts: PricedVariant[] | undefined;
 };
 const PAGE_SIZE = 10;
 
@@ -47,7 +46,6 @@ const ProductForm: FC<ProductFormProps> = ({
 	regions,
 	regionId,
 	setRegionId,
-	selectedRowProducts,
 }) => {
 	const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
 	const [searchValue, setSearchValue] = useState<string>('');
@@ -56,16 +54,17 @@ const ProductForm: FC<ProductFormProps> = ({
 	const { state, onOpen, onClose } = useToggleState(false);
 
 	// Separate query to fetch selected variants
-	const { variants: selectedVariantsData } = useAdminVariants(
-		{
-			id: selectedProducts,
-			limit: selectedProducts?.length || 0,
-		},
-		{
-			enabled: !!selectedProducts?.length,
-			keepPreviousData: true,
-		}
-	);
+	const { variants: selectedVariantsData, count: countVariant } =
+		useAdminVariants(
+			{
+				id: selectedProducts,
+				limit: selectedProducts?.length || 0,
+			},
+			{
+				enabled: !!selectedProducts?.length,
+				keepPreviousData: true,
+			}
+		);
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
 		// Identify deselected products
@@ -121,8 +120,13 @@ const ProductForm: FC<ProductFormProps> = ({
 
 		// Update selected products
 		setSelectedProducts(selectedRowKeys as string[]);
-		setSelectedRowsProducts(selectedVariantsData as PricedVariant[]);
 	};
+
+	useEffect(() => {
+		if (selectedVariantsData?.length)
+			setSelectedRowsProducts(selectedVariantsData as PricedVariant[]);
+		//eslint-disable-next-line
+	}, [selectedVariantsData]);
 
 	const handleChangeDebounce = _.debounce(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -301,7 +305,7 @@ const ProductForm: FC<ProductFormProps> = ({
 					<Tabs items={itemTabs} onChange={handleTabChange} />
 				</div>
 				<div className="flex justify-end">{`Đã chọn : ${
-					selectedRowProducts?.length ?? 0
+					countVariant ?? 0
 				} biến thể`}</div>
 				<Table
 					loading={isLoading}
@@ -313,7 +317,7 @@ const ProductForm: FC<ProductFormProps> = ({
 					}}
 					columns={columns as any}
 					dataSource={
-						(activeTab === 'list' ? variants : selectedRowProducts) ?? []
+						(activeTab === 'list' ? variants : selectedVariantsData) ?? []
 					}
 					rowKey="id"
 					pagination={
