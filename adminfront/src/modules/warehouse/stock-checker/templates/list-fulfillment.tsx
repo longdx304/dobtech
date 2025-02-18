@@ -11,7 +11,7 @@ import { ERoutes } from '@/types/routes';
 import debounce from 'lodash/debounce';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, FC, useState } from 'react';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
 import StockItem from '../components/stock-item';
 
 type Props = {};
@@ -58,6 +58,10 @@ const ListFulfillment: FC<Props> = ({}) => {
 		},
 	];
 
+	const filterFulfillment = useMemo(() => {
+		return fulfillments?.filter((item) => item && item.order) ?? [];
+	}, [fulfillments]);
+
 	const handleChangeTab = (key: boolean) => {
 		setActiveKey(key);
 	};
@@ -89,13 +93,15 @@ const ListFulfillment: FC<Props> = ({}) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
-					dataSource={fulfillments}
+					dataSource={filterFulfillment}
 					loading={isLoading}
-					renderItem={(item: Fulfillment) => (
-						<List.Item>
-							<StockItem item={item} handleClickDetail={handleClickDetail} />
-						</List.Item>
-					)}
+					renderItem={(item: Fulfillment) =>
+						item?.order ? (
+							<List.Item>
+								<StockItem item={item} handleClickDetail={handleClickDetail} />
+							</List.Item>
+						) : null
+					}
 					pagination={{
 						onChange: (page) => handleChangePage(page),
 						pageSize: DEFAULT_PAGE_SIZE,
