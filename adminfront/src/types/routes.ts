@@ -66,39 +66,39 @@ export const routesConfig: TRouteConfig[] = [
 	},
 	{
 		path: ERoutes.PRICING,
-		mode: [],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.CUSTOMERS,
-		mode: [],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.REGIONS,
-		mode: [],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.ORDERS,
-		mode: [],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.RETURN_REASONS,
-		mode: [],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.DISCOUNTS,
-		mode: [],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.GIFT_CARDS,
-		mode: [],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.SUPPLIERS,
-		mode: [],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.CURRENCIES,
-		mode: [],
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.WAREHOUSE_INBOUND,
