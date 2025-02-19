@@ -71,7 +71,7 @@ const ModalAddVariant: FC<Props> = ({
 		const { label, value } = data as ValueType;
 		if (!value || !label) return;
 
-		setLocationValue(data.value);
+		setLocationValue(data.label);
 	};
 
 	const handleOkModal = async () => {
@@ -81,6 +81,13 @@ const ModalAddVariant: FC<Props> = ({
 		if (!locationValue) {
 			return message.error('Vui lòng chọn vị trí kho');
 		}
+		console.log('123123', {
+			location: locationValue,
+			variant_id: variant.id,
+			quantity: unitData.quantity,
+			unit_id: unitData.unitId,
+			type: 'INBOUND',
+		});
 		await addWarehouseVariant.mutateAsync(
 			{
 				location: locationValue,
