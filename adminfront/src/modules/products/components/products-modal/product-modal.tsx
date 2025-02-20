@@ -292,20 +292,22 @@ const createPayload = (
 			origin_country: v?.origin_country || undefined,
 			supplier_price: +persistedPrice('vnd', v?.supplier_price ?? 0),
 			prices: v?.prices?.length
-				? (v?.prices?.map((price) => {
-						if (typeof price.amount !== 'number') {
-							return null;
-						}
-						const taxRegion = storeRegions?.find(
-							(region) => region.currency_code === price.currency_code
-						);
-						const taxRate: number = taxRegion ? taxRegion.tax_rate : 0;
-						const amount = price.amount / (1 + taxRate / 100);
-						return {
-							amount: +persistedPrice(price?.currency_code ?? 'vnd', amount),
-							currency_code: price?.currency_code ?? 'vnd',
-						};
-				  }) as any)
+				? (v?.prices
+						?.map((price) => {
+							if (typeof price.amount !== 'number') {
+								return null;
+							}
+							const taxRegion = storeRegions?.find(
+								(region) => region.currency_code === price.currency_code
+							);
+							const taxRate: number = taxRegion ? taxRegion.tax_rate : 0;
+							const amount = price.amount / (1 + taxRate / 100);
+							return {
+								amount: +persistedPrice(price?.currency_code ?? 'vnd', amount),
+								currency_code: price?.currency_code ?? 'vnd',
+							};
+						})
+						.filter((item: any) => !!item) as any)
 				: [],
 		})),
 		// Dimensions
