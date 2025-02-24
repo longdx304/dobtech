@@ -7,7 +7,7 @@ import { Title } from '@/components/Typography';
 import { ProductVariant } from '@medusajs/medusa';
 import _ from 'lodash';
 import { Search } from 'lucide-react';
-import { useAdminVariants } from 'medusa-react';
+import { useAdminUpdateVariant, useAdminVariants } from 'medusa-react';
 import { ChangeEvent, useEffect, useState } from 'react';
 import productsColumns from './products-column';
 
@@ -34,6 +34,7 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 	);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
 	const { isLoading, count, variants } = useAdminVariants({
 		q: searchValue,
@@ -42,6 +43,10 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 		region_id: regionId,
 		customer_id: customerId,
 	});
+
+	// promise update product id of variant id for price
+	// for selectedVariants
+	const updateVariant = useAdminUpdateVariant(selectedProductId || '');
 
 	useEffect(() => {
 		if (props.selectedItems) {
@@ -84,7 +89,45 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 		return <></>;
 	};
 
-	const columns = productsColumns({ variantInventoryCell, currencyCode });
+	const handlePriceChange = (variantId: string, price: number) => {
+		// Find the variant and its product ID
+		const variant = variants?.find((v) => v.id === variantId);
+		if (!variant || !variant.product_id) return;
+
+		// Set the product ID for the update hook
+		setSelectedProductId(variant.product_id);
+
+		// Update the variant in Medusa
+		updateVariant.mutate(
+			{
+				variant_id: variantId,
+				prices: [
+					{
+						amount: price,
+						currency_code: currencyCode.toLowerCase(),
+					},
+				],
+			},
+			{
+				onSuccess: ({ product }) => {
+					// Update local state with new variant data
+					const updatedVariant = product.variants.find((v) => v.id === variantId);
+					if (!updatedVariant) return;
+
+					const updatedVariants = selectedVariants.map((v) =>
+						v.id === variantId ? { ...v, calculated_price_incl_tax: price } : v
+					);
+					setSelectedVariants(updatedVariants as ProductVariant[]);
+				},
+			}
+		);
+	};
+
+	const columns = productsColumns({
+		variantInventoryCell,
+		currencyCode,
+		handlePriceChange,
+	});
 
 	const handleChangePage = (page: number) => {
 		setCurrentPage(page);
@@ -96,6 +139,7 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 		}
 		return true;
 	};
+
 	return (
 		<Modal
 			open={props.state}
@@ -128,7 +172,7 @@ const AddProductVariant = (props: AddProductVariantProps) => {
 					onChange: handleRowSelectionChange as any,
 					preserveSelectedRowKeys: true,
 					getCheckboxProps: (record: any) => ({
-						disabled: handleDisable(record),
+						// disabled: handleDisable(record),
 					}),
 				}}
 				loading={isLoading}

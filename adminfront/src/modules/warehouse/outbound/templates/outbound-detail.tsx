@@ -293,7 +293,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 			{confirmState && (
 				<ConfirmOrder
 					state={confirmState}
-					title="Xác nhận hoàn thành nhập kho"
+					title="Xác nhận hoàn thành xuất kho"
 					handleOk={handleComplete}
 					handleCancel={onCloseConfirm}
 				>
