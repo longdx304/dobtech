@@ -103,9 +103,9 @@ const AddVariantModal: FC<Props> = ({
 			const payload:
 				| AdminPostProductsProductVariantsReq
 				| AdminPostProductsProductVariantsVariantReq = createAddPayload(
-				values,
-				variant
-			);
+					values,
+					variant
+				);
 			// Update variant
 			if (typeVariant === 'UPDATE' && variant) {
 				await updateVariant.mutateAsync(
@@ -187,8 +187,8 @@ const createAddPayload = (
 ):
 	| (AdminPostProductsProductVariantsReq & { supplier_price?: number })
 	| (AdminPostProductsProductVariantsVariantReq & {
-			supplier_price?: number;
-	  }) => {
+		supplier_price?: number;
+	}) => {
 	return {
 		...data,
 		title:
@@ -196,12 +196,13 @@ const createAddPayload = (
 			`${data?.options.map((option) => option.value[0]).join(' / ')}`,
 		options: data.options.map(
 			(option) =>
-				({
-					option_id: option.option_id,
-					value: option.value[0],
-				} as any)
+			({
+				option_id: option.option_id,
+				value: option.value[0],
+			} as any)
 		),
 		supplier_price: +persistedPrice('vnd', data?.supplier_price ?? 0),
+		prices: [],
 		cogs_price: +persistedPrice('vnd', data?.cogs_price ?? 0),
 	} as any;
 };
