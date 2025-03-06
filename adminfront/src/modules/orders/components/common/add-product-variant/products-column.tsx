@@ -7,12 +7,18 @@ import { Flex } from '@/components/Flex';
 import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
 import { formatAmountWithSymbol } from '@/utils/prices';
+import { InputNumber } from '@/components/Input';
 
 interface Props {
 	variantInventoryCell: (record: ProductVariant) => React.ReactNode;
 	currencyCode: string;
+	handlePriceChange: (variantId: string, price: number) => void;
 }
-const productsColumns = ({ variantInventoryCell, currencyCode }: Props) => [
+const productsColumns = ({
+	variantInventoryCell,
+	currencyCode,
+	handlePriceChange,
+}: Props) => [
 	{
 		title: 'Tên sản phẩm',
 		key: 'product',
@@ -58,32 +64,26 @@ const productsColumns = ({ variantInventoryCell, currencyCode }: Props) => [
 			_: ProductVariant['original_price_incl_tax'],
 			record: ProductVariant
 		) => {
-			// const _render = variantInventoryCell(record);
 			if (!_) {
-				return '-';
+				return (
+					<InputNumber
+						onChange={(value) => handlePriceChange(record.id, value || 0)}
+						className="w-1/2 text-center"
+						value={record.calculated_price_incl_tax}
+						min={1}
+						max={999999999}
+					/>
+				);
 			}
 
-			const showOriginal = _ !== 'default';
 			return (
-				<div className="flex items-center justify-start gap-2">
-					<div className="flex flex-col items-end">
-						{showOriginal && (
-							<span className="text-gray-400 line-through">
-								{formatAmountWithSymbol({
-									amount: _,
-									currency: currencyCode,
-								})}
-							</span>
-						)}
-						<span>
-							{formatAmountWithSymbol({
-								amount: record.calculated_price_incl_tax,
-								currency: currencyCode,
-							})}
-						</span>
-					</div>
-					<span className="text-gray-400"> {currencyCode.toUpperCase()}</span>
-				</div>
+				<InputNumber
+					onChange={(value) => handlePriceChange(record.id, value || 0)}
+					className="w-1/2 text-center"
+					value={record.calculated_price_incl_tax}
+					min={1}
+					max={999999999}
+				/>
 			);
 		},
 	},
