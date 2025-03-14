@@ -86,7 +86,7 @@ const StockItem: React.FC<StockItemProps> = ({
 			</Flex>
 			<Flex gap={4} align="center" justify="space-between" className="mt-2">
 				<Button className="w-full" onClick={() => handleClickDetail(item)}>
-					{user?.id === item?.handler_id ? 'Xuất kho' : 'Chi tiết'}
+					{user?.id === item?.handler_id ? 'Kiểm hàng' : 'Chi tiết'}
 				</Button>
 				<ActionAbles actions={actions as any} />
 			</Flex>
