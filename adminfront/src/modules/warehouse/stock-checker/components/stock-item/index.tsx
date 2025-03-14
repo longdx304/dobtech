@@ -1,35 +1,52 @@
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
-import { Fulfillment } from '@/types/fulfillments';
-import clsx from 'clsx';
+import { useUser } from '@/lib/providers/user-provider';
+import { FulfillmentStatus, Order } from '@/types/order';
+import dayjs from 'dayjs';
 import {
 	Check,
-	Clock,
-	Hash,
-	MapPin,
-	NotebookTabs,
-	Phone,
-	User,
+	Clock
 } from 'lucide-react';
 
 type StockItemProps = {
-	item: Fulfillment;
-	handleClickDetail: (item: Fulfillment) => void;
+	item: Order;
+	handleClickDetail: (item: Order) => void;
+	handleConfirm: (item: Order) => void;
+	handleRemoveHandler: (item: Order) => void;
 };
 
-const StockItem: React.FC<StockItemProps> = ({ item, handleClickDetail }) => {
-	const isProcessing = !item?.checked_at;
+const StockItem: React.FC<StockItemProps> = ({
+	item,
+	handleClickDetail,
+	handleConfirm,
+	handleRemoveHandler,
+}) => {
+	const { user } = useUser();
 
-	const address = `${item.order?.shipping_address?.address_2 ?? ''} ${
-		item.order?.shipping_address?.city ?? ''
-	} ${item.order?.shipping_address?.address_1 ?? ''} ${
-		item.order?.shipping_address?.province ?? ''
-	} ${item.order?.shipping_address?.country_code ?? ''}`;
+	const isProcessing =
+		item.fulfillment_status === FulfillmentStatus.NOT_FULFILLED;
 
-	const checker = item.checker?.first_name || 'Chưa có người kiểm hàng';
+	const isStart = isProcessing && !item?.handler_id;
+
+	const actions = [
+		{
+			label: <span className="w-full">{'Thực hiện'}</span>,
+			key: 'handle',
+			disabled: !isStart,
+			onClick: () => handleConfirm(item),
+		},
+		{
+			label: <span className="w-full">{'Huỷ bỏ'}</span>,
+			key: 'remove',
+			disabled: user?.id !== item?.handler_id || isStart || !isProcessing,
+			danger: true,
+			onClick: () => handleRemoveHandler(item),
+		},
+	];
 
 	return (
 		<Card className="bg-[#F3F6FF]" rounded>
@@ -38,59 +55,40 @@ const StockItem: React.FC<StockItemProps> = ({ item, handleClickDetail }) => {
 				className="w-fit flex items-center gap-1 p-2 rounded-lg mb-2"
 			>
 				<span className="text-[14px] font-semibold">
-					{isProcessing ? 'Chờ kiểm hàng' : 'Đã kiểm hàng'}
+					{isStart
+						? 'Chờ xử lý'
+						: isProcessing
+							? 'Đang tiến hành'
+							: 'Đã hoàn thành'}
 				</span>
 				{isProcessing ? <Clock size={16} /> : <Check />}
 			</Tag>
-			<Flex vertical gap={4} className="mt-2">
-				<Flex gap={4} className="" align="center">
-					<div className="flex items-center">
-						<Hash size={14} color="#6b7280" />
-					</div>
-					<Text className="text-sm font-semibold">
-						{item.order?.display_id}
-					</Text>
-				</Flex>
-				<Flex gap={4} className="" align="center">
-					<div className="flex items-center">
-						<User size={18} color="#6b7280" />
-					</div>
-					<Text className="text-sm font-semibold">{`${
-						item.order?.customer?.last_name ?? ''
-					} ${item.order?.customer?.first_name ?? ''}`}</Text>
-				</Flex>
-				<Flex gap={4} className="" align="center">
-					<div className="flex items-center">
-						<Phone size={18} color="#6b7280" />
-					</div>
-					<Text className="text-sm font-semibold">
-						{item.order?.customer?.phone}
-					</Text>
-				</Flex>
-				<Flex gap={4} className="" align="center">
-					<div className="flex items-center">
-						<MapPin color="#6b7280" width={18} height={18} />
-					</div>
-					<Text className="text-sm font-semibold">{address}</Text>
-				</Flex>
-				<Flex gap={4} className="" align="center">
-					<div className="flex items-center">
-						<NotebookTabs color="#6b7280" width={18} height={18} />
-					</div>
-					<Text
-					className={clsx('text-sm font-semibold', {
-						'text-red-500': !item?.checker_id,
-						'text-green-500': item?.checker_id,
-					})}
-				>
-					{checker}
+			<Flex gap={4} className="" align="center">
+				<Text className="text-[14px] text-gray-500">Mã đơn hàng:</Text>
+				<Text className="text-sm font-semibold">{`#${item.display_id}`}</Text>
+			</Flex>
+			<Flex gap={4} className="" align="center">
+				<Text className="text-[14px] text-gray-500">Người đặt hàng:</Text>
+				<Text className="text-sm font-semibold text-wrap">{`${item.customer?.first_name || ''
+					} ${item.customer?.last_name || ''}`}</Text>
+			</Flex>
+			<Flex gap={4} className="" align="center">
+				<Text className="text-[14px] text-gray-500">Ngày đặt hàng:</Text>
+				<Text className="text-sm font-semibold">
+					{dayjs(item.created_at).format('DD/MM/YYYY')}
 				</Text>
-				</Flex>
+			</Flex>
+			<Flex gap={4} className="" align="center">
+				<Text className="text-[14px] text-gray-500">Người xử lý:</Text>
+				<Text className="text-sm font-semibold">
+					{item?.handler_id ? `${item.handler?.first_name}` : 'Chưa xác định'}
+				</Text>
 			</Flex>
 			<Flex gap={4} align="center" justify="space-between" className="mt-2">
 				<Button className="w-full" onClick={() => handleClickDetail(item)}>
-					{isProcessing ? 'Bắt đầu kiểm hàng' : 'Chi tiết'}
+					{user?.id === item?.handler_id ? 'Xuất kho' : 'Chi tiết'}
 				</Button>
+				<ActionAbles actions={actions as any} />
 			</Flex>
 		</Card>
 	);
