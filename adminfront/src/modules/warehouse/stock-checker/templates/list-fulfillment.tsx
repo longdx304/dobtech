@@ -29,7 +29,7 @@ const ListFulfillment: FC<Props> = ({}) => {
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		expand: 'order,order.customer,order.shipping_address',
+		expand: 'order,order.customer,order.shipping_address,checker',
 		isDone: activeKey,
 	});
 

@@ -4,7 +4,16 @@ import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import { Fulfillment } from '@/types/fulfillments';
-import { Check, Clock, Hash, MapPin, Phone, User } from 'lucide-react';
+import clsx from 'clsx';
+import {
+	Check,
+	Clock,
+	Hash,
+	MapPin,
+	NotebookTabs,
+	Phone,
+	User,
+} from 'lucide-react';
 
 type StockItemProps = {
 	item: Fulfillment;
@@ -19,6 +28,8 @@ const StockItem: React.FC<StockItemProps> = ({ item, handleClickDetail }) => {
 	} ${item.order?.shipping_address?.address_1 ?? ''} ${
 		item.order?.shipping_address?.province ?? ''
 	} ${item.order?.shipping_address?.country_code ?? ''}`;
+
+	const checker = item.checker?.first_name || 'Chưa có người kiểm hàng';
 
 	return (
 		<Card className="bg-[#F3F6FF]" rounded>
@@ -36,7 +47,9 @@ const StockItem: React.FC<StockItemProps> = ({ item, handleClickDetail }) => {
 					<div className="flex items-center">
 						<Hash size={14} color="#6b7280" />
 					</div>
-					<Text className="text-sm font-semibold">{item.order?.display_id}</Text>
+					<Text className="text-sm font-semibold">
+						{item.order?.display_id}
+					</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">
 					<div className="flex items-center">
@@ -59,6 +72,19 @@ const StockItem: React.FC<StockItemProps> = ({ item, handleClickDetail }) => {
 						<MapPin color="#6b7280" width={18} height={18} />
 					</div>
 					<Text className="text-sm font-semibold">{address}</Text>
+				</Flex>
+				<Flex gap={4} className="" align="center">
+					<div className="flex items-center">
+						<NotebookTabs color="#6b7280" width={18} height={18} />
+					</div>
+					<Text
+					className={clsx('text-sm font-semibold', {
+						'text-red-500': !item?.checker_id,
+						'text-green-500': item?.checker_id,
+					})}
+				>
+					{checker}
+				</Text>
 				</Flex>
 			</Flex>
 			<Flex gap={4} align="center" justify="space-between" className="mt-2">

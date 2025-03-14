@@ -39,8 +39,8 @@ const ListOutbound: FC<Props> = ({}) => {
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		status: activeKey,
-		myOrder: myOrder ? true : undefined,
+		fulfillment_status: activeKey,
+		isMyOrder: myOrder ? true : undefined,
 	});
 	const productOutboundHandler = useAdminProductOutboundHandler();
 	const productOutboundRemoveHandler = useAdminProductOutboundRemoveHandler();

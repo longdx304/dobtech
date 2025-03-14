@@ -19,8 +19,8 @@ export type ProductOutboundQueryKeyParams = {
 	q?: string;
 	offset?: number;
 	limit?: number;
-	status?: string;
-	myOrder?: boolean;
+	fulfillment_status?: string;
+	isMyOrder?: boolean;
 };
 export type AdminProductOutboundListRes = {
 	orders: Order[];
