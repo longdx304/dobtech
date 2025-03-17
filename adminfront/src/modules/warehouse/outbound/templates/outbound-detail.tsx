@@ -1,36 +1,38 @@
 'use client';
 
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input, TextArea } from '@/components/Input';
 import List from '@/components/List';
-import { Title, Text } from '@/components/Typography';
-import { ArrowLeft, Check, Search } from 'lucide-react';
-import { ChangeEvent, FC, useMemo, useState } from 'react';
-import debounce from 'lodash/debounce';
 import { Tabs } from '@/components/Tabs';
-import { TabsProps } from 'antd';
-import OutboundDetailItem from '../components/outbound-detail-item';
-import { Button } from '@/components/Button';
-import { useRouter } from 'next/navigation';
-import { ERoutes } from '@/types/routes';
+import { Text, Title } from '@/components/Typography';
+import {
+	useAdminProductOutbound,
+	useAdminUpdateProductOutbound,
+} from '@/lib/hooks/api/product-outbound';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { AdminPostOrdersOrderFulfillmentsReq } from '@medusajs/medusa';
-import { useAdminProductOutbound } from '@/lib/hooks/api/product-outbound';
-import { FulfillmentStatus } from '@/types/order';
-import OutboundModal from '../components/outbound-modal';
+import { ERoutes } from '@/types/routes';
+import { TabsProps } from 'antd';
+import debounce from 'lodash/debounce';
+import { ArrowLeft, Check, Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
+import OutboundDetailItem from '../components/outbound-detail-item';
+// import { FulfillmentStatus } from '@/types/order';
 import { ActionAbles } from '@/components/Dropdown';
-import { Modal as AntdModal, message } from 'antd';
-import Image from 'next/image';
-import PlaceholderImage from '@/modules/common/components/placeholder-image';
-import { useAdminCreateFulfillment, useAdminCreateNote } from 'medusa-react';
-import { getErrorMessage } from '@/lib/utils';
-import { LineItem } from '@/types/lineItem';
-import clsx from 'clsx';
 import { useUser } from '@/lib/providers/user-provider';
-import Notes from '../../inbound/components/notes';
+import { getErrorMessage } from '@/lib/utils';
+import PlaceholderImage from '@/modules/common/components/placeholder-image';
+import { FulfillmentStatus } from '@/types/fulfillments';
+import { LineItem } from '@/types/lineItem';
+import { message } from 'antd';
+import clsx from 'clsx';
+import { useAdminCreateNote } from 'medusa-react';
+import Image from 'next/image';
 import ConfirmOrder from '../../components/confirm-order';
-import { isEmpty } from 'lodash';
+import Notes from '../../inbound/components/notes';
+import OutboundModal from '../components/outbound-modal';
 
 type Props = {
 	id: string;
@@ -45,7 +47,8 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	const [variantId, setVariantId] = useState<string | null>(null);
 	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
 	const { order, isLoading, refetch } = useAdminProductOutbound(id);
-	const createOrderFulfillment = useAdminCreateFulfillment(id);
+	// const createOrderFulfillment = useAdminCreateFulfillment(id);
+	const updateProductOutbound = useAdminUpdateProductOutbound(id);
 
 	const createNote = useAdminCreateNote();
 
@@ -129,45 +132,22 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	};
 
 	const handleComplete = async () => {
-		let action: any = createOrderFulfillment;
-		let successText = 'Đơn hàng đã được đóng gói thành công.';
-		let requestObj;
-
-		requestObj = {
-			no_notification: false,
-		} as AdminPostOrdersOrderFulfillmentsReq;
-
-		requestObj.items = (order?.items as LineItem[])
-			?.filter(
-				(item: LineItem) =>
-					item?.warehouse_quantity - (item.fulfilled_quantity ?? 0) > 0
-			)
-			.map((item: LineItem) => ({
-				item_id: item.id,
-				quantity: item?.warehouse_quantity - (item.fulfilled_quantity ?? 0),
-			}));
-
-		const isUnsufficientQuantity = (order?.items as LineItem[]).some(
-			(item) => item.warehouse_quantity < item.quantity
-		);
-
-		if (isUnsufficientQuantity && isEmpty(noteInput)) {
-			message.error(
-				'Số lượng xuất kho không đúng với số lượng giao của đơn hàng. Vui lòng thêm ghi chú nếu muốn hoàn thành đơn'
-			);
-			return;
-		}
-		await action.mutateAsync(requestObj as any, {
-			onSuccess: () => {
-				message.success(successText);
-				refetch();
-
-				onWriteNote();
-
-				onCloseConfirm();
+		await updateProductOutbound.mutateAsync(
+			{
+				status: FulfillmentStatus.EXPORTED,
 			},
-			onError: (err: any) => message.error(getErrorMessage(err)),
-		});
+			{
+				onSuccess: () => {
+					message.success('Đơn hàng đã được xuất kho');
+					refetch();
+
+					onWriteNote();
+
+					onCloseConfirm();
+				},
+				onError: (err: any) => message.error(getErrorMessage(err)),
+			}
+		);
 	};
 
 	const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -198,10 +178,11 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 
 	const actions = [
 		isPermission && {
-			label: 'Hoàn thành lấy hàng',
+			label: 'Hoàn thành xuất kho',
 			icon: <Check size={18} />,
 			onClick: onOpenConfirm,
-			disabled: order?.fulfillment_status === FulfillmentStatus.FULFILLED,
+			disabled:
+				(order?.fulfillment_status as any) === FulfillmentStatus.EXPORTED,
 		},
 		{
 			label: 'Trang Order chi tiết',

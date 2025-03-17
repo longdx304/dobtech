@@ -4,23 +4,25 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import List from '@/components/List';
-import { Title, Text } from '@/components/Typography';
-import { Search } from 'lucide-react';
-import { ChangeEvent, FC, useState } from 'react';
-import debounce from 'lodash/debounce';
 import { Tabs } from '@/components/Tabs';
-import { message, TabsProps } from 'antd';
-import { useRouter } from 'next/navigation';
-import { ERoutes } from '@/types/routes';
+import { Text, Title } from '@/components/Typography';
 import {
 	useAdminProductOutboundHandler,
 	useAdminProductOutboundRemoveHandler,
 	useAdminProductOutbounds,
 } from '@/lib/hooks/api/product-outbound';
+import { ERoutes } from '@/types/routes';
+import { message, TabsProps } from 'antd';
+import debounce from 'lodash/debounce';
+import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, FC, useState } from 'react';
 import OutboundItem from '../components/outbound-item';
-import { FulfillmentStatus, Order } from '@/types/order';
-import { getErrorMessage } from '@/lib/utils';
+// import { FulfillmentStatus, Order } from '@/types/order';
 import { Switch } from '@/components/Switch';
+import { getErrorMessage } from '@/lib/utils';
+import { FulfillmentStatus } from '@/types/fulfillments';
+import { Order } from '@medusajs/medusa';
 
 type Props = {};
 

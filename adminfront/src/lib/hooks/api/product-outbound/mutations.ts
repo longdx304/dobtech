@@ -6,7 +6,12 @@ import {
 } from '@tanstack/react-query';
 import { useMedusa } from 'medusa-react';
 import { adminProductOutboundKeys } from './queries';
+import { Response } from '@medusajs/medusa-js';
+import { Order } from '@/types/order';
 
+interface UpdateProductOutbound {
+	data: Partial<Order>
+}
 export const useAdminProductOutboundHandler = (
 	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
 ) => {
@@ -24,15 +29,33 @@ export const useAdminProductOutboundHandler = (
 	);
 };
 
+export const useAdminUpdateProductOutbound = (
+  id: string,
+  options?: UseMutationOptions<Response<void>, Error, UpdateProductOutbound & { status?: string }>
+) => {
+  const { client } = useMedusa();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({ data, status }: { data?: UpdateProductOutbound, status?: string }) => {
+      return client.admin.custom.post(`/admin/product-outbound/${id}`, { 
+        data, 
+        status 
+      });
+    },
+    buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()])
+  );
+};
+
 export const useAdminProductOutboundCheck = (
-	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+	options?: UseMutationOptions<void, Error, { id: string, 	itemId: string[] }, unknown> | undefined
 ) => {
 	const { client } = useMedusa();
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		({ id }: { id: string }) =>
-			client.admin.custom.post(`/admin/product-outbound/${id}/check`),
+		({ id, itemId }: { id: string, itemId: string[] }) =>
+			client.admin.custom.post(`/admin/product-outbound/${id}/check`, { itemId }),
 		buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()], options)
 	);
 };

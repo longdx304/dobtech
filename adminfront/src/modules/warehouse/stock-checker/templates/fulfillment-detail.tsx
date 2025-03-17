@@ -48,8 +48,21 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 	const isProcessing = !order?.checked_at;
 
 	const handleCheckFulfillment = async () => {
-		await checkFulfillment.mutateAsync({ id });
+		await checkFulfillment.mutateAsync({ id, itemId: selectedRowKeys });
 		refetch();
+	};
+
+	const updateCheckboxesFromMetadata = () => {
+		if (isProcessing && order) {
+			// Select items that have metadata with is_outbound=true
+			const checkedItems = order.items
+				.filter((item) => item.metadata?.is_outbound === true)
+				.map((item) => item.id);
+
+			if (checkedItems.length > 0) {
+				setSelectedRowKeys(checkedItems);
+			}
+		}
 	};
 
 	useEffect(() => {
@@ -67,9 +80,10 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 						name: `Ảnh #${index + 1}`,
 					}))
 				);
-			}
+			} 
 		}
-
+ 
+		updateCheckboxesFromMetadata();
 		//eslint-disable-next-line
 	}, [order?.checker_url, order]);
 
@@ -191,7 +205,9 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					<Flex gap={4} align="center" justify="space-between" className="w-full">
 						<Button
 							onClick={() => {
-								refetch();
+								refetch().then(() => {
+									updateCheckboxesFromMetadata();
+								});
 							}}
 							icon={<Clock size={16} />}
 							className="text-sm flex items-center"
