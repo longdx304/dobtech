@@ -30,7 +30,7 @@ const StockItem: React.FC<StockItemProps> = ({
 	const isProcessing =
 		item.fulfillment_status === FulfillmentStatus.NOT_FULFILLED;
 
-	const isStart = isProcessing && !item?.handler_id;
+	const isStart = isProcessing && !item?.checker_id;
 
 	const actions = [
 		{
@@ -42,7 +42,7 @@ const StockItem: React.FC<StockItemProps> = ({
 		{
 			label: <span className="w-full">{'Huỷ bỏ'}</span>,
 			key: 'remove',
-			disabled: user?.id !== item?.handler_id || isStart || !isProcessing,
+			disabled: user?.id !== item?.checker_id || isStart || !isProcessing,
 			danger: true,
 			onClick: () => handleRemoveHandler(item),
 		},
@@ -81,12 +81,12 @@ const StockItem: React.FC<StockItemProps> = ({
 			<Flex gap={4} className="" align="center">
 				<Text className="text-[14px] text-gray-500">Người xử lý:</Text>
 				<Text className="text-sm font-semibold">
-					{item?.handler_id ? `${item.handler?.first_name}` : 'Chưa xác định'}
+					{item?.checker_id ? `${item.checker?.first_name}` : 'Chưa xác định'}
 				</Text>
 			</Flex>
 			<Flex gap={4} align="center" justify="space-between" className="mt-2">
 				<Button className="w-full" onClick={() => handleClickDetail(item)}>
-					{user?.id === item?.handler_id ? 'Kiểm hàng' : 'Chi tiết'}
+					{user?.id === item?.checker_id ? 'Kiểm hàng' : 'Chi tiết'}
 				</Button>
 				<ActionAbles actions={actions as any} />
 			</Flex>

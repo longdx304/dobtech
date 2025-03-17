@@ -16,7 +16,11 @@ export const useAdminProductOutboundHandler = (
 	return useMutation(
 		({ id }: { id: string }) =>
 			client.admin.custom.post(`/admin/product-outbound/${id}/handler`),
-		buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()], options)
+		buildOptions(
+			queryClient,
+			[adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()],
+			options
+		)
 	);
 };
 
@@ -42,6 +46,44 @@ export const useAdminProductOutboundRemoveHandler = (
 	return useMutation(
 		({ id }: { id: string }) =>
 			client.admin.custom.delete(`/admin/product-outbound/${id}/handler`),
-		buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()], options)
+		buildOptions(
+			queryClient,
+			[adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()],
+			options
+		)
+	);
+};
+
+export const useAdminStockAssignChecker = (
+	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({ id }: { id: string }) =>
+			client.admin.custom.post(`/admin/checker-stock/${id}/handler`),
+		buildOptions(
+			queryClient,
+			[adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()],
+			options
+		)
+	);
+};
+
+export const useAdminStockRemoveChecker = (
+	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({ id }: { id: string }) =>
+			client.admin.custom.delete(`/admin/checker-stock/${id}/handler`),
+		buildOptions(
+			queryClient,
+			[adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()],
+			options
+		)
 	);
 };

@@ -6,9 +6,11 @@ import List from '@/components/List';
 import { Switch } from '@/components/Switch';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
-import { useAdminCheckerStocks } from '@/lib/hooks/api/product-outbound';
+import { useAdminCheckerStocks, useAdminStockAssignChecker, useAdminStockRemoveChecker } from '@/lib/hooks/api/product-outbound';
+import { getErrorMessage } from '@/lib/utils';
 import { FulfillmentStatus, Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
+import { message } from 'antd';
 import debounce from 'lodash/debounce';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -29,6 +31,9 @@ const ListFulfillment: FC<Props> = ({ }) => {
 		FulfillmentStatus.NOT_FULFILLED
 	);
 	const [myOrder, setMyOrder] = useState(false);
+
+	const stockAssignChecker = useAdminStockAssignChecker();
+	const stockRemoveChecker = useAdminStockRemoveChecker();
 
 	const { orders, isLoading, count } = useAdminCheckerStocks({
 		q: searchValue || undefined,
@@ -69,31 +74,31 @@ const ListFulfillment: FC<Props> = ({ }) => {
 	};
 
 	const handleConfirm = async (item: Order) => {
-		// await productOutboundHandler.mutateAsync(
-		// 	{ id: item.id },
-		// 	{
-		// 		onSuccess: () => {
-		// 			router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${item.id}`);
-		// 		},
-		// 		onError: (err) => {
-		// 			message.error(getErrorMessage(err));
-		// 		},
-		// 	}
-		// );
+		await stockAssignChecker.mutateAsync(
+			{ id: item.id },
+			{
+				onSuccess: () => {
+					router.push(`${ERoutes.WAREHOUSE_STOCK_CHECKER}/${item.id}`);
+				},
+				onError: (err) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
 	};
 
 	const handleRemoveHandler = async (item: Order) => {
-		// await productOutboundRemoveHandler.mutateAsync(
-		// 	{ id: item.id },
-		// 	{
-		// 		onSuccess: () => {
-		// 			message.success('Huỷ bỏ xử lý đơn hàng thành công');
-		// 		},
-		// 		onError: (err) => {
-		// 			message.error(getErrorMessage(err));
-		// 		},
-		// 	}
-		// );
+		await stockRemoveChecker.mutateAsync(
+			{ id: item.id },
+			{
+				onSuccess: () => {
+					message.success('Huỷ bỏ xử lý đơn hàng thành công');
+				},
+				onError: (err) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
 	};
 
 	return (
