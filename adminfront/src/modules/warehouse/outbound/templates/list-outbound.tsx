@@ -18,7 +18,6 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import OutboundItem from '../components/outbound-item';
-// import { FulfillmentStatus, Order } from '@/types/order';
 import { Switch } from '@/components/Switch';
 import { getErrorMessage } from '@/lib/utils';
 import { FulfillmentStatus } from '@/types/fulfillments';
@@ -27,13 +26,13 @@ import { Order } from '@medusajs/medusa';
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
-const ListOutbound: FC<Props> = ({}) => {
+const ListOutbound: FC<Props> = ({ }) => {
 	const router = useRouter();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
 	const [activeKey, setActiveKey] = useState<string>(
-		FulfillmentStatus.NOT_FULFILLED
+		`${FulfillmentStatus.FULFILLED},${FulfillmentStatus.EXPORTED}`
 	);
 	const [myOrder, setMyOrder] = useState(false);
 
@@ -67,7 +66,7 @@ const ListOutbound: FC<Props> = ({}) => {
 			label: 'Đang thực hiện',
 		},
 		{
-			key: FulfillmentStatus.FULFILLED,
+			key: `${FulfillmentStatus.FULFILLED},${FulfillmentStatus.EXPORTED}`,
 			label: 'Đã hoàn thành',
 		},
 	];

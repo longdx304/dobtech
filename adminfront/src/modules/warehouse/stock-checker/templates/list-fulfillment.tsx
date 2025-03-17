@@ -8,7 +8,7 @@ import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import { useAdminCheckerStocks, useAdminStockAssignChecker, useAdminStockRemoveChecker } from '@/lib/hooks/api/product-outbound';
 import { getErrorMessage } from '@/lib/utils';
-import { FulfillmentStatus, Order } from '@/types/order';
+import { Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
 import { message } from 'antd';
 import debounce from 'lodash/debounce';
@@ -16,6 +16,7 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import StockItem from '../components/stock-item';
+import { FulfillmentStatus } from '@/types/fulfillments';
 
 
 type Props = {};
@@ -28,7 +29,7 @@ const ListFulfillment: FC<Props> = ({ }) => {
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
 	const [activeKey, setActiveKey] = useState<string>(
-		FulfillmentStatus.NOT_FULFILLED
+		`${FulfillmentStatus.NOT_FULFILLED},${FulfillmentStatus.EXPORTED}`
 	);
 	const [myOrder, setMyOrder] = useState(false);
 
@@ -55,7 +56,7 @@ const ListFulfillment: FC<Props> = ({ }) => {
 
 	const items: any = [
 		{
-			key: FulfillmentStatus.NOT_FULFILLED,
+			key: `${FulfillmentStatus.NOT_FULFILLED},${FulfillmentStatus.EXPORTED}`,
 			label: 'Chờ kiểm hàng',
 		},
 		{

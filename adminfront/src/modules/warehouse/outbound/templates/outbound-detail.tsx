@@ -47,7 +47,6 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	const [variantId, setVariantId] = useState<string | null>(null);
 	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
 	const { order, isLoading, refetch } = useAdminProductOutbound(id);
-	// const createOrderFulfillment = useAdminCreateFulfillment(id);
 	const updateProductOutbound = useAdminUpdateProductOutbound(id);
 
 	const createNote = useAdminCreateNote();
@@ -134,8 +133,8 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	const handleComplete = async () => {
 		await updateProductOutbound.mutateAsync(
 			{
-				status: FulfillmentStatus.EXPORTED,
-			},
+				fulfillment_status: FulfillmentStatus.EXPORTED,
+			} as any,
 			{
 				onSuccess: () => {
 					message.success('Đơn hàng đã được xuất kho');
@@ -334,9 +333,8 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 					</span>
 					{item?.variant && (
 						<span className="font-normal text-gray-500 truncate">
-							{`${item.variant.title}${
-								item.variant.sku ? ` (${item.variant.sku})` : ''
-							}`}
+							{`${item.variant.title}${item.variant.sku ? ` (${item.variant.sku})` : ''
+								}`}
 						</span>
 					)}
 				</div>

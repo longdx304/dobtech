@@ -5,7 +5,8 @@ import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import { useUser } from '@/lib/providers/user-provider';
-import { FulfillmentStatus, Order } from '@/types/order';
+import { FulfillmentStatus } from '@/types/fulfillments';
+import { Order } from '@/types/order';
 import dayjs from 'dayjs';
 import {
 	Check,
@@ -28,7 +29,8 @@ const StockItem: React.FC<StockItemProps> = ({
 	const { user } = useUser();
 
 	const isProcessing =
-		item.fulfillment_status === FulfillmentStatus.NOT_FULFILLED;
+		[FulfillmentStatus.NOT_FULFILLED, FulfillmentStatus.EXPORTED].includes(
+			item.fulfillment_status as FulfillmentStatus);
 
 	const isStart = isProcessing && !item?.checker_id;
 
