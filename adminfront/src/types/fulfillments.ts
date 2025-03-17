@@ -64,7 +64,7 @@ export class AdminGetFulfillmentsParams extends AdminListFulfillmentsSelector {
 	 */
 	order?: string;
 
-	isDone?: boolean;
+	isMyOrder?: boolean;
 }
 
 export enum FulfullmentStatus {
