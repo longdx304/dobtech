@@ -4,34 +4,35 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import List from '@/components/List';
-import { Title, Text } from '@/components/Typography';
-import { Search } from 'lucide-react';
-import { ChangeEvent, FC, useState } from 'react';
-import debounce from 'lodash/debounce';
 import { Tabs } from '@/components/Tabs';
-import { message, TabsProps } from 'antd';
-import { useRouter } from 'next/navigation';
-import { ERoutes } from '@/types/routes';
+import { Text, Title } from '@/components/Typography';
 import {
 	useAdminProductOutboundHandler,
 	useAdminProductOutboundRemoveHandler,
 	useAdminProductOutbounds,
 } from '@/lib/hooks/api/product-outbound';
+import { ERoutes } from '@/types/routes';
+import { message, TabsProps } from 'antd';
+import debounce from 'lodash/debounce';
+import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, FC, useState } from 'react';
 import OutboundItem from '../components/outbound-item';
-import { FulfillmentStatus, Order } from '@/types/order';
-import { getErrorMessage } from '@/lib/utils';
 import { Switch } from '@/components/Switch';
+import { getErrorMessage } from '@/lib/utils';
+import { FulfillmentStatus } from '@/types/fulfillments';
+import { Order } from '@medusajs/medusa';
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
-const ListOutbound: FC<Props> = ({}) => {
+const ListOutbound: FC<Props> = ({ }) => {
 	const router = useRouter();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
 	const [activeKey, setActiveKey] = useState<string>(
-		FulfillmentStatus.NOT_FULFILLED
+		`${FulfillmentStatus.FULFILLED},${FulfillmentStatus.EXPORTED}`
 	);
 	const [myOrder, setMyOrder] = useState(false);
 
@@ -39,8 +40,8 @@ const ListOutbound: FC<Props> = ({}) => {
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		status: activeKey,
-		myOrder: myOrder ? true : undefined,
+		fulfillment_status: activeKey,
+		isMyOrder: myOrder ? true : undefined,
 	});
 	const productOutboundHandler = useAdminProductOutboundHandler();
 	const productOutboundRemoveHandler = useAdminProductOutboundRemoveHandler();
@@ -65,7 +66,7 @@ const ListOutbound: FC<Props> = ({}) => {
 			label: 'Đang thực hiện',
 		},
 		{
-			key: FulfillmentStatus.FULFILLED,
+			key: `${FulfillmentStatus.FULFILLED},${FulfillmentStatus.EXPORTED}`,
 			label: 'Đã hoàn thành',
 		},
 	];

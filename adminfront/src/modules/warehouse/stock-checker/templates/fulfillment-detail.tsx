@@ -3,26 +3,38 @@ import { splitFiles } from '@/actions/images';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
-import { Input } from '@/components/Input';
+import { Image } from '@/components/Image';
+import { Input, TextArea } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import UploadTemplate from '@/components/Upload/UploadTemplate';
 import {
-	useAdminFulfillment,
-	useAdminUpdateFulfillment,
-} from '@/lib/hooks/api/fulfullment';
+	useAdminProductOutbound,
+	useAdminProductOutboundCheck,
+	useAdminUpdateProductOutbound,
+} from '@/lib/hooks/api/product-outbound';
 import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
+import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
+import PlaceholderImage from '@/modules/common/components/placeholder-image';
 import { FormImage } from '@/types/common';
+import { FulfillmentStatus } from '@/types/fulfillments';
+import { LineItem } from '@/types/lineItem';
 import { Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
+import { AdminPostOrdersOrderFulfillmentsReq } from '@medusajs/medusa';
 import { Divider, message } from 'antd';
+import clsx from 'clsx';
+import { isEmpty } from 'lodash';
 import debounce from 'lodash/debounce';
-import { ArrowLeft, Check, Clock, Hash, MapPin, Search } from 'lucide-react';
+import { ArrowLeft, Check, Clock, Hash, MapPin, Search, UserCheck } from 'lucide-react';
+import { useAdminCreateFulfillment, useAdminCreateNote } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import ConfirmOrder from '../../components/confirm-order';
 import fulfillmentColumns from './columns';
+import { useUser } from '@/lib/providers/user-provider';
 
 type FulfillmentDetailProps = {
 	id: string;
@@ -30,23 +42,66 @@ type FulfillmentDetailProps = {
 
 const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 	const router = useRouter();
+	const { user } = useUser();
+
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 	const [files, setFiles] = useState<FormImage[]>([]);
 
-	const { fulfillment, isLoading } = useAdminFulfillment(id);
-	const updateFulfillment = useAdminUpdateFulfillment(id);
+	const {
+		state: confirmState,
+		onOpen: onOpenConfirm,
+		onClose: onCloseConfirm,
+	} = useToggleState(false);
+	const [noteInput, setNoteInput] = useState<string>('');
+
+	const createOrderFulfillment = useAdminCreateFulfillment(id);
+	const updateProductOutbound = useAdminUpdateProductOutbound(id);
+	const createNote = useAdminCreateNote();
+	const {
+		order,
+		isLoading: isLoadingOrder,
+		refetch,
+	} = useAdminProductOutbound(id);
+	const checkFulfillment = useAdminProductOutboundCheck();
 	const uploadFile = useAdminUploadFile();
 
-	const isProcessing = !fulfillment?.checked_at;
+	const isProcessing = order?.fulfillment_status !== FulfillmentStatus.FULFILLED;
+
+	const isPermission = useMemo(() => {
+		if (!user) return false;
+		if (user.role === 'admin' || order?.checker_id === user.id) return true;
+		return false;
+	}, [user, order?.checker_id]);
+
+	const handleCheckFulfillment = async () => {
+		await checkFulfillment.mutateAsync({ id, itemId: selectedRowKeys });
+		refetch();
+	};
+
+	const updateCheckboxesFromMetadata = () => {
+		if (isProcessing && order) {
+			// Select items that have metadata with is_outbound=true
+			const checkedItems = order.items
+				.filter((item) => item.metadata?.is_outbound === true)
+				.map((item) => item.id);
+
+			if (checkedItems.length > 0) {
+				setSelectedRowKeys(checkedItems);
+			}
+		}
+	};
 
 	useEffect(() => {
-		if (!isProcessing) {
-			const items = fulfillment.items.map((item) => item.item_id);
+		if (!isProcessing && order) {
+			// Map item IDs for selection
+			const items = order.items.map((item) => item.id);
 			setSelectedRowKeys(items);
-			if (fulfillment?.checker_url?.length) {
+
+			// Handle checker_url if it exists
+			if (order?.checker_url?.length) {
 				setFiles(
-					fulfillment.checker_url.split(',').map((url, index) => ({
+					order.checker_url.split(',').map((url, index) => ({
 						id: url,
 						url,
 						name: `Ảnh #${index + 1}`,
@@ -55,8 +110,9 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 			}
 		}
 
+		updateCheckboxesFromMetadata();
 		//eslint-disable-next-line
-	}, [fulfillment?.checker_url]);
+	}, [order?.checker_url, order]);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -64,11 +120,14 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 	}, 500);
 
 	const itemTable = useMemo(() => {
-		if (!fulfillment) return [];
-		return fulfillment.items.filter(({ item }: any) =>
-			item.title.toLowerCase().includes(searchValue.toLowerCase())
+		if (!order) return [];
+		const items = order?.items?.filter(
+			(item: any) =>
+				item?.title?.toLowerCase()?.includes(searchValue.toLowerCase())
 		);
-	}, [fulfillment, searchValue]);
+
+		return items
+	}, [order, searchValue]);
 
 	const handleBackToList = () => {
 		router.push(ERoutes.WAREHOUSE_STOCK_CHECKER);
@@ -76,6 +135,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 
 	const handleRowSelectionChange = (selectedRowKeys: string[]) => {
 		setSelectedRowKeys(selectedRowKeys);
+		handleCheckFulfillment();
 	};
 
 	const onConfirm = async () => {
@@ -87,7 +147,39 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 			message.warning('Vui lòng tải lên hình ảnh sản phẩm');
 			return;
 		}
+		if ((order?.fulfillment_status as FulfillmentStatus) !== FulfillmentStatus.EXPORTED) {
+			message.warning('Đơn hàng chưa được xác nhận xuất kho');
+			return
+		}
 
+		onOpenConfirm();
+		return;
+	};
+
+	if (!order) return null;
+
+	const onWriteNote = () => {
+		if (!noteInput) {
+			return;
+		}
+		createNote.mutate(
+			{
+				resource_id: id,
+				resource_type: 'product-outbound',
+				value: noteInput,
+			},
+			{
+				onSuccess: () => {
+					message.success('Ghi chú đã được tạo');
+				},
+				onError: (err) => message.error(getErrorMessage(err)),
+			}
+		);
+		setNoteInput('');
+	};
+
+	// Function upload images
+	const handleUploadFile = async () => {
 		const { uploadImages } = splitFiles(files);
 
 		// Split images into chunks of maximum 5 images each
@@ -121,32 +213,87 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 
 			// Flatten the array of URLs
 			const allUrls = results.flat();
-
-			// Update fulfillment with all URLs
-			await updateFulfillment.mutateAsync(
-				{
-					checker_url: allUrls.join(','),
-				},
-				{
-					onSuccess: () => {
-						message.success('Kiểm hàng thành công');
-					},
-					onError: (error) => {
-						message.error(getErrorMessage(error));
-					},
-				}
-			);
+			return allUrls.join(',');
 		} catch (error) {
-			message.error('Có lỗi xảy ra khi tải lên hình ảnh');
-			console.error('Upload error:', error);
+			return null;
 		} finally {
 			// Close loading message
 			loadingMessage();
 		}
-		return;
 	};
 
-	if (!fulfillment) return null;
+	// Function update checker_url & checked_at
+	const handleCompleteChecker = (filesUrl: string) => {
+		updateProductOutbound.mutate(
+			{
+				checker_url: filesUrl,
+				checked_at: new Date().toISOString(),
+			},
+			{
+				onSuccess: () => {
+					refetch();
+				},
+				onError: (err: any) => message.error(getErrorMessage(err)),
+			}
+		);
+	}
+	const handleComplete = async () => {
+		let action: any = createOrderFulfillment;
+		let successText = 'Đơn hàng đã được kiêm hàng thành công.';
+		let requestObj;
+
+		requestObj = {
+			no_notification: false,
+		} as AdminPostOrdersOrderFulfillmentsReq;
+
+		requestObj.items = (order?.items as LineItem[])
+			?.filter(
+				(item: LineItem) =>
+					item?.warehouse_quantity - (item.fulfilled_quantity ?? 0) > 0
+			)
+			.map((item: LineItem) => ({
+				item_id: item.id,
+				quantity: item?.warehouse_quantity - (item.fulfilled_quantity ?? 0),
+			}));
+
+		const isUnsufficientQuantity = (order?.items as LineItem[]).some(
+			(item) => item.warehouse_quantity < item.quantity
+		);
+
+		if (isUnsufficientQuantity && isEmpty(noteInput)) {
+			message.error(
+				'Số lượng xuất kho không đúng với số lượng giao của đơn hàng. Vui lòng thêm ghi chú nếu muốn hoàn thành đơn'
+			);
+			return;
+		}
+
+		// Check upload file before create fulfillment
+		const filesUrl = await handleUploadFile();
+		if (!filesUrl) {
+			message.error('Có lỗi xảy ra khi tải ảnh lên');
+			return;
+		}
+
+		await action.mutateAsync(requestObj as any, {
+			onSuccess: () => {
+				message.success(successText);
+				refetch();
+
+				handleCompleteChecker(filesUrl);
+
+				onWriteNote();
+
+				onCloseConfirm();
+			},
+			onError: (err: any) => message.error(getErrorMessage(err)),
+		});
+	};
+
+	const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+		const { value: inputValue } = e.target;
+
+		setNoteInput(inputValue);
+	};
 
 	return (
 		<Flex vertical gap={12}>
@@ -160,8 +307,8 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					Danh sách đơn hàng
 				</Button>
 			</Flex>
-			<Card loading={isLoading} className="w-full mb-10" rounded>
-				<OrderInfo order={fulfillment!.order} isProcessing={isProcessing} />
+			<Card loading={isLoadingOrder} className="w-full mb-10" rounded>
+				<OrderInfo order={order!} isProcessing={isProcessing} />
 				<Flex
 					vertical
 					align="flex-end"
@@ -169,20 +316,34 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					className="py-4"
 					gap={4}
 				>
-					<Input
-						placeholder="Tìm kiếm sản phẩm..."
-						name="search"
-						prefix={<Search size={16} />}
-						onChange={handleChangeDebounce}
-						className="w-full sm:w-[300px]"
-					/>
-					<Text className="text-gray-500 text-xs">{`Đã kiểm ${
-						selectedRowKeys?.length ?? 0
-					} trong ${itemTable?.length}`}</Text>
+					<Flex gap={4} align="center" justify="space-between" className="w-full">
+						<Button
+							onClick={() => {
+								refetch().then(() => {
+									updateCheckboxesFromMetadata();
+								});
+							}}
+							icon={<Clock size={16} />}
+							className="text-sm flex items-center"
+						>
+							Làm mới
+						</Button>
+
+						<Input
+							placeholder="Tìm kiếm sản phẩm..."
+							name="search"
+							prefix={<Search size={16} />}
+							onChange={handleChangeDebounce}
+							className="w-full sm:w-[300px]"
+						/>
+					</Flex>
+
+					<Text className="text-gray-500 text-xs">{`Đã kiểm ${selectedRowKeys?.length ?? 0
+						} trong ${itemTable?.length}`}</Text>
 					<Table
 						columns={fulfillmentColumns as any}
 						dataSource={itemTable}
-						rowKey="item_id"
+						rowKey="id"
 						showHeader={false}
 						rowSelection={{
 							type: 'checkbox',
@@ -190,21 +351,21 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 							onChange: handleRowSelectionChange as any,
 							preserveSelectedRowKeys: true,
 							getCheckboxProps: (record: any) => ({
-								disabled: !isProcessing,
+								disabled: !isProcessing || record?.warehouse_quantity !== record.quantity || !isPermission,
 							}),
 						}}
 					/>
 					<Divider />
-					<UploadTemplate
+					{isPermission && <UploadTemplate
 						files={files}
 						setFiles={setFiles}
 						hiddenUpload={!isProcessing}
-					/>
+					/>}
 
 					<Button
-						disabled={!isProcessing}
+						disabled={!isProcessing || !isPermission}
 						onClick={onConfirm}
-						loading={updateFulfillment.isLoading || uploadFile.isLoading}
+						loading={createOrderFulfillment.isLoading || uploadFile.isLoading || updateProductOutbound.isLoading}
 						type="primary"
 						className="w-full sm:w-[200px]"
 					>
@@ -212,6 +373,33 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					</Button>
 				</Flex>
 			</Card>
+			{confirmState && (
+				<ConfirmOrder
+					state={confirmState}
+					title="Xác nhận hoàn kiểm hàng xuất kho"
+					handleOk={handleComplete}
+					handleCancel={onCloseConfirm}
+					isLoading={createOrderFulfillment.isLoading || uploadFile.isLoading || updateProductOutbound.isLoading}
+				>
+					{/* Danh sách san pham */}
+					{order?.items.map((item, idx) => {
+						return (
+							<FulfillmentLine
+								item={item as LineItem}
+								key={`fulfillmentLine-${idx}`}
+							/>
+						);
+					})}
+
+					{/* Ghi chú */}
+					<TextArea
+						value={noteInput}
+						onChange={onChangeInput}
+						placeholder="Nhập ghi chú"
+						className="w-full"
+					/>
+				</ConfirmOrder>
+			)}
 		</Flex>
 	);
 };
@@ -225,11 +413,40 @@ const OrderInfo = ({
 	order: Order;
 	isProcessing: boolean;
 }) => {
-	const address = `${order.shipping_address?.address_2 ?? ''} ${
-		order.shipping_address?.city ?? ''
-	} ${order.shipping_address?.address_1 ?? ''} ${
-		order.shipping_address?.province ?? ''
-	} ${order.shipping_address?.country_code ?? ''}`;
+	// Get shipping address from the order
+	const shippingAddressId = order.shipping_address_id;
+	const billingAddressId = order.billing_address_id;
+
+	// Format address based on available data
+	let address = '';
+
+	// Try to construct address from shipping_address if it exists
+	if (order.shipping_address) {
+		address = [
+			order.shipping_address.address_2,
+			order.shipping_address.city,
+			order.shipping_address.address_1,
+			order.shipping_address.province,
+			order.shipping_address.country_code,
+		]
+			.filter(Boolean)
+			.join(', ');
+	} else {
+		// Fallback address display
+		address = `Shipping Address ID: ${shippingAddressId || 'N/A'
+			}, Billing Address ID: ${billingAddressId || 'N/A'}`;
+	}
+
+	// Get customer information
+	const customerName = order.customer
+		? `${order.customer.last_name || ''} ${order.customer.first_name || ''
+			}`.trim()
+		: '';
+	const customerPhone = order.customer?.phone || '';
+
+	const checker = order?.checker
+		? `${order?.checker?.first_name}`
+		: 'Chưa xác định';
 
 	return (
 		<div>
@@ -248,9 +465,8 @@ const OrderInfo = ({
 						<Hash size={14} color="#6b7280" />
 					</div>
 					<Text className="text-sm font-semibold">
-						{`${order?.display_id} - ${order.customer.last_name ?? ''} ${
-							order.customer.first_name ?? ''
-						} - ${order.customer.phone ?? ''}`}
+						{`${order?.display_id || ''} ${customerName ? `- ${customerName}` : ''
+							} ${customerPhone ? `- ${customerPhone}` : ''}`}
 					</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">
@@ -259,7 +475,71 @@ const OrderInfo = ({
 					</div>
 					<Text className="text-sm font-semibold">{address}</Text>
 				</Flex>
+				<Flex gap={4} className="" align="center">
+					<div className="flex items-center">
+						<UserCheck color="#6b7280" width={18} height={18} />
+					</div>
+					<Text className="text-sm font-semibold">
+						{`Người kiểm hàng: ${checker}`}
+					</Text>
+				</Flex>
 			</Flex>
+		</div>
+	);
+};
+
+export const getFulfillAbleQuantity = (item: LineItem): number => {
+	return item.quantity - (item.fulfilled_quantity ?? 0);
+};
+
+const FulfillmentLine = ({ item }: { item: LineItem }) => {
+	if (getFulfillAbleQuantity(item) <= 0) {
+		return null;
+	}
+
+	return (
+		<div className="hover:bg-gray-50 rounded-md mx-[-5px] mb-1 flex h-[64px] justify-between px-[5px] cursor-pointer">
+			<div className="flex justify-center items-center space-x-4">
+				<div className="rounded-sm flex h-[48px] w-[36px] overflow-hidden">
+					{item.thumbnail ? (
+						<Image
+							src={item.thumbnail}
+							height={48}
+							width={36}
+							alt={`Image summary ${item.title}`}
+							className="object-cover"
+						/>
+					) : (
+						<PlaceholderImage />
+					)}
+				</div>
+				<div className="flex max-w-[185px] flex-col justify-center text-[12px]">
+					<span className="font-normal text-gray-900 truncate">
+						{item.title}
+					</span>
+					{item?.variant && (
+						<span className="font-normal text-gray-500 truncate">
+							{`${item.variant.title}${item.variant.sku ? ` (${item.variant.sku})` : ''
+								}`}
+						</span>
+					)}
+				</div>
+			</div>
+			<div className="flex items-center">
+				<span className="flex text-gray-500 text-xs">
+					<span
+						className={clsx('pl-1', {
+							'text-red-500':
+								item.warehouse_quantity - (item.fulfilled_quantity ?? 0) >
+								getFulfillAbleQuantity(item),
+						})}
+					>
+						{item.warehouse_quantity - (item.fulfilled_quantity ?? 0)}
+					</span>
+					{'/'}
+					<span className="pl-1">{getFulfillAbleQuantity(item)}</span>
+				</span>
+			</div>
 		</div>
 	);
 };

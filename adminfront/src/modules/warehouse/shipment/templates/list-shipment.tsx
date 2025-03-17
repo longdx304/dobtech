@@ -16,7 +16,7 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import ShipmentItem from '../components/shipment-item';
-import { message } from 'antd';
+import { message, Switch } from 'antd';
 import { getErrorMessage } from '@/lib/utils';
 
 type Props = {};
@@ -32,14 +32,15 @@ const ListShipment: FC<Props> = ({}) => {
 	const [activeKey, setActiveKey] = useState<FulfullmentStatus>(
 		FulfullmentStatus.AWAITING
 	);
+	const [myOrder, setMyOrder] = useState(false);
 
 	const { fulfillments, isLoading, count } = useAdminFulfillments({
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
 		expand: 'order,order.customer,order.shipping_address,shipper,checker',
-		isDone: true,
 		status: activeKey,
+		isMyOrder: myOrder ? true : undefined,
 	});
 
 	const updateFulfillment = useAdminAssignShipment();
@@ -125,7 +126,14 @@ const ListShipment: FC<Props> = ({}) => {
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				<Title level={4}>Theo dõi các đơn hàng</Title>
-				<Flex align="center" justify="flex-end" className="py-4">
+				<Flex align="center" justify="space-between" className="py-4">
+					<Flex align="center" gap={8}>
+						<Text className="text-gray-700 font-medium">Đơn hàng của tôi</Text>
+						<Switch
+							checked={myOrder}
+							onChange={(checked) => setMyOrder(checked)}
+						/>
+					</Flex>
 					<Input
 						placeholder="Tìm kiếm đơn hàng..."
 						name="search"

@@ -64,7 +64,7 @@ export class AdminGetFulfillmentsParams extends AdminListFulfillmentsSelector {
 	 */
 	order?: string;
 
-	isDone?: boolean;
+	isMyOrder?: boolean;
 }
 
 export enum FulfullmentStatus {
@@ -100,3 +100,44 @@ export type AdminAssignShipment = {
 	fulfillment_id: string;
 	status: FulfullmentStatus;
 };
+
+export enum FulfillmentStatus {
+	/**
+	 * The order's items are not fulfilled.
+	 */
+	NOT_FULFILLED = "not_fulfilled",
+	/**
+	 * Some of the order's items, but not all, are fulfilled.
+	 */
+	PARTIALLY_FULFILLED = "partially_fulfilled",
+	/**
+	 * The order's items are fulfilled.
+	 */
+	FULFILLED = "fulfilled",
+	/**
+	 * Some of the order's items, but not all, are shipped.
+	 */
+	PARTIALLY_SHIPPED = "partially_shipped",
+	/**
+	 * The order's items are shipped.
+	 */
+	SHIPPED = "shipped",
+	/**
+	 * Some of the order's items, but not all, are returned.
+	 */
+	PARTIALLY_RETURNED = "partially_returned",
+	/**
+	 * The order's items are returned.
+	 */
+	RETURNED = "returned",
+	/**
+	 * The order's fulfillments are canceled.
+	 */
+	CANCELED = "canceled",
+	/**
+	 * The order's fulfillment requires action.
+	 */
+	REQUIRES_ACTION = "requires_action",
+
+	EXPORTED = 'exported'
+}
