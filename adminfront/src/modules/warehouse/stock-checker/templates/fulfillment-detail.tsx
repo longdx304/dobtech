@@ -8,10 +8,7 @@ import { Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import UploadTemplate from '@/components/Upload/UploadTemplate';
-import {
-	useAdminFulfillment,
-	useAdminUpdateFulfillment,
-} from '@/lib/hooks/api/fulfullment';
+import { useAdminUpdateFulfillment } from '@/lib/hooks/api/fulfullment';
 import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import { getErrorMessage } from '@/lib/utils';
 import { FormImage } from '@/types/common';
@@ -23,6 +20,10 @@ import { ArrowLeft, Check, Clock, Hash, MapPin, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import fulfillmentColumns from './columns';
+import {
+	useAdminProductOutbound,
+	useAdminProductOutboundCheck,
+} from '@/lib/hooks/api/product-outbound';
 
 type FulfillmentDetailProps = {
 	id: string;
@@ -34,19 +35,33 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 	const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 	const [files, setFiles] = useState<FormImage[]>([]);
 
-	const { fulfillment, isLoading } = useAdminFulfillment(id);
+	const {
+		order,
+		isLoading: isLoadingOrder,
+		refetch,
+	} = useAdminProductOutbound(id);
+	const checkFulfillment = useAdminProductOutboundCheck();
+
 	const updateFulfillment = useAdminUpdateFulfillment(id);
 	const uploadFile = useAdminUploadFile();
 
-	const isProcessing = !fulfillment?.checked_at;
+	const isProcessing = !order?.checked_at;
+
+	const handleCheckFulfillment = async () => {
+		await checkFulfillment.mutateAsync({ id });
+		refetch();
+	};
 
 	useEffect(() => {
-		if (!isProcessing) {
-			const items = fulfillment.items.map((item) => item.item_id);
+		if (!isProcessing && order) {
+			// Map item IDs for selection
+			const items = order.items.map((item) => item.id);
 			setSelectedRowKeys(items);
-			if (fulfillment?.checker_url?.length) {
+
+			// Handle checker_url if it exists
+			if (order?.checker_url?.length) {
 				setFiles(
-					fulfillment.checker_url.split(',').map((url, index) => ({
+					order.checker_url.split(',').map((url, index) => ({
 						id: url,
 						url,
 						name: `Ảnh #${index + 1}`,
@@ -56,7 +71,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 		}
 
 		//eslint-disable-next-line
-	}, [fulfillment?.checker_url]);
+	}, [order?.checker_url, order]);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -64,11 +79,13 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 	}, 500);
 
 	const itemTable = useMemo(() => {
-		if (!fulfillment) return [];
-		return fulfillment.items.filter(({ item }: any) =>
-			item.title.toLowerCase().includes(searchValue.toLowerCase())
+		if (!order) return [];
+		return order?.items?.filter(
+			(item) =>
+				item?.title?.toLowerCase()?.includes(searchValue.toLowerCase()) &&
+				item.quantity === item.warehouse_quantity
 		);
-	}, [fulfillment, searchValue]);
+	}, [order, searchValue]);
 
 	const handleBackToList = () => {
 		router.push(ERoutes.WAREHOUSE_STOCK_CHECKER);
@@ -76,6 +93,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 
 	const handleRowSelectionChange = (selectedRowKeys: string[]) => {
 		setSelectedRowKeys(selectedRowKeys);
+		handleCheckFulfillment();
 	};
 
 	const onConfirm = async () => {
@@ -130,6 +148,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 				{
 					onSuccess: () => {
 						message.success('Kiểm hàng thành công');
+						refetch();
 					},
 					onError: (error) => {
 						message.error(getErrorMessage(error));
@@ -146,7 +165,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 		return;
 	};
 
-	if (!fulfillment) return null;
+	if (!order) return null;
 
 	return (
 		<Flex vertical gap={12}>
@@ -160,8 +179,8 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					Danh sách đơn hàng
 				</Button>
 			</Flex>
-			<Card loading={isLoading} className="w-full mb-10" rounded>
-				<OrderInfo order={fulfillment!.order} isProcessing={isProcessing} />
+			<Card loading={isLoadingOrder} className="w-full mb-10" rounded>
+				<OrderInfo order={order!} isProcessing={isProcessing} />
 				<Flex
 					vertical
 					align="flex-end"
@@ -169,19 +188,40 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					className="py-4"
 					gap={4}
 				>
-					<Input
-						placeholder="Tìm kiếm sản phẩm..."
-						name="search"
-						prefix={<Search size={16} />}
-						onChange={handleChangeDebounce}
-						className="w-full sm:w-[300px]"
-					/>
+					<Flex gap={4} align="center" justify="space-between" className="w-full">
+						<Button
+							onClick={() => {
+								refetch();
+							}}
+							icon={<Clock size={16} />}
+							className="text-sm flex items-center"
+						>
+							Làm mới
+						</Button>
+
+						<Input
+							placeholder="Tìm kiếm sản phẩm..."
+							name="search"
+							prefix={<Search size={16} />}
+							onChange={handleChangeDebounce}
+							className="w-full sm:w-[300px]"
+						/>
+					</Flex>
+
 					<Text className="text-gray-500 text-xs">{`Đã kiểm ${
 						selectedRowKeys?.length ?? 0
 					} trong ${itemTable?.length}`}</Text>
 					<Table
 						columns={fulfillmentColumns as any}
-						dataSource={itemTable}
+						dataSource={itemTable.map((item) => ({
+							item_id: item.id,
+							item: {
+								thumbnail: item.thumbnail,
+								title: item.title,
+								description: item.description,
+								fulfilled_quantity: item.quantity,
+							},
+						}))}
 						rowKey="item_id"
 						showHeader={false}
 						rowSelection={{
@@ -225,11 +265,38 @@ const OrderInfo = ({
 	order: Order;
 	isProcessing: boolean;
 }) => {
-	const address = `${order.shipping_address?.address_2 ?? ''} ${
-		order.shipping_address?.city ?? ''
-	} ${order.shipping_address?.address_1 ?? ''} ${
-		order.shipping_address?.province ?? ''
-	} ${order.shipping_address?.country_code ?? ''}`;
+	// Get shipping address from the order
+	const shippingAddressId = order.shipping_address_id;
+	const billingAddressId = order.billing_address_id;
+
+	// Format address based on available data
+	let address = '';
+
+	// Try to construct address from shipping_address if it exists
+	if (order.shipping_address) {
+		address = [
+			order.shipping_address.address_2,
+			order.shipping_address.city,
+			order.shipping_address.address_1,
+			order.shipping_address.province,
+			order.shipping_address.country_code,
+		]
+			.filter(Boolean)
+			.join(', ');
+	} else {
+		// Fallback address display
+		address = `Shipping Address ID: ${
+			shippingAddressId || 'N/A'
+		}, Billing Address ID: ${billingAddressId || 'N/A'}`;
+	}
+
+	// Get customer information
+	const customerName = order.customer
+		? `${order.customer.last_name || ''} ${
+				order.customer.first_name || ''
+		  }`.trim()
+		: '';
+	const customerPhone = order.customer?.phone || '';
 
 	return (
 		<div>
@@ -248,9 +315,9 @@ const OrderInfo = ({
 						<Hash size={14} color="#6b7280" />
 					</div>
 					<Text className="text-sm font-semibold">
-						{`${order?.display_id} - ${order.customer.last_name ?? ''} ${
-							order.customer.first_name ?? ''
-						} - ${order.customer.phone ?? ''}`}
+						{`${order?.display_id || ''} ${
+							customerName ? `- ${customerName}` : ''
+						} ${customerPhone ? `- ${customerPhone}` : ''}`}
 					</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">

@@ -20,6 +20,19 @@ export const useAdminProductOutboundHandler = (
 	);
 };
 
+export const useAdminProductOutboundCheck = (
+	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({ id }: { id: string }) =>
+			client.admin.custom.post(`/admin/product-outbound/${id}/check`),
+		buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()], options)
+	);
+};
+
 export const useAdminProductOutboundRemoveHandler = (
 	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
 ) => {

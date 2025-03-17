@@ -7,7 +7,6 @@ import { Switch } from '@/components/Switch';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import { useAdminCheckerStocks } from '@/lib/hooks/api/product-outbound';
-import { Fulfillment } from '@/types/fulfillments';
 import { FulfillmentStatus, Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
 import debounce from 'lodash/debounce';
@@ -51,11 +50,11 @@ const ListFulfillment: FC<Props> = ({ }) => {
 
 	const items: any = [
 		{
-			key: false,
+			key: FulfillmentStatus.NOT_FULFILLED,
 			label: 'Chờ kiểm hàng',
 		},
 		{
-			key: true,
+			key: FulfillmentStatus.FULFILLED,
 			label: 'Đã kiểm hàng',
 		},
 	];
