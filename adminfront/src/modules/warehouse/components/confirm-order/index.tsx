@@ -3,17 +3,19 @@ import React from 'react';
 
 type Props = {
 	state: boolean;
-  title: string;
+	title: string;
 	children?: React.ReactNode;
 	handleOk: () => void;
 	handleCancel: () => void;
+	isLoading?: boolean;
 };
 const ConfirmOrder: React.FC<Props> = ({
 	state,
-  title,
+	title,
 	children,
 	handleOk,
 	handleCancel,
+	isLoading,
 }) => {
 	return (
 		<Modal
@@ -22,6 +24,7 @@ const ConfirmOrder: React.FC<Props> = ({
 			width={600}
 			handleOk={handleOk}
 			handleCancel={handleCancel}
+			isLoading={isLoading}
 		>
 			{children}
 		</Modal>

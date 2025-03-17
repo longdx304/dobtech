@@ -14,9 +14,9 @@ const fulfillmentColumns = [
 		width: 40,
 		className: 'w-fit text-xs',
 		fixed: 'left',
-		render: (_: any, record: FulfillmentItem) => (
+		render: (_: any, record: LineItem) => (
 			<Image
-				src={record.item.thumbnail ?? '/images/product-img.png'}
+				src={record.thumbnail ?? '/images/product-img.png'}
 				alt="Product Thumbnail"
 				width={40}
 				height={40}
@@ -26,17 +26,20 @@ const fulfillmentColumns = [
 	},
 	{
 		title: '',
-		key: 'item',
+		key: '',
 		dataIndex: 'item',
 		// width: 150,
 		className: 'text-xs',
-		render: (_: LineItem, record: FulfillmentItem) => (
+		render: (_: any, record: LineItem) => (
 			<Flex vertical className="flex items-start justify-start">
 				<Text className="text-xs line-clamp-2" strong tooltip>
-					{`${record.item.title} - ${record.item.description}`}
+					{`${record.title} - ${record.description}`}
 				</Text>
 				<Text className="line-clamp-2" classNameText="text-[12px]">
-					{`Số lượng: ${record.item.fulfilled_quantity}`}
+					{`Xuất kho / Số lượng đơn`}
+				</Text>
+				<Text className="line-clamp-2" classNameText="text-[12px]">
+					{`${record.warehouse_quantity} / ${record.quantity}`}
 				</Text>
 			</Flex>
 		),

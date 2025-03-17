@@ -1,4 +1,5 @@
-import { FindParams, Order, User } from '@medusajs/medusa';
+import { Order } from '@/types/order';
+import { FindParams } from '@medusajs/medusa';
 import { Response } from '@medusajs/medusa-js';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -19,8 +20,8 @@ export type ProductOutboundQueryKeyParams = {
 	q?: string;
 	offset?: number;
 	limit?: number;
-	status?: string;
-	myOrder?: boolean;
+	fulfillment_status?: string | string[];
+	isMyOrder?: boolean;
 };
 export type AdminProductOutboundListRes = {
 	orders: Order[];
@@ -28,7 +29,7 @@ export type AdminProductOutboundListRes = {
 };
 
 export type AdminProductOutboundRes = {
-	order: Order & { handler?: User; handler_id?: string };
+	order: Order;
 	count: number;
 };
 
@@ -65,6 +66,30 @@ export const useAdminProductOutbounds = (
 		() => {
 			const params = createQueryString(query);
 			return client.admin.custom.get(`/admin/product-outbound${params}`);
+		},
+		options
+	);
+	return { ...data, ...rest } as const;
+};
+
+export const useAdminCheckerStocks = (
+	/**
+	 * Filters and pagination configurations to apply on retrieved currencies.
+	 */
+	query?: ProductOutboundQueryKeyParams,
+	options?: UseQueryOptionsWrapper<
+		Response<AdminProductOutboundListRes>,
+		Error,
+		ReturnType<ProductOutboundQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+
+	const { data, ...rest } = useQuery(
+		adminProductOutboundKeys.list(query),
+		() => {
+			const params = createQueryString(query);
+			return client.admin.custom.get(`/admin/checker-stock${params}`);
 		},
 		options
 	);

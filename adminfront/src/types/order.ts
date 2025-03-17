@@ -1,10 +1,18 @@
 import { FormImage, Option } from '@/types/shared';
-import { Order as MedusaOrder, User } from '@medusajs/medusa';
+import {
+	Order as MedusaOrder,
+	User,
+	AdminPostOrdersOrderFulfillmentsReq as MAdminPostOrdersOrderFulfillmentsReq,
+} from '@medusajs/medusa';
 
-export type Order = MedusaOrder &{
+export type Order = MedusaOrder & {
 	handler_id?: string;
 	handler?: User;
-}
+	checker_id?: string;
+	checker?: User;
+	checker_url?: string;
+	checked_at?: string;
+};
 
 export type AddressPayload = {
 	first_name: string;
@@ -179,6 +187,8 @@ export enum FulfillmentStatus {
 	 * The order's fulfillment requires action.
 	 */
 	REQUIRES_ACTION = 'requires_action',
+
+	EXPORTED = 'exported',
 }
 
 export interface LineItemReq {

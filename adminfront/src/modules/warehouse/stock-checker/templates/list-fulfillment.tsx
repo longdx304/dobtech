@@ -3,34 +3,45 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import List from '@/components/List';
+import { Switch } from '@/components/Switch';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
-import { useAdminFulfillments } from '@/lib/hooks/api/fulfullment';
-import { Fulfillment } from '@/types/fulfillments';
+import { useAdminCheckerStocks, useAdminStockAssignChecker, useAdminStockRemoveChecker } from '@/lib/hooks/api/product-outbound';
+import { getErrorMessage } from '@/lib/utils';
+import { Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
+import { message } from 'antd';
 import debounce from 'lodash/debounce';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, FC, useMemo, useState } from 'react';
+import { ChangeEvent, FC, useState } from 'react';
 import StockItem from '../components/stock-item';
+import { FulfillmentStatus } from '@/types/fulfillments';
+
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
 
-const ListFulfillment: FC<Props> = ({}) => {
+const ListFulfillment: FC<Props> = ({ }) => {
 	const router = useRouter();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
-	const [activeKey, setActiveKey] = useState<boolean>(false);
+	const [activeKey, setActiveKey] = useState<string>(
+		`${FulfillmentStatus.NOT_FULFILLED},${FulfillmentStatus.EXPORTED}`
+	);
+	const [myOrder, setMyOrder] = useState(false);
 
-	const { fulfillments, isLoading, count } = useAdminFulfillments({
+	const stockAssignChecker = useAdminStockAssignChecker();
+	const stockRemoveChecker = useAdminStockRemoveChecker();
+
+	const { orders, isLoading, count } = useAdminCheckerStocks({
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		expand: 'order,order.customer,order.shipping_address',
-		isDone: activeKey,
+		fulfillment_status: activeKey,
+		isMyOrder: myOrder ? true : undefined,
 	});
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
@@ -43,27 +54,52 @@ const ListFulfillment: FC<Props> = ({}) => {
 		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
-	const handleClickDetail = async (item: Fulfillment) => {
-		return router.push(`${ERoutes.WAREHOUSE_STOCK_CHECKER}/${item.id}`);
-	};
-
 	const items: any = [
 		{
-			key: false,
+			key: `${FulfillmentStatus.NOT_FULFILLED},${FulfillmentStatus.EXPORTED}`,
 			label: 'Chờ kiểm hàng',
 		},
 		{
-			key: true,
+			key: FulfillmentStatus.FULFILLED,
 			label: 'Đã kiểm hàng',
 		},
 	];
 
-	const filterFulfillment = useMemo(() => {
-		return fulfillments?.filter((item) => item && item.order) ?? [];
-	}, [fulfillments]);
 
-	const handleChangeTab = (key: boolean) => {
+	const handleChangeTab = (key: string) => {
 		setActiveKey(key);
+	};
+
+	const handleClickDetail = async (item: Order) => {
+		return router.push(`${ERoutes.WAREHOUSE_STOCK_CHECKER}/${item.id}`);
+	};
+
+	const handleConfirm = async (item: Order) => {
+		await stockAssignChecker.mutateAsync(
+			{ id: item.id },
+			{
+				onSuccess: () => {
+					router.push(`${ERoutes.WAREHOUSE_STOCK_CHECKER}/${item.id}`);
+				},
+				onError: (err) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
+	};
+
+	const handleRemoveHandler = async (item: Order) => {
+		await stockRemoveChecker.mutateAsync(
+			{ id: item.id },
+			{
+				onSuccess: () => {
+					message.success('Huỷ bỏ xử lý đơn hàng thành công');
+				},
+				onError: (err) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
 	};
 
 	return (
@@ -76,7 +112,14 @@ const ListFulfillment: FC<Props> = ({}) => {
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				<Title level={4}>Theo dõi các đơn hàng</Title>
-				<Flex align="center" justify="flex-end" className="py-4">
+				<Flex align="center" justify="space-between" className="py-4">
+					<Flex align="center" gap={8}>
+						<Text className="text-gray-700 font-medium">Đơn hàng của tôi</Text>
+						<Switch
+							checked={myOrder}
+							onChange={(checked) => setMyOrder(checked)}
+						/>
+					</Flex>
 					<Input
 						placeholder="Tìm kiếm đơn hàng..."
 						name="search"
@@ -93,14 +136,17 @@ const ListFulfillment: FC<Props> = ({}) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
-					dataSource={filterFulfillment}
+					dataSource={orders}
 					loading={isLoading}
-					renderItem={(item: Fulfillment) =>
-						item?.order ? (
-							<List.Item>
-								<StockItem item={item} handleClickDetail={handleClickDetail} />
-							</List.Item>
-						) : null
+					renderItem={(item: Order) =>
+						<List.Item>
+							<StockItem
+								item={item}
+								handleClickDetail={handleClickDetail}
+								handleConfirm={handleConfirm}
+								handleRemoveHandler={handleRemoveHandler}
+							/>
+						</List.Item>
 					}
 					pagination={{
 						onChange: (page) => handleChangePage(page),
