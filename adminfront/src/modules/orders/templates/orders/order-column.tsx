@@ -51,6 +51,8 @@ const decideFulfillmentStatus = (status: string, className?: string) => {
 	switch (status) {
 		case 'not_fulfilled':
 			return <Tag color="warning">Chưa hoàn thành</Tag>;
+		case 'exported':
+			return <Tag color="default">Đã xuất kho</Tag>;
 		case 'partially_fulfilled':
 			return (
 				<Tag color="processing" className={className}>
