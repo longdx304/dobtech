@@ -7,6 +7,8 @@ const decideFulfillmentStatus = (status: string) => {
 			return 'Đã giao';
 		case 'not_fulfilled':
 			return 'Chưa giao';
+		case 'exported':
+			return 'Đã xuất kho';
 		case 'partially_fulfilled':
 			return 'Giao một phần';
 		case 'partially_shipped':
