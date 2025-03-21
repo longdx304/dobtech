@@ -200,7 +200,7 @@ export default Fulfillment;
 const FulfillmentStatus = ({
 	status,
 }: {
-	status: Order['fulfillment_status'];
+	status: Order['fulfillment_status'] | 'exported';
 }) => {
 	switch (status) {
 		case 'shipped':
@@ -256,6 +256,14 @@ const FulfillmentStatus = ({
 				<StatusIndicator
 					title="Gửi một phần"
 					variant="warning"
+					className="font-normal"
+				/>
+			);
+		case 'exported':
+			return (
+				<StatusIndicator
+					title="Đã xuất kho"
+					variant="default"
 					className="font-normal"
 				/>
 			);
