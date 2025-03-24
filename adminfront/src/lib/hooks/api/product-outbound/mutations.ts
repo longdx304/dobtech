@@ -38,18 +38,20 @@ export const useAdminUpdateProductOutbound = (
 	}, buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()]));
 };
 
+
 export const useAdminProductOutboundCheck = (
 	options?:
-		| UseMutationOptions<void, Error, { id: string; itemId: string[] }, unknown>
+		| UseMutationOptions<void, Error, { id: string; itemId: string[], checked: boolean }, unknown>
 		| undefined
 ) => {
 	const { client } = useMedusa();
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		({ id, itemId }: { id: string; itemId: string[] }) =>
+		({ id, itemId, checked }: { id: string; itemId: string[]; checked: boolean }) =>
 			client.admin.custom.post(`/admin/product-outbound/${id}/check`, {
 				itemId,
+				checked,
 			}),
 		buildOptions(
 			queryClient,
@@ -109,3 +111,4 @@ export const useAdminStockRemoveChecker = (
 		)
 	);
 };
+
