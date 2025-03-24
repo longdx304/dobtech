@@ -23,6 +23,7 @@ export type ProductOutboundQueryKeyParams = {
 	fulfillment_status?: string | string[];
 	isMyOrder?: boolean;
 };
+
 export type AdminProductOutboundListRes = {
 	orders: Order[];
 	count: number;

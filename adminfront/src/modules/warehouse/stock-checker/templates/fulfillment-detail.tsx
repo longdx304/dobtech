@@ -46,6 +46,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+	const [prevSelectedKeys, setPrevSelectedKeys] = useState<string[]>([]);
 	const [files, setFiles] = useState<FormImage[]>([]);
 
 	const {
@@ -74,8 +75,33 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 		return false;
 	}, [user, order?.checker_id]);
 
-	const handleCheckFulfillment = async () => {
-		await checkFulfillment.mutateAsync({ id, itemId: selectedRowKeys });
+	const handleRowSelectionChange = (selectedRowKeys: string[]) => {
+		// Find newly selected and unselected items by comparing with previous state
+		const newlySelected = selectedRowKeys.filter(key => !prevSelectedKeys.includes(key));
+		const newlyUnselected = prevSelectedKeys.filter(key => !selectedRowKeys.includes(key));
+
+		// Update states
+		setSelectedRowKeys(selectedRowKeys);
+		setPrevSelectedKeys(selectedRowKeys);
+
+		// Handle newly selected items
+		if (newlySelected.length > 0) {
+			handleCheckFulfillment(newlySelected);
+		}
+
+		// Handle newly unselected items
+		if (newlyUnselected.length > 0) {
+			handleUncheckFulfillment(newlyUnselected);
+		}
+	};
+
+	const handleCheckFulfillment = async (itemIds: string[]) => {
+		await checkFulfillment.mutateAsync({ id, itemId: itemIds, checked: true });
+		refetch();
+	};
+
+	const handleUncheckFulfillment = async (itemIds: string[]) => {
+		await checkFulfillment.mutateAsync({ id, itemId: itemIds, checked: false });
 		refetch();
 	};
 
@@ -131,11 +157,6 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 
 	const handleBackToList = () => {
 		router.push(ERoutes.WAREHOUSE_STOCK_CHECKER);
-	};
-
-	const handleRowSelectionChange = (selectedRowKeys: string[]) => {
-		setSelectedRowKeys(selectedRowKeys);
-		handleCheckFulfillment();
 	};
 
 	const onConfirm = async () => {
