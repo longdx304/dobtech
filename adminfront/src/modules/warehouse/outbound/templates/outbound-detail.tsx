@@ -135,10 +135,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 		await updateProductOutbound.mutateAsync(
 			{
 				fulfillment_status: FulfillmentStatus.EXPORTED,
-				metadata: {
-					...order?.metadata,
-					handled_at: dayjs().format(),
-				}
+				handled_at: dayjs().format(),
 			} as any,
 			{
 				onSuccess: () => {
