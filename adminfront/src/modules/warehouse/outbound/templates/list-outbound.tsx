@@ -1,9 +1,11 @@
 'use client';
 
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import List from '@/components/List';
+import { Switch } from '@/components/Switch';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import {
@@ -11,17 +13,16 @@ import {
 	useAdminProductOutboundRemoveHandler,
 	useAdminProductOutbounds,
 } from '@/lib/hooks/api/product-outbound';
+import { getErrorMessage } from '@/lib/utils';
+import { FulfillmentStatus } from '@/types/fulfillments';
 import { ERoutes } from '@/types/routes';
+import { Order } from '@medusajs/medusa';
 import { message, TabsProps } from 'antd';
 import debounce from 'lodash/debounce';
-import { Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import OutboundItem from '../components/outbound-item';
-import { Switch } from '@/components/Switch';
-import { getErrorMessage } from '@/lib/utils';
-import { FulfillmentStatus } from '@/types/fulfillments';
-import { Order } from '@medusajs/medusa';
 
 type Props = {};
 
@@ -31,6 +32,7 @@ const ListOutbound: FC<Props> = ({ }) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
+	const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
 	const [activeKey, setActiveKey] = useState<string>(
 		FulfillmentStatus.NOT_FULFILLED
 	);
@@ -42,6 +44,7 @@ const ListOutbound: FC<Props> = ({ }) => {
 		limit: DEFAULT_PAGE_SIZE,
 		fulfillment_status: activeKey,
 		isMyOrder: myOrder ? true : undefined,
+		order: sortOrder === 'DESC' ? '-created_at' : 'created_at',
 	});
 	const productOutboundHandler = useAdminProductOutboundHandler();
 	const productOutboundRemoveHandler = useAdminProductOutboundRemoveHandler();
@@ -111,13 +114,20 @@ const ListOutbound: FC<Props> = ({ }) => {
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				<Title level={4}>Theo dõi các đơn hàng</Title>
-				<Flex align="center" justify="space-between" className="py-4">
-					<Flex align="center" gap={8}>
+				<Flex align="center" justify="space-between" className="py-4 lg:flex-row flex-col">
+					<Flex align="center" gap={8} className="py-2">
 						<Text className="text-gray-700 font-medium">Đơn hàng của tôi</Text>
 						<Switch
 							checked={myOrder}
 							onChange={(checked) => setMyOrder(checked)}
 						/>
+						<Button
+							onClick={() => setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC')}
+							className="ml-4 flex items-center gap-2"
+							icon={sortOrder === 'ASC' ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
+						>
+							{sortOrder === 'ASC' ? 'Cũ nhất' : 'Mới nhất'}
+						</Button>
 					</Flex>
 					<Input
 						placeholder="Tìm kiếm đơn nhập kho..."
