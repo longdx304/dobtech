@@ -1,4 +1,5 @@
 'use client';
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
@@ -6,24 +7,27 @@ import List from '@/components/List';
 import { Switch } from '@/components/Switch';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
-import { useAdminCheckerStocks, useAdminStockAssignChecker, useAdminStockRemoveChecker } from '@/lib/hooks/api/product-outbound';
+import {
+	useAdminCheckerStocks,
+	useAdminStockAssignChecker,
+	useAdminStockRemoveChecker,
+} from '@/lib/hooks/api/product-outbound';
 import { getErrorMessage } from '@/lib/utils';
+import { FulfillmentStatus } from '@/types/fulfillments';
 import { Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
 import { message } from 'antd';
 import debounce from 'lodash/debounce';
-import { Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import StockItem from '../components/stock-item';
-import { FulfillmentStatus } from '@/types/fulfillments';
-
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
 
-const ListFulfillment: FC<Props> = ({ }) => {
+const ListFulfillment: FC<Props> = ({}) => {
 	const router = useRouter();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
@@ -31,6 +35,7 @@ const ListFulfillment: FC<Props> = ({ }) => {
 	const [activeKey, setActiveKey] = useState<string>(
 		`${FulfillmentStatus.NOT_FULFILLED},${FulfillmentStatus.EXPORTED}`
 	);
+	const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
 	const [myOrder, setMyOrder] = useState(false);
 
 	const stockAssignChecker = useAdminStockAssignChecker();
@@ -42,6 +47,7 @@ const ListFulfillment: FC<Props> = ({ }) => {
 		limit: DEFAULT_PAGE_SIZE,
 		fulfillment_status: activeKey,
 		isMyOrder: myOrder ? true : undefined,
+		order: sortOrder === 'DESC' ? '-handled_at' : 'handled_at',
 	});
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +70,6 @@ const ListFulfillment: FC<Props> = ({ }) => {
 			label: 'Đã kiểm hàng',
 		},
 	];
-
 
 	const handleChangeTab = (key: string) => {
 		setActiveKey(key);
@@ -112,13 +117,30 @@ const ListFulfillment: FC<Props> = ({ }) => {
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				<Title level={4}>Theo dõi các đơn hàng</Title>
-				<Flex align="center" justify="space-between" className="py-4">
+				<Flex
+					align="center"
+					justify="space-between"
+					className="py-4 lg:flex-row flex-col"
+				>
 					<Flex align="center" gap={8}>
 						<Text className="text-gray-700 font-medium">Đơn hàng của tôi</Text>
 						<Switch
 							checked={myOrder}
 							onChange={(checked) => setMyOrder(checked)}
 						/>
+						<Button
+							onClick={() => setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC')}
+							className="ml-4 flex items-center gap-2"
+							icon={
+								sortOrder === 'ASC' ? (
+									<ArrowUp size={16} />
+								) : (
+									<ArrowDown size={16} />
+								)
+							}
+						>
+							{sortOrder === 'ASC' ? 'Cũ nhất' : 'Mới nhất'}
+						</Button>
 					</Flex>
 					<Input
 						placeholder="Tìm kiếm đơn hàng..."
@@ -138,7 +160,7 @@ const ListFulfillment: FC<Props> = ({ }) => {
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
 					dataSource={orders}
 					loading={isLoading}
-					renderItem={(item: Order) =>
+					renderItem={(item: Order) => (
 						<List.Item>
 							<StockItem
 								item={item}
@@ -147,7 +169,7 @@ const ListFulfillment: FC<Props> = ({ }) => {
 								handleRemoveHandler={handleRemoveHandler}
 							/>
 						</List.Item>
-					}
+					)}
 					pagination={{
 						onChange: (page) => handleChangePage(page),
 						pageSize: DEFAULT_PAGE_SIZE,
