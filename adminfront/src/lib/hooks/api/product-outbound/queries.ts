@@ -22,6 +22,7 @@ export type ProductOutboundQueryKeyParams = {
 	limit?: number;
 	fulfillment_status?: string | string[];
 	isMyOrder?: boolean;
+	order?: string;
 };
 
 export type AdminProductOutboundListRes = {
@@ -43,7 +44,7 @@ const createQueryString = (search: Record<string, any> = {}) => {
 	);
 
 	const params = Object.keys(filteredSearch)
-		.map((k) => `${k}=${filteredSearch[k]}`)
+		.map((k) => `${k}=${encodeURIComponent(filteredSearch[k])}`)
 		.join('&');
 
 	return params ? `?${params}` : '';

@@ -8,6 +8,7 @@ import {
 export type Order = MedusaOrder & {
 	handler_id?: string;
 	handler?: User;
+	handled_at?: string;
 	checker_id?: string;
 	checker?: User;
 	checker_url?: string;
