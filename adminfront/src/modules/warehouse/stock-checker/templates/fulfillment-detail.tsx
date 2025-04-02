@@ -28,7 +28,15 @@ import { Divider, message } from 'antd';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash';
 import debounce from 'lodash/debounce';
-import { ArrowLeft, Check, Clock, Hash, MapPin, Search, UserCheck } from 'lucide-react';
+import {
+	ArrowLeft,
+	Check,
+	Clock,
+	Hash,
+	MapPin,
+	Search,
+	UserCheck,
+} from 'lucide-react';
 import { useAdminCreateFulfillment, useAdminCreateNote } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
@@ -67,7 +75,8 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 	const checkFulfillment = useAdminProductOutboundCheck();
 	const uploadFile = useAdminUploadFile();
 
-	const isProcessing = order?.fulfillment_status !== FulfillmentStatus.FULFILLED;
+	const isProcessing =
+		order?.fulfillment_status !== FulfillmentStatus.FULFILLED;
 
 	const isPermission = useMemo(() => {
 		if (!user) return false;
@@ -147,12 +156,11 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 
 	const itemTable = useMemo(() => {
 		if (!order) return [];
-		const items = order?.items?.filter(
-			(item: any) =>
-				item?.title?.toLowerCase()?.includes(searchValue.toLowerCase())
+		const items = order?.items?.filter((item: any) =>
+			item?.title?.toLowerCase()?.includes(searchValue.toLowerCase())
 		);
 
-		return items
+		return items;
 	}, [order, searchValue]);
 
 	const handleBackToList = () => {
@@ -168,9 +176,12 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 			message.warning('Vui lòng tải lên hình ảnh sản phẩm');
 			return;
 		}
-		if ((order?.fulfillment_status as FulfillmentStatus) !== FulfillmentStatus.EXPORTED) {
+		if (
+			(order?.fulfillment_status as FulfillmentStatus) !==
+			FulfillmentStatus.EXPORTED
+		) {
 			message.warning('Đơn hàng chưa được xác nhận xuất kho');
-			return
+			return;
 		}
 
 		onOpenConfirm();
@@ -218,6 +229,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					files: chunk,
 					prefix: 'warehouse/stock-checker',
 				});
+				console.log('🚀 ~ uploadPromises ~ uploads:', uploads);
 				return uploads.map((item) => item.url);
 			} catch (error) {
 				console.error('Error uploading chunk:', error);
@@ -257,7 +269,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 				onError: (err: any) => message.error(getErrorMessage(err)),
 			}
 		);
-	}
+	};
 	const handleComplete = async () => {
 		let action: any = createOrderFulfillment;
 		let successText = 'Đơn hàng đã được kiêm hàng thành công.';
@@ -290,6 +302,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 
 		// Check upload file before create fulfillment
 		const filesUrl = await handleUploadFile();
+		console.log('🚀 ~ handleComplete ~ filesUrl:', filesUrl);
 		if (!filesUrl) {
 			message.error('Có lỗi xảy ra khi tải ảnh lên');
 			return;
@@ -337,7 +350,12 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					className="py-4"
 					gap={4}
 				>
-					<Flex gap={4} align="center" justify="space-between" className="w-full">
+					<Flex
+						gap={4}
+						align="center"
+						justify="space-between"
+						className="w-full"
+					>
 						<Button
 							onClick={() => {
 								refetch().then(() => {
@@ -359,8 +377,9 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 						/>
 					</Flex>
 
-					<Text className="text-gray-500 text-xs">{`Đã kiểm ${selectedRowKeys?.length ?? 0
-						} trong ${itemTable?.length}`}</Text>
+					<Text className="text-gray-500 text-xs">{`Đã kiểm ${
+						selectedRowKeys?.length ?? 0
+					} trong ${itemTable?.length}`}</Text>
 					<Table
 						columns={fulfillmentColumns as any}
 						dataSource={itemTable}
@@ -372,21 +391,30 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 							onChange: handleRowSelectionChange as any,
 							preserveSelectedRowKeys: true,
 							getCheckboxProps: (record: any) => ({
-								disabled: !isProcessing || record?.warehouse_quantity !== record.quantity || !isPermission,
+								disabled:
+									!isProcessing ||
+									record?.warehouse_quantity !== record.quantity ||
+									!isPermission,
 							}),
 						}}
 					/>
 					<Divider />
-					{isPermission && <UploadTemplate
-						files={files}
-						setFiles={setFiles}
-						hiddenUpload={!isProcessing}
-					/>}
+					{isPermission && (
+						<UploadTemplate
+							files={files}
+							setFiles={setFiles}
+							hiddenUpload={!isProcessing}
+						/>
+					)}
 
 					<Button
 						disabled={!isProcessing || !isPermission}
 						onClick={onConfirm}
-						loading={createOrderFulfillment.isLoading || uploadFile.isLoading || updateProductOutbound.isLoading}
+						loading={
+							createOrderFulfillment.isLoading ||
+							uploadFile.isLoading ||
+							updateProductOutbound.isLoading
+						}
 						type="primary"
 						className="w-full sm:w-[200px]"
 					>
@@ -400,7 +428,11 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					title="Xác nhận hoàn kiểm hàng xuất kho"
 					handleOk={handleComplete}
 					handleCancel={onCloseConfirm}
-					isLoading={createOrderFulfillment.isLoading || uploadFile.isLoading || updateProductOutbound.isLoading}
+					isLoading={
+						createOrderFulfillment.isLoading ||
+						uploadFile.isLoading ||
+						updateProductOutbound.isLoading
+					}
 				>
 					{/* Danh sách san pham */}
 					{order?.items.map((item, idx) => {
@@ -454,14 +486,16 @@ const OrderInfo = ({
 			.join(', ');
 	} else {
 		// Fallback address display
-		address = `Shipping Address ID: ${shippingAddressId || 'N/A'
-			}, Billing Address ID: ${billingAddressId || 'N/A'}`;
+		address = `Shipping Address ID: ${
+			shippingAddressId || 'N/A'
+		}, Billing Address ID: ${billingAddressId || 'N/A'}`;
 	}
 
 	// Get customer information
 	const customerName = order.customer
-		? `${order.customer.last_name || ''} ${order.customer.first_name || ''
-			}`.trim()
+		? `${order.customer.last_name || ''} ${
+				order.customer.first_name || ''
+		  }`.trim()
 		: '';
 	const customerPhone = order.customer?.phone || '';
 
@@ -486,8 +520,9 @@ const OrderInfo = ({
 						<Hash size={14} color="#6b7280" />
 					</div>
 					<Text className="text-sm font-semibold">
-						{`${order?.display_id || ''} ${customerName ? `- ${customerName}` : ''
-							} ${customerPhone ? `- ${customerPhone}` : ''}`}
+						{`${order?.display_id || ''} ${
+							customerName ? `- ${customerName}` : ''
+						} ${customerPhone ? `- ${customerPhone}` : ''}`}
 					</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">
@@ -540,8 +575,9 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 					</span>
 					{item?.variant && (
 						<span className="font-normal text-gray-500 truncate">
-							{`${item.variant.title}${item.variant.sku ? ` (${item.variant.sku})` : ''
-								}`}
+							{`${item.variant.title}${
+								item.variant.sku ? ` (${item.variant.sku})` : ''
+							}`}
 						</span>
 					)}
 				</div>

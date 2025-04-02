@@ -33,6 +33,7 @@ import Image from 'next/image';
 import ConfirmOrder from '../../components/confirm-order';
 import Notes from '../../inbound/components/notes';
 import OutboundModal from '../components/outbound-modal';
+import dayjs from 'dayjs';
 
 type Props = {
 	id: string;
@@ -134,6 +135,10 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 		await updateProductOutbound.mutateAsync(
 			{
 				fulfillment_status: FulfillmentStatus.EXPORTED,
+				metadata: {
+					...order?.metadata,
+					handled_at: dayjs().format(),
+				}
 			} as any,
 			{
 				onSuccess: () => {

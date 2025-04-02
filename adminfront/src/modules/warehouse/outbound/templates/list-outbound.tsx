@@ -32,7 +32,7 @@ const ListOutbound: FC<Props> = ({ }) => {
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
 	const [activeKey, setActiveKey] = useState<string>(
-		`${FulfillmentStatus.FULFILLED},${FulfillmentStatus.EXPORTED}`
+		FulfillmentStatus.NOT_FULFILLED
 	);
 	const [myOrder, setMyOrder] = useState(false);
 
