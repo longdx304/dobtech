@@ -14,7 +14,7 @@ const typeMap = {
 };
 const { RangePicker } = DatePicker;
 
-const transactionColumns = ({}: Props) => [
+const transactionColumns = ({ }: Props) => [
 	{
 		title: 'Sản phẩm',
 		dataIndex: 'product_name',
@@ -22,7 +22,7 @@ const transactionColumns = ({}: Props) => [
 		width: 150,
 		className: 'text-xs',
 		render: (text: string, record: any) => {
-			return record?.variant?.product?.title || '-';
+			return `${record?.variant?.product?.title} - ${record?.variant?.title}` || '-';
 		},
 	},
 	{
@@ -80,7 +80,7 @@ const transactionColumns = ({}: Props) => [
 					/>
 					<Flex justify="space-between">
 						<Button
-							onClick={() => {}}
+							onClick={() => { }}
 							style={{ marginRight: 8 }}
 							type="default"
 						>
