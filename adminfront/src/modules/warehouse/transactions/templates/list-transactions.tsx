@@ -21,7 +21,7 @@ interface DataType {
 	note: string;
 }
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 50;
 const ListTransaction: FC<Props> = () => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
@@ -83,7 +83,7 @@ const ListTransaction: FC<Props> = () => {
 			setType(null);
 		}
 	};
-	
+
 	return (
 		<Card className="w-full" bordered={false}>
 			<Flex align="center" justify="flex-start" className="mb-4">
