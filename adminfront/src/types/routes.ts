@@ -94,7 +94,11 @@ export const routesConfig: TRouteConfig[] = [
 	},
 	{
 		path: ERoutes.SUPPLIERS,
-		mode: [EPermissions.Manager],
+		mode: [EPermissions.Manager, EPermissions.Accountant],
+	},
+	{
+		path: ERoutes.SUPPLIER_ORDERS,
+		mode: [EPermissions.Manager, EPermissions.Accountant],
 	},
 	{
 		path: ERoutes.CURRENCIES,
