@@ -28,6 +28,7 @@ import { getErrorMessage } from '@/lib/utils';
 import { usePolling } from '@/lib/providers/polling-provider';
 import ImportModal from './import-modal';
 import { ActionAbles } from '@/components/Dropdown';
+import { useCheckInventory } from '@/lib/hooks/api/product';
 const PAGE_SIZE = 10;
 
 interface Props {}
@@ -153,23 +154,28 @@ const ProductList = (props: Props) => {
 			},
 		});
 	};
-	const handleCreateExportInventory = () => {
-		const reqObj = {
-			type: 'export-products-inventory',
-			context: {},
-			dry_run: false,
-		};
 
-		createBatchJob.mutate(reqObj, {
-			onSuccess: () => {
-				resetInterval();
-				message.success('Khởi tạo file sản phẩm thành công!');
-			},
-			onError: (err) => {
-				message.error(getErrorMessage(err));
-			},
-		});
-	};
+	const checkInventory = useCheckInventory();
+
+	const handleCreateExportInventory = () => {
+  const filterable_fields = {}; // Using the correct property name
+
+  checkInventory.mutate(
+    { filterable_fields }, // Match the expected request format
+    {
+      onSuccess: (data) => {
+        // Use the download URL from response
+        if (data.downloadUrl) {
+          window.open(data.downloadUrl, '_blank');
+        }
+        message.success('Xuất file kiểm kê thành công!');
+      },
+      onError: (error) => {
+        message.error(`Xuất file thất bại: ${getErrorMessage(error)}`);
+      },
+    }
+  );
+};
 
 	const actions = [
 		{
