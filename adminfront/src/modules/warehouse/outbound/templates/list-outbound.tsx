@@ -17,7 +17,7 @@ import { getErrorMessage } from '@/lib/utils';
 import { FulfillmentStatus } from '@/types/fulfillments';
 import { ERoutes } from '@/types/routes';
 import { Order } from '@medusajs/medusa';
-import { message, TabsProps } from 'antd';
+import { message, Select, TabsProps } from 'antd';
 import debounce from 'lodash/debounce';
 import { ArrowDown, ArrowUp, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -32,7 +32,7 @@ const ListOutbound: FC<Props> = ({ }) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
-	const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
+	const [sortOrder, setSortOrder] = useState<string>('-created_at');
 	const [activeKey, setActiveKey] = useState<string>(
 		FulfillmentStatus.NOT_FULFILLED
 	);
@@ -44,7 +44,7 @@ const ListOutbound: FC<Props> = ({ }) => {
 		limit: DEFAULT_PAGE_SIZE,
 		fulfillment_status: activeKey,
 		isMyOrder: myOrder ? true : undefined,
-		order: sortOrder === 'DESC' ? '-created_at' : 'created_at',
+		order: sortOrder,
 	});
 	const productOutboundHandler = useAdminProductOutboundHandler();
 	const productOutboundRemoveHandler = useAdminProductOutboundRemoveHandler();
@@ -121,13 +121,33 @@ const ListOutbound: FC<Props> = ({ }) => {
 							checked={myOrder}
 							onChange={(checked) => setMyOrder(checked)}
 						/>
-						<Button
+						{/* <Button
 							onClick={() => setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC')}
 							className="ml-4 flex items-center gap-2"
 							icon={sortOrder === 'ASC' ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
 						>
 							{sortOrder === 'ASC' ? 'Cũ nhất' : 'Mới nhất'}
-						</Button>
+						</Button> */}
+						<Select
+							defaultValue={sortOrder}
+							onChange={(value) => setSortOrder(value as any)}
+							options={[
+								{ label: 'Ngày cũ nhất', value: 'created_at' },
+								{ label: 'Ngày mới nhất', value: '-created_at' },
+								{ label: 'Mã mới nhất', value: '-display_id' },
+								{ label: 'Mã cũ nhất', value: 'display_id' },
+							]}
+							className="w-[200px]"
+							style={{ width: 200 }}
+							placeholder="Sắp xếp theo"
+							allowClear
+							showSearch
+							filterOption={(input, option) =>
+								(option?.label ?? '')
+									.toLowerCase()
+									.includes(input.toLowerCase())
+							}
+						/>
 					</Flex>
 					<Input
 						placeholder="Tìm kiếm đơn nhập kho..."
