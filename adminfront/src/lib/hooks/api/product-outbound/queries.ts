@@ -115,3 +115,78 @@ export const useAdminProductOutbound = (
 	);
 	return { ...data, ...rest } as const;
 };
+
+export interface OrderDetail {
+	id: string;
+	product_code: string;
+	product_name: string;
+	quantity: number;
+	warehouse_quantity: number;
+}
+export interface OrderKiot {
+	id: number;
+	code: string;
+	customer_name: string;
+	status: string;
+	orderDetails: OrderDetail[];
+	handler_id: string;
+	handler_at?: string;
+	checker_id: string;
+	checker_at?: string;
+}
+
+export const useGetStockOut = (
+	query?: any,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<ProductOutboundQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+
+	const { data, ...rest } = useQuery(
+		adminProductOutboundKeys.list(query),
+		() => client.admin.custom.get(`/admin/kiot/order/stock-out`),
+		options
+	);
+
+	return { ...data, ...rest } as const;
+};
+
+export const useListOrders = (
+	query?: any,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<ProductOutboundQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+
+	const { data, ...rest } = useQuery(
+		adminProductOutboundKeys.list(query),
+		() => client.admin.custom.get(`/admin/kiot/order`),
+		options
+	);
+
+	return { ...data, ...rest } as const;
+};
+
+export const useGetOrder = (
+	orderId: string,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<ProductOutboundQueryKey['detail']>
+	>
+) => {
+	const { client } = useMedusa();	
+	const { data, ...rest } = useQuery(
+		adminProductOutboundKeys.detail(orderId),
+		() => client.admin.custom.get(`/admin/kiot/order/${orderId}`),
+		options
+	);
+
+	return { ...data, ...rest } as const;
+};
