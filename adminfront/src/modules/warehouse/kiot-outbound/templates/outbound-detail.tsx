@@ -10,6 +10,7 @@ import { Text, Title } from '@/components/Typography';
 import {
 	useAdminProductOutbound,
 	useAdminUpdateProductOutbound,
+	useGetOrder,
 } from '@/lib/hooks/api/product-outbound';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ERoutes } from '@/types/routes';
@@ -40,14 +41,15 @@ type Props = {
 };
 
 const DEFAULT_PAGE_SIZE = 10;
-const OutboundDetail: FC<Props> = ({ id }) => {
+const OutboundKiotDetail: FC<Props> = ({ id }) => {
 	const router = useRouter();
 	const { user } = useUser();
 	const { state, onOpen, onClose } = useToggleState();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [variantId, setVariantId] = useState<string | null>(null);
 	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
-	const { order, isLoading, refetch } = useAdminProductOutbound(id);
+	const { order, isLoading, refetch } = useGetOrder(id);
+	console.log('🚀 ~ order:', order);
 	const updateProductOutbound = useAdminUpdateProductOutbound(id);
 
 	const createNote = useAdminCreateNote();
@@ -92,13 +94,13 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 
 		return itemsByStatus
 			.filter((item: any) => {
-				const lineItem = item as LineItem;
-				const title = lineItem.title.toLowerCase();
-				const description = lineItem?.description?.toLowerCase();
+				const lineItem = item as any;
+				const title = lineItem.product_name?.toLowerCase();
+				const description = lineItem?.product_code?.toLowerCase();
 				const search = searchValue.toLowerCase();
 				return title.includes(search) || description?.includes(search);
 			})
-			.sort((a, b) => {
+			.sort((a: any, b: any) => {
 				return (
 					new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
 				);
@@ -128,7 +130,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	};
 
 	const handleBackToList = () => {
-		router.push(ERoutes.WAREHOUSE_OUTBOUND);
+		router.push(ERoutes.WAREHOUSE_OUTBOUND_KIOT);
 	};
 
 	const handleComplete = async () => {
@@ -185,13 +187,6 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 			disabled:
 				(order?.fulfillment_status as any) === FulfillmentStatus.EXPORTED,
 		},
-		{
-			label: 'Trang Order chi tiết',
-			icon: <ArrowLeft size={18} />,
-			onClick: () => {
-				router.push(`${ERoutes.ORDERS}/${id}`);
-			},
-		},
 	];
 
 	const handler = order?.handler
@@ -213,7 +208,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 			<Card loading={false} className="w-full mb-10" bordered={false}>
 				<Flex align="flex-start" justify="space-between">
 					<Flex vertical>
-						<Title level={4}>{`Đơn hàng #${order?.display_id}`}</Title>
+						<Title level={4}>{`Đơn hàng #${order?.code}`}</Title>
 						<Text className="text-gray-600">
 							{`Người phụ trách: ${handler}`}
 						</Text>
@@ -240,7 +235,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
 					dataSource={lineItems}
 					loading={isLoading}
-					renderItem={(item: LineItem) => (
+					renderItem={(item: any) => (
 						<List.Item>
 							<OutboundDetailItem
 								item={item}
@@ -280,7 +275,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					handleCancel={onCloseConfirm}
 				>
 					{/* Danh sách san pham */}
-					{order?.items.map((item, idx) => {
+					{order?.items.map((item: any, idx: any) => {
 						return (
 							<FulfillmentLine
 								item={item as LineItem}
@@ -302,13 +297,13 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	);
 };
 
-export default OutboundDetail;
+export default OutboundKiotDetail;
 
-export const getFulfillAbleQuantity = (item: LineItem): number => {
-	return item.quantity - (item.fulfilled_quantity ?? 0);
+export const getFulfillAbleQuantity = (item: any): number => {
+	return item.quantity - (item.warehouse_quantity ?? 0);
 };
 
-const FulfillmentLine = ({ item }: { item: LineItem }) => {
+const FulfillmentLine = ({ item }: { item: any }) => {
 	if (getFulfillAbleQuantity(item) <= 0) {
 		return null;
 	}
@@ -322,7 +317,7 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 							src={item.thumbnail}
 							height={48}
 							width={36}
-							alt={`Image summary ${item.title}`}
+							alt={`Image summary ${item.product_name}`}
 							className="object-cover"
 						/>
 					) : (
@@ -331,12 +326,11 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 				</div>
 				<div className="flex max-w-[185px] flex-col justify-center text-[12px]">
 					<span className="font-normal text-gray-900 truncate">
-						{item.title}
+						{item.product_name}
 					</span>
-					{item?.variant && (
+					{item?.product_code && (
 						<span className="font-normal text-gray-500 truncate">
-							{`${item.variant.title}${item.variant.sku ? ` (${item.variant.sku})` : ''
-								}`}
+							{`${item.product_code}`}
 						</span>
 					)}
 				</div>
@@ -345,12 +339,10 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 				<span className="flex text-gray-500 text-xs">
 					<span
 						className={clsx('pl-1', {
-							'text-red-500':
-								item.warehouse_quantity - (item.fulfilled_quantity ?? 0) >
-								getFulfillAbleQuantity(item),
+							'text-red-500': item.warehouse_quantity > item.quantity,
 						})}
 					>
-						{item.warehouse_quantity - (item.fulfilled_quantity ?? 0)}
+						{item.warehouse_quantity}
 					</span>
 					{'/'}
 					<span className="pl-1">{getFulfillAbleQuantity(item)}</span>

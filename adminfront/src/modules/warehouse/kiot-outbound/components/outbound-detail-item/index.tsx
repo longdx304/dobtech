@@ -3,12 +3,11 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
-import { LineItem } from '@medusajs/medusa';
 import clsx from 'clsx';
 import { Check, Clock } from 'lucide-react';
 
 type InboundItemProps = {
-	item: LineItem & { warehouse_quantity: number };
+	item: any;
 	handleClickDetail: (id: string | null) => void;
 };
 
@@ -43,11 +42,11 @@ const OutboundDetailItem: React.FC<InboundItemProps> = ({
 			<Flex gap={2} vertical className="py-4">
 				<Flex vertical align="flex-start">
 					<Text className="text-[14px] text-gray-500">Tên sản phẩm:</Text>
-					<Text className="text-sm font-medium">{`${item.title}`}</Text>
+					<Text className="text-sm font-medium">{`${item.product_name}`}</Text>
 					<Tag
 						className="text-sm mt-1 text-wrap"
 						color="blue"
-					>{`${item.description}`}</Tag>
+					>{`${item.product_code}`}</Tag>
 				</Flex>
 				<Flex vertical align="flex-start">
 					<Text className="text-[14px] text-gray-500">Số lượng hàng:</Text>

@@ -88,7 +88,7 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 	];
 
 	const handleClickDetail = async (item: any) => {
-		return router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${item.id}`);
+		return router.push(`${ERoutes.WAREHOUSE_OUTBOUND_KIOT}/${item.id}`);
 	};
 
 	const handleConfirm = async (item: Order) => {
@@ -204,7 +204,7 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 						onChange: (page) => handleChangePage(page),
 						pageSize: DEFAULT_PAGE_SIZE,
 						current: numPages || 1,
-						total: count,
+						total: orders?.total,
 						showTotal: (total, range) =>
 							`${range[0]}-${range[1]} trong ${total} đơn hàng`,
 					}}
