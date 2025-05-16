@@ -7,9 +7,10 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query';
 import { useMedusa } from 'medusa-react';
-import { adminProductOutboundKeys } from './queries';
-
-
+import {
+	adminProductOutboundKeys,
+	adminProductOutboundKiotKeys,
+} from './queries';
 
 export const useAdminProductOutboundHandler = (
 	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
@@ -40,17 +41,29 @@ export const useAdminUpdateProductOutbound = (
 	}, buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()]));
 };
 
-
 export const useAdminProductOutboundCheck = (
 	options?:
-		| UseMutationOptions<void, Error, { id: string; itemId: string[], checked: boolean }, unknown>
+		| UseMutationOptions<
+				void,
+				Error,
+				{ id: string; itemId: string[]; checked: boolean },
+				unknown
+		  >
 		| undefined
 ) => {
 	const { client } = useMedusa();
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		({ id, itemId, checked }: { id: string; itemId: string[]; checked: boolean }) =>
+		({
+			id,
+			itemId,
+			checked,
+		}: {
+			id: string;
+			itemId: string[];
+			checked: boolean;
+		}) =>
 			client.admin.custom.post(`/admin/product-outbound/${id}/check`, {
 				itemId,
 				checked,
@@ -115,32 +128,42 @@ export const useAdminStockRemoveChecker = (
 };
 
 // Assign/Unassign Mutations
-export const useAssignOrder = () => {
-  const queryClient = useQueryClient();
+export const useAssignOrder = (
+	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (data: AssignOrderRequest) => {
-      const response = await apiClient.post<OrderActionResponse>('/api/stock-out/assign', data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stock-out'] });
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-    },
-  });
+	return useMutation(
+		({ id }: { id: string }) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}/assign`),
+		buildOptions(
+			queryClient,
+			[
+				adminProductOutboundKiotKeys.lists(),
+				adminProductOutboundKiotKeys.details(),
+			],
+			options
+		)
+	);
 };
 
-export const useUnassignOrder = () => {
-  const queryClient = useQueryClient();
+export const useUnassignOrder = (
+	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (data: UnassignOrderRequest) => {
-      const response = await apiClient.post<OrderActionResponse>('/api/stock-out/unassign', data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stock-out'] });
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-    },
-  });
+	return useMutation(
+		({ id }: { id: string }) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}/unassign`),
+		buildOptions(
+			queryClient,
+			[
+				adminProductOutboundKiotKeys.lists(),
+				adminProductOutboundKiotKeys.details(),
+			],
+			options
+		)
+	);
 };

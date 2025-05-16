@@ -9,12 +9,18 @@ import {
 } from 'medusa-react';
 
 export const ADMIN_PRODUCT_OUTBOUND = `admin_product_outbound` as const;
+export const ADMIN_PRODUCT_OUTBOUND_KIOT =
+	`admin_product_outbound_kiot` as const;
 
 export const adminProductOutboundKeys = queryKeysFactory(
 	ADMIN_PRODUCT_OUTBOUND
 );
+export const adminProductOutboundKiotKeys = queryKeysFactory(
+	ADMIN_PRODUCT_OUTBOUND_KIOT
+);
 
 type ProductOutboundQueryKey = typeof adminProductOutboundKeys;
+type ProductOutboundKiotQueryKey = typeof adminProductOutboundKiotKeys;
 
 export type ProductOutboundQueryKeyParams = {
 	q?: string;
@@ -140,32 +146,32 @@ export const useGetStockOut = (
 	options?: UseQueryOptionsWrapper<
 		Response<any>,
 		Error,
-		ReturnType<ProductOutboundQueryKey['list']>
+		ReturnType<ProductOutboundKiotQueryKey['list']>
 	>
 ) => {
 	const { client } = useMedusa();
-
+	const params = createQueryString(query);
 	const { data, ...rest } = useQuery(
-		adminProductOutboundKeys.list(query),
-		() => client.admin.custom.get(`/admin/kiot/order/stock-out`),
+		adminProductOutboundKiotKeys.list(query),
+		() => client.admin.custom.get(`/admin/kiot/order/stock-out${params}`),
 		options
 	);
 
 	return { ...data, ...rest } as const;
 };
 
-export const useListOrders = (
+export const useListOrdersKiot = (
 	query?: any,
 	options?: UseQueryOptionsWrapper<
 		Response<any>,
 		Error,
-		ReturnType<ProductOutboundQueryKey['list']>
+		ReturnType<ProductOutboundKiotQueryKey['list']>
 	>
 ) => {
 	const { client } = useMedusa();
 
 	const { data, ...rest } = useQuery(
-		adminProductOutboundKeys.list(query),
+		adminProductOutboundKiotKeys.list(query),
 		() => client.admin.custom.get(`/admin/kiot/order`),
 		options
 	);
@@ -178,12 +184,12 @@ export const useGetOrder = (
 	options?: UseQueryOptionsWrapper<
 		Response<any>,
 		Error,
-		ReturnType<ProductOutboundQueryKey['detail']>
+		ReturnType<ProductOutboundKiotQueryKey['detail']>
 	>
 ) => {
-	const { client } = useMedusa();	
+	const { client } = useMedusa();
 	const { data, ...rest } = useQuery(
-		adminProductOutboundKeys.detail(orderId),
+		adminProductOutboundKiotKeys.detail(orderId),
 		() => client.admin.custom.get(`/admin/kiot/order/${orderId}`),
 		options
 	);
