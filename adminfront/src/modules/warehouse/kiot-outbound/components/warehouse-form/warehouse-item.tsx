@@ -3,24 +3,22 @@ import { Flex } from '@/components/Flex';
 import { Popconfirm } from '@/components/Popconfirm';
 import { Text } from '@/components/Typography';
 import {
-	ADMIN_PRODUCT_OUTBOUND_KIOT
+	ADMIN_PRODUCT_OUTBOUND_KIOT,
+	ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE,
 } from '@/lib/hooks/api/product-outbound';
 import {
+	adminWarehouseKiotKeys,
 	useAdminAddInventoryToWarehouseKiot,
 	useAdminRemoveInventoryKiot,
 } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/warehouse/components/variant-inventory-form';
-import { LineItem } from '@/types/lineItem';
 import { OrderInWarehouseKiot } from '@/types/warehouse';
 import { useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import { Minus, Plus } from 'lucide-react';
 
-type UpdatedLineItem = LineItem & {
-	supplier_order_id: string;
-};
 type WarehouseItemProps = {
 	item: any;
 	lineItem: any;
@@ -70,6 +68,10 @@ const WarehouseItem = ({
 			onSuccess: () => {
 				message.success(`Đã lấy hàng tại vị trí ${item.warehouse.location}`);
 				refetchInventory();
+				queryClient.invalidateQueries([
+					ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE,
+					'detail',
+				]);
 				queryClient.invalidateQueries([ADMIN_PRODUCT_OUTBOUND_KIOT, 'detail']);
 			},
 			onError: (error: any) => {
@@ -104,6 +106,10 @@ const WarehouseItem = ({
 			onSuccess: () => {
 				message.success(`Đã nhập hàng vào vị trí ${item.warehouse.location}`);
 				refetchInventory();
+				queryClient.invalidateQueries([
+					ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE,
+					'detail',
+				]);
 				queryClient.invalidateQueries([ADMIN_PRODUCT_OUTBOUND_KIOT, 'detail']);
 			},
 			onError: (error: any) => {

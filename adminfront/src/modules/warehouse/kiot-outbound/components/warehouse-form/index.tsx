@@ -23,7 +23,6 @@ import { useMemo, useState } from 'react';
 import WarehouseItem from './warehouse-item';
 
 type WarehouseFormProps = {
-	orderId: string;
 	sku: string;
 	lineItem: LineItemKiot;
 	isPermission: boolean;
@@ -35,12 +34,7 @@ type ValueType = {
 	value: string;
 };
 
-const WarehouseForm = ({
-	sku,
-	lineItem,
-	isPermission,
-	orderId,
-}: WarehouseFormProps) => {
+const WarehouseForm = ({ sku, lineItem, isPermission }: WarehouseFormProps) => {
 	// state
 	const { state: isModalOpen, onOpen, onClose } = useToggleState(false);
 	const [searchValue, setSearchValue] = useState<ValueType | null>(null);
@@ -85,7 +79,6 @@ const WarehouseForm = ({
 		}));
 	}, [warehouses]);
 
-
 	const handleAddLocation = () => {
 		if (!searchValue) return;
 
@@ -121,22 +114,12 @@ const WarehouseForm = ({
 			return message.error('Số lượng phải lớn hơn 0');
 		}
 
-		const itemData: AdminPostItemDataKiot = {
-			sku: lineItem.product_code,
-			quantity: unitData.quantity,
-			unit_id: unitData.unitId,
-			type: 'OUTBOUND',
-			line_item_id: lineItem.id,
-			order_id: orderId,
-		};
-
-		if (!itemData) return;
-
 		const payload = {
 			location: searchValue?.label,
 			warehouse_id: searchValue?.value,
 			unit_id: unitData.unitId,
 			sku: lineItem.product_code,
+			quantity: unitData.quantity,
 		};
 
 		// clear state to refetch warehouse
@@ -150,7 +133,6 @@ const WarehouseForm = ({
 				message.success('Thêm vị trí cho sản phẩm thành công');
 				refetchWarehouse();
 				refetchInventory();
-
 				onReset();
 				onClose();
 			},

@@ -11,6 +11,8 @@ import {
 export const ADMIN_PRODUCT_OUTBOUND = `admin_product_outbound` as const;
 export const ADMIN_PRODUCT_OUTBOUND_KIOT =
 	`admin_product_outbound_kiot` as const;
+export const ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE =
+	`admin_product_outbound_kiot_item_code` as const;
 
 export const adminProductOutboundKeys = queryKeysFactory(
 	ADMIN_PRODUCT_OUTBOUND
@@ -18,9 +20,14 @@ export const adminProductOutboundKeys = queryKeysFactory(
 export const adminProductOutboundKiotKeys = queryKeysFactory(
 	ADMIN_PRODUCT_OUTBOUND_KIOT
 );
+export const adminProductOutboundKiotItemCodeKeys = queryKeysFactory(
+	ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE
+);
 
 type ProductOutboundQueryKey = typeof adminProductOutboundKeys;
 type ProductOutboundKiotQueryKey = typeof adminProductOutboundKiotKeys;
+type ProductOutboundKiotItemCodeQueryKey =
+	typeof adminProductOutboundKiotItemCodeKeys;
 
 export type ProductOutboundQueryKeyParams = {
 	q?: string;
@@ -191,6 +198,24 @@ export const useGetOrder = (
 	const { data, ...rest } = useQuery(
 		adminProductOutboundKiotKeys.detail(orderId),
 		() => client.admin.custom.get(`/admin/kiot/order/${orderId}`),
+		options
+	);
+
+	return { ...data, ...rest } as const;
+};
+
+export const useGetProductCode = (
+	productCode: string,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<ProductOutboundKiotItemCodeQueryKey['detail']>
+	>
+) => {
+	const { client } = useMedusa();
+	const { data, ...rest } = useQuery(
+		adminProductOutboundKiotItemCodeKeys.detail(productCode),
+		() => client.admin.custom.get(`/admin/kiot/item/code/${productCode}`),
 		options
 	);
 

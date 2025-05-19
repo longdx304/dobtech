@@ -13,7 +13,6 @@ import {
 	useUnassignOrder,
 } from '@/lib/hooks/api/product-outbound';
 import { getErrorMessage } from '@/lib/utils';
-import { FulfillmentStatus } from '@/types/fulfillments';
 import { KiotOrderStatus } from '@/types/kiot';
 import { ERoutes } from '@/types/routes';
 import { Order } from '@medusajs/medusa';
@@ -24,6 +23,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import OutboundItem from '../components/outbound-item';
+import { FulfillmentStatus } from '@/types/fulfillments';
 
 type Props = {};
 
@@ -54,19 +54,27 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 	const [sortOrder, setSortOrder] = useState<number>(1);
 	const [activeKey, setActiveKey] = useState<string>('1');
 
-	const { orders: ordersFromKiot, isLoading: isLoadingFromKiot, count: countFromKiot } = useGetStockOut({
+	const {
+		orders: ordersFromKiot,
+		isLoading: isLoadingFromKiot,
+		count: countFromKiot,
+	} = useGetStockOut({
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
 		status: [KiotOrderStatus.COMPLETED],
 		...SORT_ORDER[sortOrder as keyof typeof SORT_ORDER],
 	});
+	console.log('🚀 ~ ordersFromKiot:', ordersFromKiot);
 
-	const { orders: ordersInWarehouse, isLoading: isLoadingInWarehouse, count: countInWarehouse } =
-		useListOrdersKiot({
-			offset,
-			limit: DEFAULT_PAGE_SIZE,
-			...SORT_ORDER[sortOrder as keyof typeof SORT_ORDER],
-		});
+	const {
+		orders: ordersInWarehouse,
+		isLoading: isLoadingInWarehouse,
+		count: countInWarehouse,
+	} = useListOrdersKiot({
+		offset,
+		limit: DEFAULT_PAGE_SIZE,
+		...SORT_ORDER[sortOrder as keyof typeof SORT_ORDER],
+	});
 
 	const assignOrder = useAssignOrder();
 	const unassignOrder = useUnassignOrder();
@@ -108,7 +116,7 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 			{ id: item.id },
 			{
 				onSuccess: () => {
-					message.success('Giao hàng thành công');
+					message.success('Thêm nhân viên xử lý đơn hàng thành công');
 				},
 				onError: (err: any) => {
 					message.error(getErrorMessage(err));
@@ -122,7 +130,7 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 			{ id: item.id },
 			{
 				onSuccess: () => {
-					message.success('Huỷ bỏ xử lý đơn hàng thành công');
+					message.success('Huỷ bỏ nhân viên xử lý đơn hàng thành công');
 				},
 				onError: (err: any) => {
 					message.error(getErrorMessage(err));
@@ -199,7 +207,9 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
-					dataSource={activeKey === '1' ? ordersFromKiot?.data : ordersInWarehouse}
+					dataSource={
+						activeKey === '1' ? ordersFromKiot?.data : ordersInWarehouse
+					}
 					loading={activeKey === '1' ? isLoadingFromKiot : isLoadingInWarehouse}
 					renderItem={(item: any) => (
 						<List.Item>
@@ -208,7 +218,12 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 								handleClickDetail={handleClickDetail}
 								handleConfirm={handleConfirm}
 								handleRemoveHandler={handleRemoveHandler}
-								isProcessing={activeKey === '1'}
+								isProcessing={
+									activeKey === '1'
+										? !item?.status_label ||
+										  item?.status_label === FulfillmentStatus.NOT_FULFILLED
+										: item.status === FulfillmentStatus.NOT_FULFILLED
+								}
 							/>
 						</List.Item>
 					)}

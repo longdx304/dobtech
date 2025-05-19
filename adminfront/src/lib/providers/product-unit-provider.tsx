@@ -38,25 +38,26 @@ const defaultProductUnitContext: ProductUnitContextType = {
 
 const ProductUnitContext = React.createContext(defaultProductUnitContext);
 
-export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
+export const ProductUnitProvider = ({
+	children,
+	_defaultUnit,
+}: PropsWithChildren<{ _defaultUnit: string }>) => {
 	const { item_units } = useAdminItemUnits();
 	const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
 	const [quantity, setQuantity] = useState<number>(0);
 
 	const optionItemUnits = useMemo(() => {
 		if (!item_units) return [];
-		return (
-			item_units
-				.map((item) => ({
-					value: item.id,
-					label: item.unit,
-				}))
-		);
+		return item_units.map((item) => ({
+			value: item.id,
+			label: item.unit,
+		}));
 	}, [item_units]);
 
-	const defaultUnit =
-		item_units?.find((item) => item.unit === 'bịch 6' || item.quantity === 6)
-			?.id || '';
+	const defaultUnit = _defaultUnit
+		? item_units?.find((item) => item.unit === _defaultUnit)?.id || ''
+		: item_units?.find((item) => item.unit === 'bịch 6' || item.quantity === 6)
+				?.id || '';
 
 	const getSelectedUnitData = () => {
 		const findUnit = item_units?.find((item) => item.id === selectedUnit);

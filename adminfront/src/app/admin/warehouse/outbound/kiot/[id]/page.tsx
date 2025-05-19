@@ -16,7 +16,7 @@ interface Props {
 export default async function OutboundKiotDetailPage({ params }: Props) {
 	return (
 		<Flex vertical gap="middle" className="h-full w-full">
-			<ProductUnitProvider>
+			<ProductUnitProvider _defaultUnit="đôi">
 				<OutboundKiotDetail id={params.id} />
 			</ProductUnitProvider>
 		</Flex>

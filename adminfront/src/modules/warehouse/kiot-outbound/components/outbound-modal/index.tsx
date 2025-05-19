@@ -1,33 +1,28 @@
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
+import { useGetProductCode } from '@/lib/hooks/api/product-outbound';
 import LayeredModal, {
 	LayeredModalContext,
 } from '@/lib/providers/layer-modal-provider';
-import { LineItem } from '@medusajs/medusa';
+import { message } from 'antd';
+import clsx from 'clsx';
 import { useContext } from 'react';
 import WarehouseForm from '../warehouse-form';
-import { useAdminLineItem } from '@/lib/hooks/api/line-item';
-import clsx from 'clsx';
-import { message } from 'antd';
 
 type Props = {
 	open: boolean;
 	onClose: () => void;
-	item: any;
+	lineItem: any;
 	isPermission: boolean;
 };
 
-const OutboundModal = ({
-	open,
-	onClose,
-	item,
-	isPermission,
-}: Props) => {
+const OutboundModal = ({ open, onClose, lineItem, isPermission }: Props) => {
 	const layeredModalContext = useContext(LayeredModalContext);
+	const { item, isLoading, refetch } = useGetProductCode(lineItem.product_code);
 
 	const handleOk = () => {
-		if ((item.warehouse_quantity ?? 0) > item.quantity) {
+		if ((item?.warehouse_quantity ?? 0) > item.quantity) {
 			message.error('Số lượng đã lấy không được lớn hơn số lượng giao');
 			return;
 		}
@@ -43,15 +38,14 @@ const OutboundModal = ({
 			title="Cập nhật tồn kho"
 			className="layered-modal"
 			width={800}
-			loading={false}
+			loading={isLoading}
 			cancelButtonProps={{ className: 'hidden' }}
 			maskClosable={false}
 			closable={false}
 		>
 			<VariantInfo lineItem={item} />
 			<WarehouseForm
-				orderId={item.order_id}
-				sku={item.product_code}
+				sku={item?.product_code}
 				lineItem={item}
 				isPermission={isPermission}
 			/>
@@ -66,7 +60,6 @@ const VariantInfo = ({
 }: {
 	lineItem: any & { warehouse_quantity: number };
 }) => {
-	console.log('lineItem =>>>', lineItem);
 	return (
 		<Flex gap={4} vertical className="py-2">
 			<Flex vertical align="flex-start">

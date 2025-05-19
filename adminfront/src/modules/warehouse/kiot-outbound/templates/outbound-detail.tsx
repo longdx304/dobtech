@@ -228,7 +228,7 @@ const OutboundKiotDetail: FC<Props> = ({ id }) => {
 						isPermission={isPermission}
 						open={state}
 						onClose={handleClose}
-						item={selectedItem}
+						lineItem={selectedItem}
 					/>
 				)}
 			</Card>
