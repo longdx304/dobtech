@@ -47,7 +47,6 @@ export const ProductUnitProvider = ({ children }: PropsWithChildren) => {
 		if (!item_units) return [];
 		return (
 			item_units
-				// .filter((item) => item.id !== 'default')
 				.map((item) => ({
 					value: item.id,
 					label: item.unit,

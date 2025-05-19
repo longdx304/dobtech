@@ -19,7 +19,6 @@ import { ArrowLeft, Check, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import OutboundDetailItem from '../components/outbound-detail-item';
-// import { FulfillmentStatus } from '@/types/order';
 import { ActionAbles } from '@/components/Dropdown';
 import { useUser } from '@/lib/providers/user-provider';
 import { getErrorMessage } from '@/lib/utils';

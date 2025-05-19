@@ -3,13 +3,12 @@
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
-import { Input, TextArea } from '@/components/Input';
+import { Input } from '@/components/Input';
 import List from '@/components/List';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import {
-	useAdminProductOutbound,
-	useAdminUpdateProductOutbound,
+	useAdminUpdateProductOutboundKiot,
 	useGetOrder,
 } from '@/lib/hooks/api/product-outbound';
 import useToggleState from '@/lib/hooks/use-toggle-state';
@@ -29,12 +28,10 @@ import { FulfillmentStatus } from '@/types/fulfillments';
 import { LineItem } from '@/types/lineItem';
 import { message } from 'antd';
 import clsx from 'clsx';
-import { useAdminCreateNote } from 'medusa-react';
+import dayjs from 'dayjs';
 import Image from 'next/image';
 import ConfirmOrder from '../../components/confirm-order';
-import Notes from '../../inbound/components/notes';
 import OutboundModal from '../components/outbound-modal';
-import dayjs from 'dayjs';
 
 type Props = {
 	id: string;
@@ -49,17 +46,13 @@ const OutboundKiotDetail: FC<Props> = ({ id }) => {
 	const [variantId, setVariantId] = useState<string | null>(null);
 	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
 	const { order, isLoading, refetch } = useGetOrder(id);
-	console.log('🚀 ~ order:', order);
-	const updateProductOutbound = useAdminUpdateProductOutbound(id);
-
-	const createNote = useAdminCreateNote();
+	const updateProductOutboundKiot = useAdminUpdateProductOutboundKiot(id);
 
 	const {
 		state: confirmState,
 		onOpen: onOpenConfirm,
 		onClose: onCloseConfirm,
 	} = useToggleState(false);
-	const [noteInput, setNoteInput] = useState<string>('');
 
 	const isPermission = useMemo(() => {
 		if (!user) return false;
@@ -134,9 +127,9 @@ const OutboundKiotDetail: FC<Props> = ({ id }) => {
 	};
 
 	const handleComplete = async () => {
-		await updateProductOutbound.mutateAsync(
+		await updateProductOutboundKiot.mutateAsync(
 			{
-				fulfillment_status: FulfillmentStatus.EXPORTED,
+				status: FulfillmentStatus.EXPORTED,
 				handled_at: dayjs().format(),
 			} as any,
 			{
@@ -144,39 +137,13 @@ const OutboundKiotDetail: FC<Props> = ({ id }) => {
 					message.success('Đơn hàng đã được xuất kho');
 					refetch();
 
-					onWriteNote();
+					// onWriteNote();
 
 					onCloseConfirm();
 				},
 				onError: (err: any) => message.error(getErrorMessage(err)),
 			}
 		);
-	};
-
-	const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-		const { value: inputValue } = e.target;
-
-		setNoteInput(inputValue);
-	};
-
-	const onWriteNote = () => {
-		if (!noteInput) {
-			return;
-		}
-		createNote.mutate(
-			{
-				resource_id: id,
-				resource_type: 'product-outbound',
-				value: noteInput,
-			},
-			{
-				onSuccess: () => {
-					message.success('Ghi chú đã được tạo');
-				},
-				onError: (err) => message.error(getErrorMessage(err)),
-			}
-		);
-		setNoteInput('');
 	};
 
 	const actions = [
@@ -261,12 +228,11 @@ const OutboundKiotDetail: FC<Props> = ({ id }) => {
 						isPermission={isPermission}
 						open={state}
 						onClose={handleClose}
-						variantId={variantId as string}
 						item={selectedItem}
 					/>
 				)}
 			</Card>
-			<Notes orderId={id} type="OUTBOUND" />
+			{/* <Notes orderId={id} type="OUTBOUND" /> */}
 			{confirmState && (
 				<ConfirmOrder
 					state={confirmState}
@@ -283,14 +249,6 @@ const OutboundKiotDetail: FC<Props> = ({ id }) => {
 							/>
 						);
 					})}
-
-					{/* Ghi chú */}
-					<TextArea
-						value={noteInput}
-						onChange={onChangeInput}
-						placeholder="Nhập ghi chú"
-						className="w-full"
-					/>
 				</ConfirmOrder>
 			)}
 		</Flex>

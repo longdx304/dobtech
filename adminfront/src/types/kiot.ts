@@ -4,3 +4,12 @@ export enum KiotOrderStatus {
 	CANCELLED = 4,
 	CONFIRMED = 5,
 }
+
+
+
+export type WarehouseKiotWithInventory = {
+	location?: string;
+	warehouse_id?: string;
+	unit_id?: string;
+	sku: string;
+}

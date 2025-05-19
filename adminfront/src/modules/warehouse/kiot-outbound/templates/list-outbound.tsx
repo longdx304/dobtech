@@ -9,6 +9,7 @@ import { Text, Title } from '@/components/Typography';
 import {
 	useAssignOrder,
 	useGetStockOut,
+	useListOrdersKiot,
 	useUnassignOrder,
 } from '@/lib/hooks/api/product-outbound';
 import { getErrorMessage } from '@/lib/utils';
@@ -53,12 +54,20 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 	const [sortOrder, setSortOrder] = useState<number>(1);
 	const [activeKey, setActiveKey] = useState<string>('1');
 
-	const { orders, isLoading, count } = useGetStockOut({
+	const { orders: ordersFromKiot, isLoading: isLoadingFromKiot, count: countFromKiot } = useGetStockOut({
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
 		status: [KiotOrderStatus.COMPLETED],
 		...SORT_ORDER[sortOrder as keyof typeof SORT_ORDER],
 	});
+
+	const { orders: ordersInWarehouse, isLoading: isLoadingInWarehouse, count: countInWarehouse } =
+		useListOrdersKiot({
+			offset,
+			limit: DEFAULT_PAGE_SIZE,
+			...SORT_ORDER[sortOrder as keyof typeof SORT_ORDER],
+		});
+
 	const assignOrder = useAssignOrder();
 	const unassignOrder = useUnassignOrder();
 
@@ -73,17 +82,20 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 	};
 
 	const handleChangeTab = (key: string) => {
+		console.log('key', key);
 		setActiveKey(key);
+		setOffset(0);
+		setNumPages(1);
 	};
 
 	const items: any = [
 		{
 			key: '1',
-			label: 'Đang thực hiện',
+			label: 'Đơn hàng trên KiotViet',
 		},
 		{
 			key: '2',
-			label: 'Đã hoàn thành',
+			label: 'Đơn hàng trong kho',
 		},
 	];
 
@@ -96,7 +108,7 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 			{ id: item.id },
 			{
 				onSuccess: () => {
-					// router.push(`${ERoutes.WAREHOUSE_OUTBOUND}/${item.id}`);
+					message.success('Giao hàng thành công');
 				},
 				onError: (err: any) => {
 					message.error(getErrorMessage(err));
@@ -187,8 +199,8 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
-					dataSource={orders?.data}
-					loading={isLoading}
+					dataSource={activeKey === '1' ? ordersFromKiot?.data : ordersInWarehouse}
+					loading={activeKey === '1' ? isLoadingFromKiot : isLoadingInWarehouse}
 					renderItem={(item: any) => (
 						<List.Item>
 							<OutboundItem
@@ -204,15 +216,15 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 						onChange: (page) => handleChangePage(page),
 						pageSize: DEFAULT_PAGE_SIZE,
 						current: numPages || 1,
-						total: orders?.total,
+						total: activeKey === '1' ? ordersFromKiot?.total : countInWarehouse,
 						showTotal: (total, range) =>
 							`${range[0]}-${range[1]} trong ${total} đơn hàng`,
 					}}
 					locale={{
 						emptyText:
-							activeKey === FulfillmentStatus.NOT_FULFILLED
-								? 'Đã hoàn thành tất cả đơn hàng. Hãy kiểm tra tại tab "Đã hoàn thành"'
-								: 'Chưa có đơn hàng nào hoàn thành. Hãy kiểm tra tại tab "Đang thực hiện"',
+							activeKey === '1'
+								? 'Không có đơn hàng nào đang thực hiện.'
+								: 'Không có đơn hàng nào đã hoàn thành.',
 					}}
 				/>
 			</Card>

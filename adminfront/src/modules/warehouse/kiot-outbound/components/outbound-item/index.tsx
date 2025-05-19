@@ -43,6 +43,7 @@ const OutboundItem: React.FC<OutboundItemProps> = ({
 			onClick: () => handleRemoveHandler(item),
 		},
 	];
+
 	return (
 		<Card className="bg-[#F3F6FF]" rounded>
 			<Tag
@@ -64,7 +65,9 @@ const OutboundItem: React.FC<OutboundItemProps> = ({
 			</Flex>
 			<Flex gap={4} className="" align="center">
 				<Text className="text-[14px] text-gray-500">Người đặt hàng:</Text>
-				<Text className="text-sm font-semibold text-wrap">{`${item?.customerName}`}</Text>
+				<Text className="text-sm font-semibold text-wrap">{`${
+					item?.customerName || item?.customer_name || 'NA'
+				}`}</Text>
 			</Flex>
 			<Flex gap={4} className="" align="center">
 				<Text className="text-[14px] text-gray-500">Ngày đặt hàng:</Text>

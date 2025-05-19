@@ -1,4 +1,5 @@
 import {
+	AdminWarehousesKiotListRes,
 	AdminWarehousesListRes,
 	AdminWarehouseTransactionsRes,
 } from '@/types/warehouse';
@@ -15,7 +16,13 @@ const ADMIN_WAREHOUSE = `admin_warehouse` as const;
 
 export const adminWarehouseKeys = queryKeysFactory(ADMIN_WAREHOUSE);
 
+const ADMIN_WAREHOUSE_KIOT = `admin_warehouse_kiot` as const;
+
+export const adminWarehouseKiotKeys = queryKeysFactory(ADMIN_WAREHOUSE_KIOT);
+
 type WarehouseQueryKey = typeof adminWarehouseKeys;
+
+type WarehouseKiotQueryKey = typeof adminWarehouseKiotKeys;
 
 export const useAdminWarehouses = (
 	/**
@@ -33,6 +40,27 @@ export const useAdminWarehouses = (
 	const { data, ...rest } = useQuery(
 		adminWarehouseKeys.list(query),
 		() => client.admin.custom.get(`/admin/warehouse${params}`),
+		options
+	);
+	return { ...data, ...rest } as const;
+};
+
+export const useAdminWarehousesKiot = (
+	/**
+	 * Filters and pagination configurations to apply on retrieved currencies.
+	 */
+	query?: Record<string, unknown>,
+	options?: UseQueryOptionsWrapper<
+		Response<AdminWarehousesKiotListRes>,
+		Error,
+		ReturnType<WarehouseKiotQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+	const params = query && generateParams(query);
+	const { data, ...rest } = useQuery(
+		adminWarehouseKiotKeys.list(query),
+		() => client.admin.custom.get(`/admin/kiot/warehouse${params}`),
 		options
 	);
 	return { ...data, ...rest } as const;
@@ -79,6 +107,16 @@ export const useAdminWarehouseInventoryByVariant = (variantId: string) => {
 		{
 			enabled: !!variantId,
 		}
+	);
+	return { ...data, ...rest } as const;
+};
+
+export const useAdminWarehouseInventoryKiotBySku = (sku: string) => {
+	const { client } = useMedusa();
+	const { data, ...rest } = useQuery(
+		adminWarehouseKiotKeys.detail(sku),
+		() => client.admin.custom.get(`/admin/kiot/warehouse/inventory?sku=${sku}`),
+		{ enabled: !!sku }
 	);
 	return { ...data, ...rest } as const;
 };

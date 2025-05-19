@@ -14,23 +14,20 @@ import { message } from 'antd';
 type Props = {
 	open: boolean;
 	onClose: () => void;
-	variantId: string;
-	item: LineItem;
+	item: any;
 	isPermission: boolean;
 };
 
 const OutboundModal = ({
 	open,
 	onClose,
-	variantId,
 	item,
 	isPermission,
 }: Props) => {
 	const layeredModalContext = useContext(LayeredModalContext);
-	const { lineItem, isLoading } = useAdminLineItem(item.id);
 
 	const handleOk = () => {
-		if ((lineItem.warehouse_quantity ?? 0) > lineItem.quantity) {
+		if ((item.warehouse_quantity ?? 0) > item.quantity) {
 			message.error('Số lượng đã lấy không được lớn hơn số lượng giao');
 			return;
 		}
@@ -46,15 +43,16 @@ const OutboundModal = ({
 			title="Cập nhật tồn kho"
 			className="layered-modal"
 			width={800}
-			loading={isLoading}
+			loading={false}
 			cancelButtonProps={{ className: 'hidden' }}
 			maskClosable={false}
 			closable={false}
 		>
-			<VariantInfo lineItem={lineItem} />
+			<VariantInfo lineItem={item} />
 			<WarehouseForm
-				variantId={variantId}
-				lineItem={lineItem}
+				orderId={item.order_id}
+				sku={item.product_code}
+				lineItem={item}
 				isPermission={isPermission}
 			/>
 		</LayeredModal>
@@ -66,17 +64,18 @@ export default OutboundModal;
 const VariantInfo = ({
 	lineItem,
 }: {
-	lineItem: LineItem & { warehouse_quantity: number };
+	lineItem: any & { warehouse_quantity: number };
 }) => {
+	console.log('lineItem =>>>', lineItem);
 	return (
 		<Flex gap={4} vertical className="py-2">
 			<Flex vertical align="flex-start">
 				<Text className="text-[14px] text-gray-500">Tên sản phẩm:</Text>
-				<Text className="text-sm font-medium">{`${lineItem.title}`}</Text>
+				<Text className="text-sm font-medium">{`${lineItem.product_name}`}</Text>
 				<Tag
 					className="text-sm mt-1"
 					color="blue"
-				>{`${lineItem.description}`}</Tag>
+				>{`${lineItem.product_code}`}</Tag>
 			</Flex>
 			<Flex vertical align="flex-start">
 				<Text className="text-[14px] text-gray-500">Đã lấy / Tổng giao:</Text>

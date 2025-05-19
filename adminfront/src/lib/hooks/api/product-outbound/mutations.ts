@@ -41,6 +41,18 @@ export const useAdminUpdateProductOutbound = (
 	}, buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()]));
 };
 
+export const useAdminUpdateProductOutboundKiot = (
+	id: string,
+	options?: UseMutationOptions<Response<void>, Error, Partial<Order>>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation((data: Partial<Order>) => {
+		return client.admin.custom.post(`/admin/kiot/order/${id}`, data);
+	}, buildOptions(queryClient, [adminProductOutboundKiotKeys.lists(), adminProductOutboundKiotKeys.details()]));
+};
+
 export const useAdminProductOutboundCheck = (
 	options?:
 		| UseMutationOptions<

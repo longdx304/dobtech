@@ -5,7 +5,7 @@ import { ProductVariant } from './products';
 export interface Warehouse {
 	id: string;
 	location: string;
-	capacity: number;
+	capacity?: number;
 	created_at: string;
 	updated_at: string;
 	inventories: WarehouseInventory[];
@@ -14,6 +14,13 @@ export interface Warehouse {
 export interface AdminPostWarehouseReq {
 	location: string;
 	capacity?: number;
+}
+
+export interface AdminPostWarehouseInventoryKiotReq {
+	warehouse_id: string;
+	sku: string;
+	quantity: number;
+	unit_id: string;
 }
 
 export interface AdminPostManageWarehouseVariantReq {
@@ -34,8 +41,24 @@ type AdminPostWarehouseRes = {
 	unit_id: string;
 };
 
+type AdminPostWarehouseResKiot = {
+	warehouse_id?: string;
+	location: string;
+	unit_id: string;
+	sku: string;
+};
+
 export type AdminPostItemData = {
 	variant_id: string;
+	quantity: number;
+	unit_id: string;
+	line_item_id: string;
+	order_id: string;
+	type: string;
+};
+
+export type AdminPostItemDataKiot = {
+	sku: string;
 	quantity: number;
 	unit_id: string;
 	line_item_id: string;
@@ -46,6 +69,11 @@ export type AdminPostItemData = {
 export interface AdminPostWarehouseVariantReq1 {
 	warehouse: AdminPostWarehouseRes;
 	itemInventory: AdminPostItemData;
+}
+
+export interface AdminPostWarehouseInventoryKiotReq {
+	warehouse: AdminPostWarehouseResKiot;
+	itemInventory: AdminPostItemDataKiot;
 }
 
 export interface AdminPostWarehouseVariantReq {
@@ -61,6 +89,14 @@ export type AdminWarehouseRes = {
 
 export type AdminWarehousesListRes = PaginatedResponse & {
 	warehouse: Warehouse[];
+};
+
+export type AdminWarehouseKiotRes = {
+	warehouse: Warehouse;
+};
+
+export type AdminWarehousesKiotListRes = PaginatedResponse & {
+	warehouses: Warehouse[];
 };
 
 export type AdminWarehouseDeleteRes = {
@@ -97,6 +133,19 @@ export interface AdminPostInboundInventoryReq {
 	type?: string;
 	note?: string;
 }
+
+export interface OrderInWarehouseKiot {
+	unit_id: string;
+	line_item_id: string;
+	sku: string;
+	warehouse_inventory_id: string;
+	quantity: number;
+	order_id: string;
+	warehouse_id: string;
+	type: "INBOUND" | "OUTBOUND";
+	user_id?: string;
+}
+
 export interface AdminPostManageInventoryWarehouseReq {
 	id?: string;
 	warehouse_id?: string;

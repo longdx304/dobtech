@@ -18,7 +18,7 @@ const OutboundDetailItem: React.FC<InboundItemProps> = ({
 	const isProcessing = item.quantity !== (item?.warehouse_quantity ?? 0);
 
 	const handleClick = () => {
-		handleClickDetail(item.variant_id);
+		handleClickDetail(item.id);
 	};
 
 	return (
