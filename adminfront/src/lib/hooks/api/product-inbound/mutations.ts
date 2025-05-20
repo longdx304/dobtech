@@ -69,6 +69,7 @@ export const useAdminCreateWarehouseAndInventory = (
 		AdminPostWarehouseVariantReq1
 	>
 ) => {
+	
 	const { client } = useMedusa();
 	const queryClient = useQueryClient();
 

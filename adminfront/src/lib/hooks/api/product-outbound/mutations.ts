@@ -7,7 +7,10 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query';
 import { useMedusa } from 'medusa-react';
-import { adminProductOutboundKeys } from './queries';
+import {
+	adminProductOutboundKeys,
+	adminProductOutboundKiotKeys,
+} from './queries';
 
 export const useAdminProductOutboundHandler = (
 	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
@@ -38,18 +41,77 @@ export const useAdminUpdateProductOutbound = (
 	}, buildOptions(queryClient, [adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()]));
 };
 
+export const useAdminUpdateProductOutboundKiot = (
+	id: string,
+	options?: UseMutationOptions<Response<void>, Error, Partial<Order>>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation((data: Partial<Order>) => {
+		return client.admin.custom.post(`/admin/kiot/order/${id}`, data);
+	}, buildOptions(queryClient, [adminProductOutboundKiotKeys.lists(), adminProductOutboundKiotKeys.details()]));
+};
 
 export const useAdminProductOutboundCheck = (
 	options?:
-		| UseMutationOptions<void, Error, { id: string; itemId: string[], checked: boolean }, unknown>
+		| UseMutationOptions<
+				void,
+				Error,
+				{ id: string; itemId: string[]; checked: boolean },
+				unknown
+		  >
 		| undefined
 ) => {
 	const { client } = useMedusa();
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		({ id, itemId, checked }: { id: string; itemId: string[]; checked: boolean }) =>
+		({
+			id,
+			itemId,
+			checked,
+		}: {
+			id: string;
+			itemId: string[];
+			checked: boolean;
+		}) =>
 			client.admin.custom.post(`/admin/product-outbound/${id}/check`, {
+				itemId,
+				checked,
+			}),
+		buildOptions(
+			queryClient,
+			[adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()],
+			options
+		)
+	);
+};
+
+export const useAdminOrderKiotCheck = (
+	options?:
+		| UseMutationOptions<
+				void,
+				Error,
+				{ id: number; itemId: string[]; checked: boolean },
+				unknown
+		  >
+		| undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({
+			id,
+			itemId,
+			checked,
+		}: {
+			id: number;
+			itemId: string[];
+			checked: boolean;
+		}) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}/check`, {
 				itemId,
 				checked,
 			}),
@@ -112,3 +174,65 @@ export const useAdminStockRemoveChecker = (
 	);
 };
 
+export const useUpdateOrderKiot = (
+	options?:
+		| UseMutationOptions<void, Error, { id: string; data: any }, unknown>
+		| undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({ id, data }: { id: string; data: any }) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}`, data),
+		buildOptions(
+			queryClient,
+			[
+				adminProductOutboundKiotKeys.lists(),
+				adminProductOutboundKiotKeys.details(),
+			],
+			options
+		)
+	);
+};
+
+// Assign/Unassign Mutations
+export const useAssignOrder = (
+	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({ id }: { id: string }) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}/assign`),
+		buildOptions(
+			queryClient,
+			[
+				adminProductOutboundKiotKeys.lists(),
+				adminProductOutboundKiotKeys.details(),
+			],
+			options
+		)
+	);
+};
+
+export const useUnassignOrder = (
+	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({ id }: { id: string }) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}/unassign`),
+		buildOptions(
+			queryClient,
+			[
+				adminProductOutboundKiotKeys.lists(),
+				adminProductOutboundKiotKeys.details(),
+			],
+			options
+		)
+	);
+};
