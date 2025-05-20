@@ -20,11 +20,14 @@ export enum ERoutes {
 	CURRENCIES = '/admin/currencies',
 	WAREHOUSE_INBOUND = '/admin/warehouse/inbound',
 	WAREHOUSE_OUTBOUND = '/admin/warehouse/outbound',
+	WAREHOUSE_OUTBOUND_KIOT = '/admin/warehouse/outbound/kiot',
 	WAREHOUSE_TRANSACTIONS = '/admin/warehouse/transactions',
 	ITEM_UNIT = '/admin/item-unit',
 	WAREHOUSE_STOCK_CHECKER = '/admin/warehouse/stock-checker',
+	WAREHOUSE_STOCK_CHECKER_KIOT = '/admin/warehouse/stock-checker/kiot',
 	WAREHOUSE_SHIPMENT = '/admin/warehouse/shipment',
 	WAREHOUSE_MANAGE = '/admin/warehouse/manage',
+	WAREHOUSE_MANAGE_KIOT = '/admin/warehouse/manage/kiot',
 	WAREHOUSE_INVENTORY_CHECKER = '/admin/warehouse/inventory-checker',
 }
 
@@ -131,5 +134,13 @@ export const routesConfig: TRouteConfig[] = [
 	{
 		path: ERoutes.WAREHOUSE_INVENTORY_CHECKER,
 		mode: [EPermissions.Driver, EPermissions.Manager],
+	},
+	{
+		path: ERoutes.WAREHOUSE_MANAGE_KIOT,
+		mode: [EPermissions.Warehouse, EPermissions.Manager],
+	},
+	{
+		path: ERoutes.WAREHOUSE_OUTBOUND_KIOT,
+		mode: [EPermissions.Warehouse, EPermissions.Manager],
 	},
 ];

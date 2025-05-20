@@ -3,13 +3,13 @@
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
-import { Input, TextArea } from '@/components/Input';
+import { Input } from '@/components/Input';
 import List from '@/components/List';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import {
-	useAdminProductOutbound,
-	useAdminUpdateProductOutbound,
+	useAdminUpdateProductOutboundKiot,
+	useGetOrder,
 } from '@/lib/hooks/api/product-outbound';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ERoutes } from '@/types/routes';
@@ -19,6 +19,7 @@ import { ArrowLeft, Check, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import OutboundDetailItem from '../components/outbound-detail-item';
+// import { FulfillmentStatus } from '@/types/order';
 import { ActionAbles } from '@/components/Dropdown';
 import { useUser } from '@/lib/providers/user-provider';
 import { getErrorMessage } from '@/lib/utils';
@@ -27,36 +28,31 @@ import { FulfillmentStatus } from '@/types/fulfillments';
 import { LineItem } from '@/types/lineItem';
 import { message } from 'antd';
 import clsx from 'clsx';
-import { useAdminCreateNote } from 'medusa-react';
+import dayjs from 'dayjs';
 import Image from 'next/image';
 import ConfirmOrder from '../../components/confirm-order';
-import Notes from '../../inbound/components/notes';
 import OutboundModal from '../components/outbound-modal';
-import dayjs from 'dayjs';
 
 type Props = {
 	id: string;
 };
 
 const DEFAULT_PAGE_SIZE = 10;
-const OutboundDetail: FC<Props> = ({ id }) => {
+const OutboundKiotDetail: FC<Props> = ({ id }) => {
 	const router = useRouter();
 	const { user } = useUser();
 	const { state, onOpen, onClose } = useToggleState();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [variantId, setVariantId] = useState<string | null>(null);
 	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
-	const { order, isLoading, refetch } = useAdminProductOutbound(id);
-	const updateProductOutbound = useAdminUpdateProductOutbound(id);
-
-	const createNote = useAdminCreateNote();
+	const { order, isLoading, refetch } = useGetOrder(id);
+	const updateProductOutboundKiot = useAdminUpdateProductOutboundKiot(id);
 
 	const {
 		state: confirmState,
 		onOpen: onOpenConfirm,
 		onClose: onCloseConfirm,
 	} = useToggleState(false);
-	const [noteInput, setNoteInput] = useState<string>('');
 
 	const isPermission = useMemo(() => {
 		if (!user) return false;
@@ -91,13 +87,13 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 
 		return itemsByStatus
 			.filter((item: any) => {
-				const lineItem = item as LineItem;
-				const title = lineItem.title.toLowerCase();
-				const description = lineItem?.description?.toLowerCase();
+				const lineItem = item as any;
+				const title = lineItem.product_name?.toLowerCase();
+				const description = lineItem?.product_code?.toLowerCase();
 				const search = searchValue.toLowerCase();
 				return title.includes(search) || description?.includes(search);
 			})
-			.sort((a, b) => {
+			.sort((a: any, b: any) => {
 				return (
 					new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
 				);
@@ -127,13 +123,13 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	};
 
 	const handleBackToList = () => {
-		router.push(ERoutes.WAREHOUSE_OUTBOUND);
+		router.push(ERoutes.WAREHOUSE_OUTBOUND_KIOT);
 	};
 
 	const handleComplete = async () => {
-		await updateProductOutbound.mutateAsync(
+		await updateProductOutboundKiot.mutateAsync(
 			{
-				fulfillment_status: FulfillmentStatus.EXPORTED,
+				status: FulfillmentStatus.EXPORTED,
 				handled_at: dayjs().format(),
 			} as any,
 			{
@@ -141,39 +137,13 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					message.success('Đơn hàng đã được xuất kho');
 					refetch();
 
-					onWriteNote();
+					// onWriteNote();
 
 					onCloseConfirm();
 				},
 				onError: (err: any) => message.error(getErrorMessage(err)),
 			}
 		);
-	};
-
-	const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-		const { value: inputValue } = e.target;
-
-		setNoteInput(inputValue);
-	};
-
-	const onWriteNote = () => {
-		if (!noteInput) {
-			return;
-		}
-		createNote.mutate(
-			{
-				resource_id: id,
-				resource_type: 'product-outbound',
-				value: noteInput,
-			},
-			{
-				onSuccess: () => {
-					message.success('Ghi chú đã được tạo');
-				},
-				onError: (err) => message.error(getErrorMessage(err)),
-			}
-		);
-		setNoteInput('');
 	};
 
 	const actions = [
@@ -183,13 +153,6 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 			onClick: onOpenConfirm,
 			disabled:
 				(order?.fulfillment_status as any) === FulfillmentStatus.EXPORTED,
-		},
-		{
-			label: 'Trang Order chi tiết',
-			icon: <ArrowLeft size={18} />,
-			onClick: () => {
-				router.push(`${ERoutes.ORDERS}/${id}`);
-			},
 		},
 	];
 
@@ -212,7 +175,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 			<Card loading={false} className="w-full mb-10" bordered={false}>
 				<Flex align="flex-start" justify="space-between">
 					<Flex vertical>
-						<Title level={4}>{`Đơn hàng #${order?.display_id}`}</Title>
+						<Title level={4}>{`Đơn hàng #${order?.code}`}</Title>
 						<Text className="text-gray-600">
 							{`Người phụ trách: ${handler}`}
 						</Text>
@@ -239,7 +202,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
 					dataSource={lineItems}
 					loading={isLoading}
-					renderItem={(item: LineItem) => (
+					renderItem={(item: any) => (
 						<List.Item>
 							<OutboundDetailItem
 								item={item}
@@ -265,12 +228,11 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 						isPermission={isPermission}
 						open={state}
 						onClose={handleClose}
-						variantId={variantId as string}
-						item={selectedItem}
+						lineItem={selectedItem}
 					/>
 				)}
 			</Card>
-			<Notes orderId={id} type="OUTBOUND" />
+			{/* <Notes orderId={id} type="OUTBOUND" /> */}
 			{confirmState && (
 				<ConfirmOrder
 					state={confirmState}
@@ -279,7 +241,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					handleCancel={onCloseConfirm}
 				>
 					{/* Danh sách san pham */}
-					{order?.items.map((item, idx) => {
+					{order?.items.map((item: any, idx: any) => {
 						return (
 							<FulfillmentLine
 								item={item as LineItem}
@@ -287,27 +249,19 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 							/>
 						);
 					})}
-
-					{/* Ghi chú */}
-					<TextArea
-						value={noteInput}
-						onChange={onChangeInput}
-						placeholder="Nhập ghi chú"
-						className="w-full"
-					/>
 				</ConfirmOrder>
 			)}
 		</Flex>
 	);
 };
 
-export default OutboundDetail;
+export default OutboundKiotDetail;
 
-export const getFulfillAbleQuantity = (item: LineItem): number => {
-	return item.quantity - (item.fulfilled_quantity ?? 0);
+export const getFulfillAbleQuantity = (item: any): number => {
+	return item.quantity - (item.warehouse_quantity ?? 0);
 };
 
-const FulfillmentLine = ({ item }: { item: LineItem }) => {
+const FulfillmentLine = ({ item }: { item: any }) => {
 	if (getFulfillAbleQuantity(item) <= 0) {
 		return null;
 	}
@@ -321,7 +275,7 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 							src={item.thumbnail}
 							height={48}
 							width={36}
-							alt={`Image summary ${item.title}`}
+							alt={`Image summary ${item.product_name}`}
 							className="object-cover"
 						/>
 					) : (
@@ -330,12 +284,11 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 				</div>
 				<div className="flex max-w-[185px] flex-col justify-center text-[12px]">
 					<span className="font-normal text-gray-900 truncate">
-						{item.title}
+						{item.product_name}
 					</span>
-					{item?.variant && (
+					{item?.product_code && (
 						<span className="font-normal text-gray-500 truncate">
-							{`${item.variant.title}${item.variant.sku ? ` (${item.variant.sku})` : ''
-								}`}
+							{`${item.product_code}`}
 						</span>
 					)}
 				</div>
@@ -344,12 +297,10 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 				<span className="flex text-gray-500 text-xs">
 					<span
 						className={clsx('pl-1', {
-							'text-red-500':
-								item.warehouse_quantity - (item.fulfilled_quantity ?? 0) >
-								getFulfillAbleQuantity(item),
+							'text-red-500': item.warehouse_quantity > item.quantity,
 						})}
 					>
-						{item.warehouse_quantity - (item.fulfilled_quantity ?? 0)}
+						{item.warehouse_quantity}
 					</span>
 					{'/'}
 					<span className="pl-1">{getFulfillAbleQuantity(item)}</span>

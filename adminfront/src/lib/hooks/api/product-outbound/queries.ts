@@ -9,12 +9,25 @@ import {
 } from 'medusa-react';
 
 export const ADMIN_PRODUCT_OUTBOUND = `admin_product_outbound` as const;
+export const ADMIN_PRODUCT_OUTBOUND_KIOT =
+	`admin_product_outbound_kiot` as const;
+export const ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE =
+	`admin_product_outbound_kiot_item_code` as const;
 
 export const adminProductOutboundKeys = queryKeysFactory(
 	ADMIN_PRODUCT_OUTBOUND
 );
+export const adminProductOutboundKiotKeys = queryKeysFactory(
+	ADMIN_PRODUCT_OUTBOUND_KIOT
+);
+export const adminProductOutboundKiotItemCodeKeys = queryKeysFactory(
+	ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE
+);
 
 type ProductOutboundQueryKey = typeof adminProductOutboundKeys;
+type ProductOutboundKiotQueryKey = typeof adminProductOutboundKiotKeys;
+type ProductOutboundKiotItemCodeQueryKey =
+	typeof adminProductOutboundKiotItemCodeKeys;
 
 export type ProductOutboundQueryKeyParams = {
 	q?: string;
@@ -44,7 +57,14 @@ const createQueryString = (search: Record<string, any> = {}) => {
 	);
 
 	const params = Object.keys(filteredSearch)
-		.map((k) => `${k}=${encodeURIComponent(filteredSearch[k])}`)
+		.map((k) => {
+			const value = filteredSearch[k];
+			// Handle arrays by using JSON.stringify
+			const encodedValue = Array.isArray(value)
+				? encodeURIComponent(JSON.stringify(value))
+				: encodeURIComponent(value);
+			return `${k}=${encodedValue}`;
+		})
 		.join('&');
 
 	return params ? `?${params}` : '';
@@ -113,5 +133,100 @@ export const useAdminProductOutbound = (
 		() => client.admin.custom.get(`/admin/product-outbound/${id}`),
 		options
 	);
+	return { ...data, ...rest } as const;
+};
+
+export interface OrderDetail {
+	id: string;
+	product_code: string;
+	product_name: string;
+	quantity: number;
+	warehouse_quantity: number;
+}
+export interface OrderKiot {
+	id: number;
+	code: string;
+	customer_name: string;
+	status: string;
+	orderDetails: OrderDetail[];
+	handler_id: string;
+	handler_at?: string;
+	checker_id: string;
+	checker_at?: string;
+}
+
+export const useGetStockOut = (
+	query?: any,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<ProductOutboundKiotQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+	const params = createQueryString(query);
+	const { data, ...rest } = useQuery(
+		adminProductOutboundKiotKeys.list(query),
+		() => client.admin.custom.get(`/admin/kiot/order/stock-out${params}`),
+		options
+	);
+
+	return { ...data, ...rest } as const;
+};
+
+export const useListOrdersKiot = (
+	query?: any,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<ProductOutboundKiotQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+
+	const params = createQueryString(query);
+
+	const { data, ...rest } = useQuery(
+		adminProductOutboundKiotKeys.list(query),
+		() => client.admin.custom.get(`/admin/kiot/order${params}`),
+		options
+	);
+
+	return { ...data, ...rest } as const;
+};
+
+export const useGetOrder = (
+	orderId: string,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<ProductOutboundKiotQueryKey['detail']>
+	>
+) => {
+	const { client } = useMedusa();
+	const { data, ...rest } = useQuery(
+		adminProductOutboundKiotKeys.detail(orderId),
+		() => client.admin.custom.get(`/admin/kiot/order/${orderId}`),
+		options
+	);
+
+	return { ...data, ...rest } as const;
+};
+
+export const useGetProductCode = (
+	productCode: string,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<ProductOutboundKiotItemCodeQueryKey['detail']>
+	>
+) => {
+	const { client } = useMedusa();
+	const { data, ...rest } = useQuery(
+		adminProductOutboundKiotItemCodeKeys.detail(productCode),
+		() => client.admin.custom.get(`/admin/kiot/item/code/${productCode}`),
+		options
+	);
+
 	return { ...data, ...rest } as const;
 };

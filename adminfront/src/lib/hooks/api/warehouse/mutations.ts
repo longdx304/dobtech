@@ -4,10 +4,11 @@ import {
 	AdminPostManageInventoryWarehouseReq,
 	AdminPostManageWarehouseVariantReq,
 	AdminPostRemmoveInventoryReq,
+	AdminPostWarehouseInventoryKiotReq,
 	AdminPostWarehouseReq,
-	AdminPostWarehouseVariantReq,
 	AdminWarehouseDeleteRes,
 	AdminWarehouseRes,
+	OrderInWarehouseKiot,
 } from '@/types/warehouse';
 import { buildOptions } from '@/utils/build-options';
 import { Response } from '@medusajs/medusa-js';
@@ -17,8 +18,16 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query';
 import { useMedusa } from 'medusa-react';
-import { adminWarehouseKeys } from './queries';
-
+import {
+	adminWarehouseKeys,
+	adminWarehouseKiotKeys,
+	adminWarehouseKiotManageKeys,
+} from './queries';
+import {
+	WarehouseKiotVariantReq,
+	WarehouseKiotWithInventory,
+} from '@/types/kiot';
+import { adminProductOutboundKiotItemCodeKeys } from '../product-outbound/queries';
 export const useAdminCreateWarehouse = (
 	options?: UseMutationOptions<
 		Response<AdminWarehouseRes>,
@@ -33,6 +42,60 @@ export const useAdminCreateWarehouse = (
 		(payload: AdminPostWarehouseReq) =>
 			client.admin.custom.post(`/admin/warehouse`, payload),
 		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
+	);
+};
+
+export const useAdminCreateWarehouseKiot = (
+	options?: UseMutationOptions<
+		Response<AdminWarehouseRes>,
+		Error,
+		AdminPostWarehouseReq
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminPostWarehouseReq) =>
+			client.admin.custom.post(`/admin/kiot/warehouse`, payload),
+		buildOptions(queryClient, [adminWarehouseKiotKeys.lists()], options)
+	);
+};
+
+export const useAdminCreateWarehouseKiotInventory = (
+	options?: UseMutationOptions<Response<any>, Error, WarehouseKiotWithInventory>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation((payload: WarehouseKiotWithInventory) => {
+		const queryKeys = [
+			adminWarehouseKiotKeys.lists(),
+			adminProductOutboundKiotItemCodeKeys.detail(payload.sku),
+		];
+		return client.admin.custom
+			.post(`/admin/kiot/warehouse/inventory/create`, payload)
+			.then((response) => {
+				queryClient.invalidateQueries(queryKeys);
+				return response;
+			});
+	}, options);
+};
+
+export const useAdminCreateWarehouseInventoryKiot = (
+	options?: UseMutationOptions<
+		Response<any>,
+		Error,
+		AdminPostWarehouseInventoryKiotReq
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminPostWarehouseInventoryKiotReq) =>
+			client.admin.custom.post(`/admin/kiot/warehouse/inventory`, payload),
+		buildOptions(queryClient, [adminWarehouseKiotKeys.lists()], options)
 	);
 };
 
@@ -99,6 +162,23 @@ export const useAdminAddInventoryToWarehouse = (
 	);
 };
 
+export const useAdminAddInventoryToWarehouseKiot = (
+	options?: UseMutationOptions<
+		Response<AdminWarehouseRes>,
+		Error,
+		OrderInWarehouseKiot
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: OrderInWarehouseKiot) =>
+			client.admin.custom.post(`/admin/kiot/warehouse/add`, payload),
+		buildOptions(queryClient, [adminWarehouseKiotKeys.lists()], options)
+	);
+};
+
 export const useAdminRemoveInventory = (
 	options?: UseMutationOptions<
 		Response<AdminInventoryRemoveRes>,
@@ -116,6 +196,23 @@ export const useAdminRemoveInventory = (
 	);
 };
 
+export const useAdminRemoveInventoryKiot = (
+	options?: UseMutationOptions<
+		Response<AdminInventoryRemoveRes>,
+		Error,
+		OrderInWarehouseKiot
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: OrderInWarehouseKiot) =>
+			client.admin.custom.post(`/admin/kiot/warehouse/remove`, payload),
+		buildOptions(queryClient, [adminWarehouseKiotKeys.lists()], options)
+	);
+};
+
 export const useAdminRemoveInventoryToWarehouse = (
 	options?: UseMutationOptions<
 		Response<AdminWarehouseRes>,
@@ -130,5 +227,44 @@ export const useAdminRemoveInventoryToWarehouse = (
 		(payload: AdminPostManageInventoryWarehouseReq) =>
 			client.admin.custom.post(`/admin/warehouse/manage/remove`, payload),
 		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
+	);
+};
+
+export const useAdminCreateWarehouseLocationKiot = (
+	options?: UseMutationOptions<Response<any>, Error, WarehouseKiotWithInventory>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: WarehouseKiotWithInventory) =>
+			client.admin.custom.post(`/admin/kiot/warehouse/manage/sku`, payload),
+		buildOptions(queryClient, [adminWarehouseKiotManageKeys.lists()], options)
+	);
+};
+
+export const useAdminCreateWarehouseVariantKiot = (
+	options?: UseMutationOptions<Response<any>, Error, WarehouseKiotVariantReq>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: WarehouseKiotVariantReq) =>
+			client.admin.custom.post(`/admin/kiot/warehouse/manage/add`, payload),
+		buildOptions(queryClient, [adminWarehouseKiotManageKeys.lists()], options)
+	);
+};
+
+export const useAdminDeleteWarehouseVariantKiot = (
+	options?: UseMutationOptions<Response<any>, Error, WarehouseKiotVariantReq>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: WarehouseKiotVariantReq) =>
+			client.admin.custom.post(`/admin/kiot/warehouse/manage/remove`, payload),
+		buildOptions(queryClient, [adminWarehouseKiotManageKeys.lists()], options)
 	);
 };
