@@ -88,6 +88,41 @@ export const useAdminProductOutboundCheck = (
 	);
 };
 
+export const useAdminOrderKiotCheck = (
+	options?:
+		| UseMutationOptions<
+				void,
+				Error,
+				{ id: number; itemId: string[]; checked: boolean },
+				unknown
+		  >
+		| undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({
+			id,
+			itemId,
+			checked,
+		}: {
+			id: number;
+			itemId: string[];
+			checked: boolean;
+		}) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}/check`, {
+				itemId,
+				checked,
+			}),
+		buildOptions(
+			queryClient,
+			[adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()],
+			options
+		)
+	);
+};
+
 export const useAdminProductOutboundRemoveHandler = (
 	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
 ) => {
@@ -134,6 +169,28 @@ export const useAdminStockRemoveChecker = (
 		buildOptions(
 			queryClient,
 			[adminProductOutboundKeys.lists(), adminProductOutboundKeys.details()],
+			options
+		)
+	);
+};
+
+export const useUpdateOrderKiot = (
+	options?:
+		| UseMutationOptions<void, Error, { id: string; data: any }, unknown>
+		| undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({ id, data }: { id: string; data: any }) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}`, data),
+		buildOptions(
+			queryClient,
+			[
+				adminProductOutboundKiotKeys.lists(),
+				adminProductOutboundKiotKeys.details(),
+			],
 			options
 		)
 	);

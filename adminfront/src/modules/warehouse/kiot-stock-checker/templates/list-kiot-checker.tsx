@@ -7,27 +7,26 @@ import { Switch } from '@/components/Switch';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import {
-	useAdminCheckerStocks,
-	useAdminStockAssignChecker,
-	useAdminStockRemoveChecker,
+	useListOrdersKiot,
+	useUpdateOrderKiot,
 } from '@/lib/hooks/api/product-outbound';
+import { useUser } from '@/lib/providers/user-provider';
 import { getErrorMessage } from '@/lib/utils';
 import { FulfillmentStatus } from '@/types/fulfillments';
-import { Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
 import { message, Select } from 'antd';
 import debounce from 'lodash/debounce';
 import { Search } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import StockItem from '../components/stock-item';
-import Link from 'next/link';
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
 
-const ListFulfillment: FC<Props> = ({}) => {
+const KiotStockChecker: FC<Props> = ({}) => {
 	const router = useRouter();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
@@ -38,16 +37,18 @@ const ListFulfillment: FC<Props> = ({}) => {
 	const [sortOrder, setSortOrder] = useState<string>('-created_at');
 	const [myOrder, setMyOrder] = useState(false);
 
-	const stockAssignChecker = useAdminStockAssignChecker();
-	const stockRemoveChecker = useAdminStockRemoveChecker();
+	const { user } = useUser();
 
-	const { orders, isLoading, count } = useAdminCheckerStocks({
-		q: searchValue || undefined,
+	const updateOrderKiot = useUpdateOrderKiot();
+
+	const {
+		orders: ordersInWarehouse,
+		isLoading: isLoadingInWarehouse,
+		count: countInWarehouse,
+	} = useListOrdersKiot({
+		status: activeKey,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		fulfillment_status: activeKey,
-		isMyOrder: myOrder ? true : undefined,
-		order: sortOrder,
 	});
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
@@ -75,16 +76,17 @@ const ListFulfillment: FC<Props> = ({}) => {
 		setActiveKey(key);
 	};
 
-	const handleClickDetail = async (item: Order) => {
-		return router.push(`${ERoutes.WAREHOUSE_STOCK_CHECKER}/${item.id}`);
+
+	const handleClickDetail = async (item: any) => {
+		return router.push(`${ERoutes.WAREHOUSE_STOCK_CHECKER_KIOT}/${item.id}`);
 	};
 
-	const handleConfirm = async (item: Order) => {
-		await stockAssignChecker.mutateAsync(
-			{ id: item.id },
+	const handleConfirm = async (item: any) => {
+		await updateOrderKiot.mutateAsync(
+			{ id: item.id, data: { checker_id: user?.id, checker_at: new Date() } },
 			{
 				onSuccess: () => {
-					router.push(`${ERoutes.WAREHOUSE_STOCK_CHECKER}/${item.id}`);
+					router.push(`${ERoutes.WAREHOUSE_STOCK_CHECKER_KIOT}/${item.id}`);
 				},
 				onError: (err) => {
 					message.error(getErrorMessage(err));
@@ -93,9 +95,9 @@ const ListFulfillment: FC<Props> = ({}) => {
 		);
 	};
 
-	const handleRemoveHandler = async (item: Order) => {
-		await stockRemoveChecker.mutateAsync(
-			{ id: item.id },
+	const handleRemoveHandler = async (item: any) => {
+		await updateOrderKiot.mutateAsync(
+			{ id: item.id, data: { checker_id: null, checker_at: null } },
 			{
 				onSuccess: () => {
 					message.success('Huỷ bỏ xử lý đơn hàng thành công');
@@ -118,8 +120,8 @@ const ListFulfillment: FC<Props> = ({}) => {
 			<Card loading={false} className="w-full" bordered={false}>
 				<Flex justify="flex-start" align="center" gap={12}>
 					<Title level={4}>Theo dõi các đơn hàng</Title>
-					<Link href={ERoutes.WAREHOUSE_STOCK_CHECKER_KIOT} className="">
-						Chuyển kho Kiot
+					<Link href={ERoutes.WAREHOUSE_STOCK_CHECKER} className="">
+						Chuyển kho Chamdep
 					</Link>
 				</Flex>
 				<Flex
@@ -139,8 +141,6 @@ const ListFulfillment: FC<Props> = ({}) => {
 							options={[
 								{ label: 'Ngày cũ nhất', value: 'created_at' },
 								{ label: 'Ngày mới nhất', value: '-created_at' },
-								{ label: 'Mã mới nhất', value: '-display_id' },
-								{ label: 'Mã cũ nhất', value: 'display_id' },
 							]}
 							className="w-[200px]"
 							style={{ width: 200 }}
@@ -170,9 +170,9 @@ const ListFulfillment: FC<Props> = ({}) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
-					dataSource={orders}
-					loading={isLoading}
-					renderItem={(item: Order) => (
+					dataSource={ordersInWarehouse}
+					loading={isLoadingInWarehouse}
+					renderItem={(item: any) => (
 						<List.Item>
 							<StockItem
 								item={item}
@@ -186,7 +186,7 @@ const ListFulfillment: FC<Props> = ({}) => {
 						onChange: (page) => handleChangePage(page),
 						pageSize: DEFAULT_PAGE_SIZE,
 						current: numPages || 1,
-						total: count,
+						total: countInWarehouse,
 						showTotal: (total, range) =>
 							`${range[0]}-${range[1]} trong ${total} đơn hàng`,
 					}}
@@ -201,4 +201,4 @@ const ListFulfillment: FC<Props> = ({}) => {
 	);
 };
 
-export default ListFulfillment;
+export default KiotStockChecker;

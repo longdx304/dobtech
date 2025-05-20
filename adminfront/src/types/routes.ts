@@ -24,6 +24,7 @@ export enum ERoutes {
 	WAREHOUSE_TRANSACTIONS = '/admin/warehouse/transactions',
 	ITEM_UNIT = '/admin/item-unit',
 	WAREHOUSE_STOCK_CHECKER = '/admin/warehouse/stock-checker',
+	WAREHOUSE_STOCK_CHECKER_KIOT = '/admin/warehouse/stock-checker/kiot',
 	WAREHOUSE_SHIPMENT = '/admin/warehouse/shipment',
 	WAREHOUSE_MANAGE = '/admin/warehouse/manage',
 	WAREHOUSE_INVENTORY_CHECKER = '/admin/warehouse/inventory-checker',

@@ -177,9 +177,11 @@ export const useListOrdersKiot = (
 ) => {
 	const { client } = useMedusa();
 
+	const params = createQueryString(query);
+
 	const { data, ...rest } = useQuery(
 		adminProductOutboundKiotKeys.list(query),
-		() => client.admin.custom.get(`/admin/kiot/order`),
+		() => client.admin.custom.get(`/admin/kiot/order${params}`),
 		options
 	);
 
