@@ -1,3 +1,4 @@
+import { WarehouseKiotBySkuResponse } from '@/types/kiot';
 import {
 	AdminWarehousesKiotListRes,
 	AdminWarehousesListRes,
@@ -81,7 +82,10 @@ export const useAdminWarehousesInventoryVariant = (
 	const params = query && generateParams(query);
 	const { data, ...rest } = useQuery(
 		adminWarehouseKeys.list(query),
-		() => client.admin.custom.get(`/admin/warehouse/manage/inventory-variants${params}`),
+		() =>
+			client.admin.custom.get(
+				`/admin/warehouse/manage/inventory-variants${params}`
+			),
 		options
 	);
 	return { ...data, ...rest } as const;
@@ -138,6 +142,33 @@ export const useAdminWarehouseTransactions = (
 	const { data, ...rest } = useQuery(
 		adminWarehouseKeys.list(query),
 		() => client.admin.custom.get(`/admin/warehouse/transaction${params}`),
+		options
+	);
+	return { ...data, ...rest } as const;
+};
+
+// Kiot warehouse manage
+const ADMIN_WAREHOUSE_KIOT_MANAGE = `admin_warehouse_kiot_manage` as const;
+
+export const adminWarehouseKiotManageKeys = queryKeysFactory(
+	ADMIN_WAREHOUSE_KIOT_MANAGE
+);
+type WarehouseKiotManageQueryKey = typeof adminWarehouseKiotManageKeys;
+
+export const useAdminWarehouseManageKiotBySku = (
+	query?: Record<string, unknown>,
+	options?: UseQueryOptionsWrapper<
+		Response<WarehouseKiotBySkuResponse>,
+		Error,
+		ReturnType<WarehouseKiotManageQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+	const params = query && generateParams(query);
+
+	const { data, ...rest } = useQuery(
+		adminWarehouseKiotManageKeys.list(query),
+		() => client.admin.custom.get(`/admin/kiot/warehouse/manage/sku${params}`),
 		options
 	);
 	return { ...data, ...rest } as const;

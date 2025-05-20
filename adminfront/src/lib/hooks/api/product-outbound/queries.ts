@@ -55,10 +55,19 @@ const createQueryString = (search: Record<string, any> = {}) => {
 			([_, value]) => value !== undefined && value !== null
 		)
 	);
+	console.log('🚀 ~ createQueryString ~ filteredSearch:', filteredSearch);
 
 	const params = Object.keys(filteredSearch)
-		.map((k) => `${k}=${encodeURIComponent(filteredSearch[k])}`)
+		.map((k) => {
+			const value = filteredSearch[k];
+			// Handle arrays by using JSON.stringify
+			const encodedValue = Array.isArray(value)
+				? encodeURIComponent(JSON.stringify(value))
+				: encodeURIComponent(value);
+			return `${k}=${encodedValue}`;
+		})
 		.join('&');
+	console.log('🚀 ~ createQueryString ~ params:', params);
 
 	return params ? `?${params}` : '';
 };

@@ -18,8 +18,15 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query';
 import { useMedusa } from 'medusa-react';
-import { adminWarehouseKeys, adminWarehouseKiotKeys } from './queries';
-import { WarehouseKiotWithInventory } from '@/types/kiot';
+import {
+	adminWarehouseKeys,
+	adminWarehouseKiotKeys,
+	adminWarehouseKiotManageKeys,
+} from './queries';
+import {
+	WarehouseKiotVariantReq,
+	WarehouseKiotWithInventory,
+} from '@/types/kiot';
 import { adminProductOutboundKiotItemCodeKeys } from '../product-outbound/queries';
 export const useAdminCreateWarehouse = (
 	options?: UseMutationOptions<
@@ -220,5 +227,44 @@ export const useAdminRemoveInventoryToWarehouse = (
 		(payload: AdminPostManageInventoryWarehouseReq) =>
 			client.admin.custom.post(`/admin/warehouse/manage/remove`, payload),
 		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
+	);
+};
+
+export const useAdminCreateWarehouseLocationKiot = (
+	options?: UseMutationOptions<Response<any>, Error, WarehouseKiotWithInventory>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: WarehouseKiotWithInventory) =>
+			client.admin.custom.post(`/admin/kiot/warehouse/manage/sku`, payload),
+		buildOptions(queryClient, [adminWarehouseKiotManageKeys.lists()], options)
+	);
+};
+
+export const useAdminCreateWarehouseVariantKiot = (
+	options?: UseMutationOptions<Response<any>, Error, WarehouseKiotVariantReq>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: WarehouseKiotVariantReq) =>
+			client.admin.custom.post(`/admin/kiot/warehouse/manage/add`, payload),
+		buildOptions(queryClient, [adminWarehouseKiotManageKeys.lists()], options)
+	);
+};
+
+export const useAdminDeleteWarehouseVariantKiot = (
+	options?: UseMutationOptions<Response<any>, Error, WarehouseKiotVariantReq>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: WarehouseKiotVariantReq) =>
+			client.admin.custom.post(`/admin/kiot/warehouse/manage/remove`, payload),
+		buildOptions(queryClient, [adminWarehouseKiotManageKeys.lists()], options)
 	);
 };

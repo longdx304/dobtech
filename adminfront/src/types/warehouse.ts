@@ -142,7 +142,7 @@ export interface OrderInWarehouseKiot {
 	quantity: number;
 	order_id: string;
 	warehouse_id: string;
-	type: "INBOUND" | "OUTBOUND";
+	type: 'INBOUND' | 'OUTBOUND';
 	user_id?: string;
 }
 

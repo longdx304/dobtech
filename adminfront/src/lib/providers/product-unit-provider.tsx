@@ -41,7 +41,7 @@ const ProductUnitContext = React.createContext(defaultProductUnitContext);
 export const ProductUnitProvider = ({
 	children,
 	_defaultUnit,
-}: PropsWithChildren<{ _defaultUnit: string }>) => {
+}: PropsWithChildren<{ _defaultUnit?: string }>) => {
 	const { item_units } = useAdminItemUnits();
 	const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
 	const [quantity, setQuantity] = useState<number>(0);

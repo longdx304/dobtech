@@ -6,17 +6,17 @@ import { Text, Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { Plus } from 'lucide-react';
 import { FC } from 'react';
-import ModalAddWarehouse from '../components/modal-add-warehouse';
 import { TabsProps } from 'antd';
-import ProductManage from './product-manage';
-import LocationManage from './location-manage';
 import { Tabs } from '@/components/Tabs';
 import Link from 'next/link';
 import { ERoutes } from '@/types/routes';
+import ModalAddWarehouse from '../../manage/components/modal-add-warehouse';
+import ProductManage from './product-manage';
+import LocationManage from './location-manage';
 
 type Props = {};
 
-const WarehouseManage: FC<Props> = ({}) => {
+const KiotWarehouseManage: FC<Props> = ({}) => {
 	const {
 		state: stateWarehouse,
 		onOpen: openWarehouse,
@@ -29,11 +29,11 @@ const WarehouseManage: FC<Props> = ({}) => {
 			label: 'Sản phẩm',
 			children: <ProductManage />,
 		},
-		{
-			key: 'locaitons',
-			label: 'Vị trí',
-			children: <LocationManage />,
-		},
+		// {
+		// 	key: 'locaitons',
+		// 	label: 'Vị trí',
+		// 	children: <LocationManage />,
+		// },
 	];
 
 	return (
@@ -45,8 +45,8 @@ const WarehouseManage: FC<Props> = ({}) => {
 				</Text>
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
-				<Link href={ERoutes.WAREHOUSE_MANAGE_KIOT} className="">
-					Chuyển kho Kiot
+				<Link href={ERoutes.WAREHOUSE_MANAGE} className="">
+					Chuyển kho Chamdep
 				</Link>
 				<Tabs items={itemTabs} centered />
 				<FloatButton
@@ -65,4 +65,4 @@ const WarehouseManage: FC<Props> = ({}) => {
 	);
 };
 
-export default WarehouseManage;
+export default KiotWarehouseManage;

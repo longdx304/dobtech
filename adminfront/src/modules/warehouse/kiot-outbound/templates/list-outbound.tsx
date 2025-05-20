@@ -13,7 +13,7 @@ import {
 	useUnassignOrder,
 } from '@/lib/hooks/api/product-outbound';
 import { getErrorMessage } from '@/lib/utils';
-import { KiotOrderStatus } from '@/types/kiot';
+import { KiotInvoiceStatus } from '@/types/kiot';
 import { ERoutes } from '@/types/routes';
 import { Order } from '@medusajs/medusa';
 import { message, Select } from 'antd';
@@ -54,17 +54,13 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 	const [sortOrder, setSortOrder] = useState<number>(1);
 	const [activeKey, setActiveKey] = useState<string>('1');
 
-	const {
-		orders: ordersFromKiot,
-		isLoading: isLoadingFromKiot,
-		count: countFromKiot,
-	} = useGetStockOut({
-		offset,
-		limit: DEFAULT_PAGE_SIZE,
-		status: [KiotOrderStatus.COMPLETED],
-		...SORT_ORDER[sortOrder as keyof typeof SORT_ORDER],
-	});
-	console.log('🚀 ~ ordersFromKiot:', ordersFromKiot);
+	const { orders: ordersFromKiot, isLoading: isLoadingFromKiot } =
+		useGetStockOut({
+			offset,
+			limit: DEFAULT_PAGE_SIZE,
+			status: [KiotInvoiceStatus.PROCESSING],
+			...SORT_ORDER[sortOrder as keyof typeof SORT_ORDER],
+		});
 
 	const {
 		orders: ordersInWarehouse,
@@ -73,7 +69,6 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 	} = useListOrdersKiot({
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		...SORT_ORDER[sortOrder as keyof typeof SORT_ORDER],
 	});
 
 	const assignOrder = useAssignOrder();
@@ -108,12 +103,12 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 	];
 
 	const handleClickDetail = async (item: any) => {
-		return router.push(`${ERoutes.WAREHOUSE_OUTBOUND_KIOT}/${item.id}`);
+		return router.push(`${ERoutes.WAREHOUSE_OUTBOUND_KIOT}/${item.orderId}`);
 	};
 
-	const handleConfirm = async (item: Order) => {
+	const handleConfirm = async (item: any) => {
 		await assignOrder.mutateAsync(
-			{ id: item.id },
+			{ id: item.orderId },
 			{
 				onSuccess: () => {
 					message.success('Thêm nhân viên xử lý đơn hàng thành công');
@@ -127,7 +122,7 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 
 	const handleRemoveHandler = async (item: any) => {
 		await unassignOrder.mutateAsync(
-			{ id: item.id },
+			{ id: item.orderId },
 			{
 				onSuccess: () => {
 					message.success('Huỷ bỏ nhân viên xử lý đơn hàng thành công');
@@ -224,6 +219,7 @@ const ListOutboundKiot: FC<Props> = ({}) => {
 										  item?.status_label === FulfillmentStatus.NOT_FULFILLED
 										: item.status === FulfillmentStatus.NOT_FULFILLED
 								}
+								activeKey={activeKey}
 							/>
 						</List.Item>
 					)}
