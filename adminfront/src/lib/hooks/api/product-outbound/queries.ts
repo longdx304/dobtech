@@ -55,7 +55,6 @@ const createQueryString = (search: Record<string, any> = {}) => {
 			([_, value]) => value !== undefined && value !== null
 		)
 	);
-	console.log('🚀 ~ createQueryString ~ filteredSearch:', filteredSearch);
 
 	const params = Object.keys(filteredSearch)
 		.map((k) => {
@@ -67,7 +66,6 @@ const createQueryString = (search: Record<string, any> = {}) => {
 			return `${k}=${encodedValue}`;
 		})
 		.join('&');
-	console.log('🚀 ~ createQueryString ~ params:', params);
 
 	return params ? `?${params}` : '';
 };

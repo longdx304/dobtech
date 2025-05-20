@@ -12,7 +12,6 @@ import Link from 'next/link';
 import { ERoutes } from '@/types/routes';
 import ModalAddWarehouse from '../../manage/components/modal-add-warehouse';
 import ProductManage from './product-manage';
-import LocationManage from './location-manage';
 
 type Props = {};
 
