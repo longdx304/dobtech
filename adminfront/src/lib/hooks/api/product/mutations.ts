@@ -27,3 +27,20 @@ export const useCheckInventory = (
 		buildOptions(queryClient, [adminInventoryKeys.lists()], options)
 	);
 };
+
+export const useCheckInventoryKiot = (
+	options?: UseMutationOptions<
+		Response<{ fileKey: string; fileSize: number; downloadUrl: string }>,
+		Error,
+		{ filterable_fields?: Record<string, any> }
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: { filterable_fields?: Record<string, any> }) =>
+			client.admin.custom.post(`/admin/product/kiot-inventory`, payload),
+		buildOptions(queryClient, [adminInventoryKeys.lists()], options)
+	);
+};

@@ -45,7 +45,7 @@ const SORT_ORDER = {
 		orderDirection: 'ASC',
 	},
 };
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 15;
 const ListOutboundKiot: FC<Props> = ({}) => {
 	const router = useRouter();
 	const [searchValue, setSearchValue] = useState<string>('');
