@@ -11,32 +11,39 @@ import dayjs from 'dayjs';
 import { Check, Clock } from 'lucide-react';
 
 interface OutboundItemProps {
-	item: Order & {
-		code?: string;
-		customerName?: string;
-		customer_name?: string;
-		createdDate?: string;
-		status_label?: string;
-		handler?: {
-			first_name: string;
-		};
-	};
-	handleClickDetail: (item: Order) => void;
-	handleConfirm: (item: Order) => void;
-	handleRemoveHandler: (item: Order) => void;
+	item: any;
+	handleClickDetail: (item: any) => void;
+	handleConfirm: (item: any) => void;
+	handleRemoveHandler: (item: any) => void;
 	isProcessing: boolean;
 	activeKey: string;
 }
 
-const getStatusConfig = (isProcessing: boolean, isStart: boolean) => ({
-	color: isProcessing ? 'gold' : ('green' as const),
-	label: isStart
-		? 'Chờ xử lý'
-		: isProcessing
-		? 'Đang tiến hành'
-		: 'Đã hoàn thành',
-	icon: isProcessing ? <Clock size={16} /> : <Check />,
-});
+const getStatusConfig = (
+	isProcessing: boolean,
+	isStart: boolean,
+	item: any
+) => {
+	const isCompleted = item?.invoiceDelivery?.status !== 1;
+
+	if (isCompleted) {
+		return {
+			color: 'green',
+			label: 'Đã hoàn thành',
+			icon: <Check />,
+		};
+	}
+
+	return {
+		color: isProcessing ? 'gold' : 'green',
+		label: isStart
+			? 'Chờ xử lý'
+			: isProcessing
+			? 'Đang tiến hành'
+			: 'Đã hoàn thành',
+		icon: isProcessing ? <Clock size={16} /> : <Check />,
+	};
+};
 
 const getButtonConfig = (
 	user: any,
@@ -91,9 +98,10 @@ const OutboundItem: React.FC<OutboundItemProps> = ({
 	activeKey,
 }) => {
 	const { user } = useUser();
-	const isStart = isProcessing && !item?.handler_id;
+	const isStart =
+		isProcessing && !item?.handler_id && item?.invoiceDelivery?.status === 1;
 
-	const statusConfig = getStatusConfig(isProcessing, isStart);
+	const statusConfig = getStatusConfig(isProcessing, isStart, item);
 	const buttonConfig = getButtonConfig(user, item, activeKey);
 	const actions = getActions(
 		user,

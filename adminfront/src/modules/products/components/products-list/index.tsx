@@ -28,7 +28,10 @@ import { getErrorMessage } from '@/lib/utils';
 import { usePolling } from '@/lib/providers/polling-provider';
 import ImportModal from './import-modal';
 import { ActionAbles } from '@/components/Dropdown';
-import { useCheckInventory } from '@/lib/hooks/api/product';
+import {
+	useCheckInventory,
+	useCheckInventoryKiot,
+} from '@/lib/hooks/api/product';
 import * as XLSX from 'xlsx';
 
 const PAGE_SIZE = 10;
@@ -158,11 +161,66 @@ const ProductList = (props: Props) => {
 	};
 
 	const checkInventory = useCheckInventory();
-
 	const handleCreateExportInventory = async () => {
 		const filterable_fields = {}; // Using the correct property name
 
 		await checkInventory.mutateAsync(
+			{ filterable_fields }, // Match the expected request format
+			{
+				onSuccess: async (data) => {
+					console.log('🚀 ~ onSuccess: ~ data:', data);
+					// Use the download URL from response
+					if (data.downloadUrl) {
+						const { downloadUrl, fileKey } = data;
+						// Tạo một request để kiểm tra nội dung tệp
+						const response = await fetch(downloadUrl);
+						const blob = await response.blob();
+
+						// Đảm bảo mã hóa UTF-8
+						const reader = new FileReader();
+						reader.onload = () => {
+							const csvText = reader.result;
+
+							// Chuyển đổi CSV thành workbook
+							const workbook = XLSX.read(csvText, { type: 'string' });
+
+							// Chuyển đổi workbook thành tệp Blob
+							const wopts: XLSX.WritingOptions = {
+								bookType: 'xlsx',
+								type: 'array',
+							};
+							const xlsxBlob = new Blob([XLSX.write(workbook, wopts)], {
+								type: 'application/octet-stream',
+							});
+
+							// Tạo và kích hoạt link tải xuống cho tệp XLSX
+							const link = document.createElement('a');
+							link.href = URL.createObjectURL(xlsxBlob);
+							link.setAttribute(
+								'download',
+								`${fileKey.split('/').pop()?.replace('.csv', '.xlsx')}`
+							);
+							document.body.appendChild(link); // Append to body instead of a specific element
+							link.click();
+							document.body.removeChild(link); // Remove from body after click
+						};
+						reader.readAsText(blob, 'utf-8');
+					}
+					message.success('Xuất file kiểm kê thành công!');
+				},
+				onError: (error) => {
+					message.error(`Xuất file thất bại: ${getErrorMessage(error)}`);
+				},
+			}
+		);
+	};
+	const checkInventoryKiot = useCheckInventoryKiot();
+
+	const handleCreateExportInventoryKiot = async () => {
+		console.log('handleCreateExportInventoryKiot');
+		const filterable_fields = {}; // Using the correct property name
+
+		await checkInventoryKiot.mutateAsync(
 			{ filterable_fields }, // Match the expected request format
 			{
 				onSuccess: async (data) => {
@@ -223,6 +281,11 @@ const ProductList = (props: Props) => {
 			label: 'Xuất file kiểm kê vật tư',
 			// icon: <Pointer size={20} />,
 			onClick: handleCreateExportInventory,
+		},
+		{
+			label: 'Xuất file kiểm kê vật tư từ kiot',
+			// icon: <Pointer size={20} />,
+			onClick: handleCreateExportInventoryKiot,
 		},
 	];
 
