@@ -1,4 +1,4 @@
-import LoginTemplate from '@/modules/account/components/login';
+import LoginTemplate from '@/modules/admin/account/components/login';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
