@@ -21,7 +21,7 @@ export async function getToken(credentials: IAdminAuth) {
 		})
 		.then(({ access_token }) => {
 			access_token &&
-				cookies().set('_admin_chamdep_jwt', access_token, {
+				cookies().set('_jwt_token_', access_token, {
 					maxAge: 60 * 60 * 24 * 7,
 					httpOnly: true,
 					sameSite: 'strict',
@@ -50,7 +50,7 @@ export async function getAdmin() {
  * User Logout
  */
 export async function signOut() {
-	cookies().set('_admin_chamdep_jwt', '', {
+	cookies().set('_jwt_token_', '', {
 		maxAge: -1,
 	});
 }

@@ -37,15 +37,15 @@ const nextConfig = {
       }
     ],
   },
-	async redirects() {
-		return [
-			{
-				source: '/',
-				destination: '/admin/dashboard',
-				permanent: false,
-			},
-		];
-	},
+	// async redirects() {
+	// 	return [
+	// 		{
+	// 			source: '/',
+	// 			destination: '/admin/dashboard',
+	// 			permanent: false,
+	// 		},
+	// 	];
+	// },
 };
 
 export default withPWA(pwaConfig)(nextConfig);

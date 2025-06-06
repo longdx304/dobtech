@@ -1,4 +1,4 @@
-"use server";
+'use server';
 import { cookies } from 'next/headers';
 
 /**
@@ -14,7 +14,7 @@ export const getMedusaHeaders = (tags: string[] = []) => {
 		},
 	} as Record<string, any>;
 
-	const token = cookies().get('_admin_chamdep_jwt')?.value;
+	const token = cookies().get('_jwt_token_')?.value;
 
 	if (token) {
 		headers.authorization = `Bearer ${token}`;
