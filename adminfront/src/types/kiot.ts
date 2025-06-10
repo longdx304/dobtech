@@ -49,3 +49,8 @@ export type WarehouseKiotVariantReq = {
 	warehouse_id: string;
 	type: 'INBOUND' | 'OUTBOUND';
 };
+
+export enum OrderKiotType {
+	INBOUND = "INBOUND",
+	OUTBOUND = "OUTBOUND",
+}

@@ -1,5 +1,5 @@
 import { Flex } from '@/components/Flex';
-import ListInbound from '@/modules/admin/warehouse/inbound/templates/list-inbound';
+import ListInbound from '@/modules/kiot/warehouse/inbound/templates/list-inbound';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

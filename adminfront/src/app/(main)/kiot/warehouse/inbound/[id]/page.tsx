@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 import { Flex } from '@/components/Flex';
-import InboundDetail from '@/modules/admin/warehouse/inbound/templates/inbound-detail';
+import InboundDetail from '@/modules/kiot/warehouse/inbound/templates/inbound-detail';
 import { ProductUnitProvider } from '@/lib/providers/product-unit-provider';
 
 export const metadata: Metadata = {

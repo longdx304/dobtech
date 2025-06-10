@@ -7,6 +7,7 @@ import {
 	useMedusa,
 	UseQueryOptionsWrapper,
 } from 'medusa-react';
+import { adminProductOutboundKiotKeys } from '../product-outbound/queries';
 
 export const ADMIN_PRODUCT_INBOUND = `admin_product_inbound` as const;
 
@@ -85,5 +86,24 @@ export const useAdminProductInbound = (
 		() => client.admin.custom.get(`/admin/product-inbound/${id}`),
 		options
 	);
+	return { ...data, ...rest } as const;
+};
+
+export const useGetStockIn = (
+	query?: any,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<ProductInboundQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+	const params = createQueryString(query);
+	const { data, ...rest } = useQuery(
+		adminProductInboundKeys.list(query),
+		() => client.admin.custom.get(`/admin/kiot/order/stock-in${params}`),
+		options
+	);
+
 	return { ...data, ...rest } as const;
 };

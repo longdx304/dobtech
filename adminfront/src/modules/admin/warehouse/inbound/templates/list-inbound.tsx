@@ -4,6 +4,7 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import List from '@/components/List';
+import { Switch } from '@/components/Switch';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import {
@@ -20,7 +21,6 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import InboundItem from '../components/inbound-item';
-import { Switch } from '@/components/Switch';
 
 type Props = {};
 
@@ -33,6 +33,7 @@ const ListInbound: FC<Props> = ({}) => {
 	const [activeKey, setActiveKey] = useState<FulfillSupplierOrderStt | null>(
 		FulfillSupplierOrderStt.DELIVERED
 	);
+
 	const [myOrder, setMyOrder] = useState(false);
 
 	const { supplierOrder, isLoading, count } = useAdminProductInbounds({
@@ -42,6 +43,7 @@ const ListInbound: FC<Props> = ({}) => {
 		status: activeKey || undefined,
 		myOrder: myOrder ? true : undefined,
 	});
+
 	const productInboundHandler = useAdminProductInboundHandler();
 	const productInboundRemoveHandler = useAdminProductInboundRemoveHandler();
 
@@ -58,7 +60,6 @@ const ListInbound: FC<Props> = ({}) => {
 	const handleChangeTab = (key: string) => {
 		setActiveKey(key as FulfillSupplierOrderStt);
 	};
-
 
 	const items: TabsProps['items'] = [
 		{
