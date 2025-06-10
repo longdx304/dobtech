@@ -6,7 +6,7 @@ import {
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
-import { WarehouseKiotRecord } from '@/types/kiot';
+import { WarehouseKiotInventory } from '@/types/kiot';
 import { message } from 'antd';
 import { FC } from 'react';
 
@@ -14,7 +14,7 @@ interface Props {
 	isModalOpen: boolean;
 	onClose: () => void;
 	inventoryType: string;
-	warehouseInventory: WarehouseKiotRecord;
+	warehouseInventory: WarehouseKiotInventory;
 	refetch?: () => void;
 }
 
@@ -30,8 +30,8 @@ const ModalVariantInventory: FC<Props> = ({
 
 	const title =
 		inventoryType === 'INBOUND'
-			? `Nhập hàng vào kho ${warehouseInventory.warehouse.location}`
-			: `Xuất hàng từ kho ${warehouseInventory.warehouse.location}`;
+			? `Nhập hàng vào kho ${warehouseInventory.warehouse?.location}`
+			: `Xuất hàng từ kho ${warehouseInventory.warehouse?.location}`;
 	const addInventoryToWarehouse = useAdminCreateWarehouseVariantKiot();
 	const removeInventoryToWarehouse = useAdminDeleteWarehouseVariantKiot();
 
@@ -43,7 +43,7 @@ const ModalVariantInventory: FC<Props> = ({
 		if (inventoryType === 'INBOUND') {
 			// onAddUnit();
 			const itemData = {
-				warehouse_id: warehouseInventory.warehouse.id,
+				warehouse_id: warehouseInventory.warehouse?.id || '',
 				sku: warehouseInventory.sku,
 				quantity: unitData.quantity,
 				unit_id: unitData.unitId,
@@ -63,7 +63,7 @@ const ModalVariantInventory: FC<Props> = ({
 			});
 		} else {
 			const itemData = {
-				warehouse_id: warehouseInventory.warehouse.id,
+				warehouse_id: warehouseInventory.warehouse?.id || '',
 				sku: warehouseInventory.sku,
 				quantity: unitData.quantity,
 				unit_id: unitData.unitId,
@@ -102,7 +102,8 @@ const ModalVariantInventory: FC<Props> = ({
 				type={inventoryType as 'INBOUND' | 'OUTBOUND'}
 				maxQuantity={
 					inventoryType === 'OUTBOUND'
-						? warehouseInventory.quantity / warehouseInventory.unit.quantity
+						? warehouseInventory.quantity /
+						  warehouseInventory.item_unit.quantity
 						: undefined
 				}
 			/>

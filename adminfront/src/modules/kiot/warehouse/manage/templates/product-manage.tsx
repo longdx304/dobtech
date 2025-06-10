@@ -65,7 +65,7 @@ const ProductManage: FC<Props> = ({}) => {
 
 	// Add variant inventory
 	const handleAddInventory = (item: WarehouseKiotRecord) => {
-		item && item.unit && setSelectedUnit(item.unit.id);
+		item && item.item_unit && setSelectedUnit(item.item_unit.id);
 		setQuantity(1);
 		setWarehouseInventory(item);
 		setInventoryType('INBOUND');
@@ -73,7 +73,7 @@ const ProductManage: FC<Props> = ({}) => {
 	};
 	// Remove variant inventory
 	const handleRemoveInventory = (item: WarehouseKiotRecord) => {
-		item && item.unit && setSelectedUnit(item.unit.id);
+		item && item.item_unit && setSelectedUnit(item.item_unit.id);
 		setQuantity(1);
 		setWarehouseInventory(item);
 		setInventoryType('OUTBOUND');

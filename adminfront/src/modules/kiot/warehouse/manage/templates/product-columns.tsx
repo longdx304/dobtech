@@ -1,12 +1,9 @@
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
-import { Image } from '@/components/Image';
 import { Tooltip } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
 import { WarehouseKiotBySku, WarehouseKiotRecord } from '@/types/kiot';
-import { ProductVariant } from '@/types/products';
-import { Warehouse, WarehouseInventory } from '@/types/warehouse';
-import { Minus, Pen, Plus, Trash2 } from 'lucide-react';
+import { Minus, Pen, Plus } from 'lucide-react';
 
 export interface WarehouseDataType {}
 
@@ -23,13 +20,6 @@ const productColumns = ({ handleEditWarehouse }: Props) => [
 		render: (_: WarehouseKiotBySku) => {
 			return (
 				<Flex className="flex items-center gap-3">
-					{/* <Image
-						src={_?.product?.thumbnail ?? '/images/product-img.png'}
-						alt="Product variant Thumbnail"
-						width={30}
-						height={40}
-						className="rounded-md cursor-pointer"
-					/> */}
 					<Flex vertical className="">
 						<Tooltip title={`${_?.sku}`}>
 							<Text className="text-xs line-clamp-2">{`${_?.sku}`}</Text>
@@ -95,8 +85,8 @@ const expandedColumns = ({
 			_: WarehouseKiotRecord['quantity'],
 			record: WarehouseKiotRecord
 		) => {
-			const quantity = _ / record.unit.quantity;
-			return `${quantity} ${record.unit.unit} (${_} đôi)`;
+			const quantity = _ / record.item_unit.quantity;
+			return `${quantity} ${record.item_unit.unit} (${_} đôi)`;
 		},
 	},
 	{
@@ -127,4 +117,4 @@ const expandedColumns = ({
 	},
 ];
 
-export { productColumns, expandedColumns };
+export { expandedColumns, productColumns };

@@ -2,6 +2,28 @@ export enum KiotInvoiceStatus {
 	COMPLETED = 1,
 	PROCESSING = 3,
 }
+export type WarehouseKiotInventory = {
+	id: string;
+	warehouse_id: string;
+	unit_id: string;
+	sku: string;
+	quantity: number;
+	item_unit: WarehouseKiotUnit;
+	warehouse?: WarehouseKiotWarehouse;
+};
+
+export type WarehouseKiot = {
+	id: string;
+	location: string;
+	created_at: string;
+	updated_at: string;
+	inventories: WarehouseKiotInventory[];
+};
+
+export type WarehouseKiotList = {
+	warehouses: WarehouseKiot[];
+	count: number;
+};
 
 export type WarehouseKiotWithInventory = {
 	location?: string;
@@ -32,8 +54,8 @@ export type WarehouseKiotRecord = {
 	unit_id: string;
 	sku: string;
 	quantity: number;
-	unit: WarehouseKiotUnit;
-	warehouse: WarehouseKiotWarehouse;
+	item_unit: WarehouseKiotUnit;
+	warehouse?: WarehouseKiotWarehouse;
 };
 
 export type WarehouseKiotBySkuResponse = {
@@ -51,6 +73,6 @@ export type WarehouseKiotVariantReq = {
 };
 
 export enum OrderKiotType {
-	INBOUND = "INBOUND",
-	OUTBOUND = "OUTBOUND",
+	INBOUND = 'INBOUND',
+	OUTBOUND = 'OUTBOUND',
 }
