@@ -1,5 +1,5 @@
 import { Flex } from '@/components/Flex';
-import ListTransaction from '@/modules/admin/warehouse/transactions/templates/list-transactions';
+import ListTransaction from '@/modules/kiot/warehouse/transactions/templates/list-transactions';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

@@ -64,7 +64,6 @@ const LocationManage: FC<Props> = ({}) => {
 		limit: DEFAULT_PAGE_SIZE,
 		offset: offset,
 	});
-	console.log('🚀 ~ warehouses:', warehouses);
 
 	useEffect(() => {
 		if (warehouses?.length) {
@@ -153,6 +152,7 @@ const LocationManage: FC<Props> = ({}) => {
 			/>
 		);
 	};
+
 
 	return (
 		<Flex vertical gap={12}>

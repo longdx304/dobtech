@@ -1,11 +1,7 @@
-import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Image } from '@/components/Image';
 import { Tooltip } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
-import { ProductVariant } from '@/types/products';
-import { Warehouse, WarehouseInventory } from '@/types/warehouse';
-import { Minus, Pen, Plus, Trash2 } from 'lucide-react';
 
 export interface WarehouseDataType {}
 

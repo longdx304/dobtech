@@ -36,6 +36,7 @@ const ProductManage: FC<Props> = ({}) => {
 		useState<WarehouseKiotRecord>();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
+	const [sku, setSku] = useState<string>('');
 
 	const { inventoryBySku, isLoading, refetch } =
 		useAdminWarehouseManageKiotBySku({});
@@ -57,25 +58,39 @@ const ProductManage: FC<Props> = ({}) => {
 	const handleEditWarehouse = (item: WarehouseKiotBySku) => {
 		setQuantity(1);
 		setVariant(item);
+
 		openVariantInventory();
 	};
+
 	const columns = productColumns({
 		handleEditWarehouse,
 	});
 
 	// Add variant inventory
-	const handleAddInventory = (item: WarehouseKiotRecord) => {
+	const handleAddInventory = (
+		item: WarehouseKiotRecord,
+		parentSku?: string
+	) => {
 		item && item.item_unit && setSelectedUnit(item.item_unit.id);
 		setQuantity(1);
 		setWarehouseInventory(item);
+		if (parentSku) {
+			setSku(parentSku);
+		}
 		setInventoryType('INBOUND');
 		openInventory();
 	};
 	// Remove variant inventory
-	const handleRemoveInventory = (item: WarehouseKiotRecord) => {
+	const handleRemoveInventory = (
+		item: WarehouseKiotRecord,
+		parentSku?: string
+	) => {
 		item && item.item_unit && setSelectedUnit(item.item_unit.id);
 		setQuantity(1);
 		setWarehouseInventory(item);
+		if (parentSku) {
+			setSku(parentSku);
+		}
 		setInventoryType('OUTBOUND');
 		openInventory();
 	};
@@ -85,6 +100,7 @@ const ProductManage: FC<Props> = ({}) => {
 		closeInventory();
 		setQuantity(1);
 		setWarehouseInventory(undefined);
+		setSku('');
 	};
 
 	const expandColumns = expandedColumns({
@@ -99,15 +115,23 @@ const ProductManage: FC<Props> = ({}) => {
 	const expandedRowRender = (record: WarehouseKiotBySku) => {
 		if (!record.records?.length) return null;
 
+		const columnsWithSku = expandedColumns({
+			handleAddInventory: (item: WarehouseKiotRecord) =>
+				handleAddInventory(item, record.sku),
+			handleRemoveInventory: (item: WarehouseKiotRecord) =>
+				handleRemoveInventory(item, record.sku),
+		});
+
 		return (
 			<Table
-				columns={expandColumns as any}
+				columns={columnsWithSku as any}
 				dataSource={record.records}
 				rowKey="id"
 				pagination={false}
 			/>
 		);
 	};
+
 	return (
 		<Flex vertical gap={12}>
 			<Flex align="center" justify="flex-end" className="py-4">
@@ -166,6 +190,7 @@ const ProductManage: FC<Props> = ({}) => {
 					inventoryType={inventoryType}
 					onClose={handleCloseModal}
 					warehouseInventory={warehouseInventory}
+					sku={sku}
 					refetch={refetch}
 				/>
 			)}

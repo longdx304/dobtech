@@ -1,16 +1,16 @@
 'use client';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { Title } from '@/components/Typography';
-import { useAdminWarehouseTransactions } from '@/lib/hooks/api/warehouse';
-import { ChangeEvent, FC, useMemo, useState } from 'react';
-import transactionColumns from '../components/transaction-column';
-import { Input } from '@/components/Input';
-import { Search } from 'lucide-react';
-import _ from 'lodash';
+import { useAdminWarehouseTransactionsKiot } from '@/lib/hooks/api/kiot';
 import { TransactionType } from '@/types/warehouse';
 import { TableProps } from 'antd';
+import _ from 'lodash';
+import { Search } from 'lucide-react';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
+import transactionColumns from '../components/transaction-column';
 
 type Props = {};
 
@@ -30,7 +30,7 @@ const ListTransaction: FC<Props> = () => {
 	const [endAt, setEndAt] = useState<string>('');
 
 	const { inventoryTransactions, count, isLoading, isRefetching } =
-		useAdminWarehouseTransactions({
+		useAdminWarehouseTransactionsKiot({
 			limit: PAGE_SIZE,
 			offset: (currentPage - 1) * PAGE_SIZE,
 			q: searchValue || undefined,

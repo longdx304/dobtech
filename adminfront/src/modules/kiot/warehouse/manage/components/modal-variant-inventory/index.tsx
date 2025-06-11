@@ -15,6 +15,7 @@ interface Props {
 	onClose: () => void;
 	inventoryType: string;
 	warehouseInventory: WarehouseKiotInventory;
+	sku?: string;
 	refetch?: () => void;
 }
 
@@ -23,6 +24,7 @@ const ModalVariantInventory: FC<Props> = ({
 	onClose,
 	inventoryType,
 	warehouseInventory,
+	sku,
 	refetch = () => {},
 }) => {
 	const { getSelectedUnitData, onReset } = useProductUnit();
@@ -40,11 +42,12 @@ const ModalVariantInventory: FC<Props> = ({
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
 
+		const currentSku = sku || warehouseInventory.sku;
+
 		if (inventoryType === 'INBOUND') {
-			// onAddUnit();
 			const itemData = {
 				warehouse_id: warehouseInventory.warehouse?.id || '',
-				sku: warehouseInventory.sku,
+				sku: currentSku,
 				quantity: unitData.quantity,
 				unit_id: unitData.unitId,
 				warehouse_inventory_id: warehouseInventory.id,
@@ -64,7 +67,7 @@ const ModalVariantInventory: FC<Props> = ({
 		} else {
 			const itemData = {
 				warehouse_id: warehouseInventory.warehouse?.id || '',
-				sku: warehouseInventory.sku,
+				sku: currentSku,
 				quantity: unitData.quantity,
 				unit_id: unitData.unitId,
 				warehouse_inventory_id: warehouseInventory.id,
