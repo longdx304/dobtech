@@ -4,33 +4,26 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import List from '@/components/List';
+import { Switch } from '@/components/Switch';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import {
-	useAdminProductInboundHandler,
-	useAdminProductInboundRemoveHandler,
-} from '@/lib/hooks/api/product-inbound/mutations';
-import {
-	useAdminProductInbounds,
 	useGetStockIn,
+	useListOrdersKiot,
 } from '@/lib/hooks/api/product-inbound/queries';
 import { getErrorMessage } from '@/lib/utils';
+import { OrderKiotType } from '@/types/kiot';
 import { ERoutes } from '@/types/routes';
-import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
-import { message, TabsProps } from 'antd';
+import { SupplierOrder } from '@/types/supplier';
+import { message } from 'antd';
 import debounce from 'lodash/debounce';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import InboundItem from '../components/inbound-item';
-import { Switch } from '@/components/Switch';
-import {
-	useAssignOrder,
-	useUnassignOrder,
-} from '@/lib/hooks/api/product-outbound/mutations';
-import { OrderKiotType } from '@/types/kiot';
-import { useListOrdersKiot } from '@/lib/hooks/api/product-outbound/queries';
 import { FulfillmentStatus } from '@/types/fulfillments';
+import { useUnassignOrder } from '@/lib/hooks/api/product-inbound/mutations';
+import { useAssignOrder } from '@/lib/hooks/api/product-inbound';
 
 type Props = {};
 
@@ -59,9 +52,6 @@ const ListInbound: FC<Props> = ({}) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
-	// const [activeKey, setActiveKey] = useState<FulfillSupplierOrderStt | null>(
-	// 	FulfillSupplierOrderStt.DELIVERED
-	// );
 	const [myOrder, setMyOrder] = useState(false);
 	const [sortOrder, setSortOrder] = useState<number>(1);
 	const [activeKey, setActiveKey] = useState<string>('2');
@@ -128,6 +118,7 @@ const ListInbound: FC<Props> = ({}) => {
 	};
 
 	const handleRemoveHandler = async (item: any) => {
+		console.log('🚀 ~ handleRemoveHandler ~ item:', item);
 		await unassignOrder.mutateAsync(
 			{ id: item.id },
 			{
@@ -177,7 +168,7 @@ const ListInbound: FC<Props> = ({}) => {
 						activeKey === '1' ? ordersFromKiot?.data : ordersInWarehouse
 					}
 					loading={activeKey === '1' ? isLoadingFromKiot : isLoadingInWarehouse}
-					renderItem={(item: SupplierOrder) => {
+					renderItem={(item: any) => {
 						return (
 							<List.Item>
 								<InboundItem
@@ -185,6 +176,13 @@ const ListInbound: FC<Props> = ({}) => {
 									handleClickDetail={handleClickDetail}
 									handleConfirm={handleConfirm}
 									handleRemoveHandler={handleRemoveHandler}
+									isProcessing={
+										activeKey === '1'
+											? !item?.status_label ||
+											  item?.status_label === FulfillmentStatus.NOT_FULFILLED
+											: item.status === FulfillmentStatus.NOT_FULFILLED
+									}
+									activeKey={activeKey}
 								/>
 							</List.Item>
 						);

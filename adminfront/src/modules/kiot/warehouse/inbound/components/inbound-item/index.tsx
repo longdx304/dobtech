@@ -14,81 +14,87 @@ type InboundItemProps = {
 	handleConfirm: (item: any) => void;
 	handleClickDetail: (item: any) => void;
 	handleRemoveHandler: (item: any) => void;
-	// isProcessing: boolean;
-	// activeKey: string;
+	isProcessing: boolean;
+	activeKey: string;
 };
 
 export enum InboundStatus {
 	TEMPT = 1,
-	PROCESSING = 2,
 	FULFILLED = 3,
 	CANCELLED = 4,
 }
 
-const getStatusConfig = (item: any) => {
+const getStatusConfig = (
+	isProcessing: boolean,
+	isStart: boolean,
+	item: any
+) => {
 	const status = item?.status;
+	const isCompleted = status === InboundStatus.FULFILLED;
+	const isCancelled = status === InboundStatus.CANCELLED;
 
-	switch (status) {
-		case InboundStatus.FULFILLED:
-			return {
-				color: 'green',
-				label: 'Đã hoàn thành',
-				icon: <Check />,
-			};
-		case InboundStatus.PROCESSING:
-			return {
-				color: 'gold',
-				label: 'Đang tiến hành',
-				icon: <Clock size={16} />,
-			};
-		case InboundStatus.CANCELLED:
-			return {
-				color: 'red',
-				label: 'Đã hủy',
-				icon: <Check />,
-			};
-		case InboundStatus.TEMPT:
-		default:
-			return {
-				color: item?.handler_id ? 'gold' : 'blue',
-				label: item?.handler_id ? 'Chờ xử lý' : 'Chưa có người xử lý',
-				icon: <Clock size={16} />,
-			};
+	if (isCompleted) {
+		return {
+			color: 'green',
+			label: 'Đã hoàn thành',
+			icon: <Check />,
+		};
 	}
+	if (isCancelled) {
+		return {
+			color: 'red',
+			label: 'Đã hủy',
+			icon: <Check />,
+		};
+	}
+
+	return {
+		color: isProcessing ? 'gold' : 'green',
+		label: isStart
+			? 'Chờ xử lý'
+			: isProcessing
+			? 'Đang tiến hành'
+			: 'Đã hoàn thành',
+	};
 };
 
-const getButtonConfig = (user: any, item: InboundItemProps['item']) => {
+const getButtonConfig = (
+	user: any,
+	item: InboundItemProps['item'],
+	activeKey: string
+) => {
 	const isCompleted = item?.status === InboundStatus.FULFILLED;
 	const isCancelled = item?.status === InboundStatus.CANCELLED;
 
+	const isDisabled = activeKey === '1' && !item.status_label;
+	let label = 'Nhập kho';
+	if (user?.id !== item?.handler_id) label = 'Chi tiết';
+	if (isCancelled || isCompleted) label = 'Chi tiết';
 	return {
-		label: user?.id === item?.handler_id ? 'Nhập kho' : 'Chi tiết',
-		disabled: isCompleted || isCancelled,
+		label,
+		disabled: isDisabled,
 	};
 };
 
 const getActions = (
 	user: any,
 	item: InboundItemProps['item'],
+	isStart: boolean,
+	isProcessing: boolean,
 	handleConfirm: (item: Order) => void,
 	handleRemoveHandler: (item: Order) => void
 ) => {
-	const canExecute = item?.status === InboundStatus.TEMPT && item?.handler_id === user?.id;
-	const canCancel = item?.status === InboundStatus.TEMPT && item?.handler_id === user?.id;
-	const isCompleted = item?.status === InboundStatus.FULFILLED;
-	const isCancelled = item?.status === InboundStatus.CANCELLED;
-
 	return [
 		{
 			label: <span className="w-full">{'Thực hiện'}</span>,
 			key: 'handle',
-			// disabled: !canExecute || isCompleted || isCancelled,
+			disabled: !isStart,
 			onClick: () => handleConfirm(item),
 		},
 		{
 			label: <span className="w-full">{'Huỷ bỏ'}</span>,
 			key: 'remove',
-			// disabled: !canCancel || isCompleted || isCancelled,
+			disabled: user?.id !== item?.handler_id || isStart || !isProcessing,
 			danger: true,
 			onClick: () => handleRemoveHandler(item),
 		},
@@ -100,14 +106,19 @@ const InboundItem: React.FC<InboundItemProps> = ({
 	handleClickDetail,
 	handleConfirm,
 	handleRemoveHandler,
+	isProcessing,
+	activeKey,
 }) => {
 	const { user } = useUser();
-
-	const statusConfig = getStatusConfig(item);
-
+	const isStart =
+		isProcessing && !item?.handler_id && item?.invoiceDelivery?.status === 1;
+	const statusConfig = getStatusConfig(isProcessing, isStart, item);
+	const buttonConfig = getButtonConfig(user, item, activeKey);
 	const actions = getActions(
 		user,
 		item,
+		isStart,
+		isProcessing,
 		handleConfirm,
 		handleRemoveHandler
 	);
@@ -118,9 +129,7 @@ const InboundItem: React.FC<InboundItemProps> = ({
 				color={statusConfig.color}
 				className="w-fit flex items-center gap-1 p-2 rounded-lg"
 			>
-				<span className="text-[14px] font-semibold">
-					{statusConfig.label}
-				</span>
+				<span className="text-[14px] font-semibold">{statusConfig.label}</span>
 				{statusConfig.icon}
 			</Tag>
 			<Flex gap={4} className="pt-2" align="center">
@@ -144,12 +153,12 @@ const InboundItem: React.FC<InboundItemProps> = ({
 				</Text>
 			</Flex>
 			<Flex gap={4} align="center" justify="space-between" className="mt-2">
-				<Button 
-					className="w-full" 
+				<Button
+					className="w-full"
 					onClick={() => handleClickDetail(item)}
-					disabled={getButtonConfig(user, item).disabled}
+					disabled={buttonConfig.disabled}
 				>
-					{getButtonConfig(user, item).label}
+					{buttonConfig.label}
 				</Button>
 				<ActionAbles actions={actions as any} />
 			</Flex>

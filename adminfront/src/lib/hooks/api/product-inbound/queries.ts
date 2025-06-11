@@ -10,8 +10,7 @@ import {
 
 export const ADMIN_PRODUCT_INBOUND = `admin_product_inbound` as const;
 
-export const ADMIN_PRODUCT_INBOUND_KIOT =
-	`admin_product_inbound_kiot` as const;
+export const ADMIN_PRODUCT_INBOUND_KIOT = `admin_product_inbound_kiot` as const;
 export const ADMIN_PRODUCT_INBOUND_KIOT_ITEM_CODE =
 	`admin_product_inbound_kiot_item_code` as const;
 
@@ -103,18 +102,39 @@ export const useAdminProductInbound = (
 	return { ...data, ...rest } as const;
 };
 
+export const useListOrdersKiot = (
+	query?: any,
+	options?: UseQueryOptionsWrapper<
+		Response<any>,
+		Error,
+		ReturnType<ProductInboundKiotQueryKey['list']>
+	>
+) => {
+	const { client } = useMedusa();
+
+	const params = createQueryString(query);
+
+	const { data, ...rest } = useQuery(
+		adminProductInboundKiotKeys.list(query),
+		() => client.admin.custom.get(`/admin/kiot/order${params}`),
+		options
+	);
+
+	return { ...data, ...rest } as const;
+};
+
 export const useGetStockIn = (
 	query?: any,
 	options?: UseQueryOptionsWrapper<
 		Response<any>,
 		Error,
-		ReturnType<ProductInboundQueryKey['list']>
+		ReturnType<ProductInboundKiotQueryKey['list']>
 	>
 ) => {
 	const { client } = useMedusa();
 	const params = createQueryString(query);
 	const { data, ...rest } = useQuery(
-		adminProductInboundKeys.list(query),
+		adminProductInboundKiotKeys.list(query),
 		() => client.admin.custom.get(`/admin/kiot/order/stock-in${params}`),
 		options
 	);
