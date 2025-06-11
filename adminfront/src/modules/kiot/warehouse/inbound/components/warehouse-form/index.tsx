@@ -5,24 +5,22 @@ import { Modal } from '@/components/Modal';
 import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
 import { queryClient } from '@/lib/constants/query-client';
-import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
+import { useUpdateItemOrderAdminKiot } from '@/lib/hooks/api/kiot';
 import {
-	ADMIN_PRODUCT_INBOUND,
-	useAdminCreateWarehouseAndInventory,
-} from '@/lib/hooks/api/product-inbound';
+	ADMIN_PRODUCT_OUTBOUND_KIOT,
+	ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE,
+} from '@/lib/hooks/api/product-outbound';
 import {
 	useAdminCreateWarehouseKiotInventory,
-	useAdminWarehouseInventoryByVariant,
 	useAdminWarehouseInventoryKiotBySku,
-	useAdminWarehouses,
 	useAdminWarehousesKiot,
 } from '@/lib/hooks/api/warehouse';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
-import { LineItem, LineItemKiot } from '@/types/lineItem';
-import { AdminPostItemData, Warehouse } from '@/types/warehouse';
+import { LineItemKiot } from '@/types/lineItem';
+import { Warehouse } from '@/types/warehouse';
 import { Col, message, Row } from 'antd';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
@@ -64,6 +62,10 @@ const WarehouseForm = ({ sku, lineItem, isPermission }: WarehouseFormProps) => {
 	});
 
 	const addWarehouseKiot = useAdminCreateWarehouseKiotInventory();
+	const updateItemOrderAdminKiot = useUpdateItemOrderAdminKiot(
+		lineItem?.order_id?.toString(),
+		lineItem.id
+	);
 
 	const unitData = getSelectedUnitData();
 
@@ -138,11 +140,31 @@ const WarehouseForm = ({ sku, lineItem, isPermission }: WarehouseFormProps) => {
 
 		await addWarehouseKiot.mutateAsync(payload, {
 			onSuccess: () => {
-				message.success('Thêm vị trí cho sản phẩm thành công');
-				refetchWarehouse();
-				refetchInventory();
-				onReset();
-				onClose();
+				updateItemOrderAdminKiot.mutate(
+					{
+						warehouse_quantity: unitData.quantity,
+					},
+					{
+						onSuccess: () => {
+							message.success('Thêm vị trí cho sản phẩm thành công');
+							refetchWarehouse();
+							refetchInventory();
+							queryClient.invalidateQueries([
+								ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE,
+								'detail',
+							]);
+							queryClient.invalidateQueries([
+								ADMIN_PRODUCT_OUTBOUND_KIOT,
+								'detail',
+							]);
+							onReset();
+							onClose();
+						},
+						onError: (error: any) => {
+							message.error(getErrorMessage(error));
+						},
+					}
+				);
 			},
 			onError: (error: any) => {
 				message.error(getErrorMessage(error));

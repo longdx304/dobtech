@@ -5,20 +5,19 @@ import { Text } from '@/components/Typography';
 import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
 import {
 	ADMIN_PRODUCT_INBOUND,
-	adminProductInboundKeys,
+	ADMIN_PRODUCT_INBOUND_KIOT,
+	ADMIN_PRODUCT_INBOUND_KIOT_ITEM_CODE,
 } from '@/lib/hooks/api/product-inbound';
+import { ADMIN_PRODUCT_OUTBOUND_KIOT, ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE } from '@/lib/hooks/api/product-outbound';
 import {
-	useAdminCreateInventory,
-	useAdminRemoveInventory,
+	useAdminAddInventoryToWarehouseKiot,
+	useAdminRemoveInventoryKiot,
 } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
 import { LineItem } from '@/types/lineItem';
-import {
-	AdminPostRemmoveInventoryReq,
-	WarehouseInventory,
-} from '@/types/warehouse';
+import { OrderInWarehouseKiot } from '@/types/warehouse';
 import { useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import { Minus, Plus } from 'lucide-react';
@@ -27,8 +26,8 @@ type UpdatedLineItem = LineItem & {
 	supplier_order_id: string;
 };
 type WarehouseItemProps = {
-	item: WarehouseInventory;
-	lineItem: UpdatedLineItem;
+	item: any;
+	lineItem: any;
 	refetchInventory: () => void;
 	isPermission?: boolean;
 };
@@ -40,12 +39,14 @@ const WarehouseItem = ({
 }: WarehouseItemProps) => {
 	const { getSelectedUnitData, onReset, setSelectedUnit, setQuantity } =
 		useProductUnit();
-	const createInboundInventory = useAdminCreateInventory();
-	const removeInboundInventory = useAdminRemoveInventory();
+
+	const addInventoryToWarehouseKiot = useAdminAddInventoryToWarehouseKiot();
+	const removeInventoryFromWarehouseKiot = useAdminRemoveInventoryKiot();
 
 	const unitData = getSelectedUnitData();
 
 	const queryClient = useQueryClient();
+
 	const quantity =
 		item?.quantity === 0
 			? `0`
@@ -65,9 +66,9 @@ const WarehouseItem = ({
 		}
 
 		if (unitData) {
-			const itemData = {
+			const itemData: OrderInWarehouseKiot = {
 				warehouse_id: item.warehouse_id,
-				variant_id: item.variant_id,
+				sku: item.sku,
 				quantity: unitData.quantity,
 				unit_id: unitData.unitId,
 				line_item_id: lineItem.id,
@@ -77,12 +78,18 @@ const WarehouseItem = ({
 			};
 
 			onReset();
-			await createInboundInventory.mutateAsync(itemData, {
+			await addInventoryToWarehouseKiot.mutateAsync(itemData, {
 				onSuccess: () => {
 					message.success(`Đã nhập hàng vào vị trí ${item.warehouse.location}`);
 					refetchInventory();
-					queryClient.invalidateQueries([ADMIN_PRODUCT_INBOUND, 'detail']);
-					queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
+					queryClient.invalidateQueries([
+						ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE,
+						'detail',
+					]);
+					queryClient.invalidateQueries([
+						ADMIN_PRODUCT_OUTBOUND_KIOT,
+						'detail',
+					]);
 				},
 				onError: (error: any) => {
 					message.error(getErrorMessage(error));
@@ -97,9 +104,9 @@ const WarehouseItem = ({
 		}
 
 		if (unitData) {
-			const itemData: AdminPostRemmoveInventoryReq = {
+			const itemData: OrderInWarehouseKiot = {
 				warehouse_id: item.warehouse_id,
-				variant_id: item.variant_id,
+				sku: item.sku,
 				quantity: unitData.quantity,
 				unit_id: unitData.unitId,
 				line_item_id: lineItem.id,
@@ -109,12 +116,18 @@ const WarehouseItem = ({
 			};
 
 			onReset();
-			await removeInboundInventory.mutateAsync(itemData, {
+			await removeInventoryFromWarehouseKiot.mutateAsync(itemData, {
 				onSuccess: () => {
 					message.success(`Đã xuất hàng tại vị trí ${item.warehouse.location}`);
 					refetchInventory();
-					queryClient.invalidateQueries([ADMIN_PRODUCT_INBOUND, 'detail']);
-					queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
+					queryClient.invalidateQueries([
+						ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE,
+						'detail',
+					]);
+					queryClient.invalidateQueries([
+						ADMIN_PRODUCT_OUTBOUND_KIOT,
+						'detail',
+					]);
 				},
 				onError: (error: any) => {
 					message.error(getErrorMessage(error));
@@ -139,7 +152,7 @@ const WarehouseItem = ({
 							type="OUTBOUND"
 						/>
 					}
-					isLoading={removeInboundInventory.isLoading}
+					isLoading={removeInventoryFromWarehouseKiot.isLoading}
 					cancelText="Huỷ"
 					okText="Xác nhận"
 					handleOk={onRemoveUnit}
@@ -163,7 +176,7 @@ const WarehouseItem = ({
 				<Popconfirm
 					title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
 					description={<VariantInventoryForm type="INBOUND" />}
-					isLoading={createInboundInventory.isLoading}
+					isLoading={addInventoryToWarehouseKiot.isLoading}
 					cancelText="Huỷ"
 					okText="Xác nhận"
 					handleOk={onAddUnit}

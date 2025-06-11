@@ -6,6 +6,7 @@ export interface LineItem extends MedusaLineItem {
 
 export interface LineItemKiot {
 	id: string;
+	order_id: number;
 	warehouse_quantity: number;
 	warehouse_id?: string;
 	product_code: string;

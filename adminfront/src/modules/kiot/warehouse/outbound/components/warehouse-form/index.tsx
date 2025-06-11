@@ -14,7 +14,7 @@ import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
 import { LineItemKiot } from '@/types/lineItem';
-import { AdminPostItemDataKiot, Warehouse } from '@/types/warehouse';
+import { Warehouse } from '@/types/warehouse';
 import { Col, message, Row } from 'antd';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';

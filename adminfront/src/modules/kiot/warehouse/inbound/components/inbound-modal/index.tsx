@@ -1,15 +1,14 @@
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
-import { useAdminLineItem } from '@/lib/hooks/api/line-item';
+import { useGetProductCode } from '@/lib/hooks/api/product-outbound';
 import LayeredModal, {
 	LayeredModalContext,
 } from '@/lib/providers/layer-modal-provider';
-import { useContext } from 'react';
-import WarehouseForm from '../warehouse-form';
 import { message } from 'antd';
 import clsx from 'clsx';
-import { useGetProductCode } from '@/lib/hooks/api/product-outbound';
+import { useContext } from 'react';
+import WarehouseForm from '../warehouse-form';
 
 type Props = {
 	open: boolean;
@@ -18,16 +17,9 @@ type Props = {
 	isPermission: boolean;
 };
 
-const InboundModal = ({
-	open,
-	onClose,
-	lineItem,
-	isPermission,
-}: Props) => {
+const InboundModal = ({ open, onClose, lineItem, isPermission }: Props) => {
 	const layeredModalContext = useContext(LayeredModalContext);
-	// const { lineItem, isLoading } = useAdminLineItem(item.id);
 	const { item, isLoading, refetch } = useGetProductCode(lineItem.product_code);
-
 
 	const handleOk = () => {
 		if ((item?.warehouse_quantity ?? 0) > item.quantity) {
@@ -63,7 +55,13 @@ const InboundModal = ({
 
 export default InboundModal;
 
-const VariantInfo = ({ lineItem }: { lineItem: any }) => {
+const VariantInfo = ({
+	lineItem,
+}: {
+	lineItem: any & { warehouse_quantity: number };
+}) => {
+	console.log('lineItem VariantInfo', lineItem);
+
 	return (
 		<Flex gap={4} vertical className="py-2">
 			<Flex vertical align="flex-start">
@@ -81,7 +79,7 @@ const VariantInfo = ({ lineItem }: { lineItem: any }) => {
 				<Text
 					className={clsx('text-sm font-medium', {
 						'text-red-500':
-							(lineItem.warehouse_quantity ?? 0) < 0,
+							(lineItem.warehouse_quantity ?? 0) > lineItem.quantity,
 					})}
 				>{`${lineItem.warehouse_quantity ?? 0} / ${lineItem.quantity}`}</Text>
 			</Flex>

@@ -7,13 +7,27 @@ import {
 	useMedusa,
 	UseQueryOptionsWrapper,
 } from 'medusa-react';
-import { adminProductOutboundKiotKeys } from '../product-outbound/queries';
 
 export const ADMIN_PRODUCT_INBOUND = `admin_product_inbound` as const;
+
+export const ADMIN_PRODUCT_INBOUND_KIOT =
+	`admin_product_inbound_kiot` as const;
+export const ADMIN_PRODUCT_INBOUND_KIOT_ITEM_CODE =
+	`admin_product_inbound_kiot_item_code` as const;
+
+export const adminProductInboundKiotKeys = queryKeysFactory(
+	ADMIN_PRODUCT_INBOUND_KIOT
+);
+export const adminProductInboundKiotItemCodeKeys = queryKeysFactory(
+	ADMIN_PRODUCT_INBOUND_KIOT_ITEM_CODE
+);
 
 export const adminProductInboundKeys = queryKeysFactory(ADMIN_PRODUCT_INBOUND);
 
 type ProductInboundQueryKey = typeof adminProductInboundKeys;
+type ProductInboundKiotQueryKey = typeof adminProductInboundKiotKeys;
+type ProductInboundKiotItemCodeQueryKey =
+	typeof adminProductInboundKiotItemCodeKeys;
 
 export type ProductInboundQueryKeyParams = {
 	q?: string;
