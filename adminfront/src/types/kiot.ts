@@ -60,6 +60,7 @@ export type WarehouseKiotRecord = {
 
 export type WarehouseKiotBySkuResponse = {
 	inventoryBySku: WarehouseKiotBySku[];
+	count: number;
 };
 
 export type WarehouseKiotVariantReq = {
