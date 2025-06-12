@@ -217,7 +217,6 @@ const ProductList = (props: Props) => {
 	const checkInventoryKiot = useCheckInventoryKiot();
 
 	const handleCreateExportInventoryKiot = async () => {
-		console.log('handleCreateExportInventoryKiot');
 		const filterable_fields = {}; // Using the correct property name
 
 		await checkInventoryKiot.mutateAsync(

@@ -153,15 +153,8 @@ const LocationManage: FC<Props> = ({}) => {
 		);
 	};
 
-
 	return (
 		<Flex vertical gap={12}>
-			<Flex vertical align="flex-start" className="">
-				<Title level={3}>Danh sách vị trí kho</Title>
-				<Text className="text-gray-600">
-					Trang danh sách các sản phẩm ở từng vị trí kho.
-				</Text>
-			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				{/* <Title level={4}>Vị trí kho</Title> */}
 				<Flex align="center" justify="flex-end" className="py-4">

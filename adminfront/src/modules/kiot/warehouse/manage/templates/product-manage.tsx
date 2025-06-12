@@ -37,9 +37,15 @@ const ProductManage: FC<Props> = ({}) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 	const [sku, setSku] = useState<string>('');
+	const [offset, setOffset] = useState<number>(0);
+	const [numPages, setNumPages] = useState<number>(1);
 
-	const { inventoryBySku, isLoading, refetch } =
-		useAdminWarehouseManageKiotBySku({});
+	const { inventoryBySku, isLoading, refetch, count } =
+		useAdminWarehouseManageKiotBySku({
+			q: searchValue,
+			offset,
+			limit: DEFAULT_PAGE_SIZE,
+		});
 
 	useEffect(() => {
 		if (inventoryBySku?.length) {
@@ -108,9 +114,10 @@ const ProductManage: FC<Props> = ({}) => {
 		handleRemoveInventory,
 	});
 
-	const displayData = useMemo(() => {
-		return inventoryBySku?.filter((item) => item.sku.includes(searchValue));
-	}, [inventoryBySku, searchValue]);
+	const handleChangePage = (page: number) => {
+		setNumPages(page);
+		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
+	};
 
 	const expandedRowRender = (record: WarehouseKiotBySku) => {
 		if (!record.records?.length) return null;
@@ -157,7 +164,7 @@ const ProductManage: FC<Props> = ({}) => {
 				</Button>
 			</Flex>
 			<Table
-				dataSource={displayData}
+				dataSource={inventoryBySku}
 				expandable={{
 					expandedRowRender: expandedRowRender as any,
 					expandedRowKeys: expandedKeys,
@@ -168,13 +175,16 @@ const ProductManage: FC<Props> = ({}) => {
 				loading={isLoading}
 				rowKey="sku"
 				columns={columns as any}
-				pagination={{
-					pageSize: DEFAULT_PAGE_SIZE,
-					// current: numPages || 1,
-					total: displayData?.length,
-					showTotal: (total, range) =>
-						`${range[0]}-${range[1]} trong ${total} sản phẩm`,
-				}}
+				pagination={
+					(count ?? 0) > DEFAULT_PAGE_SIZE && {
+						onChange: (page) => handleChangePage(page),
+						pageSize: DEFAULT_PAGE_SIZE,
+						current: numPages || 1,
+						total: count,
+						showTotal: (total, range) =>
+							`${range[0]}-${range[1]} trong ${total} sản phẩm`,
+					}
+				}
 			/>
 			{variant && (
 				<ModalAddVariant
