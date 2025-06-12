@@ -180,6 +180,10 @@ export type AdminWarehouseTransactionsRes = {
 	inventoryTransactions: WarehouseInventory[];
 	count: number;
 };
+export type AdminWarehouseTransactionsResKiot = {
+	transactions: WarehouseInventory[];
+	count: number;
+};
 
 export enum TransactionType {
 	INBOUND = 'INBOUND',

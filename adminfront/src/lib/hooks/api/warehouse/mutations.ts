@@ -252,7 +252,11 @@ export const useAdminCreateWarehouseVariantKiot = (
 	return useMutation(
 		(payload: WarehouseKiotVariantReq) =>
 			client.admin.custom.post(`/admin/kiot/warehouse/manage/add`, payload),
-		buildOptions(queryClient, [adminWarehouseKiotManageKeys.lists()], options)
+		buildOptions(
+			queryClient,
+			[adminWarehouseKiotManageKeys.lists(), adminWarehouseKiotKeys.lists()],
+			options
+		)
 	);
 };
 
@@ -265,6 +269,10 @@ export const useAdminDeleteWarehouseVariantKiot = (
 	return useMutation(
 		(payload: WarehouseKiotVariantReq) =>
 			client.admin.custom.post(`/admin/kiot/warehouse/manage/remove`, payload),
-		buildOptions(queryClient, [adminWarehouseKiotManageKeys.lists()], options)
+		buildOptions(
+			queryClient,
+			[adminWarehouseKiotManageKeys.lists(), adminWarehouseKiotKeys.lists()],
+			options
+		)
 	);
 };

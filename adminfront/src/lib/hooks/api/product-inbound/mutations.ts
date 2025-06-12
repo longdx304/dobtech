@@ -7,8 +7,12 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query';
 import { useMedusa } from 'medusa-react';
-import { adminProductInboundKeys } from './queries';
+import {
+	adminProductInboundKeys,
+	adminProductInboundKiotKeys,
+} from './queries';
 import { AdminPostWarehouseVariantReq1 } from '@/types/warehouse';
+import { OrderKiotType } from '@/types/kiot';
 
 export const useAdminProductInboundHandler = (
 	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
@@ -19,7 +23,11 @@ export const useAdminProductInboundHandler = (
 	return useMutation(
 		({ id }: { id: string }) =>
 			client.admin.custom.post(`/admin/product-inbound/${id}/handler`),
-		buildOptions(queryClient, [adminProductInboundKeys.lists(), adminProductInboundKeys.details()], options)
+		buildOptions(
+			queryClient,
+			[adminProductInboundKeys.lists(), adminProductInboundKeys.details()],
+			options
+		)
 	);
 };
 
@@ -32,7 +40,11 @@ export const useAdminProductInboundRemoveHandler = (
 	return useMutation(
 		({ id }: { id: string }) =>
 			client.admin.custom.delete(`/admin/product-inbound/${id}/handler`),
-		buildOptions(queryClient, [adminProductInboundKeys.lists(), adminProductInboundKeys.details()], options)
+		buildOptions(
+			queryClient,
+			[adminProductInboundKeys.lists(), adminProductInboundKeys.details()],
+			options
+		)
 	);
 };
 
@@ -69,7 +81,6 @@ export const useAdminCreateWarehouseAndInventory = (
 		AdminPostWarehouseVariantReq1
 	>
 ) => {
-	
 	const { client } = useMedusa();
 	const queryClient = useQueryClient();
 
@@ -77,5 +88,53 @@ export const useAdminCreateWarehouseAndInventory = (
 		(payload: AdminPostWarehouseVariantReq1) =>
 			client.admin.custom.post(`/admin/product-inbound`, payload),
 		buildOptions(queryClient, [adminProductInboundKeys.lists()], options)
+	);
+};
+
+// Assign/Unassign Mutations
+export const useAssignOrder = (
+	options?:
+		| UseMutationOptions<
+				void,
+				Error,
+				{ id: string; type: OrderKiotType },
+				unknown
+		  >
+		| undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({ id, type }: { id: string; type: OrderKiotType }) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}/assign`, { type }),
+		buildOptions(
+			queryClient,
+			[
+				adminProductInboundKiotKeys.lists(),
+				adminProductInboundKiotKeys.details(),
+			],
+			options
+		)
+	);
+};
+
+export const useUnassignOrder = (
+	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		({ id }: { id: string }) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}/unassign`),
+		buildOptions(
+			queryClient,
+			[
+				adminProductInboundKiotKeys.lists(),
+				adminProductInboundKiotKeys.details(),
+			],
+			options
+		)
 	);
 };

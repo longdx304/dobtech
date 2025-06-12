@@ -162,7 +162,7 @@ const PaymentButton = ({ data }: Props) => {
 			} else {
 				// Handle non-redirect case
 				// if get error return dashboard
-				router.push(`${ERoutes.DASHBOARD}`);
+				router.push(`${ERoutes.HOME}`);
 			}
 		} catch (err: any) {
 			setErrorMessage(err.toString());

@@ -5,7 +5,6 @@ export enum ERoutes {
 	HOME = '/admin',
 	ACCOUNTS = '/admin/accounts',
 	PRODUCTS = '/admin/products',
-	DASHBOARD = '/admin/dashboard',
 	PRODUCT_CATEGORIES = '/admin/product-categories',
 	PRICING = '/admin/pricing',
 	CUSTOMERS = '/admin/customers',
@@ -20,15 +19,23 @@ export enum ERoutes {
 	CURRENCIES = '/admin/currencies',
 	WAREHOUSE_INBOUND = '/admin/warehouse/inbound',
 	WAREHOUSE_OUTBOUND = '/admin/warehouse/outbound',
-	WAREHOUSE_OUTBOUND_KIOT = '/admin/warehouse/outbound/kiot',
 	WAREHOUSE_TRANSACTIONS = '/admin/warehouse/transactions',
 	ITEM_UNIT = '/admin/item-unit',
 	WAREHOUSE_STOCK_CHECKER = '/admin/warehouse/stock-checker',
-	WAREHOUSE_STOCK_CHECKER_KIOT = '/admin/warehouse/stock-checker/kiot',
 	WAREHOUSE_SHIPMENT = '/admin/warehouse/shipment',
 	WAREHOUSE_MANAGE = '/admin/warehouse/manage',
-	WAREHOUSE_MANAGE_KIOT = '/admin/warehouse/manage/kiot',
 	WAREHOUSE_INVENTORY_CHECKER = '/admin/warehouse/inventory-checker',
+
+	// KIOT system routes
+	KIOT_HOME = '/kiot',
+	KIOT_ACCOUNTS = '/kiot/accounts',
+	KIOT_WAREHOUSE_INBOUND = '/kiot/warehouse/inbound',
+	KIOT_WAREHOUSE_OUTBOUND = '/kiot/warehouse/outbound',
+	KIOT_WAREHOUSE_TRANSACTIONS = '/kiot/warehouse/transactions',
+	KIOT_ITEM_UNIT = '/kiot/item-unit',
+	KIOT_WAREHOUSE_STOCK_CHECKER = '/kiot/warehouse/stock-checker',
+	KIOT_WAREHOUSE_MANAGE = '/kiot/warehouse/manage',
+	KIOT_WAREHOUSE_INVENTORY_CHECKER = '/kiot/warehouse/inventory-checker',
 }
 
 export interface TRouteConfig {
@@ -55,7 +62,7 @@ export const routesConfig: TRouteConfig[] = [
 		],
 	},
 	{
-		path: ERoutes.DASHBOARD,
+		path: ERoutes.HOME,
 		mode: [
 			EPermissions.Manager,
 			EPermissions.Driver,
@@ -136,11 +143,30 @@ export const routesConfig: TRouteConfig[] = [
 		mode: [EPermissions.Driver, EPermissions.Manager],
 	},
 	{
-		path: ERoutes.WAREHOUSE_MANAGE_KIOT,
+		path: ERoutes.KIOT_WAREHOUSE_MANAGE,
 		mode: [EPermissions.Warehouse, EPermissions.Manager],
 	},
 	{
-		path: ERoutes.WAREHOUSE_OUTBOUND_KIOT,
+		path: ERoutes.KIOT_WAREHOUSE_OUTBOUND,
 		mode: [EPermissions.Warehouse, EPermissions.Manager],
+	},
+	{
+		path: ERoutes.KIOT_WAREHOUSE_STOCK_CHECKER,
+		mode: [EPermissions.Warehouse, EPermissions.Manager],
+	},
+
+	// KIOT system routes configuration
+	{
+		path: ERoutes.KIOT_HOME,
+		mode: [
+			EPermissions.Manager,
+			EPermissions.Driver,
+			EPermissions.Accountant,
+			EPermissions.Warehouse,
+		],
+	},
+	{
+		path: ERoutes.KIOT_ACCOUNTS,
+		mode: [EPermissions.Manager, EPermissions.Accountant],
 	},
 ];

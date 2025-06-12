@@ -1,9 +1,5 @@
 import { FormImage, Option } from '@/types/shared';
-import {
-	Order as MedusaOrder,
-	User,
-	AdminPostOrdersOrderFulfillmentsReq as MAdminPostOrdersOrderFulfillmentsReq,
-} from '@medusajs/medusa';
+import { Order as MedusaOrder, User } from '@medusajs/medusa';
 
 export type Order = MedusaOrder & {
 	handler_id?: string;

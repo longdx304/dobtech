@@ -1,6 +1,5 @@
-import { WarehouseKiotBySkuResponse } from '@/types/kiot';
+import { WarehouseKiotBySkuResponse, WarehouseKiotList } from '@/types/kiot';
 import {
-	AdminWarehousesKiotListRes,
 	AdminWarehousesListRes,
 	AdminWarehouseTransactionsRes,
 } from '@/types/warehouse';
@@ -52,7 +51,7 @@ export const useAdminWarehousesKiot = (
 	 */
 	query?: Record<string, unknown>,
 	options?: UseQueryOptionsWrapper<
-		Response<AdminWarehousesKiotListRes>,
+		Response<WarehouseKiotList>,
 		Error,
 		ReturnType<WarehouseKiotQueryKey['list']>
 	>
