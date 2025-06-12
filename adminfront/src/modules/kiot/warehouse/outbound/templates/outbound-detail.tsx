@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import List from '@/components/List';
@@ -12,25 +13,22 @@ import {
 	useGetOrder,
 } from '@/lib/hooks/api/product-outbound';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { ERoutes } from '@/types/routes';
-import { TabsProps } from 'antd';
-import debounce from 'lodash/debounce';
-import { ArrowLeft, Check, Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { ChangeEvent, FC, useMemo, useState } from 'react';
-import OutboundDetailItem from '../components/outbound-detail-item';
-// import { FulfillmentStatus } from '@/types/order';
-import { ActionAbles } from '@/components/Dropdown';
 import { useUser } from '@/lib/providers/user-provider';
 import { getErrorMessage } from '@/lib/utils';
 import PlaceholderImage from '@/modules/admin/common/components/placeholder-image';
 import { FulfillmentStatus } from '@/types/fulfillments';
 import { LineItem } from '@/types/lineItem';
-import { message } from 'antd';
+import { ERoutes } from '@/types/routes';
+import { message, TabsProps } from 'antd';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
+import debounce from 'lodash/debounce';
+import { ArrowLeft, Check, Search } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
 import ConfirmOrder from '../../components/confirm-order';
+import OutboundDetailItem from '../components/outbound-detail-item';
 import OutboundModal from '../components/outbound-modal';
 
 type Props = {

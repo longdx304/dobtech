@@ -53,11 +53,11 @@ const itemDropdown: MenuProps['items'] = [
 const itemsWarehouse: MenuProps['items'] = [
 	getItem('Quản lý kho', 'warehouse-manage', <Warehouse />),
 
-	getItem('Kiểm kho', 'warehouse-inventory-checker', <Package />),
+	// getItem('Kiểm kho', 'warehouse-inventory-checker', <Package />),
 	getItem('Nhập kho', 'warehouse-inbound', <PackagePlus />),
-	getItem('Xuất kho', 'warehouse-outbound', <PackageMinus />),
-	getItem('Kiểm hàng', 'warehouse-stock-checker', <PackageCheck />),
-	getItem('Vận chuyển', 'warehouse-ship', <Truck />),
+	// getItem('Xuất kho', 'warehouse-outbound', <PackageMinus />),
+	// getItem('Kiểm hàng', 'warehouse-stock-checker', <PackageCheck />),
+	// getItem('Vận chuyển', 'warehouse-ship', <Truck />),
 	getItem('Sổ kho', 'warehouse-transaction', <NotebookPen />),
 ];
 
@@ -133,10 +133,10 @@ export const menuItems = (
 export const menuRoutes: Record<string, string> = {
 	accounts: ERoutes.KIOT_ACCOUNTS,
 	'warehouse-inbound': ERoutes.KIOT_WAREHOUSE_INBOUND,
-	'warehouse-outbound': ERoutes.KIOT_WAREHOUSE_OUTBOUND,
+	// 'warehouse-outbound': ERoutes.KIOT_WAREHOUSE_OUTBOUND,
 	'warehouse-transaction': ERoutes.KIOT_WAREHOUSE_TRANSACTIONS,
 	'item-unit': ERoutes.KIOT_ITEM_UNIT,
-	'warehouse-stock-checker': ERoutes.KIOT_WAREHOUSE_STOCK_CHECKER,
+	// 'warehouse-stock-checker': ERoutes.KIOT_WAREHOUSE_STOCK_CHECKER,
 	'warehouse-manage': ERoutes.KIOT_WAREHOUSE_MANAGE,
-	'warehouse-inventory-checker': ERoutes.KIOT_WAREHOUSE_INVENTORY_CHECKER,
+	// 'warehouse-inventory-checker': ERoutes.KIOT_WAREHOUSE_INVENTORY_CHECKER,
 };

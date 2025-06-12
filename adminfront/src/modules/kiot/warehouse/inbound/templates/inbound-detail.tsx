@@ -9,7 +9,7 @@ import List from '@/components/List';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import { useAdminProductInboundConfirmById } from '@/lib/hooks/api/product-inbound';
-import { useAdminProductInbound } from '@/lib/hooks/api/product-inbound/queries';
+import { useGetOrder } from '@/lib/hooks/api/product-outbound/queries';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useUser } from '@/lib/providers/user-provider';
 import { getErrorMessage } from '@/lib/utils';
@@ -43,7 +43,8 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [variantId, setVariantId] = useState<string | null>(null);
 	const [selectedItem, setSelectedItem] = useState<LineItem | null>(null);
-	const { supplierOrder, isLoading, refetch } = useAdminProductInbound(id);
+	const { order, isLoading, refetch } = useGetOrder(id);
+
 	const confirmInboundProduct = useAdminProductInboundConfirmById(id);
 	const createNote = useAdminCreateNote();
 
@@ -60,14 +61,11 @@ const InboundDetail: FC<Props> = ({ id }) => {
 
 	const isPermission = useMemo(() => {
 		if (!user) return false;
-		if (
-			supplierOrder?.fulfillment_status === FulfillSupplierOrderStt.INVENTORIED
-		)
+		if (order?.fulfillment_status === FulfillSupplierOrderStt.INVENTORIED)
 			return false;
-		if (user.role === 'admin' || supplierOrder?.handler_id === user.id)
-			return true;
+		if (user.role === 'admin' || order?.handler_id === user.id) return true;
 		return false;
-	}, [user, supplierOrder]);
+	}, [user, order]);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -79,9 +77,9 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	};
 
 	const lineItems = useMemo(() => {
-		if (!supplierOrder?.items) return [];
+		if (!order?.items) return [];
 
-		const itemsByStatus = supplierOrder.items.filter((item: LineItem) => {
+		const itemsByStatus = order.items.filter((item: any) => {
 			const warehouse_quantity = item.warehouse_quantity ?? 0;
 			if (activeKey === FulfillSupplierOrderStt.INVENTORIED) {
 				return warehouse_quantity === item.quantity;
@@ -90,18 +88,18 @@ const InboundDetail: FC<Props> = ({ id }) => {
 		});
 
 		return itemsByStatus
-			.filter((item: LineItem) => {
-				const title = item.title.toLowerCase();
-				const description = item?.description?.toLowerCase();
+			.filter((item: any) => {
+				const title = item?.product_name?.toLowerCase();
+				const description = item?.product_code?.toLowerCase();
 				const search = searchValue.toLowerCase();
-				return title.includes(search) || description?.includes(search);
+				return title?.includes(search) || description?.includes(search);
 			})
-			.sort((a, b) => {
+			.sort((a: any, b: any) => {
 				return (
 					new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
 				);
 			});
-	}, [supplierOrder?.items, searchValue, activeKey]);
+	}, [order?.items, searchValue, activeKey]);
 
 	const items: TabsProps['items'] = [
 		{
@@ -130,16 +128,16 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	};
 
 	const handleComplete = async () => {
-		const isProcessing = supplierOrder?.items.some(
-			(item) => item.warehouse_quantity < 0
+		const isProcessing = order?.items.some(
+			(item: any) => item.warehouse_quantity < 0
 		);
 		if (isProcessing) {
 			message.error('Tồn tại sản phẩm đang xuất kho');
 			return;
 		}
 
-		const isUnsufficientQuantity = supplierOrder?.items.some(
-			(item) => item.warehouse_quantity < item.quantity
+		const isUnsufficientQuantity = order?.items.some(
+			(item: any) => item.warehouse_quantity < item.quantity
 		);
 
 		if (isUnsufficientQuantity && isEmpty(noteInput)) {
@@ -176,7 +174,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 		}
 		createNote.mutate(
 			{
-				resource_id: supplierOrder?.id!,
+				resource_id: order?.id!,
 				resource_type: 'product-inbound',
 				value: noteInput,
 			},
@@ -196,8 +194,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 			icon: <Check size={20} />,
 			onClick: onOpenConfirm,
 			disabled:
-				supplierOrder?.fulfillment_status ===
-				FulfillSupplierOrderStt.INVENTORIED,
+				order?.fulfillment_status === FulfillSupplierOrderStt.INVENTORIED,
 		},
 		{
 			label: 'Trang đặt hàng từ NCC',
@@ -208,8 +205,8 @@ const InboundDetail: FC<Props> = ({ id }) => {
 		},
 	];
 
-	const handler = supplierOrder?.handler
-		? `${supplierOrder?.handler?.first_name}`
+	const handler = order?.handler
+		? `${order?.handler?.first_name}`
 		: 'Chưa xác định';
 
 	return (
@@ -227,9 +224,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 			<Card loading={false} className="w-full mb-10" bordered={false}>
 				<Flex align="flex-start" justify="space-between">
 					<Flex vertical>
-						<Title
-							level={4}
-						>{`Đơn nhập hàng #${supplierOrder?.display_id}`}</Title>
+						<Title level={4}>{`Đơn nhập hàng #${order?.code}`}</Title>
 						<Text className="text-gray-600">
 							{`Người phụ trách: ${handler}`}
 						</Text>
@@ -276,12 +271,11 @@ const InboundDetail: FC<Props> = ({ id }) => {
 								: 'Chưa có sản phẩm nào hoàn thành. Hãy kiểm tra tại tab "Đang thực hiện"',
 					}}
 				/>
-				{state && variantId && selectedItem && (
+				{state && selectedItem && (
 					<InboundModal
 						open={state}
 						onClose={handleClose}
-						variantId={variantId as string}
-						item={selectedItem}
+						lineItem={selectedItem}
 						isPermission={isPermission}
 					/>
 				)}
@@ -295,7 +289,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 					handleCancel={onCloseConfirm}
 				>
 					{/* Danh sách san pham */}
-					{supplierOrder?.items.map((item, idx) => {
+					{order?.items.map((item: any, idx: any) => {
 						return (
 							<FulfillmentLine
 								item={item as LineItem}

@@ -5,18 +5,22 @@ import { Modal } from '@/components/Modal';
 import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
 import { queryClient } from '@/lib/constants/query-client';
-import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
-import { ADMIN_PRODUCT_INBOUND, useAdminCreateWarehouseAndInventory } from '@/lib/hooks/api/product-inbound';
+import { useUpdateItemOrderAdminKiot } from '@/lib/hooks/api/kiot';
 import {
-	useAdminWarehouseInventoryByVariant,
-	useAdminWarehouses,
+	ADMIN_PRODUCT_OUTBOUND_KIOT,
+	ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE,
+} from '@/lib/hooks/api/product-outbound';
+import {
+	useAdminCreateWarehouseKiotInventory,
+	useAdminWarehouseInventoryKiotBySku,
+	useAdminWarehousesKiot,
 } from '@/lib/hooks/api/warehouse';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
-import { LineItem } from '@/types/lineItem';
-import { AdminPostItemData, Warehouse } from '@/types/warehouse';
+import { WarehouseKiot } from '@/types/kiot';
+import { LineItemKiot } from '@/types/lineItem';
 import { Col, message, Row } from 'antd';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
@@ -25,10 +29,8 @@ import { useMemo, useState } from 'react';
 import WarehouseItem from './warehouse-item';
 
 type WarehouseFormProps = {
-	variantId: string;
-	lineItem: LineItem & {
-		supplier_order_id: string;
-	};
+	sku: string;
+	lineItem: LineItemKiot;
 	isPermission: boolean;
 };
 
@@ -38,11 +40,7 @@ type ValueType = {
 	value: string;
 };
 
-const WarehouseForm = ({
-	variantId,
-	lineItem,
-	isPermission,
-}: WarehouseFormProps) => {
+const WarehouseForm = ({ sku, lineItem, isPermission }: WarehouseFormProps) => {
 	// state
 	const { getSelectedUnitData, onReset } = useProductUnit();
 	const [searchValue, setSearchValue] = useState<ValueType | null>(null);
@@ -50,20 +48,25 @@ const WarehouseForm = ({
 
 	// fetch hook api
 	const {
-		warehouse,
-		isLoading: warehouseLoading,
-		refetch: refetchWarehouse,
-	} = useAdminWarehouses({
-		q: searchValue?.label || undefined,
-	});
-
-	const addWarehouse = useAdminCreateWarehouseAndInventory();
-
-	const {
-		warehouseInventory,
+		inventories,
 		isLoading: warehouseInventoryLoading,
 		refetch: refetchInventory,
-	} = useAdminWarehouseInventoryByVariant(variantId);
+	} = useAdminWarehouseInventoryKiotBySku(sku);
+
+	const {
+		warehouses,
+		isLoading: warehouseLoading,
+		refetch: refetchWarehouse,
+	} = useAdminWarehousesKiot({
+		q: searchValue?.label ?? undefined,
+	});
+
+	const addWarehouseKiot = useAdminCreateWarehouseKiotInventory();
+	const updateItemOrderAdminKiot = useUpdateItemOrderAdminKiot(
+		lineItem?.order_id?.toString(),
+		lineItem.id
+	);
+
 	const unitData = getSelectedUnitData();
 
 	// Debounce fetcher
@@ -79,12 +82,12 @@ const WarehouseForm = ({
 
 	// Format options warehouse
 	const optionWarehouses = useMemo(() => {
-		if (!warehouse) return [];
-		return warehouse.map((warehouse: Warehouse) => ({
+		if (!warehouses) return [];
+		return warehouses.map((warehouse: WarehouseKiot) => ({
 			label: warehouse.location,
 			value: warehouse.id,
 		}));
-	}, [warehouse]);
+	}, [warehouses]);
 
 	const handleAddLocation = () => {
 		if (!searchValue) return;
@@ -102,38 +105,31 @@ const WarehouseForm = ({
 		});
 		onOpen();
 	};
-
 	const handleOkModal = async () => {
 		if (!searchValue) return;
 
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
-		const warehouse_quantity = lineItem.warehouse_quantity ?? 0;
-		if (unitData.totalQuantity > lineItem.quantity - warehouse_quantity) {
-			return message.error(
-				`Tổng số lượng nhập vào không được lớn hơn số lượng giao (${lineItem.quantity} đôi)`
-			);
-		}
-		const itemData: AdminPostItemData = {
-			variant_id: variantId,
-			quantity: unitData?.quantity ?? 0,
-			unit_id: unitData?.unitId ?? '',
-			line_item_id: lineItem.id,
-			order_id: lineItem.supplier_order_id,
-			type: 'INBOUND',
-		};
 
-		if (!itemData) return;
+		if (!lineItem?.product_code) {
+			return message.error('Không tìm thấy mã SKU của sản phẩm');
+		}
+
+		if (!unitData.unitId) {
+			return message.error('Vui lòng chọn đơn vị');
+		}
+
+		if (unitData.quantity <= 0) {
+			return message.error('Số lượng phải lớn hơn 0');
+		}
 
 		const payload = {
-			warehouse: {
-				warehouse_id: searchValue?.value ?? undefined,
-				location: searchValue.label,
-				variant_id: variantId,
-				unit_id: unitData?.unitId,
-			},
-			itemInventory: itemData,
+			location: searchValue?.label,
+			warehouse_id: searchValue?.value,
+			unit_id: unitData.unitId,
+			sku: lineItem.product_code,
+			quantity: unitData.quantity,
 		};
 
 		// clear state to refetch warehouse
@@ -142,16 +138,33 @@ const WarehouseForm = ({
 			value: '',
 		});
 
-		await addWarehouse.mutateAsync(payload, {
+		await addWarehouseKiot.mutateAsync(payload, {
 			onSuccess: () => {
-				message.success('Thêm vị trí cho sản phẩm thành công');
-				refetchWarehouse();
-				refetchInventory();
-				queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
-				queryClient.invalidateQueries([ADMIN_PRODUCT_INBOUND, 'detail']);
-
-				onReset();
-				onClose();
+				updateItemOrderAdminKiot.mutate(
+					{
+						warehouse_quantity: unitData.quantity,
+					},
+					{
+						onSuccess: () => {
+							message.success('Thêm vị trí cho sản phẩm thành công');
+							refetchWarehouse();
+							refetchInventory();
+							queryClient.invalidateQueries([
+								ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE,
+								'detail',
+							]);
+							queryClient.invalidateQueries([
+								ADMIN_PRODUCT_OUTBOUND_KIOT,
+								'detail',
+							]);
+							onReset();
+							onClose();
+						},
+						onError: (error: any) => {
+							message.error(getErrorMessage(error));
+						},
+					}
+				);
 			},
 			onError: (error: any) => {
 				message.error(getErrorMessage(error));
@@ -169,13 +182,13 @@ const WarehouseForm = ({
 				<Text strong className="">
 					Vị trí sản phẩm trong kho
 				</Text>
-				{warehouseInventory?.length === 0 && (
+				{inventories?.length === 0 && (
 					<Text className="text-gray-500">
 						Sản phẩm chưa có vị trí ở trong kho
 					</Text>
 				)}
 				<Row gutter={[8, 8]}>
-					{warehouseInventory?.map((item: any) => (
+					{inventories?.map((item: any) => (
 						<Col xs={24} sm={12} key={item.id}>
 							<WarehouseItem
 								item={item}
@@ -250,7 +263,7 @@ const WarehouseForm = ({
 						}}
 						handleOk={handleOkModal}
 						title={`Thao tác tại vị trí ${searchValue?.label}`}
-						isLoading={addWarehouse.isLoading}
+						isLoading={addWarehouseKiot.isLoading}
 					>
 						<VariantInventoryForm type="INBOUND" />
 					</Modal>

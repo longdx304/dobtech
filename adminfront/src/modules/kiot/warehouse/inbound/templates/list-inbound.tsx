@@ -4,25 +4,47 @@ import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import List from '@/components/List';
+import { Switch } from '@/components/Switch';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import {
-	useAdminProductInboundHandler,
-	useAdminProductInboundRemoveHandler,
-} from '@/lib/hooks/api/product-inbound/mutations';
-import { useAdminProductInbounds } from '@/lib/hooks/api/product-inbound/queries';
+	useGetStockIn,
+	useListOrdersKiot,
+} from '@/lib/hooks/api/product-inbound/queries';
 import { getErrorMessage } from '@/lib/utils';
+import { OrderKiotType } from '@/types/kiot';
 import { ERoutes } from '@/types/routes';
-import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
-import { message, TabsProps } from 'antd';
+import { SupplierOrder } from '@/types/supplier';
+import { message } from 'antd';
 import debounce from 'lodash/debounce';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useState } from 'react';
 import InboundItem from '../components/inbound-item';
-import { Switch } from '@/components/Switch';
+import { FulfillmentStatus } from '@/types/fulfillments';
+import { useUnassignOrder } from '@/lib/hooks/api/product-inbound/mutations';
+import { useAssignOrder } from '@/lib/hooks/api/product-inbound';
 
 type Props = {};
+
+const SORT_ORDER = {
+	1: {
+		orderBy: 'createdDate',
+		orderDirection: 'DESC',
+	},
+	2: {
+		orderBy: 'createdDate',
+		orderDirection: 'ASC',
+	},
+	3: {
+		orderBy: 'displayId',
+		orderDirection: 'DESC',
+	},
+	4: {
+		orderBy: 'displayId',
+		orderDirection: 'ASC',
+	},
+};
 
 const DEFAULT_PAGE_SIZE = 10;
 const ListInbound: FC<Props> = ({}) => {
@@ -30,21 +52,28 @@ const ListInbound: FC<Props> = ({}) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
-	const [activeKey, setActiveKey] = useState<FulfillSupplierOrderStt | null>(
-		FulfillSupplierOrderStt.DELIVERED
-	);
 	const [myOrder, setMyOrder] = useState(false);
+	const [sortOrder, setSortOrder] = useState<number>(1);
+	const [activeKey, setActiveKey] = useState<string>('2');
 
-	const { supplierOrder, isLoading, count } = useAdminProductInbounds({
-		q: searchValue || undefined,
+	const {
+		orders: ordersInWarehouse,
+		isLoading: isLoadingInWarehouse,
+		count: countInWarehouse,
+	} = useListOrdersKiot({
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		status: activeKey || undefined,
-		myOrder: myOrder ? true : undefined,
+		type: OrderKiotType.INBOUND,
 	});
-	const productInboundHandler = useAdminProductInboundHandler();
-	const productInboundRemoveHandler = useAdminProductInboundRemoveHandler();
 
+	const { orders: ordersFromKiot, isLoading: isLoadingFromKiot } =
+		useGetStockIn({
+			offset,
+			limit: DEFAULT_PAGE_SIZE,
+			...SORT_ORDER[sortOrder as keyof typeof SORT_ORDER],
+		});
+	const assignOrder = useAssignOrder();
+	const unassignOrder = useUnassignOrder();
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
 		setSearchValue(inputValue);
@@ -56,47 +85,47 @@ const ListInbound: FC<Props> = ({}) => {
 	};
 
 	const handleChangeTab = (key: string) => {
-		setActiveKey(key as FulfillSupplierOrderStt);
+		setActiveKey(key);
 	};
 
-
-	const items: TabsProps['items'] = [
+	const items: any = [
 		{
-			key: FulfillSupplierOrderStt.DELIVERED,
-			label: 'Đang thực hiện',
+			key: '2',
+			label: 'Đơn hàng trong kho',
 		},
 		{
-			key: FulfillSupplierOrderStt.INVENTORIED,
-			label: 'Đã hoàn thành',
+			key: '1',
+			label: 'Đơn hàng trên KiotViet',
 		},
 	];
 
-	const handleClickDetail = async (item: SupplierOrder) => {
-		return router.push(`${ERoutes.WAREHOUSE_INBOUND}/${item.id}`);
+	const handleClickDetail = async (item: any) => {
+		return router.push(`${ERoutes.KIOT_WAREHOUSE_INBOUND}/${item.id}`);
 	};
 
-	const handleConfirm = async (item: SupplierOrder) => {
-		await productInboundHandler.mutateAsync(
-			{ id: item.id },
+	const handleConfirm = async (item: any) => {
+		await assignOrder.mutateAsync(
+			{ id: item.id, type: OrderKiotType.INBOUND },
 			{
 				onSuccess: () => {
-					router.push(`${ERoutes.WAREHOUSE_INBOUND}/${item.id}`);
+					message.success('Thêm nhân viên xử lý đơn hàng thành công');
 				},
-				onError: (err) => {
+				onError: (err: any) => {
 					message.error(getErrorMessage(err));
 				},
 			}
 		);
 	};
 
-	const handleRemoveHandler = async (item: SupplierOrder) => {
-		await productInboundRemoveHandler.mutateAsync(
+	const handleRemoveHandler = async (item: any) => {
+		console.log('🚀 ~ handleRemoveHandler ~ item:', item);
+		await unassignOrder.mutateAsync(
 			{ id: item.id },
 			{
 				onSuccess: () => {
-					message.success('Huỷ bỏ xử lý đơn hàng thành công');
+					message.success('Huỷ bỏ nhân viên xử lý đơn hàng thành công');
 				},
-				onError: (err) => {
+				onError: (err: any) => {
 					message.error(getErrorMessage(err));
 				},
 			}
@@ -135,29 +164,40 @@ const ListInbound: FC<Props> = ({}) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
-					dataSource={supplierOrder}
-					loading={isLoading || productInboundHandler.isLoading}
-					renderItem={(item: SupplierOrder) => (
-						<List.Item>
-							<InboundItem
-								item={item}
-								handleClickDetail={handleClickDetail}
-								handleConfirm={handleConfirm}
-								handleRemoveHandler={handleRemoveHandler}
-							/>
-						</List.Item>
-					)}
+					dataSource={
+						activeKey === '1' ? ordersFromKiot?.data : ordersInWarehouse
+					}
+					loading={activeKey === '1' ? isLoadingFromKiot : isLoadingInWarehouse}
+					renderItem={(item: any) => {
+						return (
+							<List.Item>
+								<InboundItem
+									item={item}
+									handleClickDetail={handleClickDetail}
+									handleConfirm={handleConfirm}
+									handleRemoveHandler={handleRemoveHandler}
+									isProcessing={
+										activeKey === '1'
+											? !item?.status_label ||
+											  item?.status_label === FulfillmentStatus.NOT_FULFILLED
+											: item.status === FulfillmentStatus.NOT_FULFILLED
+									}
+									activeKey={activeKey}
+								/>
+							</List.Item>
+						);
+					}}
 					pagination={{
 						onChange: (page) => handleChangePage(page),
 						pageSize: DEFAULT_PAGE_SIZE,
 						current: numPages || 1,
-						total: count,
+						total: activeKey === '1' ? ordersFromKiot?.total : countInWarehouse,
 						showTotal: (total, range) =>
 							`${range[0]}-${range[1]} trong ${total} đơn nhập`,
 					}}
 					locale={{
 						emptyText:
-							activeKey === FulfillSupplierOrderStt.DELIVERED
+							activeKey === '1'
 								? 'Đã hoàn thành tất cả đơn hàng. Hãy kiểm tra tại tab "Đã hoàn thành"'
 								: 'Chưa có đơn hàng nào hoàn thành. Hãy kiểm tra tại tab "Đang thực hiện"',
 					}}

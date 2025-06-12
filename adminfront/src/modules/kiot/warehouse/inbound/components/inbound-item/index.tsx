@@ -5,30 +5,86 @@ import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import { useUser } from '@/lib/providers/user-provider';
-import { FulfillSupplierOrderStt, SupplierOrder } from '@/types/supplier';
+import { Order } from '@/types/order';
 import dayjs from 'dayjs';
 import { Check, Clock } from 'lucide-react';
 
 type InboundItemProps = {
-	item: SupplierOrder;
-	handleConfirm: (item: SupplierOrder) => void;
-	handleClickDetail: (item: SupplierOrder) => void;
-	handleRemoveHandler: (item: SupplierOrder) => void;
+	item: any;
+	handleConfirm: (item: any) => void;
+	handleClickDetail: (item: any) => void;
+	handleRemoveHandler: (item: any) => void;
+	isProcessing: boolean;
+	activeKey: string;
 };
 
-const InboundItem: React.FC<InboundItemProps> = ({
-	item,
-	handleClickDetail,
-	handleConfirm,
-	handleRemoveHandler,
-}) => {
-	const { user } = useUser();
-	const isProcessing =
-		item.fulfillment_status === FulfillSupplierOrderStt.DELIVERED;
+export enum InboundStatus {
+	TEMPT = 1,
+	FULFILLED = 3,
+	CANCELLED = 4,
+}
 
-	const isStart = isProcessing && !item?.handler_id;
+const getStatusConfig = (
+	isProcessing: boolean,
+	isStart: boolean,
+	item: any
+) => {
+	const status = item?.status;
+	const isCompleted = status === InboundStatus.FULFILLED;
+	const isCancelled = status === InboundStatus.CANCELLED;
 
-	const actions = [
+	if (isCompleted) {
+		return {
+			color: 'green',
+			label: 'Đã hoàn thành',
+			icon: <Check />,
+		};
+	}
+	if (isCancelled) {
+		return {
+			color: 'red',
+			label: 'Đã hủy',
+			icon: <Check />,
+		};
+	}
+
+	return {
+		color: isProcessing ? 'gold' : 'green',
+		label: isStart
+			? 'Chờ xử lý'
+			: isProcessing
+			? 'Đang tiến hành'
+			: 'Đã hoàn thành',
+	};
+};
+
+const getButtonConfig = (
+	user: any,
+	item: InboundItemProps['item'],
+	activeKey: string
+) => {
+	const isCompleted = item?.status === InboundStatus.FULFILLED;
+	const isCancelled = item?.status === InboundStatus.CANCELLED;
+
+	const isDisabled = activeKey === '1' && !item.status_label;
+	let label = 'Nhập kho';
+	if (user?.id !== item?.handler_id) label = 'Chi tiết';
+	if (isCancelled || isCompleted) label = 'Chi tiết';
+	return {
+		label,
+		disabled: isDisabled,
+	};
+};
+
+const getActions = (
+	user: any,
+	item: InboundItemProps['item'],
+	isStart: boolean,
+	isProcessing: boolean,
+	handleConfirm: (item: Order) => void,
+	handleRemoveHandler: (item: Order) => void
+) => {
+	return [
 		{
 			label: <span className="w-full">{'Thực hiện'}</span>,
 			key: 'handle',
@@ -43,25 +99,42 @@ const InboundItem: React.FC<InboundItemProps> = ({
 			onClick: () => handleRemoveHandler(item),
 		},
 	];
+};
+
+const InboundItem: React.FC<InboundItemProps> = ({
+	item,
+	handleClickDetail,
+	handleConfirm,
+	handleRemoveHandler,
+	isProcessing,
+	activeKey,
+}) => {
+	const { user } = useUser();
+	const isStart =
+		isProcessing && !item?.handler_id && item?.invoiceDelivery?.status === 1;
+	const statusConfig = getStatusConfig(isProcessing, isStart, item);
+	const buttonConfig = getButtonConfig(user, item, activeKey);
+	const actions = getActions(
+		user,
+		item,
+		isStart,
+		isProcessing,
+		handleConfirm,
+		handleRemoveHandler
+	);
 
 	return (
 		<Card className="bg-[#F3F6FF]" rounded>
 			<Tag
-				color={isProcessing ? 'gold' : 'green'}
+				color={statusConfig.color}
 				className="w-fit flex items-center gap-1 p-2 rounded-lg"
 			>
-				<span className="text-[14px] font-semibold">
-					{isStart
-						? 'Chờ xử lý'
-						: isProcessing
-						? 'Đang tiến hành'
-						: 'Đã hoàn thành'}
-				</span>
-				{isProcessing ? <Clock size={16} /> : <Check />}
+				<span className="text-[14px] font-semibold">{statusConfig.label}</span>
+				{statusConfig.icon}
 			</Tag>
 			<Flex gap={4} className="pt-2" align="center">
 				<Text className="text-[14px] text-gray-500">Mã đơn hàng:</Text>
-				<Text className="text-sm font-semibold">{`#${item.display_id}`}</Text>
+				<Text className="text-sm font-semibold">{`#${item.code}`}</Text>
 			</Flex>
 			<Flex gap={4} className="" align="center">
 				<Text className="text-[14px] text-gray-500">Ngày nhập hàng:</Text>
@@ -73,13 +146,19 @@ const InboundItem: React.FC<InboundItemProps> = ({
 				<Text className="text-[14px] text-gray-500">Người xử lý:</Text>
 				<Text className="text-sm font-semibold">
 					{item?.handler_id
-						? `${item.handler?.last_name ?? ''} ${item.handler?.first_name ?? ''}`
+						? `${item.handler?.last_name ?? ''} ${
+								item.handler?.first_name ?? ''
+						  }`
 						: 'Chưa xác định'}
 				</Text>
 			</Flex>
 			<Flex gap={4} align="center" justify="space-between" className="mt-2">
-				<Button className="w-full" onClick={() => handleClickDetail(item)}>
-					{user?.id === item?.handler_id ? 'Nhập kho' : 'Chi tiết'}
+				<Button
+					className="w-full"
+					onClick={() => handleClickDetail(item)}
+					disabled={buttonConfig.disabled}
+				>
+					{buttonConfig.label}
 				</Button>
 				<ActionAbles actions={actions as any} />
 			</Flex>

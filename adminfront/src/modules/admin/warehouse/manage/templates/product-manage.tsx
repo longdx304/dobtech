@@ -66,7 +66,6 @@ const ProductManage: FC<Props> = ({}) => {
 	};
 
 	const handleEditWarehouse = (item: ProductVariant) => {
-		console.log('item:', item);
 		setQuantity(1);
 		setVariant(item);
 		openVariantInventory();

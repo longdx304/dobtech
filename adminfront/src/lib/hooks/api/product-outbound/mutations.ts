@@ -11,6 +11,7 @@ import {
 	adminProductOutboundKeys,
 	adminProductOutboundKiotKeys,
 } from './queries';
+import { OrderKiotType } from '@/types/kiot';
 
 export const useAdminProductOutboundHandler = (
 	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
@@ -198,14 +199,21 @@ export const useUpdateOrderKiot = (
 
 // Assign/Unassign Mutations
 export const useAssignOrder = (
-	options?: UseMutationOptions<void, Error, { id: string }, unknown> | undefined
+	options?:
+		| UseMutationOptions<
+				void,
+				Error,
+				{ id: string; type: OrderKiotType },
+				unknown
+		  >
+		| undefined
 ) => {
 	const { client } = useMedusa();
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		({ id }: { id: string }) =>
-			client.admin.custom.post(`/admin/kiot/order/${id}/assign`),
+		({ id, type }: { id: string; type: OrderKiotType }) =>
+			client.admin.custom.post(`/admin/kiot/order/${id}/assign`, { type }),
 		buildOptions(
 			queryClient,
 			[

@@ -2,15 +2,14 @@
 import { FloatButton } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
+import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
+import { TabsProps } from 'antd';
 import { Plus } from 'lucide-react';
 import { FC } from 'react';
-import { TabsProps } from 'antd';
-import { Tabs } from '@/components/Tabs';
-import Link from 'next/link';
-import { ERoutes } from '@/types/routes';
 import ModalAddWarehouse from '../../manage/components/modal-add-warehouse';
+import LocationManage from './location-manage';
 import ProductManage from './product-manage';
 
 type Props = {};
@@ -28,11 +27,11 @@ const KiotWarehouseManage: FC<Props> = ({}) => {
 			label: 'Sản phẩm',
 			children: <ProductManage />,
 		},
-		// {
-		// 	key: 'locaitons',
-		// 	label: 'Vị trí',
-		// 	children: <LocationManage />,
-		// },
+		{
+			key: 'locaitons',
+			label: 'Vị trí',
+			children: <LocationManage />,
+		},
 	];
 
 	return (

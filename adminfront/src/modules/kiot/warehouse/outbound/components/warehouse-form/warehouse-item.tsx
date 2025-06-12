@@ -7,9 +7,8 @@ import {
 	ADMIN_PRODUCT_OUTBOUND_KIOT_ITEM_CODE,
 } from '@/lib/hooks/api/product-outbound';
 import {
-	adminWarehouseKiotKeys,
 	useAdminAddInventoryToWarehouseKiot,
-	useAdminRemoveInventoryKiot,
+	useAdminRemoveInventoryKiot
 } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
