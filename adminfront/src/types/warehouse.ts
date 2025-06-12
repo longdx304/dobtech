@@ -177,7 +177,7 @@ export interface AdminPostCreateOutboundInventoryReq {
 }
 
 export type AdminWarehouseTransactionsRes = {
-	inventoryTransactions: WarehouseInventory[];
+	transactions: WarehouseInventory[];
 	count: number;
 };
 

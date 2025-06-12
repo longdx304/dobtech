@@ -29,7 +29,7 @@ const ListTransaction: FC<Props> = () => {
 	const [startAt, setStartAt] = useState<string>('');
 	const [endAt, setEndAt] = useState<string>('');
 
-	const { inventoryTransactions, count, isLoading, isRefetching } =
+	const { transactions, count, isLoading, isRefetching } =
 		useAdminWarehouseTransactionsKiot({
 			limit: PAGE_SIZE,
 			offset: (currentPage - 1) * PAGE_SIZE,
@@ -39,10 +39,7 @@ const ListTransaction: FC<Props> = () => {
 			end_at: endAt || undefined,
 		});
 
-	const columns = useMemo(() => {
-		return transactionColumns({});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	const columns = transactionColumns({});
 
 	const handleChangePage = (page: number) => {
 		setCurrentPage(page);
@@ -101,8 +98,8 @@ const ListTransaction: FC<Props> = () => {
 			<Table
 				loading={isLoading || isRefetching}
 				columns={columns as any}
-				dataSource={inventoryTransactions}
-				rowKey="code"
+				dataSource={transactions}
+				rowKey="id"
 				scroll={{ x: 700 }}
 				onChange={onChange as any}
 				pagination={{
