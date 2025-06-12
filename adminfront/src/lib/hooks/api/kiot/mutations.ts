@@ -33,7 +33,27 @@ export const useUpdateItemOrderAdminKiot = (
 
 	return useMutation(
 		(payload: AdminKiotUpdateItemOrderReq) =>
-			client.admin.custom.post(`/admin/kiot/order/${id}/items/${itemId}`, payload),
+			client.admin.custom.post(
+				`/admin/kiot/order/${id}/items/${itemId}`,
+				payload
+			),
 		buildOptions(queryClient, [adminKiotKeys.lists()], options)
+	);
+};
+
+export const useExportWarehouseData = (
+	options?: UseMutationOptions<
+		Response<{ fileKey: string; fileSize: number; downloadUrl: string }>,
+		Error,
+		{ filterable_fields?: Record<string, any> }
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: { filterable_fields?: Record<string, any> }) =>
+			client.admin.custom.post(`/admin/kiot/warehouse/export`, payload),
+		buildOptions(queryClient, [], options)
 	);
 };
