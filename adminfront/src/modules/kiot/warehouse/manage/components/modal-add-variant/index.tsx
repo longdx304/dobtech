@@ -4,17 +4,14 @@ import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
 import {
 	useAdminCreateWarehouseLocationKiot,
-	useAdminCreateWarehouseVariantKiot,
-	useAdminWarehouses,
 	useAdminWarehousesKiot,
 } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
-import { WarehouseKiotBySku } from '@/types/kiot';
-import { Warehouse } from '@/types/warehouse';
+import { WarehouseKiot, WarehouseKiotBySku } from '@/types/kiot';
 import { message } from 'antd';
-import { debounce, isEmpty } from 'lodash';
+import { debounce } from 'lodash';
 import { LoaderCircle } from 'lucide-react';
 import { FC, useEffect, useState } from 'react';
 
@@ -55,7 +52,7 @@ const ModalAddVariant: FC<Props> = ({
 
 	useEffect(() => {
 		if (warehouses) {
-			const options = warehouses.map((warehouse: Warehouse) => ({
+			const options = warehouses.map((warehouse: WarehouseKiot) => ({
 				label: warehouse.location,
 				value: warehouse.id,
 			}));

@@ -13,8 +13,8 @@ import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
+import { WarehouseKiot } from '@/types/kiot';
 import { LineItemKiot } from '@/types/lineItem';
-import { Warehouse } from '@/types/warehouse';
 import { Col, message, Row } from 'antd';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
@@ -73,7 +73,7 @@ const WarehouseForm = ({ sku, lineItem, isPermission }: WarehouseFormProps) => {
 	// Format options warehouse
 	const optionWarehouses = useMemo(() => {
 		if (!warehouses) return [];
-		return warehouses.map((warehouse: Warehouse) => ({
+		return warehouses.map((warehouse: WarehouseKiot) => ({
 			label: warehouse.location,
 			value: warehouse.id,
 		}));

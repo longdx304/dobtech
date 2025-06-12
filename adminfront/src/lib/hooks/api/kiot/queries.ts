@@ -1,8 +1,4 @@
-import { WarehouseKiotBySkuResponse, WarehouseKiotList } from '@/types/kiot';
-import {
-	AdminWarehousesListRes,
-	AdminWarehouseTransactionsRes,
-} from '@/types/warehouse';
+import { AdminWarehouseTransactionsResKiot } from '@/types/warehouse';
 import generateParams from '@/utils/generate-params';
 import { Response } from '@medusajs/medusa-js';
 import { useQuery } from '@tanstack/react-query';
@@ -24,7 +20,7 @@ export const useAdminWarehouseTransactionsKiot = (
 	 */
 	query?: Record<string, unknown>,
 	options?: UseQueryOptionsWrapper<
-		Response<AdminWarehouseTransactionsRes>,
+		Response<AdminWarehouseTransactionsResKiot>,
 		Error,
 		ReturnType<WarehouseQueryKey['list']>
 	>

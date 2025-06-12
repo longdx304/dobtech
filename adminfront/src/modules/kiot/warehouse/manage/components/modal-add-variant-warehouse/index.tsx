@@ -1,22 +1,15 @@
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
-import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
-import {
-	useAdminCreateWarehouseVariant,
-	useAdminCreateWarehouseVariantKiot,
-} from '@/lib/hooks/api/warehouse';
+import { useAdminCreateWarehouseVariantKiot } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
 import { WarehouseKiot } from '@/types/kiot';
-import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
 import { message } from 'antd';
-import { debounce, isEmpty } from 'lodash';
-import { LoaderCircle } from 'lucide-react';
-import { useAdminVariants } from 'medusa-react';
-import { FC, useMemo, useState } from 'react';
+import { debounce } from 'lodash';
+import { FC, useState } from 'react';
 
 interface Props {
 	isModalOpen: boolean;
