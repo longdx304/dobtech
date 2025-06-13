@@ -9,6 +9,7 @@ import { message } from 'antd';
 import clsx from 'clsx';
 import { useContext } from 'react';
 import WarehouseForm from '../warehouse-form';
+import { RefreshCcw } from 'lucide-react';
 
 type Props = {
 	open: boolean;
@@ -43,7 +44,7 @@ const InboundModal = ({ open, onClose, lineItem, isPermission }: Props) => {
 			maskClosable={false}
 			closable={false}
 		>
-			<VariantInfo lineItem={item} />
+			<VariantInfo lineItem={item} refrechLineItem={refetch} />
 			<WarehouseForm
 				sku={item?.product_code}
 				lineItem={lineItem}
@@ -57,11 +58,11 @@ export default InboundModal;
 
 const VariantInfo = ({
 	lineItem,
+	refrechLineItem,
 }: {
 	lineItem: any & { warehouse_quantity: number };
+	refrechLineItem: () => void;
 }) => {
-	console.log('lineItem VariantInfo', lineItem);
-
 	return (
 		<Flex gap={4} vertical className="py-2">
 			<Flex vertical align="flex-start">
@@ -72,16 +73,23 @@ const VariantInfo = ({
 					color="blue"
 				>{`${lineItem?.product_code}`}</Tag>
 			</Flex>
-			<Flex vertical align="flex-start">
+			<Flex vertical gap={4}>
 				<Text className="text-[14px] text-gray-500">
 					Đã nhập kho / Tổng giao:
 				</Text>
-				<Text
-					className={clsx('text-sm font-medium', {
-						'text-red-500':
-							(lineItem.warehouse_quantity ?? 0) > lineItem.quantity,
-					})}
-				>{`${lineItem.warehouse_quantity ?? 0} / ${lineItem.quantity}`}</Text>
+				<Flex align="center" justify="flex-start" gap={12}>
+					<Text
+						className={clsx('text-sm font-medium', {
+							'text-red-500':
+								(lineItem.warehouse_quantity ?? 0) > lineItem.quantity,
+						})}
+					>{`${lineItem.warehouse_quantity ?? 0} / ${lineItem.quantity}`}</Text>
+					<RefreshCcw
+						size={16}
+						className="text-gray-400 cursor-pointer"
+						onClick={refrechLineItem}
+					/>
+				</Flex>
 			</Flex>
 		</Flex>
 	);
