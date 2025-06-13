@@ -17,26 +17,14 @@ const { RangePicker } = DatePicker;
 const transactionColumns = ({}: Props) => [
 	{
 		title: 'Sản phẩm',
-		dataIndex: 'sku',
-		key: 'sku',
+		dataIndex: 'product_name',
+		key: 'product_name',
 		width: 150,
 		className: 'text-xs',
-		render: (text: string) => {
-			return text || '-';
-		},
-	},
-	{
-		title: 'Loại hàng',
-		dataIndex: 'type',
-		key: 'type',
-		width: 150,
-		className: 'text-xs',
-		filters: [
-			{ text: 'Nhập hàng', value: 'INBOUND' },
-			{ text: 'Lấy hàng', value: 'OUTBOUND' },
-		],
-		render: (type: TransactionType) => {
-			return typeMap[type];
+		render: (text: string, record: any) => {
+			return (
+				`${record?.variant?.product?.title} - ${record?.variant?.title}` || '-'
+			);
 		},
 	},
 	{

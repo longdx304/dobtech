@@ -3,15 +3,19 @@ import { Flex } from '@/components/Flex';
 import { Tooltip } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
 import { WarehouseKiotBySku, WarehouseKiotRecord } from '@/types/kiot';
-import { Minus, Pen, Plus } from 'lucide-react';
+import { History, Minus, Pen, Plus } from 'lucide-react';
 
 export interface WarehouseDataType {}
 
 interface Props {
 	handleEditWarehouse: (item: WarehouseKiotBySku) => void;
+	handleOpenTransactionHistory: (sku: string) => void;
 }
 
-const productColumns = ({ handleEditWarehouse }: Props) => [
+const productColumns = ({
+	handleEditWarehouse,
+	handleOpenTransactionHistory,
+}: Props) => [
 	{
 		title: 'Sản phẩm',
 		key: 'sku',
@@ -43,6 +47,13 @@ const productColumns = ({ handleEditWarehouse }: Props) => [
 					icon: <Pen size={20} />,
 					onClick: () => {
 						handleEditWarehouse(record);
+					},
+				},
+				{
+					label: 'Lịch sử kho',
+					icon: <History size={20} />,
+					onClick: () => {
+						handleOpenTransactionHistory(record.sku);
 					},
 				},
 			];

@@ -139,7 +139,7 @@ const InboundItem: React.FC<InboundItemProps> = ({
 			<Flex gap={4} className="" align="center">
 				<Text className="text-[14px] text-gray-500">Ngày nhập hàng:</Text>
 				<Text className="text-sm font-semibold">
-					{dayjs(item.created_at).format('DD/MM/YYYY')}
+					{dayjs(item?.createdDate ?? item?.created_at).format('DD/MM/YYYY')}
 				</Text>
 			</Flex>
 			<Flex gap={4} className="" align="center">
