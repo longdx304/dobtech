@@ -5,15 +5,19 @@ import { Tooltip } from '@/components/Tooltip';
 import { Text } from '@/components/Typography';
 import { ProductVariant } from '@/types/products';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
-import { Minus, Pen, Plus, Trash2 } from 'lucide-react';
+import { History, Minus, Pen, Plus } from 'lucide-react';
 
 export interface WarehouseDataType {}
 
 interface Props {
 	handleEditWarehouse: (item: ProductVariant) => void;
+	handleOpenTransactionHistory: (id: string) => void;
 }
 
-const productColumns = ({ handleEditWarehouse }: Props) => [
+const productColumns = ({
+	handleEditWarehouse,
+	handleOpenTransactionHistory,
+}: Props) => [
 	{
 		title: 'Sản phẩm',
 		key: 'title',
@@ -55,8 +59,14 @@ const productColumns = ({ handleEditWarehouse }: Props) => [
 						handleEditWarehouse(record);
 					},
 				},
+				{
+					label: 'Lịch sử kho',
+					icon: <History size={20} />,
+					onClick: () => {
+						handleOpenTransactionHistory(record.id);
+					},
+				},
 			];
-
 			return <ActionAbles actions={actions as any} />;
 		},
 	},

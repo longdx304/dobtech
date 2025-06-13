@@ -14,6 +14,7 @@ import { ChangeEvent, FC, useEffect, useState } from 'react';
 import ModalAddVariant from '../components/modal-add-variant';
 import ModalVariantInventory from '../components/modal-variant-inventory';
 import { expandedColumns, productColumns } from './product-columns';
+import ModalTransactionHistory from '../components/modal-transaction-history';
 
 type Props = {};
 
@@ -31,9 +32,15 @@ const ProductManage: FC<Props> = ({}) => {
 		onOpen: openVariantInventory,
 		onClose: closeVariantInventory,
 	} = useToggleState(false);
+	const {
+		state: stateTransactionHistory,
+		onOpen: openTransactionHistory,
+		onClose: closeTransactionHistory,
+	} = useToggleState(false);
 
 	const [inventoryType, setInventoryType] = useState<string>('');
 	const [variant, setVariant] = useState<ProductVariant>();
+	const [variantId, setVariantId] = useState<string>('');
 	const [warehouseInventory, setWarehouseInventory] =
 		useState<WarehouseInventory>();
 	const [searchValue, setSearchValue] = useState<string>('');
@@ -70,8 +77,13 @@ const ProductManage: FC<Props> = ({}) => {
 		setVariant(item);
 		openVariantInventory();
 	};
+	const handleOpenTransactionHistory = (id: string) => {
+		setVariantId(id);
+		openTransactionHistory();
+	};
 	const columns = productColumns({
 		handleEditWarehouse,
+		handleOpenTransactionHistory,
 	});
 
 	// Add variant inventory
@@ -178,6 +190,13 @@ const ProductManage: FC<Props> = ({}) => {
 					onClose={handleCloseModal}
 					warehouseInventory={warehouseInventory}
 					refetch={refetch}
+				/>
+			)}
+			{variantId && (
+				<ModalTransactionHistory
+					isModalOpen={stateTransactionHistory}
+					onClose={closeTransactionHistory}
+					id={variantId}
 				/>
 			)}
 		</Flex>

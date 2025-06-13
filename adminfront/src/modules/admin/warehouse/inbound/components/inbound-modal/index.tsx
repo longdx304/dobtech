@@ -10,6 +10,7 @@ import WarehouseForm from '../warehouse-form';
 import { message } from 'antd';
 import { LineItem } from '@/types/lineItem';
 import clsx from 'clsx';
+import { RefreshCcw } from 'lucide-react';
 
 type Props = {
 	open: boolean;
@@ -27,7 +28,7 @@ const InboundModal = ({
 	isPermission,
 }: Props) => {
 	const layeredModalContext = useContext(LayeredModalContext);
-	const { lineItem, isLoading } = useAdminLineItem(item.id);
+	const { lineItem, isLoading, refetch } = useAdminLineItem(item.id);
 
 	const handleOk = () => {
 		if ((lineItem.warehouse_quantity ?? 0) > lineItem.quantity) {
@@ -51,7 +52,7 @@ const InboundModal = ({
 			maskClosable={false}
 			closable={false}
 		>
-			<VariantInfo lineItem={lineItem} />
+			<VariantInfo lineItem={lineItem} refetch={refetch} />
 			<WarehouseForm
 				variantId={variantId}
 				lineItem={lineItem}
@@ -63,7 +64,13 @@ const InboundModal = ({
 
 export default InboundModal;
 
-const VariantInfo = ({ lineItem }: { lineItem: LineItem }) => {
+const VariantInfo = ({
+	lineItem,
+	refetch,
+}: {
+	lineItem: LineItem;
+	refetch: () => void;
+}) => {
 	return (
 		<Flex gap={4} vertical className="py-2">
 			<Flex vertical align="flex-start">
@@ -78,12 +85,20 @@ const VariantInfo = ({ lineItem }: { lineItem: LineItem }) => {
 				<Text className="text-[14px] text-gray-500">
 					Đã nhập kho / Tổng giao:
 				</Text>
-				<Text
-					className={clsx('text-sm font-medium', {
-						'text-red-500':
-							(lineItem.warehouse_quantity ?? 0) < 0,
-					})}
-				>{`${lineItem.warehouse_quantity ?? 0} / ${lineItem.quantity}`}</Text>
+				<Flex align="center" justify="flex-start" gap={12}>
+					<Text
+						className={clsx('text-sm font-medium', {
+							'text-red-500': (lineItem.warehouse_quantity ?? 0) < 0,
+						})}
+					>
+						{`${lineItem.warehouse_quantity ?? 0} / ${lineItem.quantity}`}
+					</Text>
+					<RefreshCcw
+						size={16}
+						onClick={refetch}
+						className="text-gray-400 cursor-pointer"
+					/>
+				</Flex>
 			</Flex>
 		</Flex>
 	);

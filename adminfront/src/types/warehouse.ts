@@ -10,6 +10,12 @@ export interface Warehouse {
 	updated_at: string;
 	inventories: WarehouseInventory[];
 }
+export interface KiotWarehouse {
+	id: string;
+	location: string;
+	created_at: string;
+	updated_at: string;
+}
 
 export interface AdminPostWarehouseReq {
 	location: string;
@@ -181,7 +187,7 @@ export type AdminWarehouseTransactionsRes = {
 	count: number;
 };
 export type AdminWarehouseTransactionsResKiot = {
-	transactions: WarehouseInventory[];
+	transactions: KiotTransaction[];
 	count: number;
 };
 
@@ -189,3 +195,42 @@ export enum TransactionType {
 	INBOUND = 'INBOUND',
 	OUTBOUND = 'OUTBOUND',
 }
+
+export type KiotTransaction = {
+	id: string;
+	warehouse_id: string;
+	sku: string;
+	order_id?: string;
+	quantity: number;
+	type: TransactionType;
+	note?: string;
+	warehouse: KiotWarehouse;
+	user_id: string;
+	user: User;
+	created_at: string;
+	updated_at: string;
+};
+export type KiotTransactionSkuRes = {
+	transactions: KiotTransaction[];
+	count: number;
+};
+
+export type AdminTransaction = {
+	id: string;
+	warehouse_id: string;
+	variant_id: string;
+	order_id?: string;
+	quantity: number;
+	type: TransactionType;
+	note?: string;
+	warehouse: Warehouse;
+	user_id: string;
+	user: User;
+	created_at: string;
+	updated_at: string;
+};
+
+export type AdminTransactionVariantIdRes = {
+	transactions: AdminTransaction[];
+	count: number;
+};

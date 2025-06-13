@@ -63,11 +63,6 @@ const ModalAddVariantWarehouse: FC<Props> = ({
 		onClose();
 	};
 
-	// Debounce fetcher
-	const debounceFetcher = debounce((value: string) => {
-		setVariantValue(value);
-	}, 800);
-
 	return (
 		<Modal
 			open={isModalOpen}
@@ -88,7 +83,8 @@ const ModalAddVariantWarehouse: FC<Props> = ({
 					className="w-full"
 					placeholder="Chọn biến thể sản phẩm"
 					allowClear
-					onChange={(e) => debounceFetcher(e.target.value)}
+					value={variantValue || ''}
+					onChange={(e) => setVariantValue(e.target.value)}
 				/>
 			</Flex>
 			<VariantInventoryForm type={'INBOUND'} />
