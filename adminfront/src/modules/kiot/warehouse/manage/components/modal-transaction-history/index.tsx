@@ -1,9 +1,6 @@
 import { Modal } from '@/components/Modal';
 import { Table } from '@/components/Table';
-import {
-	useAdminWarehouseTransactionsKiot,
-	useKiotTransactionSku,
-} from '@/lib/hooks/api/kiot';
+import { useAdminWarehouseTransactionsKiot } from '@/lib/hooks/api/kiot';
 import { FC, useState } from 'react';
 import transactionColumns from './columns';
 
