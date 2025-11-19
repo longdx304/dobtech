@@ -9,11 +9,13 @@ import NewDraftOrderFormProvider from '@/modules/admin/draft-orders/hooks/use-ne
 import { ERoutes } from '@/types/routes';
 import { TableProps } from 'antd';
 import _ from 'lodash';
-import { Plus, Search } from 'lucide-react';
+import { FileSpreadsheet, Plus, Search } from 'lucide-react';
 import { useAdminOrders } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
+import ExportModals from '../../components/orders/export-excel/export-modals';
 import NewOrderModal from '../../components/orders/new-order';
+import { useOrderExport } from '../../hooks/use-order-export';
 import orderColumns from './order-column';
 
 type Props = {};
@@ -32,6 +34,10 @@ const OrderList: FC<Props> = () => {
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
 	const [filters, setFilters] = useState<any>({});
+	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+	// Export hook
+	const exportHook = useOrderExport();
 
 	const {
 		state: stateOrderByAdminModal,
@@ -47,6 +53,7 @@ const OrderList: FC<Props> = () => {
 			limit: DEFAULT_PAGE_SIZE,
 			payment_status: filters?.payment_status || undefined,
 			fulfillment_status: filters?.fulfillment_status || undefined,
+			expand: 'items,customer',
 		},
 		{
 			keepPreviousData: true,
@@ -101,6 +108,9 @@ const OrderList: FC<Props> = () => {
 		setFilters(formattedFilters);
 	};
 
+	const selectedOrders = orders?.filter(order => selectedRowKeys.includes(order.id)) || [];
+
+
 	return (
 		// <div className="w-full">
 		<>
@@ -117,44 +127,87 @@ const OrderList: FC<Props> = () => {
 					className="w-[300px]"
 				/>
 			</Flex>
-			<Table
-				loading={isLoading}
-				columns={columns as any}
-				dataSource={orders ?? []}
-				rowKey="id"
-				scroll={{ x: 700 }}
-				onRow={(record) => ({
-					onClick: () => handleRowClick(record),
-					className: 'cursor-pointer',
-				})}
-				onChange={handleOnChange}
-				pagination={{
-					total: Math.floor(count ?? 0 / (DEFAULT_PAGE_SIZE ?? 0)),
-					pageSize: DEFAULT_PAGE_SIZE,
-					current: numPages || 1,
-					onChange: handleChangePage,
-					showTotal: (total, range) =>
-						`${range[0]}-${range[1]} trong ${total} đơn hàng`,
-				}}
-			/>
+		<Table
+			loading={isLoading}
+			columns={columns as any}
+			dataSource={orders ?? []}
+			rowKey="id"
+			scroll={{ x: 700 }}
+			rowSelection={{
+				selectedRowKeys,
+				onChange: (selectedKeys) => setSelectedRowKeys(selectedKeys),
+				getCheckboxProps: (record: any) => ({
+					disabled: record.fulfillment_status !== 'fulfilled',
+				}),
+			}}
+			onRow={(record) => ({
+				onClick: (e) => {
+					// Prevent row click when clicking on checkbox
+					const target = e.target as HTMLElement;
+					if (!target.closest('.ant-checkbox-wrapper')) {
+						handleRowClick(record);
+					}
+				},
+				className: 'cursor-pointer',
+			})}
+			onChange={handleOnChange}
+			pagination={{
+				total: Math.floor(count ?? 0 / (DEFAULT_PAGE_SIZE ?? 0)),
+				pageSize: DEFAULT_PAGE_SIZE,
+				current: numPages || 1,
+				onChange: handleChangePage,
+				showTotal: (total, range) =>
+					`${range[0]}-${range[1]} trong ${total} đơn hàng`,
+			}}
+		/>
+		<FloatButton
+			className="absolute"
+			icon={<Plus color="white" size={20} strokeWidth={2} />}
+			type="primary"
+			onClick={handleCreateOrderByAdmin}
+			data-testid="btnCreateSupplier"
+		/>
+		{selectedRowKeys.length > 0 && (
 			<FloatButton
 				className="absolute"
-				icon={<Plus color="white" size={20} strokeWidth={2} />}
+				style={{ right: 94 }}
+				icon={<FileSpreadsheet color="white" size={20} strokeWidth={2} />}
 				type="primary"
-				onClick={handleCreateOrderByAdmin}
-				data-testid="btnCreateSupplier"
+				onClick={() => exportHook.handleOpenExportModal(selectedRowKeys)}
+				data-testid="btnExportOrders"
 			/>
-			{stateOrderByAdminModal && (
-				<NewDraftOrderFormProvider>
-					<NewOrderModal
-						state={stateOrderByAdminModal}
-						handleOk={handleCancelOrderByAdmin}
-						handleCancel={handleCancelOrderByAdmin}
-						refetch={refetch}
-					/>
-				</NewDraftOrderFormProvider>
-			)}
-		</>
+		)}
+		{stateOrderByAdminModal && (
+			<NewDraftOrderFormProvider>
+				<NewOrderModal
+					state={stateOrderByAdminModal}
+					handleOk={handleCancelOrderByAdmin}
+					handleCancel={handleCancelOrderByAdmin}
+					refetch={refetch}
+				/>
+			</NewDraftOrderFormProvider>
+		)}
+		<ExportModals
+			vatModalVisible={exportHook.vatModalVisible}
+			vatRate={exportHook.vatRate}
+			onVatRateChange={exportHook.setVatRate}
+			onVatNext={() => exportHook.handleVatNext(selectedRowKeys)}
+			onVatCancel={exportHook.handleVatCancel}
+			exportModalVisible={exportHook.exportModalVisible}
+			selectedOrders={selectedOrders}
+			soChungTuValues={exportHook.soChungTuValues}
+			soPhieuXuatValues={exportHook.soPhieuXuatValues}
+			onSoChungTuChange={exportHook.handleSoChungTuChange}
+			onSoPhieuXuatChange={exportHook.handleSoPhieuXuatChange}
+			onDocumentNext={exportHook.handleDocumentModalNext}
+			onDocumentCancel={exportHook.handleCloseExportModal}
+			customerMappingModalVisible={exportHook.customerMappingModalVisible}
+			onCustomerMappingConfirm={(mappings) => 
+				exportHook.handleCustomerMappingConfirm(mappings, selectedOrders, () => setSelectedRowKeys([]))
+			}
+			onCustomerMappingCancel={exportHook.handleCustomerMappingCancel}
+		/>
+	</>
 	);
 };
 
