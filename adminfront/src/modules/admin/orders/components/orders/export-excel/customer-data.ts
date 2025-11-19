@@ -35,7 +35,7 @@ export const parseCustomerCSV = (csvContent: string): CustomerData[] => {
  */
 export const loadCustomerData = async (): Promise<CustomerData[]> => {
 	try {
-		const response = await fetch('/data/Customer_data.csv');
+		const response = await fetch('/data/customer_data.csv');
 		const csvText = await response.text();
 		return parseCustomerCSV(csvText);
 	} catch (error) {
