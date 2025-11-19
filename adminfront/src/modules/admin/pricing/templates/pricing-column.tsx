@@ -24,6 +24,9 @@ const pricingColumns = ({
 		fixed: 'left',
 		width: 150,
 		className: 'text-xs',
+		render: (_: string, record: PriceList) => {
+			return <Text className="text-xs">{record.name}</Text>;
+		},
 	},
 	{
 		title: 'Mô tả',

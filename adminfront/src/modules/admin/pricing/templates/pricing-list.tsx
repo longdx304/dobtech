@@ -51,6 +51,7 @@ const PricingList: FC<Props> = ({}) => {
 			q: searchValue || undefined,
 			expand: 'customer_groups',
 		});
+	
 
 	const handleChangeDebounce = _.debounce(
 		(e: ChangeEvent<HTMLInputElement>) => {
