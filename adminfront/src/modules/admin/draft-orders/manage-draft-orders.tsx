@@ -8,7 +8,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import OrderList from '../orders/templates/orders';
 import DraftOrderList from './templates/draft-orders';
 
-type Props = {};
+type Props = {}; 
+
 
 const ManageDraftOrders: FC<Props> = ({}) => {
 	const router = useRouter();
@@ -35,7 +36,7 @@ const ManageDraftOrders: FC<Props> = ({}) => {
 
 	return (
 		<Card className="w-full" bordered={false}>
-			<Tabs items={itemsTab} activeKey={query} onChange={handleTabChange} />
+			<Tabs items={itemsTab} activeKey={query} onChange={handleTabChange} type="card" centered />
 		</Card>
 	);
 };

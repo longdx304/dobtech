@@ -1,4 +1,5 @@
 import { Flex } from '@/components/Flex';
+import ManageDraftOrders from '@/modules/admin/draft-orders/manage-draft-orders';
 import ManageOrders from '@/modules/admin/orders/templates/manage-orders';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
