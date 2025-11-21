@@ -1,14 +1,24 @@
 import { ActionAbles } from '@/components/Dropdown';
-import { Customer } from '@medusajs/medusa';
+import { ICustomerResponse } from '@/types/customer';
 import dayjs from 'dayjs';
 import { Boxes, Pencil } from 'lucide-react';
 
 type Props = {
-	handleViewOrder: (record: Customer) => void;
-	handleEditCustomer: (record: Customer) => void;
+handleViewOrder: (record: ICustomerResponse) => void;
+	handleEditCustomer: (record: ICustomerResponse) => void;
 };
 
 const customerColumns = ({ handleEditCustomer, handleViewOrder }: Props) => [
+	{
+		title: 'Mã khách hàng',
+		dataIndex: 'customer_code',
+		key: 'customer_code',
+		width: 80,
+		className: 'text-xs',
+		render: (_: ICustomerResponse['customer_code']) => {
+			return _ || '-';
+		},
+	},
 	{
 		title: 'Tên',
 		dataIndex: 'name',
@@ -16,7 +26,7 @@ const customerColumns = ({ handleEditCustomer, handleViewOrder }: Props) => [
 		fixed: 'left',
 		width: 150,
 		className: 'text-xs',
-		render: (_: string, record: Customer) => {
+		render: (_: string, record: ICustomerResponse) => {
 			return `${record.first_name || ''} ${record.last_name || ''}`;
 		},
 	},
@@ -24,14 +34,14 @@ const customerColumns = ({ handleEditCustomer, handleViewOrder }: Props) => [
 		title: 'Email',
 		dataIndex: 'email',
 		key: 'email',
-		width: 150,
+		width: 100,
 		className: 'text-xs',
 	},
 	{
 		title: 'Số điện thoại',
 		dataIndex: 'phone',
 		key: 'phone',
-		width: 150,
+		width: 80,
 		className: 'text-xs',
 		render: (_: string) => {
 			return `${_ || '-'} `;
@@ -41,19 +51,31 @@ const customerColumns = ({ handleEditCustomer, handleViewOrder }: Props) => [
 		title: 'Đơn hàng',
 		dataIndex: 'orders',
 		key: 'orders',
-		width: 150,
+		width: 80,
 		className: 'text-xs',
-		render: (_: Customer['orders']) => {
+		render: (_: ICustomerResponse['orders']) => {
 			return _?.length || 0;
 		},
 	},
 	{
+		title: 'Địa chỉ',
+		dataIndex: 'shipping_address',
+		key: 'shipping_address',
+		width: 150,
+		className: 'text-xs',
+		render: (_: ICustomerResponse['shipping_address'], record: ICustomerResponse) => {
+			console.log('shipping_address', record.shipping_addresses);
+			const shippingAddress = record.shipping_addresses?.[0] || null;
+			return `${shippingAddress?.address_1 || ''} ${shippingAddress?.address_2 || ''} ${shippingAddress?.city || ''} ${shippingAddress?.province || ''} ${shippingAddress?.postal_code || ''}`;
+		},
+	},
+		{
 		title: 'Ngày tạo',
 		dataIndex: 'created_at',
 		key: 'created_at',
 		width: 150,
 		className: 'text-xs',
-		render: (_: Customer['created_at']) => {
+		render: (_: ICustomerResponse['created_at']) => {
 			return dayjs(_).format('DD/MM/YYYY');
 		},
 	},
@@ -64,7 +86,7 @@ const customerColumns = ({ handleEditCustomer, handleViewOrder }: Props) => [
 		fixed: 'right',
 		className: 'text-xs',
 		align: 'center',
-		render: (_: any, record: Customer) => {
+		render: (_: any, record: ICustomerResponse) => {
 			const actions = [
 				{
 					label: 'Chỉnh sửa thông tin',

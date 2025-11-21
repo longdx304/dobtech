@@ -4,7 +4,7 @@ import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
-import { Customer } from '@medusajs/medusa';
+import { ICustomerResponse } from '@/types/customer';
 import _ from 'lodash';
 import { Search } from 'lucide-react';
 import { useAdminCustomers } from 'medusa-react';
@@ -32,14 +32,14 @@ const CustomerList: FC<Props> = ({}) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
-	const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
+	const [currentCustomer, setCurrentCustomer] = useState<ICustomerResponse | null>(null);
 
 	const { customers, isLoading, isRefetching, count } = useAdminCustomers(
 		{
 			offset,
 			limit: DEFAULT_PAGE_SIZE,
 			q: searchValue || undefined,
-			expand: 'orders',
+			expand: 'orders,shipping_addresses',
 		},
 		{ keepPreviousData: true }
 	);
@@ -57,12 +57,12 @@ const CustomerList: FC<Props> = ({}) => {
 		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
-	const handleEditCustomer = (record: Customer) => {
+	const handleEditCustomer = (record: ICustomerResponse) => {
 		setCurrentCustomer(record);
 		onOpenEditCustomer();
 	};
 
-	const handleViewOrder = (record: Customer) => {
+	const handleViewOrder = (record: ICustomerResponse) => {
 		setCurrentCustomer(record);
 		onOpenOrders();
 	};
@@ -75,6 +75,7 @@ const CustomerList: FC<Props> = ({}) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [customers]);
 
+	console.log('customers', customers);
 	return (
 		<div className="w-full">
 			<Flex align="center" justify="flex-start" className="">

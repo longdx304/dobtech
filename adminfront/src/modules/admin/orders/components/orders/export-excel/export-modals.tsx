@@ -5,7 +5,6 @@ import { Modal } from '@/components/Modal';
 import { Text } from '@/components/Typography';
 import { Order } from '@medusajs/medusa';
 import { FC } from 'react';
-import CustomerMappingModal from './customer-mapping-modal';
 
 interface ExportModalsProps {
 	// VAT Modal
@@ -24,11 +23,6 @@ interface ExportModalsProps {
 	onSoPhieuXuatChange: (orderId: string, value: string) => void;
 	onDocumentNext: () => void;
 	onDocumentCancel: () => void;
-
-	// Customer Mapping Modal
-	customerMappingModalVisible: boolean;
-	onCustomerMappingConfirm: (mappings: Record<string, string>) => void;
-	onCustomerMappingCancel: () => void;
 }
 
 const ExportModals: FC<ExportModalsProps> = ({
@@ -45,9 +39,6 @@ const ExportModals: FC<ExportModalsProps> = ({
 	onSoPhieuXuatChange,
 	onDocumentNext,
 	onDocumentCancel,
-	customerMappingModalVisible,
-	onCustomerMappingConfirm,
-	onCustomerMappingCancel,
 }) => {
 	return (
 		<>
@@ -82,7 +73,7 @@ const ExportModals: FC<ExportModalsProps> = ({
 			{/* Step 2: Document Modal */}
 			<Modal
 				open={exportModalVisible}
-				title="Xuất đơn hàng (Bước 2/3)"
+				title="Xuất đơn hàng (Bước 2/2)"
 				handleOk={onDocumentNext}
 				handleCancel={onDocumentCancel}
 				width={600}
@@ -91,7 +82,7 @@ const ExportModals: FC<ExportModalsProps> = ({
 						Hủy
 					</Button>,
 					<Button key="next" type="primary" onClick={onDocumentNext}>
-						Tiếp theo
+						Xuất Excel
 					</Button>,
 				]}
 			>
@@ -113,14 +104,6 @@ const ExportModals: FC<ExportModalsProps> = ({
 					))}
 				</div>
 			</Modal>
-
-			{/* Step 3: Customer Mapping Modal */}
-			<CustomerMappingModal
-				visible={customerMappingModalVisible}
-				orders={selectedOrders}
-				onConfirm={onCustomerMappingConfirm}
-				onCancel={onCustomerMappingCancel}
-			/>
 		</>
 	);
 };

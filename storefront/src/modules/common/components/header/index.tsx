@@ -28,27 +28,29 @@ const Header: FC<Props> = ({ categories }) => {
 	return (
 		<Card
 			className={cn(
-				'fixed top-0 w-full shadow-none px-0 pt-0 pb-0 rounded-none transition-all ease-in-out duration-300 z-10'
+				'fixed top-0 w-full shadow-none !p-0 rounded-none transition-all ease-in-out duration-300 z-10 bg-white'
 			)}
 			bordered={false}
 		>
-			<Flex vertical className="box-border container">
-				{/* For Desktop */}
-				<div className="hidden lg:block">
-					<HeaderWrap />
-					{showCategory.includes(pathname) && (
-						<Category categories={categories} />
-					)}
-				</div>
+			<div className="w-full container box-border">
+				<Flex vertical>
+					{/* For Desktop */}
+					<div className="hidden lg:block">
+						<HeaderWrap />
+						{showCategory.includes(pathname) && (
+							<Category categories={categories} />
+						)}
+					</div>
 
-				{/* For Mobile */}
-				<div className={cn('lg:hidden', { hidden: isHeaderHidden })}>
-					<HeaderWrapMobile categories={categories} />
-					{showCategory.includes(pathname) && (
-						<Category categories={categories} />
-					)}
-				</div>
-			</Flex>
+					{/* For Mobile */}
+					<div className={cn('lg:hidden', { hidden: isHeaderHidden })}>
+						<HeaderWrapMobile categories={categories} />
+						{showCategory.includes(pathname) && (
+							<Category categories={categories} />
+						)}
+					</div>
+				</Flex>
+			</div>
 		</Card>
 	);
 };

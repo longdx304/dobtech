@@ -122,7 +122,7 @@ const SupplierOrdersList: FC<Props> = () => {
 	};
 
 	return (
-		<Card className="w-full" bordered={false}>
+		<>
 			<Flex align="center" justify="flex-start" className="">
 				<Title level={3}>Đơn đặt hàng</Title>
 			</Flex>
@@ -191,7 +191,7 @@ const SupplierOrdersList: FC<Props> = () => {
 					suppliers={suppliers || []}
 				/>
 			)}
-		</Card>
+		</>
 	);
 };
 
