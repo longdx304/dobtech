@@ -12,17 +12,17 @@ interface Props {}
 const HeaderWrap: FC<Props> = ({}) => {
 	return (
 		<Flex
-			className="w-full hidden lg:flex"
+			className="w-full hidden lg:flex py-4"
 			justify="space-between"
 			align="center"
 		>
-			<div className="items-center w-[125px] h-[48px] overflow-hidden">
+			<div className="items-center w-[180px] h-[54px] overflow-hidden flex-shrink-0">
 				<LocalizedClientLink href="/">
 					<Image
-						src="/images/dob-icon.webp"
-						width={125}
-						height={48}
-						alt="Dob Icon"
+						src="/syna-logo/LOGO/logo.svg"
+						width={180}
+						height={54}
+						alt="Syna Logo"
 						className="w-full h-full object-contain"
 						priority
 					/>

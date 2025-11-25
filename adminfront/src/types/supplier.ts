@@ -20,6 +20,7 @@ export interface Supplier {
 	warehouse_entry_date: number;
 	shipping_started_date: number;
 	metadata: Record<string, any>;
+	supplier_code?: string;
 	created_at: string;
 	updated_at: string;
 }
