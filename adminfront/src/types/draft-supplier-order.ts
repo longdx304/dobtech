@@ -1,5 +1,5 @@
 import { Cart, Payment, Refund, Region, User } from '@medusajs/medusa';
-import { Supplier, SupplierOrderDocument } from './supplier';
+import { Supplier, SupplierOrder, SupplierOrderDocument } from './supplier';
 import { LineItem } from './lineItem';
 
 export interface DraftSupplierOrder {
@@ -10,6 +10,7 @@ export interface DraftSupplierOrder {
 	display_name?: string;
 	supplier_id: string;
 	supplier: Supplier;
+	supplier_order: SupplierOrder;
 	documents: SupplierOrderDocument[];
 	user_id: string;
 	currency_code: string;

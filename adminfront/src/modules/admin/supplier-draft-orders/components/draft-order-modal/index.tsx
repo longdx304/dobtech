@@ -58,11 +58,11 @@ const DraftOrderModal: FC<Props> = ({
 					unit_price: i.unit_price,
 					metadata: i.metadata,
 				})),
-				estimated_production_time: values.estimated_production_time,
-				settlement_time: values.settlement_time,
-				shipping_started_date: values.shipping_started_date,
-				warehouse_entry_date: values.warehouse_entry_date,
-				completed_payment_date: values.completed_payment_date,
+				estimated_production_time: values.estimated_production_time?.toISOString(),
+				settlement_time: values.settlement_time?.toISOString(),
+				shipping_started_date: values.shipping_started_date?.toISOString(),
+				warehouse_entry_date: values.warehouse_entry_date?.toISOString(),
+				completed_payment_date: values.completed_payment_date?.toISOString(),
 				metadata: values.metadata,
 			};
 

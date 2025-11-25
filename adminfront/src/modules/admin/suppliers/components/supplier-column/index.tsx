@@ -28,6 +28,16 @@ const supplierColumn = ({
 		className: 'text-xs',
 	},
 	{
+		title: 'Mã nhà cung cấp',
+		dataIndex: 'supplier_code',
+		key: 'supplier_code',
+		width: 150,
+		className: 'text-xs',
+		render: (_: Supplier['supplier_code']) => {
+			return _ ?? '-';
+		},
+	},
+	{
 		title: 'Thời gian sản xuất',
 		dataIndex: 'estimated_production_time',
 		key: 'estimated_production_time',

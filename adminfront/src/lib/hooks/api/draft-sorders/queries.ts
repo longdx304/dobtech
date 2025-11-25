@@ -57,8 +57,14 @@ export const useAdminDraftSupplierOrder = (
 	const { client } = useMedusa();
 	const { data, ...rest } = useQuery(
 		draftSupplierOrderKeys.detail(id),
-		() => client.admin.custom.get(`/admin/draft-supplier-orders/${id}`),
-		options
+		() => {
+			const params = query && generateParams(query);
+			return client.admin.custom.get(`/admin/draft-supplier-orders/${id}${params || ''}`);
+		},
+		{
+			...options,
+			enabled: !!id && (options?.enabled !== undefined ? options.enabled : true),
+		}
 	);
 	return { ...data, ...rest } as const;
 };

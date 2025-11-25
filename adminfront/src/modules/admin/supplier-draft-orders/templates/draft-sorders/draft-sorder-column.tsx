@@ -4,6 +4,7 @@ import { DraftOrder } from '@medusajs/medusa';
 import { MenuProps } from 'antd';
 import dayjs from 'dayjs';
 import { FolderSync, Trash2 } from 'lucide-react';
+import { DraftSupplierOrder } from '@/types/draft-supplier-order';
 
 type Props = {
 	handleTransferToOrder: (id: string) => void;
@@ -38,25 +39,22 @@ const draftOrderColumns = ({
 	},
 	{
 		title: 'Đơn hàng',
-		dataIndex: 'order',
-		key: 'order',
+		dataIndex: 'supplier_order',
+		key: 'supplier_order',
 		// width: 150,
 		className: 'text-xs',
-		render: (_: any, record: DraftOrder) => {
-			const orderId = record.order?.display_id;
-			return orderId ? `#${orderId}` : '-';
+		render: (_: DraftSupplierOrder['supplier_order']) => {
+			return `#${_?.display_id ?? '-'}`;
 		},
 	},
 	{
-		title: 'Khách ',
-		dataIndex: 'customer',
-		key: 'customer',
+		title: 'Nhà cung cấp',
+		dataIndex: 'supplier',
+		key: 'supplier',
 		// width: 150,
 		className: 'text-xs',
-		render: (_: any, record: any) => {
-			console.log(record);
-			const customerEmail = record.cart?.email;
-			return customerEmail || '-';
+		render: (_: DraftSupplierOrder['supplier']) => {
+			return _.supplier_name ?? '-';
 		},
 	},
 	{

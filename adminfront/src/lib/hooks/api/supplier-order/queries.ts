@@ -21,6 +21,7 @@ export type SupplierOrderQueryKeyParams = {
 	limit?: number;
 	status?: any;
 	fulfillment_status?: any;
+	expand?: string;
 };
 export const useAdminSupplierOrders = (
 	/**

@@ -23,6 +23,7 @@ type SupplierFormProps = {
 	address: string;
 	estimated_production_time: number;
 	settlement_time: number;
+	supplier_code?: string;
 };
 
 const SupplierModal: FC<Props> = ({
@@ -46,7 +47,10 @@ const SupplierModal: FC<Props> = ({
 				address: supplier.address,
 				estimated_production_time: supplier.estimated_production_time,
 				settlement_time: supplier.settlement_time,
-			});
+				supplier_code: supplier.supplier_code,
+				completed_payment_date: supplier.completed_payment_date,
+				warehouse_entry_date: supplier.warehouse_entry_date,
+				});
 		} else {
 			form.resetFields();
 		}
@@ -123,6 +127,11 @@ const SupplierModal: FC<Props> = ({
 							rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
 						>
 							<Input placeholder="Địa chỉ nhà cung cấp" />
+						</Form.Item>
+					</Col>
+					<Col xs={24}>
+						<Form.Item name="supplier_code" label="Mã nhà cung cấp">
+							<Input placeholder="Mã nhà cung cấp" />
 						</Form.Item>
 					</Col>
 					<Col xs={24} sm={12}>
