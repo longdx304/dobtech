@@ -12,7 +12,7 @@ type Props = {
 };
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Chi tiết đơn hàng của bạn',
+	title: 'SYNA | Chi tiết đơn hàng của bạn',
 	description: 'Xem chi tiết đơn hàng của bạn',
 };
 

@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 			`${title} category.`;
 
 		return {
-			title: `CHAMDEP VN | ${title}`,
+			title: `SYNA | ${title}`,
 			description,
 			alternates: {
 				canonical: `${params.category.join('/')}`,

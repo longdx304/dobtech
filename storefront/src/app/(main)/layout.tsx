@@ -18,7 +18,7 @@ import Header from '@/modules/common/components/header';
 import Menu from '@/modules/common/components/menu';
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Giày dép nam nữ trẻ em',
+	title: 'SYNA | Giày dép nam nữ trẻ em',
 	description: 'Giày dép nam nữ trẻ em',
 	manifest: '/manifest.json',
 };

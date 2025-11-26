@@ -8,8 +8,8 @@ const CartTemplate = dynamic(() => import('@/modules/cart/templates'), {
 });
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Giỏ hàng',
-	description: 'Giỏ hàng của bạn trên CHAMDEP VN',
+	title: 'SYNA | Giỏ hàng',
+	description: 'Giỏ hàng của bạn trên SYNA',
 };
 
 export default async function Cart() {

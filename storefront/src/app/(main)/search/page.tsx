@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import SearchModal from '@/modules/search/templates/SearchModal';
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Tìm kiếm',
+	title: 'SYNA | Tìm kiếm',
 	description: 'Tìm kiếm sản phẩm',
 };
 
