@@ -8,7 +8,7 @@ const CheckoutTemplate = dynamic(() => import('@/modules/checkout/templates'), {
 });
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Thanh toán',
+	title: 'SYNA | Thanh toán',
 	description: 'Thanh toán mua hàng',
 };
 

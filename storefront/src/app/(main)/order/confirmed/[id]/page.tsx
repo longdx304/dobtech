@@ -38,7 +38,7 @@ async function getOrder(id: string) {
 }
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Đơn hàng thanh toán',
+	title: 'SYNA | Đơn hàng thanh toán',
 	description: 'Đơn hàng của bạn thanh toán thành công',
 };
 
