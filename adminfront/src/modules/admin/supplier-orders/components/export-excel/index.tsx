@@ -145,7 +145,7 @@ export const generateSupplierOrderExcelData = (
 				'Số lượng': item.quantity,
 				'Đơn giá': donGia,
 				'Thành tiền': thanhTien,
-				'Thành tiền quy đổi': thanhTien,
+				'Thành tiền quy đổi': thanhTienQuyDoi,
 
 				// Discount fields
 				'Tỷ lệ CK': '',
