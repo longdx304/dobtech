@@ -1,12 +1,12 @@
 import { Order } from '@medusajs/medusa';
 import dayjs from 'dayjs';
+import { ICustomerResponse } from '@/types/customer';
 
 interface ExportOrderData {
 	order: Order;
 	soChungTu: string;
 	soPhieuXuat: string;
 	vatRate: number;
-	customerCode: string;
 }
 
 export interface ExcelRow {
@@ -43,7 +43,7 @@ export interface ExcelRow {
 	'ĐVT': string;
 	'Số lượng': number;
 	'Đơn giá sau thuế': string | number;
-	'Đơn giá': number;
+	'Đơn giá': string | number;
 	'Thành tiền': number;
 	'Thành tiền quy đổi': string | number;
 	'Tỷ lệ CK (%)': string | number;
@@ -80,16 +80,16 @@ export interface ExcelFile {
 export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] => {
 	const files: ExcelFile[] = [];
 
-	ordersData.forEach(({ order, soChungTu, soPhieuXuat, vatRate, customerCode }) => {
+	ordersData.forEach(({ order, soChungTu, soPhieuXuat, vatRate }) => {
 		const rows: ExcelRow[] = [];
 		// Get customer name
 		const customerName = order.customer
 			? `${order.customer.last_name || ''} ${order.customer.first_name || ''}`.trim()
 			: order.email;
 		
-		// Use provided customer code (from manual selection)
-		// If not provided, fall back to automatic mapping
-		const finalCustomerCode = customerCode || '';
+		// Get customer code from order
+		const customer = order.customer as ICustomerResponse | undefined;
+		const finalCustomerCode = customer?.customer_code || '';
 
 		// Format dates
 		const ngayHachToan = dayjs(order.created_at).format('DD/MM/YYYY');
@@ -122,8 +122,8 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 				'Số chứng từ (*)': soChungTu,
 				'Số phiếu xuất': soPhieuXuat,
 
-				// Empty fields
-				'Lý do xuất': '',
+				// Export reason and description
+				'Lý do xuất': `Xuất kho bán hàng ${customerName}`,
 				'Mẫu số HĐ': '',
 				'Ký hiệu HĐ': '',
 				'Số hóa đơn': '',
@@ -132,7 +132,7 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 				'Tên khách hàng': customerName,
 				'Địa chỉ': '',
 				'Mã số thuế': '',
-				'Diễn giải': '',
+				'Diễn giải': `Bán hàng ${customerName}`,
 				'Nộp vào TK': '',
 				'NV bán hàng': '',
 				'Loại tiền': '',
@@ -150,8 +150,8 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 
 				// Item quantities and prices
 				'Số lượng': item.quantity,
-				'Đơn giá sau thuế': '',
-				'Đơn giá': item.unit_price,
+				'Đơn giá sau thuế': item.unit_price,
+				'Đơn giá': '',
 				'Thành tiền': item.subtotal,
 				'Thành tiền quy đổi': '',
 

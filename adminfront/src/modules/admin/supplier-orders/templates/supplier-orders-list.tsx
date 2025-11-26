@@ -1,24 +1,26 @@
 'use client';
 
-import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
+import { Tooltip } from '@/components/Tooltip';
 import { Title } from '@/components/Typography';
 import { useAdminSuppliers } from '@/lib/hooks/api/supplier';
 import { useAdminSupplierOrders } from '@/lib/hooks/api/supplier-order';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { ERoutes } from '@/types/routes';
-import { SupplierOrders } from '@/types/supplier';
+import { FulfillSupplierOrderStt, SupplierOrders } from '@/types/supplier';
+import { SupplierOrder } from '@/types/supplier-order';
 import { FloatButton, TableProps } from 'antd';
 import _ from 'lodash';
-import { NotepadTextDashed, Plus, Search } from 'lucide-react';
+import { FileSpreadsheet, NotepadTextDashed, Plus, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
+import ExportModals from '../components/export-excel/export-modals';
 import SupplierOrdersModal from '../components/supplier-orders-modal';
-import supplierOrdersColumn from './supplier-order-column';
-import { Tooltip } from '@/components/Tooltip';
 import SupplierOrdersSample from '../components/supplier-orders-sample';
+import { useSupplierOrderExport } from '../hooks/use-supplier-order-export';
+import supplierOrdersColumn from './supplier-order-column';
 
 type Props = {};
 
@@ -44,6 +46,10 @@ const SupplierOrdersList: FC<Props> = () => {
 	const [currentSupplierOrders, setCurrentSupplierOrders] =
 		useState<SupplierOrders | null>(null);
 	const [filters, setFilters] = useState<any>({});
+	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+	// Export hook
+	const exportHook = useSupplierOrderExport();
 
 	const { supplierOrders, isLoading, isRefetching, count } =
 		useAdminSupplierOrders({
@@ -52,6 +58,7 @@ const SupplierOrdersList: FC<Props> = () => {
 			fulfillment_status: filters.fulfillment_status || undefined,
 			offset,
 			limit: DEFAULT_PAGE_SIZE,
+			expand: 'supplier',
 		});
 
 	// fetch suppliers for choosing supplier in order
@@ -121,8 +128,11 @@ const SupplierOrdersList: FC<Props> = () => {
 		setFilters(formattedFilters);
 	};
 
+	const selectedSupplierOrders =
+		supplierOrders?.filter((order) => selectedRowKeys.includes(order.id)) || [];
+
 	return (
-		<Card className="w-full" bordered={false}>
+		<>
 			<Flex align="center" justify="flex-start" className="">
 				<Title level={3}>Đơn đặt hàng</Title>
 			</Flex>
@@ -140,8 +150,21 @@ const SupplierOrdersList: FC<Props> = () => {
 				columns={(columns as any) ?? []}
 				dataSource={supplierOrders ?? []}
 				rowKey="id"
+				rowSelection={{
+					selectedRowKeys,
+					onChange: (selectedKeys) => setSelectedRowKeys(selectedKeys),
+					getCheckboxProps: (record: any) => ({
+						disabled: record.fulfillment_status !== FulfillSupplierOrderStt.INVENTORIED,
+					}),
+				}}
 				onRow={(record) => ({
-					onClick: () => handleRowClick(record),
+					onClick: (e) => {
+						// Prevent row click when clicking on checkbox
+						const target = e.target as HTMLElement;
+						if (!target.closest('.ant-checkbox-wrapper')) {
+							handleRowClick(record);
+						}
+					},
 					className: 'cursor-pointer',
 				})}
 				scroll={{ x: 700 }}
@@ -157,6 +180,16 @@ const SupplierOrdersList: FC<Props> = () => {
 			/>
 
 			<FloatButton.Group shape="circle" style={{ insetInlineEnd: 24 }}>
+				{selectedRowKeys.length > 0 && (
+					<Tooltip title="Xuất Excel" placement="left">
+						<FloatButton
+							icon={<FileSpreadsheet color="white" size={20} strokeWidth={2} />}
+							type="primary"
+							onClick={() => exportHook.handleOpenExportModal(selectedRowKeys)}
+							data-testid="btnExportSupplierOrders"
+						/>
+					</Tooltip>
+				)}
 				<Tooltip title="Tạo đơn đặt hàng" placement="left">
 					<FloatButton
 						icon={<Plus color="white" size={20} strokeWidth={2} />}
@@ -191,7 +224,31 @@ const SupplierOrdersList: FC<Props> = () => {
 					suppliers={suppliers || []}
 				/>
 			)}
-		</Card>
+
+			<ExportModals
+				vatModalVisible={exportHook.vatModalVisible}
+				vatRate={exportHook.vatRate}
+				tiGia={exportHook.tiGia}
+				onVatRateChange={exportHook.setVatRate}
+				onTiGiaChange={exportHook.setTiGia}
+				onVatNext={() =>
+					exportHook.handleVatNext(selectedRowKeys, selectedSupplierOrders as SupplierOrder[])
+				}
+				onVatCancel={exportHook.handleVatCancel}
+				exportModalVisible={exportHook.exportModalVisible}
+				selectedSupplierOrders={selectedSupplierOrders as SupplierOrder[]}
+				soChungTuValues={exportHook.soChungTuValues}
+				soPhieuNhapValues={exportHook.soPhieuNhapValues}
+				onSoChungTuChange={exportHook.handleSoChungTuChange}
+				onSoPhieuNhapChange={exportHook.handleSoPhieuNhapChange}
+				onDocumentNext={() =>
+					exportHook.handleDocumentModalNext(selectedSupplierOrders as SupplierOrder[], () =>
+						setSelectedRowKeys([])
+					)
+				}
+				onDocumentCancel={exportHook.handleCloseExportModal}
+			/>
+		</>
 	);
 };
 

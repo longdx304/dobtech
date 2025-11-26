@@ -1,7 +1,7 @@
 import { Input } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
 import { getErrorMessage } from '@/lib/utils';
-import { Customer } from '@medusajs/medusa';
+import { ICustomerResponse } from '@/types/customer';
 import { Col, Form, Row, message } from 'antd';
 import { useAdminUpdateCustomer } from 'medusa-react';
 import { FC, useEffect } from 'react';
@@ -10,7 +10,7 @@ type Props = {
 	state: boolean;
 	handleOk: () => void;
 	handleCancel: () => void;
-	customer: Customer;
+	customer: ICustomerResponse;
 };
 
 type CustomerFormProps = {
@@ -18,6 +18,7 @@ type CustomerFormProps = {
 	first_name: string;
 	last_name: string;
 	phone: string;
+	customer_code: string;
 };
 
 const EditCustomerModal: FC<Props> = ({
@@ -35,6 +36,7 @@ const EditCustomerModal: FC<Props> = ({
 			first_name: customer?.first_name,
 			last_name: customer?.last_name,
 			phone: customer?.phone,
+			customer_code: customer?.customer_code,
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [customer]);
@@ -45,7 +47,8 @@ const EditCustomerModal: FC<Props> = ({
 				first_name: values.first_name,
 				last_name: values.last_name,
 				phone: values?.phone || undefined,
-			},
+				customer_code: values?.customer_code || undefined,
+			} as any,
 			{
 				onSuccess: () => {
 					message.success('Cập nhật thông tin khách hàng thành công');
@@ -84,7 +87,7 @@ const EditCustomerModal: FC<Props> = ({
 							labelCol={{ span: 24 }}
 							name="last_name"
 							label="Họ"
-							rules={[{ required: true, message: 'Vui lòng nhập họ' }]}
+							rules={[{  message: 'Vui lòng nhập họ' }]}
 						>
 							<Input placeholder="Họ" />
 						</Form.Item>
@@ -100,14 +103,19 @@ const EditCustomerModal: FC<Props> = ({
 							name="phone"
 							label="Số điện thoại"
 							rules={[
-								{ min: 10, message: 'Số điện thoại ít nhất phải 10 chữ số' },
+								{ min: 9, message: 'Số điện thoại ít nhất phải 10 chữ số' },
 								{
-									type: 'number',
+									type: 'string',
 									message: 'Số điện thoại không hợp lệ',
 								},
 							]}
 						>
 							<Input placeholder="0987654321" />
+						</Form.Item>
+					</Col>
+					<Col xs={24} sm={12}>
+						<Form.Item labelCol={{ span: 24 }} name="customer_code" label="Mã khách hàng">
+							<Input placeholder="Mã khách hàng" />
 						</Form.Item>
 					</Col>
 				</Row>

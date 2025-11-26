@@ -17,6 +17,7 @@ import ExportModals from '../../components/orders/export-excel/export-modals';
 import NewOrderModal from '../../components/orders/new-order';
 import { useOrderExport } from '../../hooks/use-order-export';
 import orderColumns from './order-column';
+import { FulfillmentStatus } from '@/types/fulfillments';
 
 type Props = {};
 
@@ -137,7 +138,7 @@ const OrderList: FC<Props> = () => {
 				selectedRowKeys,
 				onChange: (selectedKeys) => setSelectedRowKeys(selectedKeys),
 				getCheckboxProps: (record: any) => ({
-					disabled: record.fulfillment_status !== 'fulfilled',
+					disabled: record.fulfillment_status !== FulfillmentStatus.FULFILLED,
 				}),
 			}}
 			onRow={(record) => ({
@@ -191,7 +192,7 @@ const OrderList: FC<Props> = () => {
 			vatModalVisible={exportHook.vatModalVisible}
 			vatRate={exportHook.vatRate}
 			onVatRateChange={exportHook.setVatRate}
-			onVatNext={() => exportHook.handleVatNext(selectedRowKeys)}
+			onVatNext={() => exportHook.handleVatNext(selectedRowKeys, selectedOrders)}
 			onVatCancel={exportHook.handleVatCancel}
 			exportModalVisible={exportHook.exportModalVisible}
 			selectedOrders={selectedOrders}
@@ -199,13 +200,8 @@ const OrderList: FC<Props> = () => {
 			soPhieuXuatValues={exportHook.soPhieuXuatValues}
 			onSoChungTuChange={exportHook.handleSoChungTuChange}
 			onSoPhieuXuatChange={exportHook.handleSoPhieuXuatChange}
-			onDocumentNext={exportHook.handleDocumentModalNext}
+			onDocumentNext={() => exportHook.handleDocumentModalNext(selectedOrders, () => setSelectedRowKeys([]))}
 			onDocumentCancel={exportHook.handleCloseExportModal}
-			customerMappingModalVisible={exportHook.customerMappingModalVisible}
-			onCustomerMappingConfirm={(mappings) => 
-				exportHook.handleCustomerMappingConfirm(mappings, selectedOrders, () => setSelectedRowKeys([]))
-			}
-			onCustomerMappingCancel={exportHook.handleCustomerMappingCancel}
 		/>
 	</>
 	);

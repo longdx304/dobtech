@@ -1,17 +1,21 @@
-import { Metadata } from 'next';
-
 import { Flex } from '@/components/Flex';
-import SupplierOrdersList from '@/modules/admin/supplier-orders/templates/supplier-orders-list';
+import ManageSupplierOrders from '@/modules/admin/supplier-orders/templates/manage-sorder';
+import { Metadata } from 'next';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-	title: 'Quản lý nhà cung cấp',
-	description: 'Trang nhập hàng',
+	title: 'Quản lý đơn đặt hàng',
+	description: 'Trang quản lý đơn đặt hàng',
 };
 
-export default function SupplierOrders() {
+interface Props {}
+
+export default async function SupplierOrders({}: Props) {
 	return (
-		<Flex vertical gap="middle" className="h-full w-full">
-			<SupplierOrdersList />
-		</Flex>
+		<Suspense>
+			<Flex vertical gap="middle" className="h-full w-full">
+				<ManageSupplierOrders />
+			</Flex>
+		</Suspense>
 	);
 }

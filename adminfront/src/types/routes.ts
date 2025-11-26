@@ -15,6 +15,7 @@ export enum ERoutes {
 	DISCOUNTS = '/admin/discounts',
 	SUPPLIERS = '/admin/suppliers',
 	SUPPLIER_ORDERS = '/admin/supplier-orders',
+	SUPPLIER_DRAFT_ORDERS = '/admin/supplier-draft-orders',
 	GIFT_CARDS = '/admin/gift-cards',
 	CURRENCIES = '/admin/currencies',
 	WAREHOUSE_INBOUND = '/admin/warehouse/inbound',
