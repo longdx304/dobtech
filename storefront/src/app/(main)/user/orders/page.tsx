@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Đơn đặt mua',
+	title: 'SYNA | Đơn đặt mua',
 	description: 'Đơn đặt mua của bạn',
 };
 

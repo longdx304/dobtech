@@ -32,10 +32,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	}
 
 	return {
-		title: `${product.title} | CHAMDEP VN`,
+		title: `${product.title} | SYNA`,
 		description: `${product.title}`,
 		openGraph: {
-			title: `${product.title} | CHAMDEP VN`,
+			title: `${product.title} | SYNA`,
 			description: `${product.title}`,
 			images: product.thumbnail ? [product.thumbnail] : [],
 		},

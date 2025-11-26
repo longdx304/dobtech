@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import { LOGIN_VIEW } from '@/types/auth';
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Trang cá nhân',
+	title: 'SYNA | Trang cá nhân',
 	description: 'Trang cá nhân của bạn',
 };
 

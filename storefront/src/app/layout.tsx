@@ -10,7 +10,7 @@ const BASE_URL =
 const font = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Giày dép nam nữ trẻ em',
+	title: 'SYNA | Giày dép nam nữ trẻ em',
 	description: 'Giày dép nam nữ trẻ em',
 	metadataBase: new URL(BASE_URL),
 	icons: [{ rel: 'icon', url: Favicon.src }],

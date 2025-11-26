@@ -9,7 +9,7 @@ import { Metadata } from 'next';
 import { cache, Suspense } from 'react';
 
 export const metadata: Metadata = {
-	title: 'CHAMDEP VN | Tìm kiếm',
+	title: 'SYNA | Tìm kiếm',
 	description: 'Tìm kiếm sản phẩm',
 };
 
