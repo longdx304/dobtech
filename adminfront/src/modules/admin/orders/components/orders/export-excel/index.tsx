@@ -44,7 +44,7 @@ export interface ExcelRow {
 	'Số lượng': number;
 	'Đơn giá sau thuế': string | number;
 	'Đơn giá': string | number;
-	'Thành tiền': number;
+	'Thành tiền': string | number;
 	'Thành tiền quy đổi': string | number;
 	'Tỷ lệ CK (%)': string | number;
 	'Tiền chiết khấu': string | number;
@@ -63,8 +63,8 @@ export interface ExcelRow {
 	'Kho': string;
 	'TK giá vốn': string | number;
 	'TK Kho': string | number;
-	'Đơn giá vốn': number;
-	'Tiền vốn': number;
+	'Đơn giá vốn': string | number;
+	'Tiền vốn': string | number;
 	'Hàng hóa giữ hộ/bán hộ': string;
 }
 
@@ -106,7 +106,7 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 
 			const row: ExcelRow = {
 				// Default values
-				'Hiển thị trên sổ': 2,
+				'Hiển thị trên sổ': 1,
 				'Hình thức bán hàng': '',
 				'Phương thức thanh toán': 0,
 				'Kiêm phiếu xuất kho': 1,
@@ -151,8 +151,8 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 				// Item quantities and prices
 				'Số lượng': item.quantity,
 				'Đơn giá sau thuế': item.unit_price,
-				'Đơn giá': '',
-				'Thành tiền': item.subtotal,
+				'Đơn giá': Math.round(item.unit_price / (1 + vatRate / 100)),
+				'Thành tiền': '',
 				'Thành tiền quy đổi': '',
 
 				// Discount fields
@@ -168,7 +168,7 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 				'TK thuế XK': '',
 				'% thuế GTGT': `${vatRate}`,
 				'Tỷ lệ tính thuế (Thuế suất KHAC)': '',
-				'Tiền thuế GTGT': item.subtotal * vatRate / 100,
+				'Tiền thuế GTGT': '',
 				'Tiền thuế GTGT quy đổi': '',
 				'TK thuế GTGT': 33311,
 				'HH không TH trên tờ khai thuế GTGT': '',
@@ -177,8 +177,8 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 				'Kho': 'KHH',
 				'TK giá vốn': 632,
 				'TK Kho': 156,
-				'Đơn giá vốn': cogsPrice,
-				'Tiền vốn': tienVon,
+				'Đơn giá vốn': '',
+				'Tiền vốn': '',
 				'Hàng hóa giữ hộ/bán hộ': '',
 			};
 
