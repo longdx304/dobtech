@@ -44,3 +44,15 @@ export const useCheckInventoryKiot = (
 		buildOptions(queryClient, [adminInventoryKeys.lists()], options)
 	);
 };
+
+export const useSyncInventory = (
+	options?: UseMutationOptions<Response<any>, Error, void>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		() => client.admin.custom.post(`/admin/product/sync-inventory`, {}),
+		buildOptions(queryClient, [adminInventoryKeys.lists()], options)
+	);
+};

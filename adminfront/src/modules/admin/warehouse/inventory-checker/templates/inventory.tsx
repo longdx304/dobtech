@@ -1,12 +1,16 @@
 'use client';
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { Text, Title } from '@/components/Typography';
+import { useSyncInventory } from '@/lib/hooks/api/product/mutations';
 import { useAdminWarehousesInventoryVariant } from '@/lib/hooks/api/warehouse';
+import { useUser } from '@/lib/providers/user-provider';
+import { message } from 'antd';
 import debounce from 'lodash/debounce';
-import { Search } from 'lucide-react';
+import { RefreshCw, Search } from 'lucide-react';
 import { ChangeEvent, FC, useState } from 'react';
 import { inventoryColumns } from './columns';
 
@@ -19,11 +23,28 @@ const InventoryChecker: FC<Props> = ({}) => {
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
 
+	const { user } = useUser();
+	const isAdmin = (user as any)?.role === 'admin';
+
 	const { data, isLoading, refetch } = useAdminWarehousesInventoryVariant({
 		q: searchValue || undefined,
 		limit: DEFAULT_PAGE_SIZE,
 		offset,
 	});
+
+	const { mutate: syncInventory, isLoading: isSyncing } = useSyncInventory({
+		onSuccess: () => {
+			message.success('Đồng bộ kho thành công!');
+			refetch();
+		},
+		onError: (error: any) => {
+			message.error(error?.message || 'Đồng bộ kho thất bại!');
+		},
+	});
+
+	const handleSyncInventory = () => {
+		syncInventory();
+	};
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
@@ -50,18 +71,30 @@ const InventoryChecker: FC<Props> = ({}) => {
 				<Text className="text-gray-600">
 					Trang danh sách các sản phẩm ở từng vị trí kho.
 				</Text>
-			</Flex>
-			<Card loading={false} className="w-full" bordered={false}>
+		</Flex>
+		<Card loading={false} className="w-full" bordered={false}>
+			<Flex align="center" justify="space-between" className="mb-4">
 				<Title level={4}>Vị trí kho</Title>
-				<Flex align="center" justify="flex-end" className="py-4">
-					<Input
-						placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
-						name="search"
-						prefix={<Search size={16} />}
-						onChange={handleChangeDebounce}
-						className="w-[300px]"
-					/>
-				</Flex>
+				{isAdmin && (
+					<Button
+						type="primary"
+						icon={<RefreshCw size={16} />}
+						onClick={handleSyncInventory}
+						loading={isSyncing}
+					>
+						Đồng bộ kho
+					</Button>
+				)}
+			</Flex>
+			<Flex align="center" justify="flex-end" className="py-4">
+				<Input
+					placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
+					name="search"
+					prefix={<Search size={16} />}
+					onChange={handleChangeDebounce}
+					className="w-[300px]"
+				/>
+			</Flex>
 				<Table
 					dataSource={data}
 					loading={isLoading}
