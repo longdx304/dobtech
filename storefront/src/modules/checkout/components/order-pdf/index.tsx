@@ -126,49 +126,49 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 			<Page size="A4" style={styles.page}>
 				<View style={styles.header}>
 					<View>
-						<Text style={styles.title}>Purchase Order</Text>
+						<Text style={styles.title}>Đơn Hàng Mua</Text>
 					</View>
 					<View>
 						<Text style={styles.text}>
-							Date: {dayjs(new Date()).format('DD/MM/YYYY')}
+							Ngày: {dayjs(new Date()).format('DD/MM/YYYY')}
 						</Text>
 					</View>
 				</View>
 
 				<View style={styles.section}>
-					<Text style={styles.title}>Customer Details</Text>
+					<Text style={styles.title}>Thông Tin Khách Hàng</Text>
 					<View style={styles.row}>
 						<View style={styles.column}>
-							<Text style={styles.label}>Customer Name</Text>
+							<Text style={styles.label}>Tên Khách Hàng</Text>
 							<Text
 								style={styles.text}
 							>{`${order.customer?.last_name} ${order.customer?.first_name}`}</Text>
 						</View>
 						<View style={styles.column}>
-							<Text style={styles.label}>Address</Text>
+							<Text style={styles.label}>Địa Chỉ</Text>
 							<Text style={styles.text}>{order.address}</Text>
 						</View>
 					</View>
 					<View style={styles.row}>
 						<View style={styles.column}>
-							<Text style={styles.label}>Customer Email</Text>
+							<Text style={styles.label}>Email Khách Hàng</Text>
 							<Text style={styles.text}>{order.customer?.email}</Text>
 						</View>
 						<View style={styles.column}>
-							<Text style={styles.label}>Phone Number</Text>
+							<Text style={styles.label}>Số Điện Thoại</Text>
 							<Text style={styles.text}>{order.customer?.phone}</Text>
 						</View>
 					</View>
 				</View>
 
 				<View style={styles.section}>
-					<Text style={styles.title}>Order Items</Text>
+					<Text style={styles.title}>Sản Phẩm Đặt Hàng</Text>
 					<View style={styles.tableHeader}>
 						<Text style={styles.tableCell}>#</Text>
-						<Text style={[styles.tableCell, { flex: 2 }]}>Product</Text>
-						<Text style={styles.tableCell}>Unit Price</Text>
-						<Text style={styles.tableCell}>Quantity</Text>
-						<Text style={styles.tableCell}>Total</Text>
+						<Text style={[styles.tableCell, { flex: 2 }]}>Sản Phẩm</Text>
+						<Text style={styles.tableCell}>Đơn Giá</Text>
+						<Text style={styles.tableCell}>Số Lượng</Text>
+						<Text style={styles.tableCell}>Tổng</Text>
 					</View>
 
 					{order.lineItems.map((item, index) => {
