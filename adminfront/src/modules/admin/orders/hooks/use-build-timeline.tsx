@@ -26,29 +26,29 @@ export interface TimelineEvent {
 	orderId: string;
 	noNotification?: boolean;
 	type:
-		| 'payment'
-		| 'note'
-		| 'notification'
-		| 'placed'
-		| 'shipped'
-		| 'delivered'
-		| 'fulfilled'
-		| 'canceled'
-		| 'return'
-		| 'refund'
-		| 'exchange'
-		| 'exchange_fulfilled'
-		| 'claim'
-		| 'edit-created'
-		| 'edit-requested'
-		| 'edit-declined'
-		| 'edit-canceled'
-		| 'edit-confirmed'
-		| 'payment-required'
-		| 'refund-required'
-		| 'paid'
-		| 'change-price'
-		| 'attachment';
+	| 'payment'
+	| 'note'
+	| 'notification'
+	| 'placed'
+	| 'shipped'
+	| 'delivered'
+	| 'fulfilled'
+	| 'canceled'
+	| 'return'
+	| 'refund'
+	| 'exchange'
+	| 'exchange_fulfilled'
+	| 'claim'
+	| 'edit-created'
+	| 'edit-requested'
+	| 'edit-declined'
+	| 'edit-canceled'
+	| 'edit-confirmed'
+	| 'payment-required'
+	| 'refund-required'
+	| 'paid'
+	| 'change-price'
+	| 'attachment';
 }
 
 export interface AttachmentEvent extends TimelineEvent {
@@ -363,7 +363,7 @@ export const useBuildTimeline = (orderId: string) => {
 			for (const event of order.metadata.files as any[]) {
 				events.push({
 					...event,
-					id: event.url.split('/').pop(),
+					id: event?.url?.split('/').pop(),
 					time: event.created_at,
 					type: 'attachment',
 					url: event.url,

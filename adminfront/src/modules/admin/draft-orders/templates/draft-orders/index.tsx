@@ -4,15 +4,19 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { useAdminDraftOrderTransferOrder } from '@/lib/hooks/api/draft-orders';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
+import { LineItemReq } from '@/types/order';
 import { Modal as AntdModal, message } from 'antd';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';
 import { useAdminDeleteDraftOrder, useAdminDraftOrders } from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
+import { generatePdfBlob } from '../../../orders/components/orders/new-order/order-pdf';
+import { pdfOrderRes } from '../../../orders/components/orders/new-order';
 import DraftOrderModal from '../../components/draft-order-modal';
 import NewDraftOrderFormProvider from '../../hooks/use-new-draft-form';
 import draftOrderColumns from './draft-order-column';
@@ -35,6 +39,7 @@ const DraftOrderList: FC<Props> = () => {
 	// Mutations api
 	const transferOrder = useAdminDraftOrderTransferOrder();
 	const cancelOrder = useAdminDeleteDraftOrder(currentDraftOrderId ?? '');
+	const uploadFile = useAdminUploadFile();
 
 	const {
 		state: stateDraftOrdersModal,
@@ -47,6 +52,7 @@ const DraftOrderList: FC<Props> = () => {
 			q: searchValue || undefined,
 			offset,
 			limit: DEFAULT_PAGE_SIZE,
+			expand: 'cart,cart.items,cart.shipping_address,cart.billing_address,cart.customer',
 		},
 		{
 			keepPreviousData: true,
@@ -66,9 +72,74 @@ const DraftOrderList: FC<Props> = () => {
 		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
+	const generateFilePdf = async (draftOrder: any): Promise<string> => {
+		console.log("🚀 ~ draftOrder:", draftOrder)
+
+		// Get items from cart, not directly from draft order
+		const items = draftOrder.cart?.items || [];
+		const customer = draftOrder.cart?.customer;
+		const shippingAddress = draftOrder.cart?.shipping_address;
+
+		// Prepare PDF data
+		const pdfReq: pdfOrderRes = {
+			email: draftOrder.cart?.email || draftOrder.email,
+			userId: draftOrder.cart?.id || draftOrder.id,
+			user: null, // Can be fetched if needed
+			customer: {
+				first_name: customer?.first_name || shippingAddress?.first_name || '',
+				last_name: customer?.last_name || shippingAddress?.last_name || '',
+				email: customer?.email || draftOrder.cart?.email || draftOrder.email,
+				phone: customer?.phone || shippingAddress?.phone || '',
+			},
+			address: `${shippingAddress?.address_1 || ''} ${shippingAddress?.address_2 || ''} ${shippingAddress?.city || ''} ${shippingAddress?.province || ''}`.trim(),
+			lineItems: items.map((item: any) => ({
+				variantId: item.variant_id,
+				quantity: item.quantity,
+				unit_price: item.unit_price,
+				title: item.title,
+			})),
+			totalQuantity: items.reduce((sum: number, item: any) => sum + item.quantity, 0),
+			countryCode: shippingAddress?.country_code || 'vn',
+			isSendEmail: false,
+		};
+
+		// Generate pdf blob
+		const pdfBlob = await generatePdfBlob(pdfReq);
+
+		// Create a File object
+		const fileName = `purchase-order.pdf`;
+
+		// Create a File object
+		const files = new File([pdfBlob], fileName, {
+			type: 'application/pdf',
+		});
+
+		// Upload pdf to s3 using Medusa uploads API
+		const uploadRes = await uploadFile.mutateAsync({
+			files,
+			prefix: 'orders',
+		});
+
+		const pdfUrl = uploadRes.uploads[0].url;
+
+		return pdfUrl;
+	};
+
 	const handleTransferToOrder = async (id: string) => {
 		try {
-			await transferOrder.mutateAsync({ id, isSendEmail, urlPdf: '' });
+			// Find the draft order from the current data
+			const draftOrder = draft_orders?.find((order: any) => order.id === id);
+
+			if (!draftOrder) {
+				message.error('Không tìm thấy thông tin draft order');
+				return;
+			}
+
+			// Generate PDF for the draft order
+			const urlPdf = await generateFilePdf(draftOrder);
+
+			// Transfer the draft order to order with PDF URL
+			await transferOrder.mutateAsync({ id, isSendEmail, urlPdf });
 
 			message.success('Chuyển đơn hàng thành công');
 		} catch (error) {
