@@ -155,10 +155,10 @@ const EditableQuantity = ({
 			<Radio.Group value={selectedUnit} onChange={handleUnitChange}>
 				<Space direction="vertical">
 					<Radio value={Unit.Đôi}>Đôi</Radio>
-					<Radio value={Unit.Giỏ}>Giỏ (1 giỏ = 24 đôi)</Radio>
 					<Radio value={Unit.Bịch6}>Bịch 6 (1 bịch = 6 đôi)</Radio>
+					<Radio value={Unit.Thùng}>Thùng 6 (1 thùng = 6 đôi)</Radio>
 					<Radio value={Unit.Bịch12}>Bịch 12 (1 bịch = 12 đôi)</Radio>
-					<Radio value={Unit.Thùng}>Thùng (1 thùng = 6 đôi)</Radio>
+					<Radio value={Unit.Giỏ}>Giỏ 24 (1 giỏ = 24 đôi)</Radio>
 					<Radio value={Unit.Bao60}>Bao 60 (1 bao = 60 đôi)</Radio>
 					<Radio value={Unit.Bao120}>Bao 120 (1 bao = 120 đôi)</Radio>
 					<Radio value={Unit.Bao240}>Bao 240 (1 bao = 240 đôi)</Radio>
