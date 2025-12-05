@@ -133,9 +133,9 @@ const Summary = ({
 
 	// Sort items based on the variant product id
 	const sortedItems = [...filteredItems].sort((a, b) => {
-		const productIdA = a.variant?.product_id || '';
-		const productIdB = b.variant?.product_id || '';
-		return productIdA.localeCompare(productIdB);
+		const skuA = a.variant?.sku || '';
+		const skuB = b.variant?.sku || '';
+		return skuA.localeCompare(skuB);
 	});
 
 	// Paginated items
