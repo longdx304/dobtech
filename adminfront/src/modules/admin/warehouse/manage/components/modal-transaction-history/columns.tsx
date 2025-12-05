@@ -5,6 +5,9 @@ import { User } from '@medusajs/medusa';
 import { DatePicker } from 'antd';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 type Props = {};
 
@@ -51,7 +54,7 @@ const transactionColumns = ({}: Props) => [
 		width: 180,
 		className: 'text-xs',
 		sorter: (a: any, b: any) =>
-			dayjs(a.created_at).valueOf() - dayjs(b.created_at).valueOf(),
+			dayjs.utc(a.created_at).utcOffset(7).valueOf() - dayjs.utc(b.created_at).utcOffset(7).valueOf(),
 		filterDropdown: ({
 			setSelectedKeys,
 			selectedKeys,
@@ -88,7 +91,7 @@ const transactionColumns = ({}: Props) => [
 			);
 		},
 		render: (createdAt: string) => {
-			return dayjs(createdAt).add(7, 'hour').format('DD/MM/YYYY HH:mm');
+			return dayjs.utc(createdAt).utcOffset(7).format('DD/MM/YYYY HH:mm');
 		},
 	},
 ];

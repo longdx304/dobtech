@@ -27,7 +27,83 @@ type SelectProduct = Omit<
 enum Unit {
 	Đôi = 'đôi',
 	Giỏ = 'giỏ',
+	Bịch6 = 'bịch6',
+	Bịch12 = 'bịch12',
+	Thùng = 'thùng',
+	Bao60 = 'bao60',
+	Bao120 = 'bao120',
+	Bao240 = 'bao240',
 }
+
+// Helper functions for unit conversion
+const convertToDoi = (value: number, fromUnit: Unit): number => {
+	switch (fromUnit) {
+		case Unit.Đôi:
+			return value;
+		case Unit.Giỏ:
+			return value * 24;
+		case Unit.Bịch6:
+			return value * 6;
+		case Unit.Bịch12:
+			return value * 12;
+		case Unit.Thùng:
+			return value * 6;
+		case Unit.Bao60:
+			return value * 60;
+		case Unit.Bao120:
+			return value * 120;
+		case Unit.Bao240:
+			return value * 240;
+		default:
+			return value;
+	}
+};
+
+const convertFromDoi = (valueInDoi: number, toUnit: Unit): number => {
+	switch (toUnit) {
+		case Unit.Đôi:
+			return valueInDoi;
+		case Unit.Giỏ:
+			return Math.floor(valueInDoi / 24);
+		case Unit.Bịch6:
+			return Math.floor(valueInDoi / 6);
+		case Unit.Bịch12:
+			return Math.floor(valueInDoi / 12);
+		case Unit.Thùng:
+			return Math.floor(valueInDoi / 6);
+		case Unit.Bao60:
+			return Math.floor(valueInDoi / 60);
+		case Unit.Bao120:
+			return Math.floor(valueInDoi / 120);
+		case Unit.Bao240:
+			return Math.floor(valueInDoi / 240);
+		default:
+			return valueInDoi;
+	}
+};
+
+const getUnitMultiplier = (unit: Unit): number => {
+	switch (unit) {
+		case Unit.Đôi:
+			return 1;
+		case Unit.Giỏ:
+			return 24;
+		case Unit.Bịch6:
+			return 6;
+		case Unit.Bịch12:
+			return 12;
+		case Unit.Thùng:
+			return 6;
+		case Unit.Bao60:
+			return 60;
+		case Unit.Bao120:
+			return 120;
+		case Unit.Bao240:
+			return 240;
+		default:
+			return 1;
+	}
+};
 
 const EditableQuantity = ({
 	quantity,
@@ -47,30 +123,23 @@ const EditableQuantity = ({
 		const newUnit = e.target.value as Unit;
 		setSelectedUnit(newUnit);
 
-		// Convert current inputValue to the new unit
-		if (newUnit === Unit.Giỏ && selectedUnit === Unit.Đôi) {
-			setInputValue(Math.floor(inputValue / 24));
-		} else if (newUnit === Unit.Đôi && selectedUnit === Unit.Giỏ) {
-			setInputValue(inputValue * 24);
-		}
+		// Convert current inputValue from đôi to new unit
+		const currentQuantityInDoi = convertToDoi(inputValue, selectedUnit);
+		setInputValue(convertFromDoi(currentQuantityInDoi, newUnit));
 	};
 
 	const handleValueChange = (value: number | null) => {
 		if (value !== null) {
-			const maxInCurrentUnit =
-				selectedUnit === Unit.Đôi
-					? record.inventory_quantity
-					: Math.floor(record.inventory_quantity / 24);
+			const unitMultiplier = getUnitMultiplier(selectedUnit);
+			const maxInCurrentUnit = !record.allow_backorder
+				? Math.floor(record.inventory_quantity / unitMultiplier)
+				: Number.MAX_SAFE_INTEGER;
 
-			const finalInputValue = Math.min(
-				value,
-				!record.allow_backorder ? maxInCurrentUnit : Number.MAX_SAFE_INTEGER
-			);
+			const finalInputValue = Math.min(value, maxInCurrentUnit);
 			setInputValue(finalInputValue);
 
 			// Convert to đôi before sending to parent
-			const finalQuantity =
-				selectedUnit === Unit.Giỏ ? finalInputValue * 24 : finalInputValue;
+			const finalQuantity = convertToDoi(finalInputValue, selectedUnit);
 			handleQuantityChange(finalQuantity, record?.id as string);
 		}
 	};
@@ -78,9 +147,7 @@ const EditableQuantity = ({
 	// Update inputValue when quantity prop changes
 	useEffect(() => {
 		const newValue = quantity || 1;
-		setInputValue(
-			selectedUnit === Unit.Giỏ ? Math.floor(newValue / 24) : newValue
-		);
+		setInputValue(convertFromDoi(newValue, selectedUnit));
 	}, [quantity, selectedUnit]);
 
 	const popoverContent = (
@@ -88,7 +155,13 @@ const EditableQuantity = ({
 			<Radio.Group value={selectedUnit} onChange={handleUnitChange}>
 				<Space direction="vertical">
 					<Radio value={Unit.Đôi}>Đôi</Radio>
-					<Radio value={Unit.Giỏ}>Giỏ (1 giỏ = 24 đôi)</Radio>
+					<Radio value={Unit.Bịch6}>Bịch 6 (1 bịch = 6 đôi)</Radio>
+					<Radio value={Unit.Thùng}>Thùng 6 (1 thùng = 6 đôi)</Radio>
+					<Radio value={Unit.Bịch12}>Bịch 12 (1 bịch = 12 đôi)</Radio>
+					<Radio value={Unit.Giỏ}>Giỏ 24 (1 giỏ = 24 đôi)</Radio>
+					<Radio value={Unit.Bao60}>Bao 60 (1 bao = 60 đôi)</Radio>
+					<Radio value={Unit.Bao120}>Bao 120 (1 bao = 120 đôi)</Radio>
+					<Radio value={Unit.Bao240}>Bao 240 (1 bao = 240 đôi)</Radio>
 				</Space>
 			</Radio.Group>
 			<InputNumber
@@ -96,9 +169,7 @@ const EditableQuantity = ({
 				min={1}
 				max={
 					!record.allow_backorder
-						? selectedUnit === Unit.Đôi
-							? record.inventory_quantity
-							: Math.floor(record.inventory_quantity / 24)
+						? Math.floor(record.inventory_quantity / getUnitMultiplier(selectedUnit))
 						: Number.MAX_SAFE_INTEGER
 				}
 				value={inputValue}

@@ -115,48 +115,48 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 			<Page size="A4" style={styles.page}>
 				<View style={styles.header}>
 					<View>
-						<Text style={styles.title}>Purchase Order</Text>
+						<Text style={styles.title}>Đơn Hàng Mua</Text>
 					</View>
 					<View>
 						<Text style={styles.text}>
-							Date: {dayjs(new Date()).format('DD/MM/YYYY')}
+							Ngày: {dayjs(new Date()).format('DD/MM/YYYY')}
 						</Text>
 					</View>
 				</View>
 
 				<View style={styles.section}>
-					<Text style={styles.title}>Supplier Details</Text>
+					<Text style={styles.title}>Thông Tin Nhà Cung Cấp</Text>
 					<View style={styles.row}>
 						<View style={styles.column}>
-							<Text style={styles.label}>Supplier Name</Text>
+							<Text style={styles.label}>Tên Nhà Cung Cấp</Text>
 							<Text style={styles.text}>{order.supplier?.supplier_name}</Text>
 						</View>
 						<View style={styles.column}>
-							<Text style={styles.label}>Address</Text>
+							<Text style={styles.label}>Địa Chỉ</Text>
 							<Text style={styles.text}>{order.supplier?.address}</Text>
 						</View>
 					</View>
 					<View style={styles.row}>
 						<View style={styles.column}>
-							<Text style={styles.label}>Supplier Email</Text>
+							<Text style={styles.label}>Email Nhà Cung Cấp</Text>
 							<Text style={styles.text}>{order.supplier?.email}</Text>
 						</View>
 						<View style={styles.column}>
-							<Text style={styles.label}>Phone Number</Text>
+							<Text style={styles.label}>Số Điện Thoại</Text>
 							<Text style={styles.text}>{order.supplier?.phone}</Text>
 						</View>
 					</View>
 				</View>
 
 				<View style={styles.section}>
-					<Text style={styles.title}>Order Details</Text>
+					<Text style={styles.title}>Thông Tin Đơn Hàng</Text>
 					<View style={styles.row}>
 						<View style={styles.column}>
-							<Text style={styles.label}>Ordered By</Text>
+							<Text style={styles.label}>Đặt Hàng Bởi</Text>
 							<Text style={styles.text}>{order.email}</Text>
 						</View>
 						<View style={styles.column}>
-							<Text style={styles.label}>User</Text>
+							<Text style={styles.label}>Người Dùng</Text>
 							<Text style={styles.text}>
 								{order.user?.first_name} {order.user?.last_name}
 							</Text>
@@ -165,11 +165,11 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 				</View>
 
 				<View style={styles.section}>
-					<Text style={styles.title}>Order Items</Text>
+					<Text style={styles.title}>Sản Phẩm Đặt Hàng</Text>
 					<View style={styles.tableHeader}>
 						<Text style={styles.tableCell}>#</Text>
-						<Text style={[styles.tableCell, styles.productCell]}>Product</Text>
-						<Text style={styles.tableCell}>Quantity</Text>
+						<Text style={[styles.tableCell, styles.productCell]}>Sản Phẩm</Text>
+						<Text style={styles.tableCell}>Số Lượng</Text>
 					</View>
 
 					{order.lineItems.map((item, index) => {
