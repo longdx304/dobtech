@@ -120,10 +120,10 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 	}
 
 	// Sort items based on the variant product id
-	const sortedItems = [...order.lineItems].sort((a, b) => {
-		const productIdA = a.variantId || '';
-		const productIdB = b.variantId || '';
-		return productIdA.localeCompare(productIdB);
+	const sortedItems = [...order.lineItems].sort((a: any, b: any) => {
+		const skuA = a.sku || '';
+		const skuB = b.sku || '';
+		return skuA.localeCompare(skuB);
 	});
 
 	return (

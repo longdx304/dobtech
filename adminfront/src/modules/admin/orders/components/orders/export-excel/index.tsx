@@ -86,7 +86,7 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 		const customerName = order.customer
 			? `${order.customer.last_name || ''} ${order.customer.first_name || ''}`.trim()
 			: order.email;
-		
+
 		// Get customer code from order
 		const customer = order.customer as ICustomerResponse | undefined;
 		const finalCustomerCode = customer?.customer_code || '';
@@ -95,8 +95,14 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 		const ngayHachToan = dayjs(order.created_at).format('DD/MM/YYYY');
 		const ngayChungTu = dayjs(order.created_at).format('DD/MM/YYYY');
 
-		// Process each item in the order
-		order.items?.forEach((item: any) => {
+		// Sort items by SKU first, then process
+		const sortedItems = [...(order.items || [])].sort((a: any, b: any) => {
+			const skuA = a.variant?.sku || '';
+			const skuB = b.variant?.sku || '';
+			return skuA.localeCompare(skuB);
+		});
+
+		sortedItems.forEach((item: any) => {
 			const productTitle = item.variant?.product?.title || item.title;
 			const variantTitle = item.variant?.title || item.description;
 			const tenHang = `${productTitle} - ${variantTitle}`;
@@ -198,4 +204,3 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 
 	return files;
 };
-
