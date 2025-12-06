@@ -81,7 +81,7 @@ const VariantStock: FC<Props> = ({ form, field }) => {
 				<Form.Item
 					name={[field.name, 'allow_backorder']}
 					label="Cho phép đặt hàng trước"
-					initialValue={true}
+					initialValue={false}
 					className="mb-0"
 					colon={false}
 				>
