@@ -96,11 +96,12 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 		const ngayChungTu = dayjs(order.created_at).format('DD/MM/YYYY');
 
 		// Sort items by SKU first, then process
-		const sortedItems = [...(order.items || [])].sort((a: any, b: any) => {
-			const skuA = a.variant?.sku || '';
-			const skuB = b.variant?.sku || '';
-			return skuA.localeCompare(skuB);
-		});
+		const sortedItems = [...(order.items || [])]
+		// .sort((a: any, b: any) => {
+		// 	const skuA = a.variant?.sku || '';
+		// 	const skuB = b.variant?.sku || '';
+		// 	return skuA.localeCompare(skuB);
+		// });
 
 		sortedItems.forEach((item: any) => {
 			const productTitle = item.variant?.product?.title || item.title;
