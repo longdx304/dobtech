@@ -95,11 +95,9 @@ const Timeline = ({
 		let pdfReq = {} as pdfOrderRes;
 		if (!isEmpty(order)) {
 			const { items, shipping_address } = order!;
-			const address = `${shipping_address?.address_1 ?? ''}, ${
-				shipping_address?.address_2 ?? ''
-			}, ${shipping_address?.province ?? ''}, ${
-				shipping_address?.city ?? ''
-			}, ${shipping_address?.country_code ?? ''}`;
+			const address = `${shipping_address?.address_1 ?? ''}, ${shipping_address?.address_2 ?? ''
+				}, ${shipping_address?.province ?? ''}, ${shipping_address?.city ?? ''
+				}, ${shipping_address?.country_code ?? ''}`;
 
 			pdfReq = {
 				email: order!.customer.email,
@@ -118,6 +116,7 @@ const Timeline = ({
 						quantity: i.quantity,
 						unit_price: i.unit_price,
 						title: `${i.title} - ${i.description}`,
+						sku: i.variant?.sku || '',
 					})) ?? [],
 				totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
 				countryCode: shipping_address!.country_code!,
