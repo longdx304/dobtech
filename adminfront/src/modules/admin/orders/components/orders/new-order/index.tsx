@@ -43,6 +43,7 @@ interface LineItemForm {
 	unit_price: number;
 	thumbnail?: string | null;
 	product_title?: string;
+	sku?: string | null;
 }
 
 type Props = {
@@ -104,6 +105,7 @@ const NewOrderModal: FC<Props> = ({
 	): Promise<string> => {
 		const values = form.getFieldsValue(true);
 		let pdfReq = {} as pdfOrderRes;
+		console.log('items', items)
 		pdfReq = {
 			email: values.email,
 			userId: user!.id,
@@ -115,6 +117,7 @@ const NewOrderModal: FC<Props> = ({
 				quantity: i.quantity,
 				unit_price: i.unit_price,
 				title: `${i.product_title} - ${i.title}`,
+				sku: i?.sku || '',
 			})),
 			totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
 			countryCode: values.shipping_address.country_code.value,
@@ -181,9 +184,9 @@ const NewOrderModal: FC<Props> = ({
 				quantity: i.quantity,
 				...(i.variant_id
 					? {
-							variant_id: i.variant_id,
-							unit_price: i.unit_price / (1 + taxRate / 100),
-					  }
+						variant_id: i.variant_id,
+						unit_price: i.unit_price / (1 + taxRate / 100),
+					}
 					: { title: i.title, unit_price: i.unit_price / (1 + taxRate / 100) }),
 			})),
 			region_id: values.region,
@@ -213,11 +216,9 @@ const NewOrderModal: FC<Props> = ({
 				await addCustomerAddress();
 			}
 
-			const address = `${values.shipping_address.address_1 ?? ''} ${
-				values.shipping_address.address_2 ?? ''
-			} ${values.shipping_address.province ?? ''} ${
-				values.shipping_address.city ?? ''
-			}`;
+			const address = `${values.shipping_address.address_1 ?? ''} ${values.shipping_address.address_2 ?? ''
+				} ${values.shipping_address.province ?? ''} ${values.shipping_address.city ?? ''
+				}`;
 
 			const urlPdf = await generateFilePdf(
 				{
