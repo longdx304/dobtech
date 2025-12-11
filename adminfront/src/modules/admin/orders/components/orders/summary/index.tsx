@@ -132,12 +132,11 @@ const Summary = ({
 	);
 
 	// Sort items based on the variant product id
-	const sortedItems = [...filteredItems]
-	// .sort((a, b) => {
-	// 	const skuA = a.variant?.sku || '';
-	// 	const skuB = b.variant?.sku || '';
-	// 	return skuA.localeCompare(skuB);
-	// });
+	const sortedItems = [...filteredItems].sort((a, b) => {
+		const skuA = a.variant?.sku || '';
+		const skuB = b.variant?.sku || '';
+		return skuA.localeCompare(skuB);
+	});
 
 	// Paginated items
 	const startIndex = (currentPage - 1) * pageSize;

@@ -78,10 +78,10 @@ const Items = () => {
 		useAdminVariants(
 			items?.length > 0
 				? {
-						id: items.map((item) => item.variant_id),
-						region_id: region?.id,
-						customer_id: form.getFieldValue('customer_id'),
-				  }
+					id: items.map((item) => item.variant_id),
+					region_id: region?.id,
+					customer_id: form.getFieldValue('customer_id'),
+				}
 				: undefined,
 			{
 				enabled: !!items?.length,
@@ -101,7 +101,7 @@ const Items = () => {
 		// Otherwise use original_price
 		const priceAmount =
 			variant.calculated_price_type === 'override' ||
-			variant.calculated_price_type === 'sale'
+				variant.calculated_price_type === 'sale'
 				? Math.round(variant.calculated_price_incl_tax)
 				: Math.round(variant.original_price_incl_tax);
 
@@ -194,6 +194,7 @@ const Items = () => {
 				title: variant?.title as string,
 				product_title: variant?.product?.title,
 				thumbnail: thumbnail,
+				sku: variant.sku
 			};
 		});
 		setItems(formItems);
@@ -303,8 +304,8 @@ const Items = () => {
 			return customPrice && customPrice !== 0
 				? customPrice
 				: variant
-				? getVariantPrice(variant, region as Region)
-				: 0;
+					? getVariantPrice(variant, region as Region)
+					: 0;
 		},
 		handlePriceChange,
 	});
@@ -537,9 +538,8 @@ const Items = () => {
 					activeKey={activeTab}
 				/>
 			</div>
-			<div className="flex justify-end">{`Đã chọn : ${
-				selectedVariantsCount ?? 0
-			} biến thể`}</div>
+			<div className="flex justify-end">{`Đã chọn : ${selectedVariantsCount ?? 0
+				} biến thể`}</div>
 			<Table
 				rowSelection={{
 					selectedRowKeys: selectedVariantIds,
@@ -557,12 +557,12 @@ const Items = () => {
 				pagination={
 					activeTab === 'list'
 						? {
-								total: count,
-								pageSize: PAGE_SIZE,
-								current: currentPage,
-								onChange: handleChangePage,
-								showSizeChanger: false,
-						  }
+							total: count,
+							pageSize: PAGE_SIZE,
+							current: currentPage,
+							onChange: handleChangePage,
+							showSizeChanger: false,
+						}
 						: false
 				}
 				summary={() => (
