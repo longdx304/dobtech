@@ -97,6 +97,7 @@ const DraftOrderList: FC<Props> = () => {
 				quantity: item.quantity,
 				unit_price: item.unit_price,
 				title: item.title,
+				sku: item.variant?.sku || '',
 			})),
 			totalQuantity: items.reduce((sum: number, item: any) => sum + item.quantity, 0),
 			countryCode: shippingAddress?.country_code || 'vn',
