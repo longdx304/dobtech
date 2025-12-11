@@ -43,7 +43,7 @@ interface LineItemForm {
 	unit_price: number;
 	thumbnail?: string | null;
 	product_title?: string;
-	sku: string | null;
+	sku?: string | null;
 }
 
 type Props = {
