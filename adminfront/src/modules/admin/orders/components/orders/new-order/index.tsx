@@ -240,16 +240,18 @@ const NewOrderModal: FC<Props> = ({
 						{ id: response.draft_order.id, isSendEmail: isSendEmail, urlPdf },
 						{
 							onSuccess: () => {
+								message.success('Admin tạo đơn hàng thành công');
 								refetch();
 								form.resetFields();
 								handleOk();
+								// Refresh the page to reload prices
+								window.location.reload();
 							},
 							onError: (error) => {
 								console.error('Transfer order error', getErrorMessage(error));
 							},
 						}
 					);
-					message.success('Admin tạo đơn hàng thành công');
 				},
 				onError: (error) => {
 					message.error('Đã xảy ra lỗi khi tạo bản nháp đơn hàng');

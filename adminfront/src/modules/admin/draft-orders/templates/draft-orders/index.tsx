@@ -73,8 +73,6 @@ const DraftOrderList: FC<Props> = () => {
 	};
 
 	const generateFilePdf = async (draftOrder: any): Promise<string> => {
-		console.log("🚀 ~ draftOrder:", draftOrder)
-
 		// Get items from cart, not directly from draft order
 		const items = draftOrder.cart?.items || [];
 		const customer = draftOrder.cart?.customer;
@@ -143,6 +141,9 @@ const DraftOrderList: FC<Props> = () => {
 			await transferOrder.mutateAsync({ id, isSendEmail, urlPdf });
 
 			message.success('Chuyển đơn hàng thành công');
+
+			// Refresh the page to reload prices
+			window.location.reload();
 		} catch (error) {
 			message.error('Có lỗi xảy ra khi chuyển đơn hàng');
 			console.error('Error transferring order:', error);
