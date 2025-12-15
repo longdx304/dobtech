@@ -258,7 +258,7 @@ const Items = () => {
 			return updated;
 		});
 
-		setItems((prevItems) => {
+		setItems((prevItems = []) => {
 			return prevItems.map((item) =>
 				item.variant_id === variantId ? { ...item, unit_price: value } : item
 			);
