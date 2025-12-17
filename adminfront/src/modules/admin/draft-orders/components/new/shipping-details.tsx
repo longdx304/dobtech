@@ -61,7 +61,7 @@ const ShippingDetails = () => {
 		if (!customers) return [];
 
 		return customers.map(({ id, first_name, last_name, email }) => ({
-			label: `${first_name || ''} ${last_name || ''} (${email})`,
+			label: `${last_name || ''} ${first_name || ''} (${email})`,
 			value: id,
 		}));
 	}, [customers]);
@@ -271,11 +271,9 @@ const ShippingDetails = () => {
 								{validAddresses.map((sa) => (
 									<Radio key={sa.id} value={sa.id}>
 										{`${sa.last_name || ''} ${sa.first_name || ''} `}
-										<div>{`${sa.address_1 || ''}, ${sa.address_2 || ''} ${
-											sa.postal_code || ''
-										} ${sa.city || ''} ${
-											sa.country_code?.toUpperCase() || ''
-										}`}</div>
+										<div>{`${sa.address_1 || ''}, ${sa.address_2 || ''} ${sa.postal_code || ''
+											} ${sa.city || ''} ${sa.country_code?.toUpperCase() || ''
+											}`}</div>
 									</Radio>
 								))}
 							</Radio.Group>
