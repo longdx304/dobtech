@@ -110,6 +110,14 @@ const nextConfig = withStoreConfig({
 				port: '',
 				pathname: '/**',
 			},
+			{
+				protocol: "https",
+				hostname: "staging-api.chamdep.com",
+			},
+			{
+				protocol: "https",
+				hostname: "api.chamdep.com",
+			},
 		],
 	},
 	webpack: (config, { dev, isServer }) => {
