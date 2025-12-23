@@ -135,7 +135,8 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 				'Số hóa đơn': '',
 				'Ngày hóa đơn': '',
 				'Mã khách hàng': finalCustomerCode,
-				'Tên khách hàng': customerName,
+				'Tên khách hàng': '',
+				// 'Tên khách hàng': customerName,
 				'Địa chỉ': '',
 				'Mã số thuế': '',
 				'Diễn giải': `Bán hàng ${customerName}`,
@@ -146,7 +147,8 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 
 				// Product data
 				'Mã hàng (*)': maHang,
-				'Tên hàng': tenHang,
+				'Tên hàng': '',
+				// 'Tên hàng': tenHang,
 				'Hàng khuyến mại': '',
 
 				// Account codes
@@ -180,7 +182,7 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 				'HH không TH trên tờ khai thuế GTGT': '',
 
 				// Warehouse and cost
-				'Kho': 'KHH',
+				'Kho': 'KHH-HCM',
 				'TK giá vốn': 632,
 				'TK Kho': 156,
 				'Đơn giá vốn': '',
