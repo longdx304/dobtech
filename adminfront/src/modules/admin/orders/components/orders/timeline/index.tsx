@@ -1,62 +1,61 @@
-import { useState } from 'react';
 import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Title } from '@/components/Typography';
+import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
+import { useUser } from '@/lib/providers/user-provider';
+import { getErrorMessage } from '@/lib/utils';
 import {
+	AttachmentEvent,
+	ClaimEvent,
+	ExchangeEvent,
 	ItemsFulfilledEvent,
 	ItemsShippedEvent,
-	OrderPlacedEvent,
-	RefundEvent,
-	TimelineEvent,
-	PaymentRequiredEvent,
-	RefundRequiredEvent,
 	OrderEditEvent,
 	OrderEditRequestedEvent,
-	ReturnEvent,
-	ExchangeEvent,
-	ClaimEvent,
+	OrderPlacedEvent,
 	PaidEvent,
-	AttachmentEvent,
+	PaymentRequiredEvent,
+	RefundEvent,
+	RefundRequiredEvent,
+	ReturnEvent,
+	TimelineEvent,
 } from '@/modules/admin/orders/hooks/use-build-timeline';
 import {
 	AdminPostOrdersOrderReq,
-	Customer,
 	LineItem,
 	Order,
-	Region,
+	Region
 } from '@medusajs/medusa';
 import { Empty, message } from 'antd';
-import { CircleAlert, FileDown, RefreshCcw, RotateCcw } from 'lucide-react';
+import { isEmpty } from 'lodash';
+import { FileDown, RotateCcw, Warehouse } from 'lucide-react';
 import { useAdminOrder, useAdminUpdateOrder } from 'medusa-react';
-import useOrdersExpandParam from '../utils/use-admin-expand-parameter';
-import ItemsFulfilled from './timeline-events/items-fulfilled';
-import ItemsShipped from './timeline-events/items-shipped';
-import OrderCanceled from './timeline-events/order-canceled';
-import OrderPlaced from './timeline-events/order-placed';
-import Refund from './timeline-events/refund';
-import Return from './timeline-events/return';
-import Exchange from './timeline-events/exchange';
-import Claim from './timeline-events/claim';
-import PaymentRequired from './timeline-events/order-edit/payment-required';
-import RefundRequired from './timeline-events/order-edit/refund-required';
-import EditCreated from './timeline-events/order-edit/created';
-import EditConfirmed from './timeline-events/order-edit/confirmed';
-import EditCanceled from './timeline-events/order-edit/canceled';
-import EditDeclined from './timeline-events/order-edit/declined';
-import EditRequested from './timeline-events/order-edit/requested';
-import ReturnMenu from './timeline-events/modal/returns';
-import SwapModal from './timeline-events/modal/swap';
-import ClaimModal from './timeline-events/modal/claim';
-import Paid from './timeline-events/paid';
-import ChangedPrice from './timeline-events/order-edit/changed-price';
-import Attachment from './timeline-events/attachment';
+import { useState } from 'react';
 import { pdfOrderRes } from '../new-order';
 import { generatePdfBlob } from '../new-order/order-pdf';
-import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
-import { isEmpty } from 'lodash';
-import { useUser } from '@/lib/providers/user-provider';
-import { getErrorMessage } from '@/lib/utils';
+import useOrdersExpandParam from '../utils/use-admin-expand-parameter';
+import Attachment from './timeline-events/attachment';
+import Claim from './timeline-events/claim';
+import Exchange from './timeline-events/exchange';
+import ItemsFulfilled from './timeline-events/items-fulfilled';
+import ItemsShipped from './timeline-events/items-shipped';
+import ClaimModal from './timeline-events/modal/claim';
+import ReturnMenu from './timeline-events/modal/returns';
+import SwapModal from './timeline-events/modal/swap';
+import OrderCanceled from './timeline-events/order-canceled';
+import EditCanceled from './timeline-events/order-edit/canceled';
+import ChangedPrice from './timeline-events/order-edit/changed-price';
+import EditConfirmed from './timeline-events/order-edit/confirmed';
+import EditCreated from './timeline-events/order-edit/created';
+import EditDeclined from './timeline-events/order-edit/declined';
+import PaymentRequired from './timeline-events/order-edit/payment-required';
+import RefundRequired from './timeline-events/order-edit/refund-required';
+import EditRequested from './timeline-events/order-edit/requested';
+import OrderPlaced from './timeline-events/order-placed';
+import Paid from './timeline-events/paid';
+import Refund from './timeline-events/refund';
+import Return from './timeline-events/return';
 
 type Props = {
 	orderId: Order['id'];
@@ -179,25 +178,56 @@ const Timeline = ({
 		);
 	};
 
+	const handleTransferToWarehouse = async () => {
+		message.loading('Đang chuyển đơn hàng sang kho...');
+
+		const currentMetadata = order?.metadata ? { ...order.metadata } : {};
+
+		await updateOrder.mutateAsync(
+			{
+				metadata: {
+					...currentMetadata,
+					transferred_to_warehouse: true,
+					transferred_at: new Date().toISOString(),
+				},
+			} as AdminPostOrdersOrderReq & { metadata: any },
+			{
+				onSuccess: () => {
+					refetchOrder();
+					message.success('Chuyển đơn hàng sang kho thành công');
+				},
+				onError: (err: any) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
+	};
+
 	const actions = [
+		{
+			label: <span className="w-full">{'Chuyển sang Kho'}</span>,
+			key: 'transfer-warehouse',
+			icon: <Warehouse size={18} />,
+			onClick: handleTransferToWarehouse,
+		},
 		{
 			label: <span className="w-full">{'Yêu cầu trả hàng'}</span>,
 			key: 'require_return',
 			icon: <RotateCcw size={18} />,
 			onClick: () => setShowRequestReturn(true),
 		},
-		{
-			label: <span className="w-full">{'Đăng ký trao đổi'}</span>,
-			key: 'exchange',
-			icon: <RefreshCcw size={18} />,
-			onClick: () => setShowCreateSwap(true),
-		},
-		{
-			label: <span className="w-full">{'Đăng ký đòi hỏi'}</span>,
-			key: 'claim',
-			icon: <CircleAlert size={18} />,
-			onClick: () => setShowRegisterClaim(true),
-		},
+		// {
+		// 	label: <span className="w-full">{'Đăng ký trao đổi'}</span>,
+		// 	key: 'exchange',
+		// 	icon: <RefreshCcw size={18} />,
+		// 	onClick: () => setShowCreateSwap(true),
+		// },
+		// {
+		// 	label: <span className="w-full">{'Đăng ký đòi hỏi'}</span>,
+		// 	key: 'claim',
+		// 	icon: <CircleAlert size={18} />,
+		// 	onClick: () => setShowRegisterClaim(true),
+		// },
 		{
 			label: <span className="w-full">{'Cập nhật file order'}</span>,
 			key: 'update-file',
