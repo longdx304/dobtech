@@ -172,8 +172,9 @@ const ProductList = (props: Props) => {
 					// Use the download URL from response
 					if (data.downloadUrl) {
 						const { downloadUrl, fileKey } = data;
-						// Tạo một request để kiểm tra nội dung tệp
-						const response = await fetch(downloadUrl);
+						// Proxy request qua Next.js API route để tránh CORS
+						const proxyUrl = `/api/download-export?url=${encodeURIComponent(downloadUrl)}`;
+						const response = await fetch(proxyUrl);
 						const blob = await response.blob();
 
 						// Đảm bảo mã hóa UTF-8
@@ -227,8 +228,9 @@ const ProductList = (props: Props) => {
 					// Use the download URL from response
 					if (data.downloadUrl) {
 						const { downloadUrl, fileKey } = data;
-						// Tạo một request để kiểm tra nội dung tệp
-						const response = await fetch(downloadUrl);
+						// Proxy request qua Next.js API route để tránh CORS
+						const proxyUrl = `/api/download-export?url=${encodeURIComponent(downloadUrl)}`;
+						const response = await fetch(proxyUrl);
 						const blob = await response.blob();
 
 						// Đảm bảo mã hóa UTF-8

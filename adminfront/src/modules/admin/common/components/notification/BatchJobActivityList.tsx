@@ -122,8 +122,9 @@ const BatchJobActivityCard = (props: { batchJob: BatchJob }) => {
 			const { download_url } = await createPresignedUrl({
 				file_key: batchJob.result?.file_key,
 			});
-			// Tạo một request để kiểm tra nội dung tệp
-			const response = await fetch(download_url);
+			// Proxy request qua Next.js API route để tránh CORS
+			const proxyUrl = `/api/download-export?url=${encodeURIComponent(download_url)}`;
+			const response = await fetch(proxyUrl);
 			const blob = await response.blob();
 
 			// Đảm bảo mã hóa UTF-8
