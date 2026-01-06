@@ -124,43 +124,53 @@ const Items = () => {
 		selectedRowKeys: React.Key[],
 		selectedRows: ProductVariant[]
 	) => {
-		setSelectedVariantIds(selectedRowKeys as string[]);
-		setSelectedVariants(selectedRows as ProductVariant[]);
+		const newSelectedIds = selectedRowKeys as string[];
+		setSelectedVariantIds(newSelectedIds);
+
+		// Filter out undefined/null values from selectedRows
+		const validSelectedRows = selectedRows.filter((r) => r && r.id);
+
+		// Merge variants: keep previously selected variants not in current page + add new ones
+		const mergedVariants = [
+			// Keep variants from previous state that are still selected but not in current page
+			...selectedVariants.filter(
+				(v) =>
+					v &&
+					v.id &&
+					newSelectedIds.includes(v.id) &&
+					!validSelectedRows.some((r) => r.id === v.id)
+			),
+			// Add variants from current page
+			...validSelectedRows,
+		];
+
+		setSelectedVariants(mergedVariants);
 
 		// Initialize quantities for newly selected variants
-		const newQuantities = selectedRows?.map((variant) => ({
-			variantId: variant?.id,
-			quantity: 1,
-		}));
-
-		// Preserve existing quantities for previously selected variants
-		const updatedQuantities = newQuantities?.map((newQuant) => {
+		const newQuantities = mergedVariants?.map((variant) => {
 			const existing = variantQuantities.find(
-				(q) => q.variantId === newQuant.variantId
+				(q) => q.variantId === variant?.id
 			);
-			return existing || newQuant;
+			return existing || { variantId: variant?.id, quantity: 1 };
 		});
 
-		setVariantQuantities(updatedQuantities as any);
+		setVariantQuantities(newQuantities as any);
 
 		// Initialize prices for newly selected variants
-		const newPrices = selectedRows?.map((variant) => ({
-			variantId: variant?.id,
-			unit_price: getDefaultPrice(variant).amount,
-		}));
-
-		// Preserve existing prices for previously selected variants
-		const updatedPrices = newPrices?.map((newPrice) => {
-			const existing = variantPrices.find(
-				(p) => p.variantId === newPrice.variantId
+		const newPrices = mergedVariants?.map((variant) => {
+			const existing = variantPrices.find((p) => p.variantId === variant?.id);
+			return (
+				existing || {
+					variantId: variant?.id,
+					unit_price: getDefaultPrice(variant).amount,
+				}
 			);
-			return existing || newPrice;
 		});
 
-		setVariantPrices(updatedPrices as any);
+		setVariantPrices(newPrices as any);
 
-		// Wait for pricedVariants to be available before updating form items
-		updateFormItems(selectedRows as any, variantQuantities, updatedPrices);
+		// Update form items with merged variants
+		updateFormItems(mergedVariants as any, newQuantities, newPrices);
 	};
 
 	const updateFormItems = (
@@ -572,7 +582,7 @@ const Items = () => {
 								<Table.Summary.Row>
 									<Table.Summary.Cell index={0} />
 									<Table.Summary.Cell index={1}>
-										{selectedVariants?.length} (sản phẩm)
+										{selectedVariantsCount} (sản phẩm)
 									</Table.Summary.Cell>
 									<Table.Summary.Cell index={2} className="text-center">
 										{totalQuantity} (đôi)
