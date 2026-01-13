@@ -10,18 +10,15 @@ interface ExportOrderData {
 }
 
 export interface ExcelRow {
-	'Hiển thị trên sổ': string | number;
 	'Hình thức bán hàng': string;
 	'Phương thức thanh toán': string | number;
 	'Kiêm phiếu xuất kho': string | number;
-	'XK vào khu phi thuế quan và các TH được coi như XK': string | number;
 	'Lập kèm hóa đơn': string | number;
 	'Đã lập hóa đơn': string | number;
 	'Ngày hạch toán (*)': string;
 	'Ngày chứng từ (*)': string;
 	'Số chứng từ (*)': string;
 	'Số phiếu xuất': string;
-	'Lý do xuất': string;
 	'Mẫu số HĐ': string;
 	'Ký hiệu HĐ': string;
 	'Số hóa đơn': string;
@@ -30,19 +27,23 @@ export interface ExcelRow {
 	'Tên khách hàng': string;
 	'Địa chỉ': string;
 	'Mã số thuế': string;
-	'Diễn giải': string;
+	'Đơn vị giao đại lý': string;
+	'Người nộp': string;
 	'Nộp vào TK': string;
-	'NV bán hàng': string;
+	'Tên ngân hàng': string;
+	'Diễn giải/Lý do nộp': string;
+	'Lý do xuất': string;
 	'Loại tiền': string;
 	'Tỷ giá': string;
 	'Mã hàng (*)': string;
 	'Tên hàng': string;
+	'Là dòng ghi chú': string;
 	'Hàng khuyến mại': string;
+	'Chiết khấu thương mại': string;
 	'TK Tiền/Chi phí/Nợ (*)': string | number;
 	'TK Doanh thu/Có (*)': string | number;
 	'ĐVT': string;
 	'Số lượng': number;
-	'Đơn giá sau thuế': string | number;
 	'Đơn giá': string | number;
 	'Thành tiền': string | number;
 	'Thành tiền quy đổi': string | number;
@@ -51,16 +52,16 @@ export interface ExcelRow {
 	'Tiền chiết khấu quy đổi': string | number;
 	'TK chiết khấu': string;
 	'Giá tính thuế XK': string | number;
-	'% thuế XK': string | number;
-	'Tiền thuế XK': string | number;
-	'TK thuế XK': string;
+	'% thuế xuất khẩu': string | number;
+	'Tiền thuế xuất khẩu': string | number;
+	'TK thuế xuất khẩu': string;
 	'% thuế GTGT': string | number;
-	'Tỷ lệ tính thuế (Thuế suất KHAC)': string | number;
+	'% thuế suất KHAC': string | number;
 	'Tiền thuế GTGT': string | number;
 	'Tiền thuế GTGT quy đổi': string | number;
 	'TK thuế GTGT': string | number;
 	'HH không TH trên tờ khai thuế GTGT': string;
-	'Kho': string;
+	'Mã kho': string;
 	'TK giá vốn': string | number;
 	'TK Kho': string | number;
 	'Đơn giá vốn': string | number;
@@ -111,78 +112,60 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 			const tienVon = cogsPrice * item.quantity;
 
 			const row: ExcelRow = {
-				// Default values
-				'Hiển thị trên sổ': 1,
-				'Hình thức bán hàng': '',
-				'Phương thức thanh toán': 0,
-				'Kiêm phiếu xuất kho': 1,
-				'XK vào khu phi thuế quan và các TH được coi như XK': 0,
-				'Lập kèm hóa đơn': 0,
-				'Đã lập hóa đơn': 0,
-
-				// Date fields
+				'Hình thức bán hàng': 'Bán hàng hóa trong nước',
+				'Phương thức thanh toán': 'Chưa thu tiền',
+				'Kiêm phiếu xuất kho': 'Có',
+				'Lập kèm hóa đơn': 'Không',
+				'Đã lập hóa đơn': 'Chưa lập',
 				'Ngày hạch toán (*)': ngayHachToan,
 				'Ngày chứng từ (*)': ngayChungTu,
-
-				// User input
 				'Số chứng từ (*)': soChungTu,
 				'Số phiếu xuất': soPhieuXuat,
-
-				// Export reason and description
-				'Lý do xuất': `Xuất kho bán hàng ${customerName}`,
 				'Mẫu số HĐ': '',
 				'Ký hiệu HĐ': '',
 				'Số hóa đơn': '',
 				'Ngày hóa đơn': '',
 				'Mã khách hàng': finalCustomerCode,
-				'Tên khách hàng': '',
+				'Tên khách hàng': customerName,
 				// 'Tên khách hàng': customerName,
 				'Địa chỉ': '',
 				'Mã số thuế': '',
-				'Diễn giải': `Bán hàng ${customerName}`,
+				'Đơn vị giao đại lý': '',
+				'Người nộp': '',
 				'Nộp vào TK': '',
-				'NV bán hàng': '',
+				'Tên ngân hàng': '',
+				'Diễn giải/Lý do nộp': `Bán hàng ${customerName}`,
+				'Lý do xuất': `Xuất kho bán hàng ${customerName}`,
 				'Loại tiền': '',
 				'Tỷ giá': '',
-
-				// Product data
 				'Mã hàng (*)': maHang,
-				'Tên hàng': '',
+				'Tên hàng': tenHang,
 				// 'Tên hàng': tenHang,
+				'Là dòng ghi chú': '',
 				'Hàng khuyến mại': '',
-
-				// Account codes
+				'Chiết khấu thương mại': '',
 				'TK Tiền/Chi phí/Nợ (*)': 131,
 				'TK Doanh thu/Có (*)': 5111,
 				'ĐVT': 'Đôi',
-
-				// Item quantities and prices
 				'Số lượng': item.quantity,
-				'Đơn giá sau thuế': item.unit_price,
 				'Đơn giá': Math.round(item.unit_price / (1 + vatRate / 100)),
 				'Thành tiền': '',
 				'Thành tiền quy đổi': '',
-
-				// Discount fields
 				'Tỷ lệ CK (%)': '',
 				'Tiền chiết khấu': '',
 				'Tiền chiết khấu quy đổi': '',
 				'TK chiết khấu': '',
-
-				// Tax fields
 				'Giá tính thuế XK': '',
-				'% thuế XK': '',
-				'Tiền thuế XK': '',
-				'TK thuế XK': '',
+				'% thuế xuất khẩu': '',
+				'Tiền thuế xuất khẩu': '',
+				'TK thuế xuất khẩu': '',
 				'% thuế GTGT': `${vatRate}`,
-				'Tỷ lệ tính thuế (Thuế suất KHAC)': '',
+				'% thuế suất KHAC': '',
 				'Tiền thuế GTGT': '',
 				'Tiền thuế GTGT quy đổi': '',
 				'TK thuế GTGT': 33311,
 				'HH không TH trên tờ khai thuế GTGT': '',
-
-				// Warehouse and cost
-				'Kho': 'KHH-HCM',
+				'Mã kho': 'KHH-HCM',
 				'TK giá vốn': 632,
 				'TK Kho': 156,
 				'Đơn giá vốn': '',
