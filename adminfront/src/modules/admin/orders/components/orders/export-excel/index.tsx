@@ -36,7 +36,6 @@ export interface ExcelRow {
 	'Loại tiền': string;
 	'Tỷ giá': string;
 	'Mã hàng (*)': string;
-	'Tên hàng': string;
 	'Là dòng ghi chú': string;
 	'Hàng khuyến mại': string;
 	'Chiết khấu thương mại': string;
@@ -139,7 +138,6 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 				'Loại tiền': '',
 				'Tỷ giá': '',
 				'Mã hàng (*)': maHang,
-				'Tên hàng': tenHang,
 				// 'Tên hàng': tenHang,
 				'Là dòng ghi chú': '',
 				'Hàng khuyến mại': '',
@@ -148,7 +146,7 @@ export const generateExcelData = (ordersData: ExportOrderData[]): ExcelFile[] =>
 				'TK Doanh thu/Có (*)': 5111,
 				'ĐVT': 'Đôi',
 				'Số lượng': item.quantity,
-				'Đơn giá': Math.round(item.unit_price / (1 + vatRate / 100)),
+				'Đơn giá': Math.round((item.unit_price / (1 + vatRate / 100)) * 100) / 100,
 				'Thành tiền': '',
 				'Thành tiền quy đổi': '',
 				'Tỷ lệ CK (%)': '',

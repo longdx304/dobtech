@@ -109,3 +109,15 @@ export const getCurrencyInfo = (currencyCode?: string) => {
 	const currencyInfo = currencies[currencyCode.toUpperCase()];
 	return currencyInfo;
 };
+
+/**
+ * Generates a customer code based on the current total number of customers.
+ * Format: CUS-XXXXXX (e.g., CUS-000001)
+ * @param currentTotal - The current total number of customers
+ * @returns The generated customer code
+ */
+export const generateCustomerCode = (currentTotal: number): string => {
+	const nextNumber = currentTotal + 1;
+	const paddedNumber = nextNumber.toString().padStart(6, '0');
+	return `CUS-${paddedNumber}`;
+};

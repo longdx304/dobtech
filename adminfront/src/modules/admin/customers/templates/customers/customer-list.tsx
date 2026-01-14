@@ -75,7 +75,6 @@ const CustomerList: FC<Props> = ({}) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [customers]);
 
-	console.log('customers', customers);
 	return (
 		<div className="w-full">
 			<Flex align="center" justify="flex-start" className="">
