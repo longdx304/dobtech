@@ -1,7 +1,8 @@
-import React from 'react';
+import { Button } from '@/components/Button';
+import { generateCustomerCode } from '@/lib/utils';
 import { Form, Input, Modal } from 'antd';
 import { useAdminCreateCustomer } from 'medusa-react';
-import { Button } from '@/components/Button';
+import React, { useEffect } from 'react';
 
 type Props = {
 	visible: boolean;
@@ -19,6 +20,13 @@ const CreateCustomerModal = ({
 	const [form] = Form.useForm();
 	const createCustomer = useAdminCreateCustomer();
 
+	useEffect(() => {
+		if (visible) {
+			const customerCode = generateCustomerCode(totalCustomers);
+			form.setFieldValue('customer_code', customerCode);
+		}
+	}, [visible, totalCustomers, form]);
+
 	const handleSubmit = async (values: any) => {
 		try {
 			await createCustomer.mutate(
@@ -28,7 +36,8 @@ const CreateCustomerModal = ({
 					last_name: values.last_name,
 					password: values.password,
 					phone: values.phone,
-				},
+					customer_code: values.customer_code,
+				} as any,
 				{
 					onSuccess: ({ customer }) => {
 						onCustomerCreated({
@@ -64,6 +73,13 @@ const CreateCustomerModal = ({
 					]}
 				>
 					<Input placeholder="example@email.com" />
+				</Form.Item>
+
+				<Form.Item
+					name="customer_code"
+					label="Mã khách hàng"
+				>
+					<Input placeholder="Mã khách hàng (tự động tạo)" />
 				</Form.Item>
 
 				<Form.Item
