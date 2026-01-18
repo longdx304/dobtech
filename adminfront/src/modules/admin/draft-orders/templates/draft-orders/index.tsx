@@ -4,7 +4,7 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
 import { useAdminDraftOrderTransferOrder } from '@/lib/hooks/api/draft-orders';
-import { useAdminUploadFile } from '@/lib/hooks/api/uploads';
+import { useAdminDeleteFile, useAdminUploadFile } from '@/lib/hooks/api/uploads';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
@@ -40,6 +40,7 @@ const DraftOrderList: FC<Props> = () => {
 	const transferOrder = useAdminDraftOrderTransferOrder();
 	const cancelOrder = useAdminDeleteDraftOrder(currentDraftOrderId ?? '');
 	const uploadFile = useAdminUploadFile();
+	const deleteFile = useAdminDeleteFile();
 
 	const {
 		state: stateDraftOrdersModal,
@@ -72,7 +73,7 @@ const DraftOrderList: FC<Props> = () => {
 		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
-	const generateFilePdf = async (draftOrder: any): Promise<string> => {
+	const generateFilePdf = async (draftOrder: any): Promise<{ url: string; key: string }> => {
 		// Get items from cart, not directly from draft order
 		const items = draftOrder.cart?.items || [];
 		const customer = draftOrder.cart?.customer;
@@ -119,12 +120,12 @@ const DraftOrderList: FC<Props> = () => {
 			prefix: 'orders',
 		});
 
-		const pdfUrl = uploadRes.uploads[0].url;
-
-		return pdfUrl;
+		const result = uploadRes.uploads[0];
+		return { url: result.url, key: result.key };
 	};
 
 	const handleTransferToOrder = async (id: string) => {
+		let uploadedFileKey: string | null = null;
 		try {
 			// Find the draft order from the current data
 			const draftOrder = draft_orders?.find((order: any) => order.id === id);
@@ -135,7 +136,8 @@ const DraftOrderList: FC<Props> = () => {
 			}
 
 			// Generate PDF for the draft order
-			const urlPdf = await generateFilePdf(draftOrder);
+			const { url: urlPdf, key: keyPdf } = await generateFilePdf(draftOrder);
+			uploadedFileKey = keyPdf;
 
 			// Transfer the draft order to order with PDF URL
 			await transferOrder.mutateAsync({ id, isSendEmail, urlPdf });
@@ -145,8 +147,14 @@ const DraftOrderList: FC<Props> = () => {
 			// Refresh the page to reload prices
 			window.location.reload();
 		} catch (error) {
-			message.error('Có lỗi xảy ra khi chuyển đơn hàng');
+			message.error('Có lỗi xảy ra khi chuyển đơn hàng, vui lòng kiểm tra số lượng tồn kho');
 			console.error('Error transferring order:', error);
+
+			// Clean up the uploaded file if exists
+			if (uploadedFileKey) {
+				await deleteFile.mutateAsync({ file_key: uploadedFileKey });
+				console.log('Cleaned up uploaded file due to error:', uploadedFileKey);
+			}
 		} finally {
 			setCurrentDraftOrderId(null);
 		}

@@ -1,4 +1,4 @@
-import { AdminUploadsRes } from '@medusajs/medusa';
+import { AdminUploadsRes, AdminDeleteUploadsRes } from '@medusajs/medusa';
 import { buildOptions } from '@/utils/build-options';
 import { Response } from '@medusajs/medusa-js';
 import {
@@ -13,6 +13,10 @@ export type AdminCreateUploadPayload = {
 	prefix?: string;
 };
 
+export type AdminDeleteUploadPayload = {
+	file_key: string;
+};
+
 export const useAdminUploadFile = (
 	options?: UseMutationOptions<Response<AdminUploadsRes>, Error, AdminCreateUploadPayload>
 ) => {
@@ -22,6 +26,17 @@ export const useAdminUploadFile = (
 	return useMutation((payload: AdminCreateUploadPayload) => {
 		const _payload = _createPayload(payload);
 		return client.admin.custom.post(`/admin/uploads`, _payload);
+	}, buildOptions(queryClient, [], options));
+};
+
+export const useAdminDeleteFile = (
+	options?: UseMutationOptions<Response<AdminDeleteUploadsRes>, Error, AdminDeleteUploadPayload>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation((payload: AdminDeleteUploadPayload) => {
+		return client.admin.uploads.delete(payload);
 	}, buildOptions(queryClient, [], options));
 };
 
