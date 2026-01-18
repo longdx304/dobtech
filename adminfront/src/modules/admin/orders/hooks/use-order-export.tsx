@@ -4,14 +4,19 @@ import dayjs from 'dayjs';
 import { useState } from 'react';
 import { ICustomerResponse } from '@/types/customer';
 import { downloadExcelFiles } from '../components/orders/export-excel/download';
-import { generateExcelData } from '../components/orders/export-excel';
+import { generateAmisExcelData, generateSmeExcelData } from '../components/orders/export-excel';
+import { ExportType } from '../components/orders/export-excel/export-modals';
 
 export const useOrderExport = () => {
 	const [vatModalVisible, setVatModalVisible] = useState<boolean>(false);
 	const [exportModalVisible, setExportModalVisible] = useState<boolean>(false);
+	const [exportTypeModalVisible, setExportTypeModalVisible] = useState<boolean>(false);
 	const [vatRate, setVatRate] = useState<number>(8);
 	const [soChungTuValues, setSoChungTuValues] = useState<Record<string, string>>({});
 	const [soPhieuXuatValues, setSoPhieuXuatValues] = useState<Record<string, string>>({});
+	
+	// Store pending data for final step
+	const [pendingExportData, setPendingExportData] = useState<{orders: Order[], onComplete: () => void} | null>(null);
 
 	const handleOpenExportModal = (selectedKeys: React.Key[]) => {
 		// Show VAT modal first
@@ -65,46 +70,61 @@ export const useOrderExport = () => {
 			return;
 		}
 
-		// Close document modal and proceed to Excel generation
+		// Close document modal and open export type modal
 		setExportModalVisible(false);
+		setExportTypeModalVisible(true);
 		
+		// Save pending data
+		setPendingExportData({ orders: selectedOrders, onComplete });
+	};
+
+	const handleExportTypeNext = (type: ExportType) => {
+		if (!pendingExportData) return;
+		
+		const { orders, onComplete } = pendingExportData;
+
 		// Prepare data for Excel generation
-		const ordersData = selectedOrders.map(order => ({
+		const ordersData = orders.map(order => ({
 			order,
 			soChungTu: soChungTuValues[order.id] || '',
 			soPhieuXuat: soPhieuXuatValues[order.id] || '',
 			vatRate: vatRate,
 		}));
 
-		// Generate Excel data structure (one file per order)
-		const excelFiles = generateExcelData(ordersData);
+		// Generate Excel data structure based on type
+		let excelFiles;
+		if (type === 'AMIS') {
+			excelFiles = generateAmisExcelData(ordersData);
+		} else {
+			excelFiles = generateSmeExcelData(ordersData);
+		}
 		
-		console.log('=== EXCEL EXPORT DATA ===');
+		console.log(`=== EXCEL EXPORT DATA (${type}) ===`);
 		console.log(`Total Files to Export: ${excelFiles.length}`);
-		console.log('');
-		
-		excelFiles.forEach((file, index) => {
-			console.log(`📄 File ${index + 1}:`);
-			console.log(`   Order Display ID: ${file.displayId}`);
-			console.log(`   Customer: ${file.customerName}`);
-			console.log(`   Số chứng từ: ${file.soChungTu}`);
-			console.log(`   Số phiếu xuất: ${file.soPhieuXuat}`);
-			console.log(`   Total Items (Rows): ${file.rows.length}`);
-			console.log(`   Data:`, file.rows);
-			console.log('');
-		});
 		
 		// Download Excel files
 		downloadExcelFiles(excelFiles).then((success) => {
 			if (success) {
 				console.log('✅ Excel files downloaded successfully!');
+				message.success('Xuất file Excel thành công!');
 			} else {
-				console.error('❌ Failed to download Excel files. Make sure xlsx library is installed: yarn add xlsx');
+				console.error('❌ Failed to download Excel files.');
+				message.error('Có lỗi xảy ra khi xuất file Excel.');
 			}
 		});
 		
-		// Clear selection
+		// Clear selection and state
+		setExportTypeModalVisible(false);
+		setPendingExportData(null);
 		onComplete();
+	};
+
+	const handleExportTypeCancel = () => {
+		setExportTypeModalVisible(false);
+		// Go back to document modal or close all? 
+		// Usually back to document modal is better UX, but let's just close for simplicity or reopen document modal
+		// Let's go back to document modal
+		setExportModalVisible(true);
 	};
 
 	const handleSoChungTuChange = (orderId: string, value: string) => {
@@ -125,6 +145,7 @@ export const useOrderExport = () => {
 		// State
 		vatModalVisible,
 		exportModalVisible,
+		exportTypeModalVisible,
 		vatRate,
 		soChungTuValues,
 		soPhieuXuatValues,
@@ -136,8 +157,9 @@ export const useOrderExport = () => {
 		handleVatCancel,
 		handleCloseExportModal,
 		handleDocumentModalNext,
+		handleExportTypeNext,
+		handleExportTypeCancel,
 		handleSoChungTuChange,
 		handleSoPhieuXuatChange,
 	};
 };
-
