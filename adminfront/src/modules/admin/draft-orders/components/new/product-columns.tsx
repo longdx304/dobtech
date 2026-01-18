@@ -131,11 +131,11 @@ const EditableQuantity = ({
 	const handleValueChange = (value: number | null) => {
 		if (value !== null) {
 			const unitMultiplier = getUnitMultiplier(selectedUnit);
-			const maxInCurrentUnit = !record.allow_backorder
-				? Math.floor(record.inventory_quantity / unitMultiplier)
-				: Number.MAX_SAFE_INTEGER;
+			// const maxInCurrentUnit = !record.allow_backorder
+			// 	? Math.floor(record.inventory_quantity / unitMultiplier)
+			// 	: Number.MAX_SAFE_INTEGER;
 
-			const finalInputValue = Math.min(value, maxInCurrentUnit);
+			const finalInputValue = Math.min(value, Number.MAX_SAFE_INTEGER);
 			setInputValue(finalInputValue);
 
 			// Convert to đôi before sending to parent
@@ -167,11 +167,11 @@ const EditableQuantity = ({
 			<InputNumber
 				autoFocus
 				min={1}
-				max={
-					!record.allow_backorder
-						? Math.floor(record.inventory_quantity / getUnitMultiplier(selectedUnit))
-						: Number.MAX_SAFE_INTEGER
-				}
+				// max={
+				// 	!record.allow_backorder
+				// 		? Math.floor(record.inventory_quantity / getUnitMultiplier(selectedUnit))
+				// 		: Number.MAX_SAFE_INTEGER
+				// }
 				value={inputValue}
 				onChange={handleValueChange}
 				onBlur={() => setIsEditing(false)}

@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function DraftOrderDetail({ id }: Readonly<Props>) {
-	const { draft_order, isLoading, refetch } = useAdminDraftOrder(id);
+	const { draft_order, isLoading } = useAdminDraftOrder(id);
 	const {
 		events,
 		isLoading: isLoadingTimeline,
