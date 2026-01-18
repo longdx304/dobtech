@@ -202,6 +202,9 @@ const OrderList: FC<Props> = () => {
 			onSoPhieuXuatChange={exportHook.handleSoPhieuXuatChange}
 			onDocumentNext={() => exportHook.handleDocumentModalNext(selectedOrders, () => setSelectedRowKeys([]))}
 			onDocumentCancel={exportHook.handleCloseExportModal}
+			exportTypeModalVisible={exportHook.exportTypeModalVisible}
+			onExportTypeNext={exportHook.handleExportTypeNext}
+			onExportTypeCancel={exportHook.handleExportTypeCancel}
 		/>
 	</>
 	);

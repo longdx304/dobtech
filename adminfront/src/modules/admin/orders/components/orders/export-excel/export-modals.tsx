@@ -4,7 +4,10 @@ import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { Text } from '@/components/Typography';
 import { Order } from '@medusajs/medusa';
-import { FC } from 'react';
+import { Radio, Space } from 'antd';
+import { FC, useState } from 'react';
+
+export type ExportType = 'AMIS' | 'SME';
 
 interface ExportModalsProps {
 	// VAT Modal
@@ -23,6 +26,11 @@ interface ExportModalsProps {
 	onSoPhieuXuatChange: (orderId: string, value: string) => void;
 	onDocumentNext: () => void;
 	onDocumentCancel: () => void;
+
+	// Export Type Modal
+	exportTypeModalVisible: boolean;
+	onExportTypeNext: (type: ExportType) => void;
+	onExportTypeCancel: () => void;
 }
 
 const ExportModals: FC<ExportModalsProps> = ({
@@ -39,7 +47,16 @@ const ExportModals: FC<ExportModalsProps> = ({
 	onSoPhieuXuatChange,
 	onDocumentNext,
 	onDocumentCancel,
+	exportTypeModalVisible,
+	onExportTypeNext,
+	onExportTypeCancel,
 }) => {
+	const [selectedType, setSelectedType] = useState<ExportType>('AMIS');
+
+	const handleTypeNext = () => {
+		onExportTypeNext(selectedType);
+	};
+
 	return (
 		<>
 			{/* Step 1: VAT Modal */}
@@ -73,7 +90,7 @@ const ExportModals: FC<ExportModalsProps> = ({
 			{/* Step 2: Document Modal */}
 			<Modal
 				open={exportModalVisible}
-				title="Xuất đơn hàng (Bước 2/2)"
+				title="Xuất đơn hàng (Bước 2/3)"
 				handleOk={onDocumentNext}
 				handleCancel={onDocumentCancel}
 				width={600}
@@ -82,7 +99,7 @@ const ExportModals: FC<ExportModalsProps> = ({
 						Hủy
 					</Button>,
 					<Button key="next" type="primary" onClick={onDocumentNext}>
-						Xuất Excel
+						Tiếp theo
 					</Button>,
 				]}
 			>
@@ -104,9 +121,35 @@ const ExportModals: FC<ExportModalsProps> = ({
 					))}
 				</div>
 			</Modal>
+
+			{/* Step 3: Export Type Modal */}
+			<Modal
+				open={exportTypeModalVisible}
+				title="Chọn định dạng xuất khẩu (Bước 3/3)"
+				handleOk={handleTypeNext}
+				handleCancel={onExportTypeCancel}
+				width={400}
+				footer={[
+					<Button key="cancel" type="default" danger onClick={onExportTypeCancel}>
+						Hủy
+					</Button>,
+					<Button key="next" type="primary" onClick={handleTypeNext}>
+						Xuất Excel
+					</Button>,
+				]}
+			>
+				<div className="flex flex-col gap-4">
+					<Text>Chọn định dạng file Excel:</Text>
+					<Radio.Group onChange={(e) => setSelectedType(e.target.value)} value={selectedType}>
+						<Space direction="vertical">
+							<Radio value="AMIS">AMIS</Radio>
+							<Radio value="SME">SME</Radio>
+						</Space>
+					</Radio.Group>
+				</div>
+			</Modal>
 		</>
 	);
 };
 
 export default ExportModals;
-
