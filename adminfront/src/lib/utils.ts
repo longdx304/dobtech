@@ -117,7 +117,7 @@ export const getCurrencyInfo = (currencyCode?: string) => {
  * @returns The generated customer code
  */
 export const generateCustomerCode = (currentTotal: number): string => {
-	const nextNumber = currentTotal + 1;
+	const nextNumber = currentTotal + 1001;
 	const paddedNumber = nextNumber.toString().padStart(6, '0');
 	return `CUS-${paddedNumber}`;
 };
