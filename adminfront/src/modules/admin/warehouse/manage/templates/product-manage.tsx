@@ -9,7 +9,8 @@ import { ProductVariant } from '@/types/products';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import debounce from 'lodash/debounce';
 import { Search } from 'lucide-react';
-import { useAdminVariants } from 'medusa-react';
+import { useAdminVariants, useMedusa } from 'medusa-react';
+import * as XLSX from 'xlsx';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import ModalAddVariant from '../components/modal-add-variant';
 import ModalVariantInventory from '../components/modal-variant-inventory';
@@ -37,6 +38,9 @@ const ProductManage: FC<Props> = ({}) => {
 		onOpen: openTransactionHistory,
 		onClose: closeTransactionHistory,
 	} = useToggleState(false);
+
+	const { client } = useMedusa();
+	const [isExporting, setIsExporting] = useState<boolean>(false);
 
 	const [inventoryType, setInventoryType] = useState<string>('');
 	const [variant, setVariant] = useState<ProductVariant>();
@@ -111,6 +115,54 @@ const ProductManage: FC<Props> = ({}) => {
 		setWarehouseInventory(undefined);
 	};
 
+	const handleExportExcel = async () => {
+		setIsExporting(true);
+		try {
+			const { variants } = await client.admin.variants.list({
+				limit: 9999,
+				expand:
+					'product,inventories,inventories.item_unit,inventories.warehouse',
+			});
+
+			const data = variants.flatMap((variant: any) => {
+				if (!variant.inventories?.length) return [];
+
+				return variant.inventories
+					.filter((inv: any) => {
+						const location = inv.warehouse?.location || '';
+						// Exclude locations starting with 1-2 letters followed by digits (e.g. A1, B 2, d5, h1d10, B,1)
+						// This keeps "Kho 1" (3 letters) and "Hàng mẫu" (no digits/long word)
+						if (/\b[a-zA-Z]{1,2}[\.\,\-\s]*\d+/.test(location)) return false;
+						
+						// Ensure we process items that have a location
+						if (!location) return false;
+						
+						return true;
+					})
+					.map((inv: any) => ({
+						'Mã': variant.sku,
+						'Model': `${variant.product?.title || ''} - ${variant.title}`,
+						'Số lượng': inv.quantity,
+						'Vị trí': inv.warehouse?.location,
+					}));
+			});
+
+			if (data.length === 0) {
+				// alert('Không có dữ liệu phù hợp');
+				return;
+			}
+
+			const ws = XLSX.utils.json_to_sheet(data);
+			const wb = XLSX.utils.book_new();
+			XLSX.utils.book_append_sheet(wb, ws, 'Danh sách');
+			XLSX.writeFile(wb, 'danh-sach-san-pham.xlsx');
+		} catch (error) {
+			console.error('Export error:', error);
+		} finally {
+			setIsExporting(false);
+		}
+	};
+
 	const expandColumns = expandedColumns({
 		handleAddInventory,
 		handleRemoveInventory,
@@ -139,6 +191,14 @@ const ProductManage: FC<Props> = ({}) => {
 					onChange={handleChangeDebounce}
 					className="w-[300px] mr-2"
 				/>
+				<Button
+					type="default"
+					className="mr-2"
+					onClick={handleExportExcel}
+					loading={isExporting}
+				>
+					Xuất Excel
+				</Button>
 				<Button
 					type="dashed"
 					onClick={() => {
