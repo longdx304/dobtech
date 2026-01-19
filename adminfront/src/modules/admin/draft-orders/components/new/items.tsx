@@ -45,6 +45,7 @@ const Items = () => {
 
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [selectedPage, setSelectedPage] = useState<number>(1);
 	const [activeTab, setActiveTab] = useState<TabsProps['activeKey']>('list');
 
 	const {
@@ -81,6 +82,7 @@ const Items = () => {
 					id: items.map((item) => item.variant_id),
 					region_id: region?.id,
 					customer_id: form.getFieldValue('customer_id'),
+					limit: items.length,
 				}
 				: undefined,
 			{
@@ -214,6 +216,11 @@ const Items = () => {
 		setCurrentPage(page);
 	};
 
+	// Handle selected page change
+	const handleSelectedPageChange = (page: number) => {
+		setSelectedPage(page);
+	};
+
 	useEffect(() => {
 		if (variantPrices.some((p) => p.unit_price === 0)) {
 			disableNext();
@@ -310,8 +317,8 @@ const Items = () => {
 		handlePriceChange,
 	});
 
-	const handleDisable = (record: PricedVariant) => {
-		// if ((record?.inventory_quantity || 0) > 0 || record?.allow_backorder) {
+	const handleDisable = (_record: PricedVariant) => {
+		// if ((_record?.inventory_quantity || 0) > 0 || _record?.allow_backorder) {
 		// 	return false;
 		// }
 		// return true;
@@ -331,6 +338,12 @@ const Items = () => {
 
 	const handleTabChange = (key: string) => {
 		setActiveTab(key);
+		// Reset page when switching tabs
+		if (key === 'list') {
+			setCurrentPage(1);
+		} else {
+			setSelectedPage(1);
+		}
 	};
 
 	// Sync selected variants with prices and quantities with items context
@@ -373,6 +386,13 @@ const Items = () => {
 	const totalQuantity = useMemo(() => {
 		return variantQuantities.reduce((total, item) => total + item.quantity, 0);
 	}, [variantQuantities]);
+
+	// Paginated selected variants for display
+	const paginatedSelectedVariants = useMemo(() => {
+		const startIndex = (selectedPage - 1) * PAGE_SIZE;
+		const endIndex = startIndex + PAGE_SIZE;
+		return selectedVariants.slice(startIndex, endIndex);
+	}, [selectedVariants, selectedPage]);
 
 	// Find variants not in dataFromExcel
 	const dataFromExcelError = useMemo(() => {
@@ -462,6 +482,7 @@ const Items = () => {
 
 	const handleExcelOpen = () => {
 		setActiveTab('checked');
+		setSelectedPage(1);
 		onOpen();
 		setSelectedVariantIds([]);
 		setSelectedVariants([]);
@@ -552,7 +573,7 @@ const Items = () => {
 				}}
 				loading={isLoading}
 				columns={columns as any}
-				dataSource={(activeTab === 'list' ? variants : selectedVariants) ?? []}
+				dataSource={(activeTab === 'list' ? variants : paginatedSelectedVariants) ?? []}
 				rowKey="id"
 				scroll={{ x: 700 }}
 				pagination={
@@ -564,7 +585,13 @@ const Items = () => {
 							onChange: handleChangePage,
 							showSizeChanger: false,
 						}
-						: false
+						: {
+							total: selectedVariants.length,
+							pageSize: PAGE_SIZE,
+							current: selectedPage,
+							onChange: handleSelectedPageChange,
+							showSizeChanger: false,
+						}
 				}
 				summary={() => (
 					<>
