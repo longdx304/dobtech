@@ -213,9 +213,8 @@ const OrderEditLine = ({
 					</div>
 					{item?.variant && (
 						<span className="font-normal text-gray-500 truncate">
-							{`${item.variant.title}${
-								item.variant.sku ? ` (${item.variant.sku})` : ''
-							}`}
+							{`${item.variant.title}${item.variant.sku ? ` (${item.variant.sku})` : ''
+								}`}
 						</span>
 					)}
 				</div>
@@ -243,10 +242,7 @@ const OrderEditLine = ({
 						<div className="flex sm:flex-row flex-col items-end">
 							<div
 								className={clsx(
-									'space-x-2 flex items-center text-end text-sm',
-									{
-										'pointer-events-none !text-gray-400': isLocked,
-									}
+									'space-x-2 flex items-center text-end text-sm'
 								)}
 							>
 								<Popconfirm
@@ -255,19 +251,16 @@ const OrderEditLine = ({
 										<InputNumber
 											placeholder="Thay đổi số lượng"
 											className={clsx(
-												'cursor-pointer text-gray-400 my-2 w-[130px]',
-												{
-													'pointer-events-none': isLoading,
-												}
+												'cursor-pointer text-gray-400 my-2 w-[130px]'
 											)}
 											value={Math.round(unitPrice)}
 											onChange={(value) => setUnitPrice(Number(value))}
-											disabled={isLocked || isLoading}
+											disabled={isLoading}
 										/>
 									}
 									isLoading={isLoading}
 									handleOk={onUnitPriceUpdate}
-									handleCancel={() => {}}
+									handleCancel={() => { }}
 									icon={null}
 								>
 									<Pencil size={16} />
