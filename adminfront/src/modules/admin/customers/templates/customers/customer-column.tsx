@@ -75,6 +75,8 @@ const customerColumns = ({ handleEditCustomer, handleViewOrder }: Props) => [
 		key: 'created_at',
 		width: 150,
 		className: 'text-xs',
+		sorter: (a: ICustomerResponse, b: ICustomerResponse) =>
+			dayjs(a.created_at).valueOf() - dayjs(b.created_at).valueOf(),
 		render: (_: ICustomerResponse['created_at']) => {
 			return dayjs(_).format('DD/MM/YYYY');
 		},
