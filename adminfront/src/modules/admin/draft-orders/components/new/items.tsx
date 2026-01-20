@@ -311,11 +311,10 @@ const Items = () => {
 	});
 
 	const handleDisable = (record: PricedVariant) => {
-		// if ((record?.inventory_quantity || 0) > 0 || record?.allow_backorder) {
-		// 	return false;
-		// }
-		// return true;
-		return false;
+		if ((record?.inventory_quantity || 0) > 0 || record?.allow_backorder) {
+			return false;
+		}
+		return true;
 	};
 
 	const itemTabs: TabsProps['items'] = [

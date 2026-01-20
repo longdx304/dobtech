@@ -8,7 +8,6 @@ import { useAdminDeleteFile, useAdminUploadFile } from '@/lib/hooks/api/uploads'
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { getErrorMessage } from '@/lib/utils';
 import { ERoutes } from '@/types/routes';
-import { LineItemReq } from '@/types/order';
 import { Modal as AntdModal, message } from 'antd';
 import _ from 'lodash';
 import { Plus, Search } from 'lucide-react';

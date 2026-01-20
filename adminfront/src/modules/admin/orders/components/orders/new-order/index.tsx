@@ -105,7 +105,6 @@ const NewOrderModal: FC<Props> = ({
 	): Promise<string> => {
 		const values = form.getFieldsValue(true);
 		let pdfReq = {} as pdfOrderRes;
-		console.log('items', items)
 		pdfReq = {
 			email: values.email,
 			userId: user!.id,
@@ -174,7 +173,6 @@ const NewOrderModal: FC<Props> = ({
 	};
 
 	const generateTransferOrderData = (tax: number) => {
-		console.log('tax:', tax);
 		const values = form.getFieldsValue(true);
 		const taxRate = region?.tax_rate || 0;
 		// for create draft order by admin
