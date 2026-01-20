@@ -128,17 +128,6 @@ const ProductManage: FC<Props> = ({}) => {
 				if (!variant.inventories?.length) return [];
 
 				return variant.inventories
-					.filter((inv: any) => {
-						const location = inv.warehouse?.location || '';
-						// Exclude locations starting with 1-2 letters followed by digits (e.g. A1, B 2, d5, h1d10, B,1)
-						// This keeps "Kho 1" (3 letters) and "Hàng mẫu" (no digits/long word)
-						if (/\b[a-zA-Z]{1,2}[\.\,\-\s]*\d+/.test(location)) return false;
-						
-						// Ensure we process items that have a location
-						if (!location) return false;
-						
-						return true;
-					})
 					.map((inv: any) => ({
 						'Mã': variant.sku,
 						'Model': `${variant.product?.title || ''} - ${variant.title}`,
