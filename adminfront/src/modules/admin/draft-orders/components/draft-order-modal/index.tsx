@@ -8,7 +8,7 @@ import { message } from 'antd';
 import { useAdminCreateDraftOrder } from 'medusa-react';
 import { FC } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
-import Items from '../new/items';
+import ItemsDraft from '../new/items-draft';
 import SelectRegion from '../new/select-region';
 import ShippingDetails from '../new/shipping-details';
 import Summary from '../new/summary';
@@ -36,7 +36,7 @@ const DraftOrderModal: FC<Props> = ({
 	const steps = [
 		{ title: '', content: <SelectRegion /> },
 		{ title: '', content: <ShippingDetails /> },
-		{ title: '', content: <Items /> },
+		{ title: '', content: <ItemsDraft /> },
 		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} /> },
 	];
 

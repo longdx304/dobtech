@@ -327,12 +327,11 @@ const Items = () => {
 		handlePriceChange,
 	});
 
-	const handleDisable = (_record: PricedVariant) => {
-		// if ((_record?.inventory_quantity || 0) > 0 || _record?.allow_backorder) {
-		// 	return false;
-		// }
-		// return true;
-		return false;
+	const handleDisable = (record: PricedVariant) => {
+		if ((record?.inventory_quantity || 0) > 0 || record?.allow_backorder) {
+			return false;
+		}
+		return true;
 	};
 
 	const itemTabs: TabsProps['items'] = [
