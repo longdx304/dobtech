@@ -247,6 +247,9 @@ const SupplierOrdersList: FC<Props> = () => {
 					)
 				}
 				onDocumentCancel={exportHook.handleCloseExportModal}
+				exportTypeModalVisible={exportHook.exportTypeModalVisible}
+				onExportTypeNext={exportHook.handleExportTypeNext}
+				onExportTypeCancel={exportHook.handleExportTypeCancel}
 			/>
 		</>
 	);
