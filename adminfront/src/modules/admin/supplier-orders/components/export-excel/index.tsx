@@ -117,7 +117,7 @@ export interface SmeExcelRow {
 	'ĐVT': string;
 	'Số lượng': number;
 	'Đơn giá': string | number;
-	'Thành tiền': number;
+	'Thành tiền': string | number;
 	'Thành tiền quy đổi': string | number;
 	'Tỷ lệ CK': string | number;
 	'Tiền chiết khấu': string | number;
@@ -185,12 +185,12 @@ export const generateAmisExcelData = (
 			// Assuming input unit_price is in base currency for now or handled by tiGia
 
 			const row: AmisExcelRow = {
-				'Hình thức mua hàng': 'Mua hàng trong nước nhập kho',
+				'Hình thức mua hàng': 'Mua hàng nhập khẩu nhập kho',
 				'Phương thức thanh toán': 'Chưa thanh toán',
 				'Ngày hạch toán (*)': ngayHachToan,
 				'Ngày chứng từ (*)': ngayChungTu,
 				'Số phiếu nhập (*)': soPhieuNhap,
-				'Số chứng từ ghi nợ/Số chứng từ thanh toán': soChungTu,
+				'Số chứng từ ghi nợ/Số chứng từ thanh toán': '',
 				'Mẫu số HĐ': '',
 				'Ký hiệu HĐ': '',
 				'Số hóa đơn': '',
@@ -212,7 +212,7 @@ export const generateAmisExcelData = (
 				'Loại tiền': 'THB', // Default to VND, user can change if needed or based on order currency
 				'Tỷ giá': tiGia,
 				'Mã hàng (*)': maHang,
-				'Tên hàng': tenHang,
+				'Tên hàng': '',
 				'Là dòng ghi chú': 'không',
 				'Mã kho': 'KHH-HCM',
 				'Hàng hóa giữ hộ/bán hộ': '',
@@ -221,8 +221,8 @@ export const generateAmisExcelData = (
 				'ĐVT': 'Đôi',
 				'Số lượng': item.quantity,
 				'Đơn giá': donGia,
-				'Thành tiền': thanhTien,
-				'Thành tiền quy đổi': thanhTienQuyDoi,
+				'Thành tiền': '',
+				'Thành tiền quy đổi': '',
 				'Tỷ lệ CK (%)': '',
 				'Tiền chiết khấu': '',
 				'Tiền chiết khấu quy đổi': '',
@@ -320,7 +320,7 @@ export const generateSmeExcelData = (
 
 				// User input
 				'Số phiếu nhập (*)': soPhieuNhap,
-				'Số chứng từ thanh toán': soChungTu,
+				'Số chứng từ thanh toán': '',
 
 				// Invoice information
 				'Mẫu số HĐ': '',
@@ -341,7 +341,7 @@ export const generateSmeExcelData = (
 
 				// Product data
 				'Mã hàng (*)': maHang,
-				'Tên hàng': tenHang,
+				'Tên hàng': '',
 				'Kho': 'KHH-HCM',
 				'Hàng hóa giữ hộ/bán hộ': '',
 
@@ -353,8 +353,8 @@ export const generateSmeExcelData = (
 				// Item quantities and prices
 				'Số lượng': item.quantity,
 				'Đơn giá': donGia,
-				'Thành tiền': thanhTien,
-				'Thành tiền quy đổi': thanhTienQuyDoi,
+				'Thành tiền': '',
+				'Thành tiền quy đổi': '',
 
 				// Discount fields
 				'Tỷ lệ CK': '',
