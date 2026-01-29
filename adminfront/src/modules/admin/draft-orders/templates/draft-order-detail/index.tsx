@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function DraftOrderDetail({ id }: Readonly<Props>) {
-	const { draft_order, isLoading } = useAdminDraftOrder(id);
+	const { draft_order, isLoading, refetch } = useAdminDraftOrder(id);
 	const {
 		events,
 		isLoading: isLoadingTimeline,
@@ -37,6 +37,7 @@ export default function DraftOrderDetail({ id }: Readonly<Props>) {
 						draftOrderId={draft_order.id}
 						isLoading={isLoading || isLoadingTimeline}
 						events={events}
+						refetchDraftOrder={refetch}
 					/>
 				)}
 			</Col>
