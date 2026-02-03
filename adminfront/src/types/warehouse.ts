@@ -1,6 +1,7 @@
-import { PaginatedResponse, User } from '@medusajs/medusa';
+import { Order, PaginatedResponse, User } from '@medusajs/medusa';
 import { ItemUnit } from './item-unit';
 import { ProductVariant } from './products';
+import { SupplierOrder } from './supplier-order';
 
 export interface Warehouse {
 	id: string;
@@ -126,6 +127,8 @@ export type WarehouseInventory = {
 	updated_at: string;
 	user_id: string;
 	user: User;
+	order?: Order;
+	supplier_order?: SupplierOrder;
 };
 
 export interface AdminPostInboundInventoryReq {
