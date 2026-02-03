@@ -2,8 +2,8 @@ import { SupplierOrder } from '@/types/supplier-order';
 import { message } from 'antd';
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { generateAmisExcelData, generateSmeExcelData } from '../components/export-excel';
 import { downloadExcelFiles } from '../components/export-excel/download';
-import { generateSupplierOrderExcelData } from '../components/export-excel';
 
 export const useSupplierOrderExport = () => {
 	const [vatModalVisible, setVatModalVisible] = useState<boolean>(false);
@@ -16,6 +16,12 @@ export const useSupplierOrderExport = () => {
 	const [soPhieuNhapValues, setSoPhieuNhapValues] = useState<
 		Record<string, string>
 	>({});
+
+	const [exportTypeModalVisible, setExportTypeModalVisible] = useState<boolean>(false);
+	const [pendingExportData, setPendingExportData] = useState<{
+		selectedSupplierOrders: SupplierOrder[];
+		onComplete: () => void;
+	} | null>(null);
 
 	const handleOpenExportModal = (selectedKeys: React.Key[]) => {
 		// Show VAT modal first
@@ -64,8 +70,17 @@ export const useSupplierOrderExport = () => {
 		selectedSupplierOrders: SupplierOrder[],
 		onComplete: () => void
 	) => {
-		// Close document modal and proceed to Excel generation
+		// Close document modal and open export type modal
 		setExportModalVisible(false);
+		setExportTypeModalVisible(true);
+
+		// Save pending data
+		setPendingExportData({ selectedSupplierOrders, onComplete });
+	};
+
+	const handleExportTypeNext = (type: 'AMIS' | 'SME') => {
+		if (!pendingExportData) return;
+		const { selectedSupplierOrders, onComplete } = pendingExportData;
 
 		// Prepare data for Excel generation
 		const ordersData = selectedSupplierOrders.map((supplierOrder) => ({
@@ -76,23 +91,16 @@ export const useSupplierOrderExport = () => {
 			tiGia: tiGia,
 		}));
 
-		// Generate Excel data structure (one file per supplier order)
-		const excelFiles = generateSupplierOrderExcelData(ordersData);
+		// Generate Excel data structure based on type
+		let excelFiles;
+		if (type === 'AMIS') {
+			excelFiles = generateAmisExcelData(ordersData);
+		} else {
+			excelFiles = generateSmeExcelData(ordersData);
+		}
 
-		console.log('=== SUPPLIER ORDER EXCEL EXPORT DATA ===');
+		console.log(`=== SUPPLIER ORDER EXCEL EXPORT DATA (${type}) ===`);
 		console.log(`Total Files to Export: ${excelFiles.length}`);
-		console.log('');
-
-		excelFiles.forEach((file, index) => {
-			console.log(`📄 File ${index + 1}:`);
-			console.log(`   Supplier Order Display ID: ${file.displayId}`);
-			console.log(`   Supplier: ${file.supplierName}`);
-			console.log(`   Số chứng từ: ${file.soChungTu}`);
-			console.log(`   Số phiếu nhập: ${file.soPhieuNhap}`);
-			console.log(`   Total Items (Rows): ${file.rows.length}`);
-			console.log(`   Data:`, file.rows);
-			console.log('');
-		});
 
 		// Download Excel files
 		downloadExcelFiles(excelFiles).then((success) => {
@@ -111,8 +119,15 @@ export const useSupplierOrderExport = () => {
 			}
 		});
 
-		// Clear selection
+		// Clear selection and state
+		setExportTypeModalVisible(false);
+		setPendingExportData(null);
 		onComplete();
+	};
+
+	const handleExportTypeCancel = () => {
+		setExportTypeModalVisible(false);
+		setExportModalVisible(true);
 	};
 
 	const handleSoChungTuChange = (supplierOrderId: string, value: string) => {
@@ -133,6 +148,7 @@ export const useSupplierOrderExport = () => {
 		// State
 		vatModalVisible,
 		exportModalVisible,
+		exportTypeModalVisible,
 		vatRate,
 		tiGia,
 		soChungTuValues,
@@ -146,6 +162,8 @@ export const useSupplierOrderExport = () => {
 		handleVatCancel,
 		handleCloseExportModal,
 		handleDocumentModalNext,
+		handleExportTypeNext,
+		handleExportTypeCancel,
 		handleSoChungTuChange,
 		handleSoPhieuNhapChange,
 	};

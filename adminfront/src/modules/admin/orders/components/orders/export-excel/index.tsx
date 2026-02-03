@@ -24,7 +24,6 @@ export interface AmisExcelRow {
 	'Số hóa đơn': string;
 	'Ngày hóa đơn': string;
 	'Mã khách hàng': string;
-	'Tên khách hàng': string;
 	'Địa chỉ': string;
 	'Mã số thuế': string;
 	'Đơn vị giao đại lý': string;
@@ -186,8 +185,6 @@ export const generateAmisExcelData = (ordersData: ExportOrderData[]): ExcelFile[
 				'Số hóa đơn': '',
 				'Ngày hóa đơn': '',
 				'Mã khách hàng': finalCustomerCode,
-				'Tên khách hàng': customerName,
-				// 'Tên khách hàng': customerName,
 				'Địa chỉ': '',
 				'Mã số thuế': '',
 				'Đơn vị giao đại lý': '',

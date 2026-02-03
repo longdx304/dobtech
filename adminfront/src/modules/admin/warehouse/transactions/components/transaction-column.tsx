@@ -6,6 +6,7 @@ import { DatePicker } from 'antd';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import Link from 'next/link';
 
 dayjs.extend(utc);
 
@@ -27,6 +28,38 @@ const transactionColumns = ({ }: Props) => [
 		render: (text: string, record: any) => {
 			return (
 				`${record?.variant?.product?.title} - ${record?.variant?.title}` || '-'
+			);
+		},
+	},
+	{
+		title: 'Số đơn hàng',
+		dataIndex: 'order_id',
+		key: 'order_id',
+		width: 150,
+		className: 'text-xs',
+		render: (order_id: string | null, record: any) => {
+			if (!order_id) {
+				return '-';
+			}
+			const isSupplierOrder = order_id.startsWith('so_');
+			const href = isSupplierOrder
+				? `/admin/supplier-orders/${order_id}`
+				: `/admin/orders/${order_id}`;
+
+			let displayText = order_id;
+			if (isSupplierOrder && record?.supplier_order?.display_id) {
+				displayText = `#${record.supplier_order.display_id}`;
+			} else if (record?.order?.display_id) {
+				displayText = `#${record.order.display_id}`;
+			}
+
+			return (
+				<Link
+					href={href}
+					className="text-blue-600 hover:text-blue-800 underline"
+				>
+					{displayText}
+				</Link>
 			);
 		},
 	},
