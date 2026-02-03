@@ -107,9 +107,10 @@ const styles = StyleSheet.create({
 interface OrderPDFProps {
 	order: pdfOrderRes;
 	region?: Region;
+	title?: string;
 }
 
-const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
+const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hàng Mua' }) => {
 	const total = order.lineItems.reduce(
 		(sum, item) => sum + item.quantity * (item.unit_price || 0),
 		0
@@ -131,7 +132,7 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region }) => {
 			<Page size="A4" style={styles.page}>
 				<View style={styles.header}>
 					<View>
-						<Text style={styles.title}>Đơn Hàng Mua</Text>
+						<Text style={styles.title}>{title}</Text>
 					</View>
 					<View>
 						<Text style={styles.text}>
@@ -238,8 +239,8 @@ export const OrderPDF: FC<OrderPDFProps> = (props) => {
 	return <OrderPDFDocument {...props} />;
 };
 
-export const generatePdfBlob = async (order: pdfOrderRes) => {
-	const blob = await pdf(<OrderPDFDocument order={order} />).toBlob();
+export const generatePdfBlob = async (order: pdfOrderRes, title?: string) => {
+	const blob = await pdf(<OrderPDFDocument order={order} title={title} />).toBlob();
 	return blob;
 };
 

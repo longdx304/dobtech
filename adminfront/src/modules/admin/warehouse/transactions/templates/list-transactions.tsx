@@ -37,6 +37,7 @@ const ListTransaction: FC<Props> = () => {
 			type: type || undefined,
 			start_at: startAt || undefined,
 			end_at: endAt || undefined,
+			expand: 'order,supplier_order',
 		});
 
 	const columns = useMemo(() => {

@@ -7,7 +7,7 @@ import { useAdminDraftOrderUpdateMetadata } from '@/lib/hooks/api/draft-orders';
 import { useUser } from '@/lib/providers/user-provider';
 import { getErrorMessage } from '@/lib/utils';
 import { DraftTimelineEvent } from '../../hooks/use-build-draft-timeline';
-import { LineItem, DraftOrder } from '@medusajs/medusa';
+import { LineItem } from '@medusajs/medusa';
 import { Empty, message } from 'antd';
 import { isEmpty } from 'lodash';
 import { FileDown, File as FileIcon, Paperclip } from 'lucide-react';
@@ -67,7 +67,7 @@ const DraftTimeline = ({ draftOrderId, isLoading, events, refetchDraftOrder }: P
 			};
 
 			// Generate pdf blob
-			const pdfBlob = await generatePdfBlob(pdfReq!);
+			const pdfBlob = await generatePdfBlob(pdfReq!, 'Đơn Nháp');
 
 			// Create a File object
 			const fileName = `draft-order.pdf`;

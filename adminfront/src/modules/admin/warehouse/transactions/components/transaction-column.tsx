@@ -37,7 +37,7 @@ const transactionColumns = ({ }: Props) => [
 		key: 'order_id',
 		width: 150,
 		className: 'text-xs',
-		render: (order_id: string | null) => {
+		render: (order_id: string | null, record: any) => {
 			if (!order_id) {
 				return '-';
 			}
@@ -46,12 +46,19 @@ const transactionColumns = ({ }: Props) => [
 				? `/admin/supplier-orders/${order_id}`
 				: `/admin/orders/${order_id}`;
 
+			let displayText = order_id;
+			if (isSupplierOrder && record?.supplier_order?.display_id) {
+				displayText = `#${record.supplier_order.display_id}`;
+			} else if (record?.order?.display_id) {
+				displayText = `#${record.order.display_id}`;
+			}
+
 			return (
 				<Link
 					href={href}
 					className="text-blue-600 hover:text-blue-800 underline"
 				>
-					{order_id}
+					{displayText}
 				</Link>
 			);
 		},
