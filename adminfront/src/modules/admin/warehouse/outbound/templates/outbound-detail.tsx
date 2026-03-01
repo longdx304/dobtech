@@ -25,7 +25,7 @@ import { getErrorMessage } from '@/lib/utils';
 import PlaceholderImage from '@/modules/admin/common/components/placeholder-image';
 import { FulfillmentStatus } from '@/types/fulfillments';
 import { LineItem } from '@/types/lineItem';
-import { message } from 'antd';
+import { message, Tooltip } from 'antd';
 import clsx from 'clsx';
 import { useAdminCreateNote } from 'medusa-react';
 import Image from 'next/image';
@@ -328,16 +328,20 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 						<PlaceholderImage />
 					)}
 				</div>
-				<div className="flex max-w-[185px] flex-col justify-center text-[12px]">
-					<span className="font-normal text-gray-900 truncate">
-						{item.title}
-					</span>
-					{item?.variant && (
-						<span className="font-normal text-gray-500 truncate">
-							{`${item.variant.title}${
-								item.variant.sku ? ` (${item.variant.sku})` : ''
-							}`}
+				<div className="flex max-w-[320px] flex-col justify-center text-[12px]">
+					<Tooltip title={item.title}>
+						<span className="font-normal text-gray-900 truncate">
+							{item.title}
 						</span>
+					</Tooltip>
+					{item?.variant && (
+						<Tooltip title={`${item.variant.title}${item.variant.sku ? ` (${item.variant.sku})` : ''}`}>
+							<span className="font-normal text-gray-500 truncate">
+								{`${item.variant.title}${
+									item.variant.sku ? ` (${item.variant.sku})` : ''
+								}`}
+							</span>
+						</Tooltip>
 					)}
 				</div>
 			</div>

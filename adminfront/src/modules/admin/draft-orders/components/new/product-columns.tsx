@@ -17,6 +17,7 @@ interface Props {
 		value: number,
 		currency: string
 	) => void;
+	ignoreInventoryLimit?: boolean;
 }
 
 type SelectProduct = Omit<
@@ -109,10 +110,12 @@ const EditableQuantity = ({
 	quantity,
 	record,
 	handleQuantityChange,
+	ignoreInventoryLimit,
 }: {
 	quantity: number;
 	record: SelectProduct;
 	handleQuantityChange: (value: number, variantId: string) => void;
+	ignoreInventoryLimit?: boolean;
 }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [selectedUnit, setSelectedUnit] = useState<Unit>(Unit.Đôi);
@@ -130,12 +133,16 @@ const EditableQuantity = ({
 
 	const handleValueChange = (value: number | null) => {
 		if (value !== null) {
-			const unitMultiplier = getUnitMultiplier(selectedUnit);
-			const maxInCurrentUnit = !record.allow_backorder
-				? Math.floor((record.inventory_quantity ?? 0) / unitMultiplier)
-				: Number.MAX_SAFE_INTEGER;
+			let finalInputValue = value;
 
-			const finalInputValue = Math.min(value, maxInCurrentUnit);
+			if (!ignoreInventoryLimit) {
+				const unitMultiplier = getUnitMultiplier(selectedUnit);
+				const maxInCurrentUnit = !record.allow_backorder
+					? Math.floor((record.inventory_quantity ?? 0) / unitMultiplier)
+					: Number.MAX_SAFE_INTEGER;
+
+				finalInputValue = Math.min(value, maxInCurrentUnit);
+			}
 			setInputValue(finalInputValue);
 
 			// Convert to đôi before sending to parent
@@ -168,9 +175,12 @@ const EditableQuantity = ({
 				autoFocus
 				min={1}
 				max={
-					!record.allow_backorder
-						? Math.floor((record.inventory_quantity ?? 0) / getUnitMultiplier(selectedUnit))
-						: undefined
+					ignoreInventoryLimit || record.allow_backorder
+						? undefined
+						: Math.floor(
+								(record.inventory_quantity ?? 0) /
+									getUnitMultiplier(selectedUnit)
+						  )
 				}
 				value={inputValue}
 				onChange={handleValueChange}
@@ -245,6 +255,7 @@ const productsColumns = ({
 	handleQuantityChange,
 	getPrice,
 	handlePriceChange,
+	ignoreInventoryLimit,
 }: Props) => {
 	return [
 		{
@@ -298,6 +309,7 @@ const productsColumns = ({
 						quantity={getQuantity(record?.id as string)}
 						record={record}
 						handleQuantityChange={handleQuantityChange}
+						ignoreInventoryLimit={ignoreInventoryLimit}
 					/>
 				);
 			},
