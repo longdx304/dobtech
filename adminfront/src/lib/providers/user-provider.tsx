@@ -28,12 +28,39 @@ const UserContext = React.createContext(defaultUserContext);
 export const UserProvider = ({ children }: PropsWithChildren) => {
 	const router = useRouter();
 	const { user, isLoading, remove, isError, error } = useAdminGetSession();
-	
-	// Redirect to login if there is an error
-	if (isError) {
-		removeCookie();
-		router.push(ERoutes.LOGIN);
-		return;
+	const [logoutAttempted, setLogoutAttempted] = useState(false);
+
+	useEffect(() => {
+		if (isError && !logoutAttempted) {
+			// Only logout for authentication errors, not network errors
+			const errorObj = error as any;
+			const isAuthError = errorObj?.response?.status === 401 ||
+			                    errorObj?.response?.status === 403 ||
+			                    errorObj?.status === 401 ||
+			                    errorObj?.status === 403;
+
+			const errorMessage = errorObj?.message || '';
+			const isNetworkError = errorMessage.includes('fetch') ||
+			                       errorMessage.includes('network') ||
+			                       errorMessage.includes('Failed to fetch');
+
+			if (isAuthError) {
+				// Legitimate auth error - logout
+				console.warn('Authentication error, logging out:', error);
+				setLogoutAttempted(true);
+				removeCookie();
+				router.push(ERoutes.LOGIN);
+			} else if (!isNetworkError) {
+				// Other error (not network) - log but don't logout
+				console.warn('Session check error (not logging out):', error);
+			}
+			// Network errors: do nothing, let retry logic handle it
+		}
+	}, [isError, error, logoutAttempted, router]);
+
+	// Don't block rendering during transient errors
+	if (isError && !logoutAttempted) {
+		return <>{children}</>;
 	}
 
 	return (
