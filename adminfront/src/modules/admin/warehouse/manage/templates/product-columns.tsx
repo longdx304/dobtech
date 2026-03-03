@@ -35,7 +35,7 @@ const productColumns = ({
 					/>
 					<Flex vertical className="">
 						<Tooltip title={`${_?.product?.title} - ${_?.title}`}>
-							<Text className="text-xs line-clamp-2">{`${_?.product?.title} - ${_?.title}`}</Text>
+							<Text className="text-xs whitespace-normal break-words">{`${_?.product?.title} - ${_?.title}`}</Text>
 						</Tooltip>
 						<span className="text-gray-500">{_?.title}</span>
 					</Flex>

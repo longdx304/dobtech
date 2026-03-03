@@ -15,16 +15,18 @@ import { getErrorMessage } from '@/lib/utils';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import { Modal as AntdModal, message } from 'antd';
 import debounce from 'lodash/debounce';
-import { Plus, Search } from 'lucide-react';
-import { ChangeEvent, FC, useState, useEffect } from 'react';
+import { Minus, Plus, Search } from 'lucide-react';
+import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import ModalAddVariantWarehouse from '../components/modal-add-variant-warehouse';
 import ModalAddWarehouse from '../components/modal-add-warehouse';
 import ModalVariantInventory from '../components/modal-variant-inventory';
 import { expandedColumns, warehouseColumns } from './location-columns';
+import { Pagination } from '@/components/Pagination';
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 20;
+const SEARCH_FETCH_LIMIT = 200;
 
 const LocationManage: FC<Props> = ({}) => {
 	const deleteWarehouse = useAdminDeleteWarehouse();
@@ -54,34 +56,85 @@ const LocationManage: FC<Props> = ({}) => {
 	const [numPages, setNumPages] = useState<number>(1);
 	const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
-	const {
-		warehouse,
-		isLoading: warehouseLoading,
-		count,
-	} = useAdminWarehouses({
+	const isSearching = !!searchValue.trim();
+
+	const { warehouse, isLoading: warehouseLoading, count } = useAdminWarehouses({
 		q: searchValue || undefined,
 		expand:
 			'inventories,inventories.variant,inventories.item_unit,inventories.variant.product',
-		limit: DEFAULT_PAGE_SIZE,
-		offset,
+		limit: isSearching ? SEARCH_FETCH_LIMIT : DEFAULT_PAGE_SIZE,
+		offset: isSearching ? 0 : offset,
 		order: '-inventories.updated_at',
 	});
-
-	useEffect(() => {
-		if (warehouse?.length) {
-			const keys = warehouse.map((item) => item.id);
-			setExpandedKeys(keys);
-		}
-	}, [warehouse]);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
 		setSearchValue(inputValue);
 	}, 500);
 
+	const normalizedSearch = useMemo(
+		() => searchValue.trim().toLowerCase(),
+		[searchValue]
+	);
+
+	const sortedWarehouse = useMemo(() => {
+		if (!warehouse?.length || !normalizedSearch) {
+			return warehouse || [];
+		}
+
+		const getPriority = (location?: string | null) => {
+			const lower = (location || '').trim().toLowerCase();
+
+			if (!lower.includes(normalizedSearch)) return 2;
+			if (lower === normalizedSearch || lower.startsWith(normalizedSearch))
+				return 0;
+			return 1;
+		};
+
+		return [...warehouse].sort((a, b) => {
+			const priorityA = getPriority(a.location);
+			const priorityB = getPriority(b.location);
+
+			if (priorityA !== priorityB) {
+				return priorityA - priorityB;
+			}
+
+			const locA = (a.location || '').trim().toLowerCase();
+			const locB = (b.location || '').trim().toLowerCase();
+
+			return locA.localeCompare(locB);
+		});
+	}, [warehouse, normalizedSearch]);
+
+	const displayWarehouse = useMemo(() => {
+		const list = sortedWarehouse ?? warehouse ?? [];
+		if (isSearching && list.length > DEFAULT_PAGE_SIZE) {
+			const start = (numPages - 1) * DEFAULT_PAGE_SIZE;
+			return list.slice(start, start + DEFAULT_PAGE_SIZE);
+		}
+		return list;
+	}, [sortedWarehouse, warehouse, isSearching, numPages]);
+
+	const displayCount = isSearching
+		? (sortedWarehouse ?? warehouse ?? []).length
+		: (count ?? 0);
+
+	useEffect(() => {
+		if (displayWarehouse.length) {
+			setExpandedKeys(displayWarehouse.map((item) => item.id));
+		}
+	}, [displayWarehouse]);
+
+	useEffect(() => {
+		setOffset(0);
+		setNumPages(1);
+	}, [searchValue]);
+
 	const handleChangePage = (page: number) => {
 		setNumPages(page);
-		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
+		if (!isSearching) {
+			setOffset((page - 1) * DEFAULT_PAGE_SIZE);
+		}
 	};
 
 	const handleEditWarehouse = (item: Warehouse) => {
@@ -165,7 +218,11 @@ const LocationManage: FC<Props> = ({}) => {
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				{/* <Title level={4}>Vị trí kho</Title> */}
-				<Flex align="center" justify="flex-end" className="py-4">
+				<Flex
+					align="center"
+					justify="flex-end"
+					className="py-4 w-full flex-col gap-2 md:flex-row md:items-center md:justify-end"
+				>
 					<Input
 						placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
 						name="search"
@@ -177,36 +234,110 @@ const LocationManage: FC<Props> = ({}) => {
 						type="dashed"
 						onClick={() => {
 							setExpandedKeys((prev) =>
-								prev.length ? [] : warehouse?.map((item) => item.id) || []
+								prev.length ? [] : displayWarehouse.map((item) => item.id)
 							);
 						}}
 					>
 						{expandedKeys.length ? 'Ẩn vị trí' : 'Hiển thị vị trí'}
 					</Button>
 				</Flex>
-				<Table
-					dataSource={warehouse}
-					expandable={{
-						expandedRowRender: expandedRowRender as any,
-						expandedRowKeys: expandedKeys,
-						onExpandedRowsChange: (keys) => {
-							setExpandedKeys(keys as string[]);
-						},
-					}}
-					loading={warehouseLoading}
-					rowKey="id"
-					columns={columns as any}
-					pagination={
-						(count ?? 0) > DEFAULT_PAGE_SIZE && {
-							onChange: (page) => handleChangePage(page),
-							pageSize: DEFAULT_PAGE_SIZE,
-							current: numPages || 1,
-							total: count,
-							showTotal: (total, range) =>
-								`${range[0]}-${range[1]} trong ${total} vị trí`,
+				<div className="hidden md:block">
+					<Table
+						dataSource={displayWarehouse}
+						expandable={{
+							expandedRowRender: expandedRowRender as any,
+							expandedRowKeys: expandedKeys,
+							onExpandedRowsChange: (keys) => {
+								setExpandedKeys(keys as string[]);
+							},
+						}}
+						loading={warehouseLoading}
+						rowKey="id"
+						columns={columns as any}
+						pagination={
+							displayCount > DEFAULT_PAGE_SIZE && {
+								onChange: (page) => handleChangePage(page),
+								pageSize: DEFAULT_PAGE_SIZE,
+								current: numPages || 1,
+								total: displayCount,
+								showTotal: (total, range) =>
+									`${range[0]}-${range[1]} trong ${total} vị trí`,
+							}
 						}
-					}
-				/>
+						scroll={{ x: 'max-content' }}
+					/>
+				</div>
+				<div className="block md:hidden">
+					{displayWarehouse?.map((item) => (
+						<div
+							key={item.id}
+							className="mb-3 rounded-md border p-3 shadow-sm flex flex-col gap-2"
+						>
+							<Flex className="items-center justify-between gap-2">
+								<Text className="text-sm font-semibold break-words">
+									{item.location}
+								</Text>
+								<Text className="text-xs text-gray-500">
+									{item.inventories?.length ?? 0} sản phẩm
+								</Text>
+							</Flex>
+
+							{item.inventories?.map((inv) => {
+								const baseQuantity =
+									inv.item_unit?.quantity && inv.item_unit.quantity > 0
+										? inv.quantity / inv.item_unit.quantity
+										: inv.quantity;
+
+								return (
+									<div
+										key={inv.id}
+										className="mt-2 flex items-center justify-between gap-2 border-t pt-2 first:mt-0 first:border-t-0"
+									>
+										<div className="min-w-0">
+											<p className="text-xs font-medium break-words">
+												{inv.variant?.product?.title} - {inv.variant?.title}
+											</p>
+											<p className="text-[11px] text-gray-500">
+												{baseQuantity}{' '}
+												{inv.item_unit?.unit
+													? `${inv.item_unit.unit} (${inv.quantity} đôi)`
+													: inv.quantity}
+											</p>
+										</div>
+										<div className="flex items-center gap-3">
+											<Minus
+												onClick={() => handleRemoveInventory(inv)}
+												size={18}
+												color="red"
+												className="cursor-pointer"
+											/>
+											<Plus
+												onClick={() => handleAddInventory(inv)}
+												size={18}
+												color="green"
+												className="cursor-pointer"
+											/>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					))}
+				{displayCount > DEFAULT_PAGE_SIZE && (
+					<div className="mt-4 pb-20 flex justify-center">
+						<Pagination
+							simple
+							current={numPages}
+							pageSize={DEFAULT_PAGE_SIZE}
+							total={displayCount}
+							onChange={handleChangePage}
+							showTotal={(total, range) =>
+								`${range[0]}-${range[1]} trong ${total} vị trí`
+							}
+						/>
+					</div>
+				)}
+				</div>
 				<FloatButton
 					icon={<Plus color="white" size={20} strokeWidth={2} />}
 					type="primary"
