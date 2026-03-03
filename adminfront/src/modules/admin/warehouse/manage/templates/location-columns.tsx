@@ -22,7 +22,7 @@ const warehouseColumns = ({
 		title: 'Vị trí',
 		key: 'location',
 		dataIndex: 'location',
-		className: 'text-xs',
+		className: 'text-xs whitespace-normal break-words',
 		fixed: 'left',
 		render: (_: Warehouse['location']) => {
 			return _;
