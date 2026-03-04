@@ -22,12 +22,10 @@ import ModalAddVariantWarehouse from '../components/modal-add-variant-warehouse'
 import ModalAddWarehouse from '../components/modal-add-warehouse';
 import ModalVariantInventory from '../components/modal-variant-inventory';
 import { expandedColumns, warehouseColumns } from './location-columns';
-import { Pagination } from '@/components/Pagination';
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 20;
-const SEARCH_FETCH_LIMIT = 200;
 
 const LocationManage: FC<Props> = ({}) => {
 	const deleteWarehouse = useAdminDeleteWarehouse();
@@ -57,85 +55,34 @@ const LocationManage: FC<Props> = ({}) => {
 	const [numPages, setNumPages] = useState<number>(1);
 	const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
-	const isSearching = !!searchValue.trim();
-
-	const { warehouse, isLoading: warehouseLoading, count } = useAdminWarehouses({
+	const {
+		warehouse,
+		isLoading: warehouseLoading,
+		count,
+	} = useAdminWarehouses({
 		q: searchValue || undefined,
 		expand:
 			'inventories,inventories.variant,inventories.item_unit,inventories.variant.product',
-		limit: isSearching ? SEARCH_FETCH_LIMIT : DEFAULT_PAGE_SIZE,
-		offset: isSearching ? 0 : offset,
+		limit: DEFAULT_PAGE_SIZE,
+		offset,
 		order: '-inventories.updated_at',
 	});
+
+	useEffect(() => {
+		if (warehouse?.length) {
+			const keys = warehouse.map((item) => item.id);
+			setExpandedKeys(keys);
+		}
+	}, [warehouse]);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
 		setSearchValue(inputValue);
 	}, 500);
 
-	const normalizedSearch = useMemo(
-		() => searchValue.trim().toLowerCase(),
-		[searchValue]
-	);
-
-	const sortedWarehouse = useMemo(() => {
-		if (!warehouse?.length || !normalizedSearch) {
-			return warehouse || [];
-		}
-
-		const getPriority = (location?: string | null) => {
-			const lower = (location || '').trim().toLowerCase();
-
-			if (!lower.includes(normalizedSearch)) return 2;
-			if (lower === normalizedSearch || lower.startsWith(normalizedSearch))
-				return 0;
-			return 1;
-		};
-
-		return [...warehouse].sort((a, b) => {
-			const priorityA = getPriority(a.location);
-			const priorityB = getPriority(b.location);
-
-			if (priorityA !== priorityB) {
-				return priorityA - priorityB;
-			}
-
-			const locA = (a.location || '').trim().toLowerCase();
-			const locB = (b.location || '').trim().toLowerCase();
-
-			return locA.localeCompare(locB);
-		});
-	}, [warehouse, normalizedSearch]);
-
-	const displayWarehouse = useMemo(() => {
-		const list = sortedWarehouse ?? warehouse ?? [];
-		if (isSearching && list.length > DEFAULT_PAGE_SIZE) {
-			const start = (numPages - 1) * DEFAULT_PAGE_SIZE;
-			return list.slice(start, start + DEFAULT_PAGE_SIZE);
-		}
-		return list;
-	}, [sortedWarehouse, warehouse, isSearching, numPages]);
-
-	const displayCount = isSearching
-		? (sortedWarehouse ?? warehouse ?? []).length
-		: (count ?? 0);
-
-	useEffect(() => {
-		if (displayWarehouse.length) {
-			setExpandedKeys(displayWarehouse.map((item) => item.id));
-		}
-	}, [displayWarehouse]);
-
-	useEffect(() => {
-		setOffset(0);
-		setNumPages(1);
-	}, [searchValue]);
-
 	const handleChangePage = (page: number) => {
 		setNumPages(page);
-		if (!isSearching) {
-			setOffset((page - 1) * DEFAULT_PAGE_SIZE);
-		}
+		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
 
 	const handleEditWarehouse = (item: Warehouse) => {
@@ -219,11 +166,7 @@ const LocationManage: FC<Props> = ({}) => {
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				{/* <Title level={4}>Vị trí kho</Title> */}
-				<Flex
-					align="center"
-					justify="flex-end"
-					className="py-4 w-full flex-col gap-2 md:flex-row md:items-center md:justify-end"
-				>
+				<Flex align="center" justify="flex-end" className="py-4">
 					<Input
 						placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
 						name="search"
@@ -235,35 +178,33 @@ const LocationManage: FC<Props> = ({}) => {
 						type="dashed"
 						onClick={() => {
 							setExpandedKeys((prev) =>
-								prev.length ? [] : displayWarehouse.map((item) => item.id)
+								prev.length ? [] : warehouse?.map((item) => item.id) || []
 							);
 						}}
 					>
 						{expandedKeys.length ? 'Ẩn vị trí' : 'Hiển thị vị trí'}
 					</Button>
 				</Flex>
-				<div className="hidden md:block">
-					<Table
-						dataSource={displayWarehouse}
-						expandable={{
-							expandedRowRender: expandedRowRender as any,
-							expandedRowKeys: expandedKeys,
-							onExpandedRowsChange: (keys) => {
-								setExpandedKeys(keys as string[]);
-							},
-						}}
-						loading={warehouseLoading}
-						rowKey="id"
-						columns={columns as any}
-						pagination={
-							displayCount > DEFAULT_PAGE_SIZE && {
-								onChange: (page) => handleChangePage(page),
-								pageSize: DEFAULT_PAGE_SIZE,
-								current: numPages || 1,
-								total: displayCount,
-								showTotal: (total, range) =>
-									`${range[0]}-${range[1]} trong ${total} vị trí`,
-							}
+				<Table
+					dataSource={warehouse}
+					expandable={{
+						expandedRowRender: expandedRowRender as any,
+						expandedRowKeys: expandedKeys,
+						onExpandedRowsChange: (keys) => {
+							setExpandedKeys(keys as string[]);
+						},
+					}}
+					loading={warehouseLoading}
+					rowKey="id"
+					columns={columns as any}
+					pagination={
+						(count ?? 0) > DEFAULT_PAGE_SIZE && {
+							onChange: (page) => handleChangePage(page),
+							pageSize: DEFAULT_PAGE_SIZE,
+							current: numPages || 1,
+							total: count,
+							showTotal: (total, range) =>
+								`${range[0]}-${range[1]} trong ${total} vị trí`,
 						}
 						scroll={{ x: 'max-content' }}
 					/>
