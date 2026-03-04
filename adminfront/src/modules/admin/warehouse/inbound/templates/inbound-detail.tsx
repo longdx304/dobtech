@@ -17,7 +17,7 @@ import PlaceholderImage from '@/modules/admin/common/components/placeholder-imag
 import { LineItem } from '@/types/lineItem';
 import { ERoutes } from '@/types/routes';
 import { FulfillSupplierOrderStt } from '@/types/supplier';
-import { message, TabsProps, Tooltip } from 'antd';
+import { message, TabsProps } from 'antd';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash';
 import debounce from 'lodash/debounce';
@@ -336,20 +336,16 @@ const FulfillmentLine = ({ item }: { item: LineItem }) => {
 						<PlaceholderImage />
 					)}
 				</div>
-				<div className="flex max-w-[320px] flex-col justify-center text-[12px]">
-					<Tooltip title={item.title}>
-						<span className="font-normal text-gray-900 truncate">
-							{item.title}
-						</span>
-					</Tooltip>
+				<div className="flex max-w-[185px] flex-col justify-center text-[12px]">
+					<span className="font-normal text-gray-900 truncate">
+						{item.title}
+					</span>
 					{item?.variant && (
-						<Tooltip title={`${item.variant.title}${item.variant.sku ? ` (${item.variant.sku})` : ''}`}>
-							<span className="font-normal text-gray-500 truncate">
-								{`${item.variant.title}${
-									item.variant.sku ? ` (${item.variant.sku})` : ''
-								}`}
-							</span>
-						</Tooltip>
+						<span className="font-normal text-gray-500 truncate">
+							{`${item.variant.title}${
+								item.variant.sku ? ` (${item.variant.sku})` : ''
+							}`}
+						</span>
 					)}
 				</div>
 			</div>

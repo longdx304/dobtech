@@ -308,8 +308,6 @@ const ItemsDraft = () => {
           : 0;
     },
     handlePriceChange,
-    // Cho phép tạo bản nháp kể cả khi tồn kho = 0
-    ignoreInventoryLimit: true,
   });
 
   const handleDisable = (record: PricedVariant) => {

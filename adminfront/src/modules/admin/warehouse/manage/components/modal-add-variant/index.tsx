@@ -12,7 +12,7 @@ import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-i
 import { ProductVariant } from '@/types/products';
 import { Warehouse } from '@/types/warehouse';
 import { message } from 'antd';
-import { debounce } from 'lodash';
+import { debounce, isEmpty } from 'lodash';
 import { LoaderCircle } from 'lucide-react';
 import { FC, useEffect, useState } from 'react';
 
@@ -34,7 +34,7 @@ const ModalAddVariant: FC<Props> = ({
 	refetch = () => {},
 }) => {
 	const [searchValue, setSearchValue] = useState<string | undefined>();
-	const [selectedOption, setSelectedOption] = useState<ValueType | undefined>();
+	const [locationValue, setLocationValue] = useState<string | undefined>();
 	const [optionWarehouses, setOptionWarehouses] = useState<
 		ValueType[] | undefined
 	>();
@@ -71,19 +71,19 @@ const ModalAddVariant: FC<Props> = ({
 		const { label, value } = data as ValueType;
 		if (!value || !label) return;
 
-		setSelectedOption(data);
+		setLocationValue(data.label);
 	};
 
 	const handleOkModal = async () => {
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
-		if (!selectedOption) {
+		if (!locationValue) {
 			return message.error('Vui lòng chọn vị trí kho');
 		}
 		await addWarehouseVariant.mutateAsync(
 			{
-				location: selectedOption.label,
+				location: locationValue,
 				variant_id: variant.id,
 				quantity: unitData.quantity,
 				unit_id: unitData.unitId,
@@ -93,7 +93,7 @@ const ModalAddVariant: FC<Props> = ({
 				onSuccess: () => {
 					message.success(`Đã thêm sản phẩm vào kho thành công`);
 					setSearchValue(undefined);
-					setSelectedOption(undefined);
+					setLocationValue(undefined);
 					onReset();
 					refetch();
 				},
@@ -111,7 +111,6 @@ const ModalAddVariant: FC<Props> = ({
 			handleCancel={() => {
 				onReset();
 				setSearchValue(undefined);
-				setSelectedOption(undefined);
 				onClose();
 			}}
 			handleOk={handleOkModal}
@@ -127,13 +126,9 @@ const ModalAddVariant: FC<Props> = ({
 					options={optionWarehouses}
 					labelInValue
 					filterOption={false}
-					value={selectedOption}
+					value={!isEmpty(searchValue) ? searchValue : undefined}
 					onSearch={debounceFetcher}
 					onSelect={handleSelect}
-					onClear={() => {
-						setSelectedOption(undefined);
-						setSearchValue(undefined);
-					}}
 					showSearch
 					notFoundContent={
 						warehouseLoading ? (
