@@ -13,7 +13,7 @@ import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
-import { Modal as AntdModal, message } from 'antd';
+import { Modal as AntdModal, message, Pagination } from 'antd';
 import debounce from 'lodash/debounce';
 import { ActionAbles } from '@/components/Dropdown';
 import { Minus, Pen, Plus, Search, Trash2 } from 'lucide-react';
@@ -156,6 +156,10 @@ const LocationManage: FC<Props> = ({}) => {
 		);
 	};
 
+	// Use warehouse for display
+	const displayWarehouse = warehouse || [];
+	const displayCount = count || 0;
+
 	return (
 		<Flex vertical gap={12}>
 			<Flex vertical align="flex-start" className="">
@@ -185,30 +189,36 @@ const LocationManage: FC<Props> = ({}) => {
 						{expandedKeys.length ? 'Ẩn vị trí' : 'Hiển thị vị trí'}
 					</Button>
 				</Flex>
-				<Table
-					dataSource={warehouse}
-					expandable={{
-						expandedRowRender: expandedRowRender as any,
-						expandedRowKeys: expandedKeys,
-						onExpandedRowsChange: (keys) => {
-							setExpandedKeys(keys as string[]);
-						},
-					}}
-					loading={warehouseLoading}
-					rowKey="id"
-					columns={columns as any}
-					pagination={
-						(count ?? 0) > DEFAULT_PAGE_SIZE && {
-							onChange: (page) => handleChangePage(page),
-							pageSize: DEFAULT_PAGE_SIZE,
-							current: numPages || 1,
-							total: count,
-							showTotal: (total, range) =>
-								`${range[0]}-${range[1]} trong ${total} vị trí`,
+
+				<div className="hidden md:block">
+					<Table
+						dataSource={warehouse}
+						expandable={{
+							expandedRowRender: expandedRowRender as any,
+							expandedRowKeys: expandedKeys,
+							onExpandedRowsChange: (keys) => {
+								setExpandedKeys(keys as string[]);
+							},
+						}}
+						loading={warehouseLoading}
+						rowKey="id"
+						columns={columns as any}
+						pagination={
+							(count ?? 0) > DEFAULT_PAGE_SIZE
+								? {
+										onChange: (page) => handleChangePage(page),
+										pageSize: DEFAULT_PAGE_SIZE,
+										current: numPages || 1,
+										total: count,
+										showTotal: (total, range) =>
+											`${range[0]}-${range[1]} trong ${total} vị trí`,
+								  }
+								: false
 						}
 						scroll={{ x: 'max-content' }}
 					/>
 				</div>
+
 				<div className="block md:hidden">
 					{displayWarehouse?.map((item) => (
 						<div
@@ -225,19 +235,21 @@ const LocationManage: FC<Props> = ({}) => {
 									</Text>
 								</Flex>
 								<ActionAbles
-									actions={[
-										{
-											label: 'Thêm sản phẩm',
-											icon: <Pen size={20} />,
-											onClick: () => handleEditWarehouse(item),
-										},
-										{
-											label: 'Xoá vị trí',
-											icon: <Trash2 size={20} />,
-											danger: true,
-											onClick: () => handleRemoveWarehouse(item.id),
-										},
-									] as any}
+									actions={
+										[
+											{
+												label: 'Thêm sản phẩm',
+												icon: <Pen size={20} />,
+												onClick: () => handleEditWarehouse(item),
+											},
+											{
+												label: 'Xoá vị trí',
+												icon: <Trash2 size={20} />,
+												danger: true,
+												onClick: () => handleRemoveWarehouse(item.id),
+											},
+										] as any
+									}
 								/>
 							</Flex>
 
@@ -282,21 +294,22 @@ const LocationManage: FC<Props> = ({}) => {
 							})}
 						</div>
 					))}
-				{displayCount > DEFAULT_PAGE_SIZE && (
-					<div className="mt-4 pb-20 flex justify-center">
-						<Pagination
-							simple
-							current={numPages}
-							pageSize={DEFAULT_PAGE_SIZE}
-							total={displayCount}
-							onChange={handleChangePage}
-							showTotal={(total, range) =>
-								`${range[0]}-${range[1]} trong ${total} vị trí`
-							}
-						/>
-					</div>
-				)}
+					{displayCount > DEFAULT_PAGE_SIZE && (
+						<div className="mt-4 pb-20 flex justify-center">
+							<Pagination
+								simple
+								current={numPages}
+								pageSize={DEFAULT_PAGE_SIZE}
+								total={displayCount}
+								onChange={handleChangePage}
+								showTotal={(total, range) =>
+									`${range[0]}-${range[1]} trong ${total} vị trí`
+								}
+							/>
+						</div>
+					)}
 				</div>
+
 				<FloatButton
 					icon={<Plus color="white" size={20} strokeWidth={2} />}
 					type="primary"
