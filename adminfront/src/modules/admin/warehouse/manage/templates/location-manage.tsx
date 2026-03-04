@@ -15,7 +15,8 @@ import { getErrorMessage } from '@/lib/utils';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import { Modal as AntdModal, message } from 'antd';
 import debounce from 'lodash/debounce';
-import { Minus, Plus, Search } from 'lucide-react';
+import { ActionAbles } from '@/components/Dropdown';
+import { Minus, Pen, Plus, Search, Trash2 } from 'lucide-react';
 import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import ModalAddVariantWarehouse from '../components/modal-add-variant-warehouse';
 import ModalAddWarehouse from '../components/modal-add-warehouse';
@@ -274,12 +275,29 @@ const LocationManage: FC<Props> = ({}) => {
 							className="mb-3 rounded-md border p-3 shadow-sm flex flex-col gap-2"
 						>
 							<Flex className="items-center justify-between gap-2">
-								<Text className="text-sm font-semibold break-words">
-									{item.location}
-								</Text>
-								<Text className="text-xs text-gray-500">
-									{item.inventories?.length ?? 0} sản phẩm
-								</Text>
+								<Flex vertical className="min-w-0">
+									<Text className="text-sm font-semibold break-words">
+										{item.location}
+									</Text>
+									<Text className="text-xs text-gray-500">
+										{item.inventories?.length ?? 0} sản phẩm
+									</Text>
+								</Flex>
+								<ActionAbles
+									actions={[
+										{
+											label: 'Thêm sản phẩm',
+											icon: <Pen size={20} />,
+											onClick: () => handleEditWarehouse(item),
+										},
+										{
+											label: 'Xoá vị trí',
+											icon: <Trash2 size={20} />,
+											danger: true,
+											onClick: () => handleRemoveWarehouse(item.id),
+										},
+									] as any}
+								/>
 							</Flex>
 
 							{item.inventories?.map((inv) => {

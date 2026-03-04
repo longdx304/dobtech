@@ -9,7 +9,8 @@ import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { ProductVariant } from '@/types/products';
 import { WarehouseInventory } from '@/types/warehouse';
 import debounce from 'lodash/debounce';
-import { Minus, Plus, Search } from 'lucide-react';
+import { ActionAbles } from '@/components/Dropdown';
+import { History, Minus, Pen, Plus, Search } from 'lucide-react';
 import { useAdminVariants, useMedusa } from 'medusa-react';
 import * as XLSX from 'xlsx';
 import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
@@ -330,22 +331,39 @@ const ProductManage: FC<Props> = ({}) => {
 							vertical
 							className="mb-3 rounded-md border p-3 shadow-sm gap-2"
 						>
-							<Flex className="items-center gap-3">
-								<Image
-									src={variantItem.product?.thumbnail ?? '/images/product-img.png'}
-									alt="Product variant Thumbnail"
-									width={40}
-									height={50}
-									className="rounded-md"
-								/>
-								<Flex vertical className="min-w-0">
-									<Text className="text-sm font-semibold break-words">
-										{variantItem.product?.title} - {variantItem.title}
-									</Text>
-									<Text className="text-xs text-gray-500 break-words">
-										SKU: {variantItem.sku}
-									</Text>
+							<Flex className="items-center justify-between gap-2">
+								<Flex className="items-center gap-3 min-w-0">
+									<Image
+										src={variantItem.product?.thumbnail ?? '/images/product-img.png'}
+										alt="Product variant Thumbnail"
+										width={40}
+										height={50}
+										className="rounded-md shrink-0"
+									/>
+									<Flex vertical className="min-w-0">
+										<Text className="text-sm font-semibold break-words">
+											{variantItem.product?.title} - {variantItem.title}
+										</Text>
+										<Text className="text-xs text-gray-500 break-words">
+											SKU: {variantItem.sku}
+										</Text>
+									</Flex>
 								</Flex>
+								<ActionAbles
+									actions={[
+										{
+											label: 'Thêm vị trí vào',
+											icon: <Pen size={20} />,
+											onClick: () => handleEditWarehouse(variantItem as any),
+										},
+										{
+											label: 'Lịch sử kho',
+											icon: <History size={20} />,
+											onClick: () =>
+												handleOpenTransactionHistory(variantItem.id ?? ''),
+										},
+									] as any}
+								/>
 							</Flex>
 
 							{sortedInventories.length ? (
@@ -395,14 +413,6 @@ const ProductManage: FC<Props> = ({}) => {
 								Chưa có vị trí kho cho sản phẩm này.
 							</Text>
 						)}
-
-						<Button
-							type="link"
-							className="self-end p-0 text-xs"
-							onClick={() => handleOpenTransactionHistory(variantItem.id ?? '')}
-						>
-							Xem lịch sử kho
-						</Button>
 					</Flex>
 					);
 				})}

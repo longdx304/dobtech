@@ -31,14 +31,19 @@ const fulfillmentColumns = [
 		// width: 150,
 		className: 'text-xs',
 		render: (_: any, record: LineItem) => (
-			<Flex vertical className="flex items-start justify-start">
+			<Flex vertical className="flex items-start justify-start gap-0">
 				<Text className="text-xs line-clamp-2" strong tooltip>
 					{`${record.title} - ${record.description}`}
 				</Text>
-				<Text className="line-clamp-2" classNameText="text-[12px]">
+				{record.variant?.sku && (
+					<Text className="text-[12px] text-gray-500">
+						{record.variant.sku}
+					</Text>
+				)}
+				<Text className="line-clamp-2 text-[12px] text-gray-500">
 					{`Xuất kho / Số lượng đơn`}
 				</Text>
-				<Text className="line-clamp-2" classNameText="text-[12px]">
+				<Text className="line-clamp-2 text-[12px]">
 					{`${record.warehouse_quantity} / ${record.quantity}`}
 				</Text>
 			</Flex>
