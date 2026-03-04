@@ -8,7 +8,8 @@ import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { ProductVariant } from '@/types/products';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import debounce from 'lodash/debounce';
-import { Search } from 'lucide-react';
+import { ActionAbles } from '@/components/Dropdown';
+import { History, Minus, Pen, Plus, Search } from 'lucide-react';
 import { useAdminVariants, useMedusa } from 'medusa-react';
 import * as XLSX from 'xlsx';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
@@ -222,8 +223,121 @@ const ProductManage: FC<Props> = ({}) => {
 						showTotal: (total, range) =>
 							`${range[0]}-${range[1]} trong ${total} sản phẩm`,
 					}
-				}
-			/>
+					scroll={{ x: 'max-content' }}
+				/>
+			</div>
+
+			<div className="block md:hidden">
+				{displayVariants?.map((variantItem) => {
+					const sortedInventories = sortInventoriesByLocationPriority(
+						(variantItem as any).inventories ?? []
+					);
+					return (
+						<Flex
+							key={variantItem.id}
+							vertical
+							className="mb-3 rounded-md border p-3 shadow-sm gap-2"
+						>
+							<Flex className="items-center justify-between gap-2">
+								<Flex className="items-center gap-3 min-w-0">
+									<Image
+										src={variantItem.product?.thumbnail ?? '/images/product-img.png'}
+										alt="Product variant Thumbnail"
+										width={40}
+										height={50}
+										className="rounded-md shrink-0"
+									/>
+									<Flex vertical className="min-w-0">
+										<Text className="text-sm font-semibold break-words">
+											{variantItem.product?.title} - {variantItem.title}
+										</Text>
+										<Text className="text-xs text-gray-500 break-words">
+											SKU: {variantItem.sku}
+										</Text>
+									</Flex>
+								</Flex>
+								<ActionAbles
+									actions={[
+										{
+											label: 'Thêm vị trí vào',
+											icon: <Pen size={20} />,
+											onClick: () => handleEditWarehouse(variantItem as any),
+										},
+										{
+											label: 'Lịch sử kho',
+											icon: <History size={20} />,
+											onClick: () =>
+												handleOpenTransactionHistory(variantItem.id ?? ''),
+										},
+									] as any}
+								/>
+							</Flex>
+
+							{sortedInventories.length ? (
+								<Flex vertical className="mt-2 gap-2">
+									{sortedInventories.map((inv: WarehouseInventory) => {
+									const baseQuantity =
+										inv.item_unit?.quantity && inv.item_unit.quantity > 0
+											? inv.quantity / inv.item_unit.quantity
+											: inv.quantity;
+
+									return (
+										<Flex
+											key={inv.id}
+											className="items-center justify-between gap-2 border-t pt-2 first:mt-0 first:border-t-0"
+										>
+											<Flex vertical className="min-w-0">
+												<Text className="text-xs font-medium break-words">
+													Vị trí: {inv.warehouse?.location}
+												</Text>
+												<Text className="text-[11px] text-gray-500">
+													{baseQuantity}{' '}
+													{inv.item_unit?.unit
+														? `${inv.item_unit.unit} (${inv.quantity} đôi)`
+														: inv.quantity}
+												</Text>
+											</Flex>
+											<Flex className="items-center gap-3">
+												<Minus
+													onClick={() => handleRemoveInventory(inv)}
+													size={18}
+													color="red"
+													className="cursor-pointer"
+												/>
+												<Plus
+													onClick={() => handleAddInventory(inv)}
+													size={18}
+													color="green"
+													className="cursor-pointer"
+												/>
+											</Flex>
+										</Flex>
+									);
+								})}
+							</Flex>
+						) : (
+							<Text className="text-xs text-gray-500">
+								Chưa có vị trí kho cho sản phẩm này.
+							</Text>
+						)}
+					</Flex>
+					);
+				})}
+				{displayCount > DEFAULT_PAGE_SIZE && (
+					<div className="mt-4 pb-20 flex justify-center">
+						<Pagination
+							simple
+							current={numPages}
+							pageSize={DEFAULT_PAGE_SIZE}
+							total={displayCount}
+							onChange={handleChangePage}
+							showTotal={(total, range) =>
+								`${range[0]}-${range[1]} trong ${total} sản phẩm`
+							}
+						/>
+					</div>
+				)}
+			</div>
 			{variant && (
 				<ModalAddVariant
 					isModalOpen={stateVariantInventory}
