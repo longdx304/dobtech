@@ -17,10 +17,23 @@ import ModalAddVariant from '../components/modal-add-variant';
 import ModalVariantInventory from '../components/modal-variant-inventory';
 import { expandedColumns, productColumns } from './product-columns';
 import ModalTransactionHistory from '../components/modal-transaction-history';
+import Image from 'next/image';
+import { Typography, Pagination } from 'antd';
+
+const { Text } = Typography;
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 20;
+
+// Helper function to sort inventories by location priority
+const sortInventoriesByLocationPriority = (inventories: WarehouseInventory[]) => {
+	return [...inventories].sort((a, b) => {
+		const locationA = a.warehouse?.location || '';
+		const locationB = b.warehouse?.location || '';
+		return locationA.localeCompare(locationB);
+	});
+};
 
 const ProductManage: FC<Props> = ({}) => {
 	const { setSelectedUnit, setQuantity } = useProductUnit();
@@ -128,13 +141,12 @@ const ProductManage: FC<Props> = ({}) => {
 			const data = variants.flatMap((variant: any) => {
 				if (!variant.inventories?.length) return [];
 
-				return variant.inventories
-					.map((inv: any) => ({
-						'Mã': variant.sku,
-						'Model': `${variant.product?.title || ''} - ${variant.title}`,
-						'Số lượng': inv.quantity,
-						'Vị trí': inv.warehouse?.location,
-					}));
+				return variant.inventories.map((inv: any) => ({
+					'Mã': variant.sku,
+					'Model': `${variant.product?.title || ''} - ${variant.title}`,
+					'Số lượng': inv.quantity,
+					'Vị trí': inv.warehouse?.location,
+				}));
 			});
 
 			if (data.length === 0) {
@@ -171,6 +183,10 @@ const ProductManage: FC<Props> = ({}) => {
 		);
 	};
 
+	// Use variants for display
+	const displayVariants = variants || [];
+	const displayCount = count || 0;
+
 	return (
 		<Flex vertical gap={12}>
 			<Flex align="center" justify="flex-end" className="py-4">
@@ -202,26 +218,31 @@ const ProductManage: FC<Props> = ({}) => {
 					{expandedKeys.length ? 'Ẩn vị trí' : 'Hiển thị vị trí'}
 				</Button>
 			</Flex>
-			<Table
-				dataSource={variants}
-				expandable={{
-					expandedRowRender: expandedRowRender as any,
-					expandedRowKeys: expandedKeys,
-					onExpandedRowsChange: (keys) => {
-						setExpandedKeys(keys as string[]);
-					},
-				}}
-				loading={isLoading}
-				rowKey="id"
-				columns={columns as any}
-				pagination={
-					(count ?? 0) > DEFAULT_PAGE_SIZE && {
-						onChange: (page) => handleChangePage(page),
-						pageSize: DEFAULT_PAGE_SIZE,
-						current: numPages || 1,
-						total: count,
-						showTotal: (total, range) =>
-							`${range[0]}-${range[1]} trong ${total} sản phẩm`,
+
+			<div className="hidden md:block">
+				<Table
+					dataSource={variants}
+					expandable={{
+						expandedRowRender: expandedRowRender as any,
+						expandedRowKeys: expandedKeys,
+						onExpandedRowsChange: (keys) => {
+							setExpandedKeys(keys as string[]);
+						},
+					}}
+					loading={isLoading}
+					rowKey="id"
+					columns={columns as any}
+					pagination={
+						(count ?? 0) > DEFAULT_PAGE_SIZE
+							? {
+									onChange: (page) => handleChangePage(page),
+									pageSize: DEFAULT_PAGE_SIZE,
+									current: numPages || 1,
+									total: count,
+									showTotal: (total, range) =>
+										`${range[0]}-${range[1]} trong ${total} sản phẩm`,
+							  }
+							: false
 					}
 					scroll={{ x: 'max-content' }}
 				/>
@@ -241,7 +262,9 @@ const ProductManage: FC<Props> = ({}) => {
 							<Flex className="items-center justify-between gap-2">
 								<Flex className="items-center gap-3 min-w-0">
 									<Image
-										src={variantItem.product?.thumbnail ?? '/images/product-img.png'}
+										src={
+											variantItem.product?.thumbnail ?? '/images/product-img.png'
+										}
 										alt="Product variant Thumbnail"
 										width={40}
 										height={50}
@@ -257,70 +280,72 @@ const ProductManage: FC<Props> = ({}) => {
 									</Flex>
 								</Flex>
 								<ActionAbles
-									actions={[
-										{
-											label: 'Thêm vị trí vào',
-											icon: <Pen size={20} />,
-											onClick: () => handleEditWarehouse(variantItem as any),
-										},
-										{
-											label: 'Lịch sử kho',
-											icon: <History size={20} />,
-											onClick: () =>
-												handleOpenTransactionHistory(variantItem.id ?? ''),
-										},
-									] as any}
+									actions={
+										[
+											{
+												label: 'Thêm vị trí vào',
+												icon: <Pen size={20} />,
+												onClick: () => handleEditWarehouse(variantItem as any),
+											},
+											{
+												label: 'Lịch sử kho',
+												icon: <History size={20} />,
+												onClick: () =>
+													handleOpenTransactionHistory(variantItem.id ?? ''),
+											},
+										] as any
+									}
 								/>
 							</Flex>
 
 							{sortedInventories.length ? (
 								<Flex vertical className="mt-2 gap-2">
 									{sortedInventories.map((inv: WarehouseInventory) => {
-									const baseQuantity =
-										inv.item_unit?.quantity && inv.item_unit.quantity > 0
-											? inv.quantity / inv.item_unit.quantity
-											: inv.quantity;
+										const baseQuantity =
+											inv.item_unit?.quantity && inv.item_unit.quantity > 0
+												? inv.quantity / inv.item_unit.quantity
+												: inv.quantity;
 
-									return (
-										<Flex
-											key={inv.id}
-											className="items-center justify-between gap-2 border-t pt-2 first:mt-0 first:border-t-0"
-										>
-											<Flex vertical className="min-w-0">
-												<Text className="text-xs font-medium break-words">
-													Vị trí: {inv.warehouse?.location}
-												</Text>
-												<Text className="text-[11px] text-gray-500">
-													{baseQuantity}{' '}
-													{inv.item_unit?.unit
-														? `${inv.item_unit.unit} (${inv.quantity} đôi)`
-														: inv.quantity}
-												</Text>
+										return (
+											<Flex
+												key={inv.id}
+												className="items-center justify-between gap-2 border-t pt-2 first:mt-0 first:border-t-0"
+											>
+												<Flex vertical className="min-w-0">
+													<Text className="text-xs font-medium break-words">
+														Vị trí: {inv.warehouse?.location}
+													</Text>
+													<Text className="text-[11px] text-gray-500">
+														{baseQuantity}{' '}
+														{inv.item_unit?.unit
+															? `${inv.item_unit.unit} (${inv.quantity} đôi)`
+															: inv.quantity}
+													</Text>
+												</Flex>
+												<Flex className="items-center gap-3">
+													<Minus
+														onClick={() => handleRemoveInventory(inv)}
+														size={18}
+														color="red"
+														className="cursor-pointer"
+													/>
+													<Plus
+														onClick={() => handleAddInventory(inv)}
+														size={18}
+														color="green"
+														className="cursor-pointer"
+													/>
+												</Flex>
 											</Flex>
-											<Flex className="items-center gap-3">
-												<Minus
-													onClick={() => handleRemoveInventory(inv)}
-													size={18}
-													color="red"
-													className="cursor-pointer"
-												/>
-												<Plus
-													onClick={() => handleAddInventory(inv)}
-													size={18}
-													color="green"
-													className="cursor-pointer"
-												/>
-											</Flex>
-										</Flex>
-									);
-								})}
-							</Flex>
-						) : (
-							<Text className="text-xs text-gray-500">
-								Chưa có vị trí kho cho sản phẩm này.
-							</Text>
-						)}
-					</Flex>
+										);
+									})}
+								</Flex>
+							) : (
+								<Text className="text-xs text-gray-500">
+									Chưa có vị trí kho cho sản phẩm này.
+								</Text>
+							)}
+						</Flex>
 					);
 				})}
 				{displayCount > DEFAULT_PAGE_SIZE && (
