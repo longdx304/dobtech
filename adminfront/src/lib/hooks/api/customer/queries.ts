@@ -16,7 +16,7 @@ export const useAdminNextCustomerCode = (
 	const { client } = useMedusa();
 	const { data, ...rest } = useQuery(
 		adminCustomerKeys.detail('next-code'),
-		() => client.admin.custom.get('/admin/customers/next-code'),
+		() => client.admin.custom.get('/admin/customer-code'),
 		options
 	);
 	return { nextCode: (data as any)?.next_code as string | undefined, ...rest };

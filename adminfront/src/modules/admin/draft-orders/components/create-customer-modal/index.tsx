@@ -1,5 +1,5 @@
 import { Button } from '@/components/Button';
-import { Form, Input, Modal } from 'antd';
+import { Form, Input, message, Modal } from 'antd';
 import { useAdminCreateCustomer } from 'medusa-react';
 import React, { useEffect } from 'react';
 
@@ -38,6 +38,7 @@ const CreateCustomerModal = ({
 				} as any,
 				{
 					onSuccess: ({ customer }) => {
+						message.success('Tạo khách hàng thành công');
 						onCustomerCreated({
 							id: customer.id,
 							first_name: customer.first_name,
