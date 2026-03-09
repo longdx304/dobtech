@@ -25,7 +25,7 @@ import { expandedColumns, warehouseColumns } from './location-columns';
 
 type Props = {};
 
-const DEFAULT_PAGE_SIZE = 20;
+const DEFAULT_PAGE_SIZE = 300;
 
 const LocationManage: FC<Props> = ({}) => {
 	const deleteWarehouse = useAdminDeleteWarehouse();
@@ -156,8 +156,23 @@ const LocationManage: FC<Props> = ({}) => {
 		);
 	};
 
-	// Use warehouse for display
-	const displayWarehouse = warehouse || [];
+	// Use warehouse for display, sorted by search relevance
+	const displayWarehouse = useMemo(() => {
+		if (!warehouse) return [];
+		if (!searchValue) return warehouse;
+		const q = searchValue.toLowerCase();
+		return [...warehouse].sort((a, b) => {
+			const aLoc = a.location.toLowerCase();
+			const bLoc = b.location.toLowerCase();
+			const aExact = aLoc === q;
+			const bExact = bLoc === q;
+			if (aExact !== bExact) return aExact ? -1 : 1;
+			const aStarts = aLoc.startsWith(q);
+			const bStarts = bLoc.startsWith(q);
+			if (aStarts !== bStarts) return aStarts ? -1 : 1;
+			return aLoc.localeCompare(bLoc);
+		});
+	}, [warehouse, searchValue]);
 	const displayCount = count || 0;
 
 	return (
@@ -192,7 +207,7 @@ const LocationManage: FC<Props> = ({}) => {
 
 				<div className="hidden md:block">
 					<Table
-						dataSource={warehouse}
+						dataSource={displayWarehouse}
 						expandable={{
 							expandedRowRender: expandedRowRender as any,
 							expandedRowKeys: expandedKeys,

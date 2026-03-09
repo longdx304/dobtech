@@ -8,6 +8,7 @@ import { Customer } from '@medusajs/medusa';
 import { Form, Radio } from 'antd';
 import { debounce, isEmpty } from 'lodash';
 import { LoaderCircle, LockIcon, PlusIcon } from 'lucide-react';
+import { useAdminNextCustomerCode } from '@/lib/hooks/api/customer';
 import { useAdminCustomer, useAdminCustomers } from 'medusa-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
@@ -22,6 +23,7 @@ const ShippingDetails = () => {
 	const [addNew, setAddNew] = useState(false);
 	const { disableNext, enableNext } = useStepModal();
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+	const { nextCode } = useAdminNextCustomerCode({ enabled: isCreateModalOpen });
 	const [sameAsShipping, setSameAsShipping] = useState(true);
 	const [searchValue, setSearchValue] = useState<ValueType | undefined>();
 	const [customerValue, setCustomerValue] = useState<string>('');
@@ -314,7 +316,7 @@ const ShippingDetails = () => {
 				visible={isCreateModalOpen}
 				onClose={() => setIsCreateModalOpen(false)}
 				onCustomerCreated={handleCustomerCreated}
-				totalCustomers={count || 0}
+				nextCustomerCode={nextCode}
 			/>
 		</div>
 	);
