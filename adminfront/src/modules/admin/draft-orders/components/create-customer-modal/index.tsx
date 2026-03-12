@@ -1,6 +1,5 @@
 import { Button } from '@/components/Button';
-import { generateCustomerCode } from '@/lib/utils';
-import { Form, Input, Modal } from 'antd';
+import { Form, Input, message, Modal } from 'antd';
 import { useAdminCreateCustomer } from 'medusa-react';
 import React, { useEffect } from 'react';
 
@@ -8,30 +7,29 @@ type Props = {
 	visible: boolean;
 	onClose: () => void;
 	onCustomerCreated: (customer: any) => void;
-	totalCustomers: number;
+	nextCustomerCode?: string;
 };
 
 const CreateCustomerModal = ({
 	visible,
 	onClose,
 	onCustomerCreated,
-	totalCustomers,
+	nextCustomerCode,
 }: Props) => {
 	const [form] = Form.useForm();
 	const createCustomer = useAdminCreateCustomer();
 
 	useEffect(() => {
-		if (visible) {
-			const customerCode = generateCustomerCode(totalCustomers);
-			form.setFieldValue('customer_code', customerCode);
+		if (visible && nextCustomerCode) {
+			form.setFieldValue('customer_code', nextCustomerCode);
 		}
-	}, [visible, totalCustomers, form]);
+	}, [visible, nextCustomerCode, form]);
 
 	const handleSubmit = async (values: any) => {
 		try {
 			await createCustomer.mutate(
 				{
-					email: values?.email || `customer_${totalCustomers + 1}@example.com`,
+					email: values?.email || `customer_${Date.now()}@example.com`,
 					first_name: values.first_name,
 					last_name: values.last_name,
 					password: values.password,
@@ -40,6 +38,7 @@ const CreateCustomerModal = ({
 				} as any,
 				{
 					onSuccess: ({ customer }) => {
+						message.success('Tạo khách hàng thành công');
 						onCustomerCreated({
 							id: customer.id,
 							first_name: customer.first_name,

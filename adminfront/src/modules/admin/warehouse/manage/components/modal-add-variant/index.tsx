@@ -44,6 +44,7 @@ const ModalAddVariant: FC<Props> = ({
 
 	const { warehouse, isLoading: warehouseLoading } = useAdminWarehouses({
 		q: searchValue || undefined,
+		limit: 300,
 	});
 
 	// Debounce fetcher
@@ -53,9 +54,21 @@ const ModalAddVariant: FC<Props> = ({
 
 	useEffect(() => {
 		if (warehouse) {
-			const options = warehouse.map((warehouse: Warehouse) => ({
-				label: warehouse.location,
-				value: warehouse.id,
+			const q = (searchValue || '').toLowerCase();
+			const sorted = [...warehouse].sort((a, b) => {
+				const aLoc = a.location.toLowerCase();
+				const bLoc = b.location.toLowerCase();
+				const aExact = aLoc === q;
+				const bExact = bLoc === q;
+				if (aExact !== bExact) return aExact ? -1 : 1;
+				const aStarts = aLoc.startsWith(q);
+				const bStarts = bLoc.startsWith(q);
+				if (aStarts !== bStarts) return aStarts ? -1 : 1;
+				return aLoc.localeCompare(bLoc);
+			});
+			const options = sorted.map((w: Warehouse) => ({
+				label: w.location,
+				value: w.id,
 			}));
 			setOptionWarehouses(options);
 		}

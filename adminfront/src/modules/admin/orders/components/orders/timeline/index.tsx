@@ -33,6 +33,7 @@ import { FileDown, RotateCcw, Warehouse } from 'lucide-react';
 import { useAdminOrder, useAdminUpdateOrder } from 'medusa-react';
 import { useState } from 'react';
 import { pdfOrderRes } from '../new-order';
+import { generateHandoverPdfBlob } from '../new-order/handover-pdf';
 import { generatePdfBlob } from '../new-order/order-pdf';
 import useOrdersExpandParam from '../utils/use-admin-expand-parameter';
 import Attachment from './timeline-events/attachment';
@@ -178,6 +179,66 @@ const Timeline = ({
 		);
 	};
 
+	const updateHandoverFileOrder = async () => {
+		message.loading('Đang tạo biên bản bàn giao...');
+		let pdfUrl = '';
+		if (!isEmpty(order)) {
+			const { items, shipping_address } = order!;
+			const address = `${shipping_address?.address_1 ?? ''}, ${shipping_address?.address_2 ?? ''}, ${shipping_address?.province ?? ''}, ${shipping_address?.city ?? ''}, ${shipping_address?.country_code ?? ''}`;
+			const pdfReq: pdfOrderRes = {
+				email: order!.customer.email,
+				userId: user!.id,
+				user: user,
+				customer: {
+					first_name: order!.customer.first_name,
+					last_name: order!.customer.last_name,
+					email: order!.customer.email,
+					phone: order!.customer.phone,
+				},
+				address,
+				lineItems: items?.map((i: LineItem) => ({
+					variantId: i.variant_id ?? '',
+					quantity: i.quantity,
+					unit_price: i.unit_price,
+					title: `${i.title} - ${i.description}`,
+					sku: i.variant?.sku || '',
+				})) ?? [],
+				totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
+				countryCode: shipping_address!.country_code!,
+				isSendEmail: false,
+			};
+			const pdfBlob = await generateHandoverPdfBlob(pdfReq);
+			const files_upload = new File([pdfBlob], 'handover.pdf', { type: 'application/pdf' });
+			const uploadRes = await uploadFile.mutateAsync({ files: files_upload, prefix: 'orders' });
+			pdfUrl = uploadRes.uploads[0].url;
+		}
+
+		let files: any[] = Array.isArray(order?.metadata?.files) ? order.metadata.files : [];
+		await updateOrder.mutateAsync(
+			{
+				metadata: {
+					files: [
+						...files,
+						{
+							url: pdfUrl,
+							name: 'Biên Bản Bàn Giao',
+							created_at: new Date().toISOString(),
+						},
+					],
+				},
+			} as AdminPostOrdersOrderReq & { metadata: { files: any[] } },
+			{
+				onSuccess: () => {
+					refetchOrder();
+					message.success('Tạo biên bản bàn giao thành công');
+				},
+				onError: (err: any) => {
+					message.error(getErrorMessage(err));
+				},
+			}
+		);
+	};
+
 	const handleTransferToWarehouse = async () => {
 		message.loading('Đang chuyển đơn hàng sang kho...');
 
@@ -233,6 +294,12 @@ const Timeline = ({
 			key: 'update-file',
 			icon: <FileDown size={18} />,
 			onClick: updateDocFileOrder,
+		},
+		{
+			label: <span className="w-full">{'Biên Bản Bàn Giao'}</span>,
+			key: 'handover-file',
+			icon: <FileDown size={18} />,
+			onClick: updateHandoverFileOrder,
 		},
 	];
 

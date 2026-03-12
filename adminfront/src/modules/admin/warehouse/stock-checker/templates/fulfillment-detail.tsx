@@ -543,6 +543,16 @@ const OrderInfo = ({
 						{`Người kiểm hàng: ${checker}`}
 					</Text>
 				</Flex>
+				<Flex gap={4} className="" align="center">
+					<Text className="text-sm font-semibold">
+						{`Tổng số đôi: ${(
+							order.items?.reduce(
+								(sum, item) => sum + (item.quantity ?? 0),
+								0
+							) ?? 0
+						)}`}
+					</Text>
+				</Flex>
 			</Flex>
 		</div>
 	);
