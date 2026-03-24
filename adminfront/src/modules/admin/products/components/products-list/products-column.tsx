@@ -1,6 +1,6 @@
 import { Product } from '@medusajs/medusa';
 import { Dot, MonitorX, Pencil, Trash2 } from 'lucide-react';
-import Image from 'next/image';
+import { Image } from '@/components/Image';
 
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';

@@ -1,9 +1,13 @@
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Title } from '@/components/Typography';
+import useToggleState from '@/lib/hooks/use-toggle-state';
+import DraftOrderEditModal from '@/modules/admin/draft-orders/components/draft-order-edit-modal';
 import { DisplayTotal } from '@/modules/admin/orders/components/common';
 import { DraftOrder } from '@medusajs/medusa';
 import { Divider, Empty } from 'antd';
+import { Pencil } from 'lucide-react';
 import OrderLine from './order-line';
 
 type Props = {
@@ -12,6 +16,12 @@ type Props = {
 };
 
 const Summary = ({ dorder, isLoading }: Props) => {
+	const {
+		state: editState,
+		onOpen: openEdit,
+		onClose: closeEdit,
+	} = useToggleState(false);
+
 	if (!dorder) {
 		return (
 			<Card loading={isLoading}>
@@ -21,10 +31,21 @@ const Summary = ({ dorder, isLoading }: Props) => {
 	}
 
 	return (
+		<>
 		<Card loading={isLoading} className="px-4">
 			<div>
 				<Flex align="center" justify="space-between" className="pb-2">
 					<Title level={4}>{`Tổng quan`}</Title>
+					{dorder.status === 'open' && (
+						<Button
+							type="default"
+							size="small"
+							icon={<Pencil size={14} />}
+							onClick={openEdit}
+						>
+							Chỉnh sửa
+						</Button>
+					)}
 				</Flex>
 			</div>
 			<div>
@@ -59,6 +80,16 @@ const Summary = ({ dorder, isLoading }: Props) => {
 				/>
 			</div>
 		</Card>
+		<DraftOrderEditModal
+			state={editState}
+			onClose={closeEdit}
+			draftOrderId={dorder.id}
+			cartItems={(dorder.cart?.items as any) ?? []}
+			currencyCode={dorder.cart?.region?.currency_code ?? 'vnd'}
+			regionId={dorder.cart?.region_id ?? ''}
+			customerId={dorder.cart?.customer_id ?? ''}
+		/>
+		</>
 	);
 };
 

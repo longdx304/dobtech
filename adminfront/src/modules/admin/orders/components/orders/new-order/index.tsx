@@ -234,7 +234,7 @@ const NewOrderModal: FC<Props> = ({
 			// create draft order && transfer to order
 			await createDraftOrder(transformedData as any, {
 				onSuccess: async (response) => {
-					transferOrder.mutateAsync(
+					await transferOrder.mutateAsync(
 						{ id: response.draft_order.id, isSendEmail: isSendEmail, urlPdf },
 						{
 							onSuccess: () => {
