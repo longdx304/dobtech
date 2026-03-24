@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
 		flex: 3,
 		flexDirection: 'column',
 		textAlign: 'left',
+		flexShrink: 1,
 	},
 	signatureSection: {
 		marginTop: 30,

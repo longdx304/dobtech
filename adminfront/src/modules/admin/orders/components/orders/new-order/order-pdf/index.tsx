@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
 		flex: 2,
 		flexDirection: 'column',
 		textAlign: 'left',
+		flexShrink: 1,
 	},
 	quantityTotal: {
 		fontWeight: 'bold',
