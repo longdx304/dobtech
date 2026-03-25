@@ -48,12 +48,17 @@ export interface TimelineEvent {
 	| 'refund-required'
 	| 'paid'
 	| 'change-price'
-	| 'attachment';
+	| 'attachment'
+	| 'transferred-to-warehouse';
 }
 
 export interface AttachmentEvent extends TimelineEvent {
 	url: string;
 	fileName: string;
+}
+
+export interface TransferredToWarehouseEvent extends TimelineEvent {
+	transferredByName: string;
 }
 
 export interface RefundRequiredEvent extends TimelineEvent {
@@ -371,6 +376,19 @@ export const useBuildTimeline = (orderId: string) => {
 					orderId: order.id,
 				} as AttachmentEvent);
 			}
+		}
+
+		if (
+			order.metadata?.transferred_to_warehouse === true &&
+			order.metadata?.transferred_by_user_name
+		) {
+			events.push({
+				id: `${order.id}-transferred-to-warehouse`,
+				time: new Date(order.metadata.transferred_at as string),
+				type: 'transferred-to-warehouse',
+				orderId: order.id,
+				transferredByName: order.metadata.transferred_by_user_name as string,
+			} as TransferredToWarehouseEvent);
 		}
 
 		for (const payment of order.payments) {

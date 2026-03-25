@@ -20,6 +20,7 @@ import {
 	RefundRequiredEvent,
 	ReturnEvent,
 	TimelineEvent,
+	TransferredToWarehouseEvent,
 } from '@/modules/admin/orders/hooks/use-build-timeline';
 import {
 	AdminPostOrdersOrderReq,
@@ -37,6 +38,7 @@ import { generateHandoverPdfBlob } from '../new-order/handover-pdf';
 import { generatePdfBlob } from '../new-order/order-pdf';
 import useOrdersExpandParam from '../utils/use-admin-expand-parameter';
 import Attachment from './timeline-events/attachment';
+import TransferredToWarehouse from './timeline-events/transferred-to-warehouse';
 import Claim from './timeline-events/claim';
 import Exchange from './timeline-events/exchange';
 import ItemsFulfilled from './timeline-events/items-fulfilled';
@@ -250,6 +252,8 @@ const Timeline = ({
 					...currentMetadata,
 					transferred_to_warehouse: true,
 					transferred_at: new Date().toISOString(),
+					transferred_by_user_id: user?.id,
+					transferred_by_user_name: `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim(),
 				},
 			} as AdminPostOrdersOrderReq & { metadata: any },
 			{
@@ -271,12 +275,12 @@ const Timeline = ({
 			icon: <Warehouse size={18} />,
 			onClick: handleTransferToWarehouse,
 		},
-		{
-			label: <span className="w-full">{'Yêu cầu trả hàng'}</span>,
-			key: 'require_return',
-			icon: <RotateCcw size={18} />,
-			onClick: () => setShowRequestReturn(true),
-		},
+		// {
+		// 	label: <span className="w-full">{'Yêu cầu trả hàng'}</span>,
+		// 	key: 'require_return',
+		// 	icon: <RotateCcw size={18} />,
+		// 	onClick: () => setShowRequestReturn(true),
+		// },
 		// {
 		// 	label: <span className="w-full">{'Đăng ký trao đổi'}</span>,
 		// 	key: 'exchange',
@@ -431,6 +435,8 @@ function switchOnType(
 			return <ChangedPrice event={event as any} region={region} />;
 		case 'attachment':
 			return <Attachment event={event as AttachmentEvent} />;
+		case 'transferred-to-warehouse':
+			return <TransferredToWarehouse event={event as TransferredToWarehouseEvent} />;
 		default:
 			return null;
 	}

@@ -114,6 +114,14 @@ const CustomerInfo = ({ order, isLoading }: Props) => {
 					</Flex>
 					<Flex vertical gap={4} className="pt-8">
 						<Flex justify="space-between" align="center">
+							<Text className="text-gray-500 text-sm">Tên khách hàng:</Text>
+							<Text className="text-gray-500 text-sm">
+								{[order.customer?.first_name, order.customer?.last_name]
+									.filter(Boolean)
+									.join(' ') || '-'}
+							</Text>
+						</Flex>
+						<Flex justify="space-between" align="center">
 							<Text className="text-gray-500 text-sm">Email:</Text>
 							<Text className="text-gray-500 text-sm">{order.email}</Text>
 						</Flex>
