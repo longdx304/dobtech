@@ -1,37 +1,45 @@
 import isEmpty from 'lodash/isEmpty';
 import intersection from 'lodash/intersection';
+import { decodeJwt } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { ERoutes, routesConfig } from '@/types/routes';
 import { ERole } from './types/account';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 // Environment variable to control user access paths
 const USER_ACCESS_TYPE = process.env.NEXT_PUBLIC_USER_ACCESS_TYPE || 'admin';
 const PUBLIC_ROUTES = ['/login'];
 
-interface UserData {
-	user: {
-		role: ERole;
-		permissions: string;
-	};
+interface CachedUserData {
+	role: ERole;
+	permissions: string;
 }
 
 /**
- * Fetches user data using the access token
+ * Decodes JWT and checks expiry — no secret needed in Edge Runtime.
+ * Signature verification happens at the backend on every API call.
  */
-async function fetchUserData(
-	accessToken: string | undefined
-): Promise<UserData | null> {
-	if (!accessToken) return null;
-
+function verifyToken(token: string | undefined): boolean {
+	if (!token) return false;
 	try {
-		const response = await fetch(`${BACKEND_URL}/admin/auth`, {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
-		return response.json();
+		const payload = decodeJwt(token);
+		if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+			return false; // token expired
+		}
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * Reads cached user role/permissions from cookie set at login time
+ */
+function getUserData(request: NextRequest): CachedUserData | null {
+	const raw = request.cookies.get('_user_data_')?.value;
+	if (!raw) return null;
+	try {
+		return JSON.parse(raw) as CachedUserData;
 	} catch {
 		return null;
 	}
@@ -112,16 +120,22 @@ export async function middleware(request: NextRequest) {
 			return NextResponse.next();
 		}
 
-		// Authenticate user
+		// Decode JWT locally — no backend call, no network dependency
 		const accessToken = request.cookies.get('_jwt_token_')?.value;
-		const userData = await fetchUserData(accessToken);
+		const isValid = verifyToken(accessToken);
 
-		// Redirect to login if user is not authenticated
-		if (isEmpty(userData)) {
+		if (!isValid) {
 			return createRedirect(request, ERoutes.LOGIN);
 		}
 
-		const { role, permissions } = userData.user;
+		// Read user role/permissions from cookie cached at login time
+		const userData = getUserData(request);
+
+		if (!userData) {
+			return createRedirect(request, ERoutes.LOGIN);
+		}
+
+		const { role, permissions } = userData;
 
 		// Admin users have full access
 		if (role === ERole.ADMIN) {
