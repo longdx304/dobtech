@@ -2,7 +2,7 @@
 
 import { Lock, LogIn, Mail } from 'lucide-react';
 
-import { setCookie } from '@/actions/auth';
+import { setCookie, setUserData } from '@/actions/auth';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Input, InputPassword } from '@/components/Input';
@@ -34,6 +34,14 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 					.getToken(values)
 					.then(async ({ access_token }) => {
 						await setCookie(access_token);
+						// Fetch user role/permissions once at login and cache in cookie
+						// so middleware can read them without calling the backend on every request
+						const res = await fetch(
+							`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/auth`,
+							{ headers: { Authorization: `Bearer ${access_token}` } }
+						);
+						const { user } = await res.json();
+						await setUserData(user.role, user.permissions);
 					});
 				message.success('Đăng nhập thành công!');
 				router.push(ERoutes.HOME);

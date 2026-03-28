@@ -168,7 +168,8 @@ export const StepModal: React.FC<StepModalProps> = ({
 					key="next"
 					type="primary"
 					onClick={handleNext}
-					disabled={!SteppedContext.nextEnabled}
+					loading={loading}
+					disabled={!SteppedContext.nextEnabled || loading}
 				>
 					{SteppedContext.currentStep === steps.length - 1 ? 'Tạo' : 'Tiếp tục'}
 				</Button>,
