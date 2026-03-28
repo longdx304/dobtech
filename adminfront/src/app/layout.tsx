@@ -2,6 +2,7 @@ import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider } from 'antd';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { cookies } from 'next/headers';
 import './globals.css';
 
 import { MedusaProvider } from '@/lib/providers/medusa-provider';
@@ -18,6 +19,8 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const token = cookies().get('_jwt_token_')?.value;
+
 	return (
 		<html lang="en">
 			<head>
@@ -29,7 +32,7 @@ export default async function RootLayout({
 			<body className={inter.className}>
 				<AntdRegistry>
 					<ConfigProvider theme={theme}>
-						<MedusaProvider>{children}</MedusaProvider>
+						<MedusaProvider token={token}>{children}</MedusaProvider>
 					</ConfigProvider>
 				</AntdRegistry>
 			</body>
