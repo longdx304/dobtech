@@ -10,7 +10,7 @@ import {
 } from '@/utils/prices';
 import { Avatar, Button, Table } from 'antd';
 import { useAdminShippingOptions } from 'medusa-react';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { useContext, useMemo } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 
@@ -63,7 +63,7 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 					<div className="flex min-w-[240px] py-2">
 						<div className="h-[40px] w-[30px]">
 							{record.thumbnail ? (
-								<Image
+								<MedusaImage
 									className="rounded object-cover"
 									src={record.thumbnail}
 									alt={record.product_title}

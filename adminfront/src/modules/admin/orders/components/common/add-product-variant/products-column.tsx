@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { ProductVariant } from '@medusajs/medusa';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import React from 'react';
 
 import { Flex } from '@/components/Flex';
@@ -28,7 +28,7 @@ const productsColumns = ({
 		fixed: 'left',
 		render: (_: any, record: ProductVariant) => (
 			<Flex className="flex items-center gap-3">
-				<Image
+				<MedusaImage
 					src={_?.thumbnail ?? '/images/product-img.png'}
 					alt="Product variant Thumbnail"
 					width={30}

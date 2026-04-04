@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import { ChangeEvent, FC, useState, useEffect } from 'react';
 import _ from 'lodash';
 import { useAdminProducts } from 'medusa-react';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { Button } from '@/components/Button';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { Product } from '@medusajs/medusa';
@@ -180,7 +180,7 @@ const PriceForm: FC<Props> = ({
 								<div className="flex items-center gap-x-4">
 									<div className="bg-gray-100 h-10 w-[30px] overflow-hidden rounded-md">
 										{product?.thumbnail && (
-											<Image
+											<MedusaImage
 												src={product.thumbnail}
 												alt={product.title || ''}
 												width={30}

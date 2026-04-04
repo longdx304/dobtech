@@ -6,7 +6,7 @@ import { Upload } from '@/components/Upload';
 import { FormImage } from '@/types/common';
 import { Col, MenuProps, message, Row } from 'antd';
 import { File, Trash2 } from 'lucide-react';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import * as XLSX from 'xlsx';
@@ -203,7 +203,7 @@ const Item = ({ itemUpload, index, remove }: ItemProps) => {
 			<div className="gap-x-6 flex items-center">
 				<div className="flex h-16 w-16 items-center justify-center">
 					{itemUpload?.nativeFile?.type.startsWith('image') ? (
-						<Image
+						<MedusaImage
 							src={itemUpload.url}
 							alt={itemUpload.name || 'Uploaded image'}
 							width={64}

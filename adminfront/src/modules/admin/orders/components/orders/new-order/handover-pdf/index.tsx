@@ -185,14 +185,14 @@ const HandoverPDFDocument: FC<HandoverPDFProps> = ({ order }) => {
 
 				<View style={styles.section}>
 					<Text style={styles.title}>Sản Phẩm Bàn Giao</Text>
-					<View style={styles.tableHeader}>
+					<View style={styles.tableHeader} wrap={false}>
 						<Text style={styles.tableCell}>#</Text>
 						<Text style={[styles.tableCell, { flex: 3 }]}>Sản Phẩm</Text>
 						<Text style={styles.tableCell}>Số Lượng</Text>
 					</View>
 
 					{sortedItems.map((item, index) => (
-						<View key={index} style={styles.tableRow}>
+						<View key={index} style={styles.tableRow} wrap={false}>
 							<Text style={styles.tableCell}>{index + 1}</Text>
 							<View style={[styles.tableCell, styles.productCell]}>
 								<Text>{item.title}</Text>
@@ -201,7 +201,7 @@ const HandoverPDFDocument: FC<HandoverPDFProps> = ({ order }) => {
 						</View>
 					))}
 
-					<View style={styles.tableRow}>
+					<View style={styles.tableRow} wrap={false}>
 						<Text style={styles.tableCell}>{'-'}</Text>
 						<View style={[styles.tableCell, styles.productCell]}>
 							<Text>{'-'}</Text>

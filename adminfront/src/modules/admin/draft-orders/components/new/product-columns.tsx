@@ -4,7 +4,7 @@ import { Text } from '@/components/Typography';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { ProductVariant } from '@medusajs/medusa';
 import { InputNumber, Popover, Radio, RadioChangeEvent, Space } from 'antd';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { useEffect, useState } from 'react';
 
 interface Props {
@@ -279,7 +279,7 @@ const productsColumns = ({
 
 				return (
 					<Flex className="flex items-center gap-3">
-						<Image
+						<MedusaImage
 							src={thumbnail}
 							alt="Product variant Thumbnail"
 							width={30}

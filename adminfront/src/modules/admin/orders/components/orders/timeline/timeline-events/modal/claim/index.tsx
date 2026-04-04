@@ -14,7 +14,7 @@ import {
 	useAdminOrder,
 	useAdminShippingOptions,
 } from 'medusa-react';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/Button';
@@ -478,7 +478,7 @@ const SummaryLineItem = ({
 			<div className="flex justify-center items-center space-x-4">
 				<div className="rounded-sm flex h-[48px] w-[36px] overflow-hidden">
 					{item?.thumbnail || item?.product?.thumbnail ? (
-						<Image
+						<MedusaImage
 							src={isReplace ? item?.product?.thumbnail : item.thumbnail}
 							height={48}
 							width={36}

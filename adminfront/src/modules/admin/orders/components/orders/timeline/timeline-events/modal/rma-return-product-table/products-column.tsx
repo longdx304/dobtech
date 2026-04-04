@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { Trash2 } from 'lucide-react';
 import { ProductVariant } from '@medusajs/medusa';
 
@@ -54,7 +54,7 @@ const productsColumns = ({
 		fixed: 'left',
 		render: (_: SelectProduct['product'], record: SelectProduct) => (
 			<Flex className="flex items-center gap-3">
-				<Image
+				<MedusaImage
 					src={_?.thumbnail ?? '/images/product-img.png'}
 					alt="Product variant Thumbnail"
 					width={30}

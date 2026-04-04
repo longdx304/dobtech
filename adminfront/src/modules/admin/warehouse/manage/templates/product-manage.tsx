@@ -17,7 +17,7 @@ import ModalAddVariant from '../components/modal-add-variant';
 import ModalVariantInventory from '../components/modal-variant-inventory';
 import { expandedColumns, productColumns } from './product-columns';
 import ModalTransactionHistory from '../components/modal-transaction-history';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { Typography, Pagination } from 'antd';
 
 const { Text } = Typography;
@@ -261,7 +261,7 @@ const ProductManage: FC<Props> = ({}) => {
 						>
 							<Flex className="items-center justify-between gap-2">
 								<Flex className="items-center gap-3 min-w-0">
-									<Image
+									<MedusaImage
 										src={
 											variantItem.product?.thumbnail ?? '/images/product-img.png'
 										}

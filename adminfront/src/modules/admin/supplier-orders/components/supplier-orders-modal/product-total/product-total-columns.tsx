@@ -1,5 +1,5 @@
 import { ProductVariant, Region } from '@medusajs/medusa';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 
 import { Flex } from '@/components/Flex';
 import { Tag } from '@/components/Tag';
@@ -53,7 +53,7 @@ const productTotalColumns = ({
 				: _?.thumbnail ?? '/images/product-img.png';
 			return (
 				<Flex className="flex items-center gap-3">
-					<Image
+					<MedusaImage
 						src={thumbnail}
 						alt="Product variant Thumbnail"
 						width={30}

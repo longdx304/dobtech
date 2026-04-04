@@ -4,7 +4,7 @@ import { ReservationItemDTO } from '@medusajs/types';
 import { Tooltip } from '@/components/Tooltip';
 import PlaceholderImage from '@/modules/admin/common/components/placeholder-image';
 import { formatAmountWithSymbol } from '@/utils/prices';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 
 type OrderLineProps = {
 	item: LineItem;
@@ -26,7 +26,7 @@ const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
 				{/* Product Image */}
 				<div className="rounded-lg flex h-[56px] w-[56px] overflow-hidden flex-shrink-0">
 					{item.thumbnail ? (
-						<Image
+						<MedusaImage
 							src={item.thumbnail}
 							height={56}
 							width={56}

@@ -3,7 +3,7 @@ import {
 	ProductCollection
 } from '@medusajs/medusa';
 import { Dot } from 'lucide-react';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 
 const ProductColumns = [
 	{
@@ -14,7 +14,7 @@ const ProductColumns = [
 		render: (text: string, record: Product) => (
 			<div style={{ display: 'flex', alignItems: 'center' }}>
 				{record.thumbnail && (
-					<Image
+					<MedusaImage
 						src={record.thumbnail}
 						alt={text}
 						style={{ marginRight: 8 }}
