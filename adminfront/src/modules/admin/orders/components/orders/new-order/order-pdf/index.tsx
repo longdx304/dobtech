@@ -186,7 +186,7 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hà
 
 				<View style={styles.section}>
 					<Text style={styles.title}>Sản Phẩm Đặt Hàng</Text>
-					<View style={styles.tableHeader}>
+					<View style={styles.tableHeader} wrap={false}>
 						<Text style={styles.tableCell}>#</Text>
 						<Text style={[styles.tableCell, { flex: 2 }]}>Sản Phẩm</Text>
 						<Text style={styles.tableCell}>Đơn Giá</Text>
@@ -196,7 +196,7 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hà
 
 					{sortedItems.map((item, index) => {
 						return (
-							<View key={index} style={styles.tableRow}>
+							<View key={index} style={styles.tableRow} wrap={false}>
 								<Text style={styles.tableCell}>{index + 1}</Text>
 
 								<View style={[styles.tableCell, styles.productCell]}>
@@ -217,7 +217,7 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hà
 					})}
 
 					{/* Overview */}
-					<View style={styles.tableRow}>
+					<View style={styles.tableRow} wrap={false}>
 						<Text style={styles.tableCell}>{'-'}</Text>
 						<View style={[styles.tableCell, styles.productCell]}>
 							<Text>{'-'}</Text>

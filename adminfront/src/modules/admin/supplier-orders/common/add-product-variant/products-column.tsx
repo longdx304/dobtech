@@ -1,5 +1,5 @@
 import { ProductVariant } from '@medusajs/medusa';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 
 import { Flex } from '@/components/Flex';
 import { InputNumber } from '@/components/Input';
@@ -72,7 +72,7 @@ const productColumns = ({
 		render: (_: any, record: ProductVariant) => {
 			return (
 				<Flex className="flex items-center gap-3">
-					<Image
+					<MedusaImage
 						src={_?.thumbnail ?? '/images/product-img.png'}
 						alt="Product variant Thumbnail"
 						width={30}

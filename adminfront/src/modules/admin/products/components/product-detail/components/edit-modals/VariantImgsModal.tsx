@@ -6,7 +6,7 @@ import { getErrorMessage } from '@/lib/utils';
 import { Product } from '@medusajs/medusa';
 import { Form, FormProps, message } from 'antd';
 import { useMedusa } from 'medusa-react';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { FC, useEffect, useState } from 'react';
 
 type Props = {
@@ -121,7 +121,7 @@ const VariantImgsModal: FC<Props> = ({
 						align="center"
 						justify="space-between"
 					>
-						<Image
+						<MedusaImage
 							className="rounded-md"
 							src={img.url}
 							alt={img.id}

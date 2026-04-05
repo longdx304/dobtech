@@ -6,7 +6,7 @@ import {
 } from '@medusajs/medusa';
 import { useAdminOrder, useAdminReceiveReturn, useMedusa } from 'medusa-react';
 import { message, Divider } from 'antd';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { SquareArrowOutUpRight } from 'lucide-react';
 
 import { useFeatureFlag } from '@/lib/providers/feature-flag-provider';
@@ -298,7 +298,7 @@ const SummaryLineItem = ({
 			<div className="flex justify-center items-center space-x-4">
 				<div className="rounded-sm flex h-[48px] w-[36px] overflow-hidden">
 					{item.thumbnail ? (
-						<Image
+						<MedusaImage
 							src={item.thumbnail}
 							height={48}
 							width={36}

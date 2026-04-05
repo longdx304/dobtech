@@ -13,7 +13,7 @@ import { LineItem, OrderItemChange } from '@medusajs/medusa';
 import { message } from 'antd';
 import clsx from 'clsx';
 import { CopyPlus, Pencil, Trash2 } from 'lucide-react';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { useState } from 'react';
 
 type SupplierOrderEditLineProps = {
@@ -144,7 +144,7 @@ const SupplierOrderEditLine = ({
 			<div className="flex justify-center items-center space-x-4">
 				<div className="rounded-sm flex h-[48px] w-[36px] overflow-hidden">
 					{item.thumbnail ? (
-						<Image
+						<MedusaImage
 							src={item.thumbnail}
 							height={48}
 							width={36}
