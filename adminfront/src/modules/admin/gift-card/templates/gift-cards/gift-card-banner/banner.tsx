@@ -9,7 +9,7 @@ import {
 	normalizeAmount,
 } from '@/utils/prices';
 import { EditIcon, MonitorCheck, TrashIcon } from 'lucide-react';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { useMemo, useRef, useState } from 'react';
 
 type GiftCardVariant = {
@@ -86,7 +86,7 @@ const GiftCardBanner = ({
 				<div className="gap-4 flex items-start">
 					{thumbnail && (
 						<div className="rounded-lg h-[72px] min-h-[72px] w-[72px] min-w-[72px] overflow-hidden">
-							<Image
+							<MedusaImage
 								src={thumbnail}
 								alt="Thumbnail"
 								height={72}

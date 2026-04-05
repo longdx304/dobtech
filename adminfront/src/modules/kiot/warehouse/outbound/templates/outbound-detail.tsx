@@ -24,7 +24,7 @@ import clsx from 'clsx';
 import dayjs from 'dayjs';
 import debounce from 'lodash/debounce';
 import { ArrowLeft, Check, Search } from 'lucide-react';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import ConfirmOrder from '../../components/confirm-order';
@@ -269,7 +269,7 @@ const FulfillmentLine = ({ item }: { item: any }) => {
 			<div className="flex justify-center items-center space-x-4">
 				<div className="rounded-sm flex h-[48px] w-[36px] overflow-hidden">
 					{item.thumbnail ? (
-						<Image
+						<MedusaImage
 							src={item.thumbnail}
 							height={48}
 							width={36}

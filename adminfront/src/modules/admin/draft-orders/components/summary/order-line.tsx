@@ -2,7 +2,7 @@ import { LineItem } from '@medusajs/medusa';
 
 import PlaceholderImage from '@/modules/admin/common/components/placeholder-image';
 import { formatAmountWithSymbol } from '@/utils/prices';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 
 type OrderLineProps = {
 	item: LineItem;
@@ -15,7 +15,7 @@ const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
 			<div className="flex justify-center items-center space-x-4">
 				<div className="rounded-sm flex h-[48px] w-[36px] overflow-hidden">
 					{item.thumbnail ? (
-						<Image
+						<MedusaImage
 							src={item.thumbnail}
 							height={48}
 							width={36}

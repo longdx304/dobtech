@@ -1,6 +1,6 @@
 import { CircleDollarSign } from 'lucide-react';
 import EventContainer from '../event-container';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 import PlaceholderImage from '@/modules/admin/common/components/placeholder-image';
 import { Region } from '@medusajs/medusa';
 import { formatAmountWithSymbol } from '@/utils/prices';
@@ -37,7 +37,7 @@ const ItemChangedPrice: React.FC<Props> = ({ event, region }) => {
 					<div className="rounded-md flex h-[40px] w-[30px] overflow-hidden">
 						{event?.thumbnail ? (
 							// eslint-disable-next-line @next/next/no-img-element
-							<Image
+							<MedusaImage
 								height={40}
 								width={32}
 								src={event.thumbnail}

@@ -1,5 +1,5 @@
 import { LineItem } from '@medusajs/medusa';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 
 import { Flex } from '@/components/Flex';
 import Tooltip from '@/components/Tooltip/Tooltip';
@@ -20,7 +20,7 @@ const productsColumns = ({ currencyCode }: Props) => [
 		render: (_: LineItem['title'], record: any) => (
 			<div>
 				<Flex className="flex items-center gap-3">
-					<Image
+					<MedusaImage
 						src={record?.thumbnail ?? '/images/product-img.png'}
 						alt="Product variant Thumbnail"
 						width={30}

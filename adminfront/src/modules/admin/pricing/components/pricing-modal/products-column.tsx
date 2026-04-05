@@ -1,6 +1,6 @@
 import { Product } from '@medusajs/medusa';
 import { Dot } from 'lucide-react';
-import Image from 'next/image';
+import { MedusaImage } from '@/components/MedusaImage';
 
 import { Flex } from '@/components/Flex';
 import Tooltip from '@/components/Tooltip/Tooltip';
@@ -17,7 +17,7 @@ const productsColumns = ({}: Props) => [
 		fixed: 'left',
 		render: (_: any, record: Product) => (
 			<Flex className="flex items-center gap-3">
-				<Image
+				<MedusaImage
 					src={record?.thumbnail ?? '/images/product-img.png'}
 					alt="Product Thumbnail"
 					width={30}
