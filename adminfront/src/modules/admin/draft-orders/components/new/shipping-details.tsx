@@ -85,12 +85,16 @@ const ShippingDetails = () => {
 			return [];
 		}
 
-		const validCountryCodes = validCountries.map(({ value }) => value);
-
-		return customer.shipping_addresses.filter(
-			({ country_code }) =>
-				!country_code || validCountryCodes.includes(country_code)
+		const validCountryCodes = validCountries.map(({ value }) =>
+			String(value).toLowerCase()
 		);
+
+		return customer.shipping_addresses.filter(({ country_code }) => {
+			if (!country_code) {
+				return true;
+			}
+			return validCountryCodes.includes(country_code.toLowerCase());
+		});
 	}, [customer, validCountries]);
 
 	const onCustomerSelect = (customerId: string) => {

@@ -20,6 +20,23 @@ type Props = {
 	setIsSendEmail: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+/** Form may store country as string (e.g. "vn") or Select option { label, value }. */
+function draftOrderCountryCode(raw: unknown, fallback = 'vn'): string {
+	if (raw == null || raw === '') {
+		return fallback;
+	}
+	if (typeof raw === 'string') {
+		return raw.toLowerCase().trim();
+	}
+	if (typeof raw === 'object' && raw !== null && 'value' in raw) {
+		const v = (raw as { value?: string }).value;
+		if (v != null && v !== '') {
+			return String(v).toLowerCase().trim();
+		}
+	}
+	return fallback;
+}
+
 const DraftOrderModal: FC<Props> = ({
 	state,
 	handleOk,
@@ -55,11 +72,15 @@ const DraftOrderModal: FC<Props> = ({
 				shipping_methods: [{ option_id: values.shipping_option }],
 				shipping_address: values.shipping_address_id || {
 					...values.shipping_address,
-					country_code: values.shipping_address?.country_code?.value || 'vn',
+					country_code: draftOrderCountryCode(
+						values.shipping_address?.country_code
+					),
 				},
 				billing_address: values.billing_address_id || {
 					...values.billing_address,
-					country_code: values.billing_address?.country_code?.value || 'vn',
+					country_code: draftOrderCountryCode(
+						values.billing_address?.country_code
+					),
 				},
 				customer_id: values.customer_id,
 				discounts: values.discount_code
