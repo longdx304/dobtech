@@ -14,8 +14,8 @@ import ShippingDetails from '@/modules/admin/draft-orders/components/new/shippin
 import Summary from '@/modules/admin/draft-orders/components/new/summary';
 import { useNewDraftOrderForm } from '@/modules/admin/draft-orders/hooks/use-new-draft-form';
 import { LineItemReq } from '@/types/order';
-import { Customer, User } from '@medusajs/medusa';
-import { message } from 'antd';
+import { AddressCreatePayload, Customer, User } from '@medusajs/medusa';
+import { Form, message } from 'antd';
 import { useAdminCreateDraftOrder, useAdminCustomer } from 'medusa-react';
 import { FC, useState } from 'react';
 import { generatePdfBlob } from './order-pdf';
@@ -53,6 +53,22 @@ type Props = {
 	refetch: () => void;
 };
 
+function orderFormCountryCode(raw: unknown, fallback = 'vn'): string {
+	if (raw == null || raw === '') {
+		return fallback;
+	}
+	if (typeof raw === 'string') {
+		return raw.toLowerCase().trim();
+	}
+	if (typeof raw === 'object' && raw !== null && 'value' in raw) {
+		const v = (raw as { value?: string }).value;
+		if (v != null && v !== '') {
+			return String(v).toLowerCase().trim();
+		}
+	}
+	return fallback;
+}
+
 const NewOrderModal: FC<Props> = ({
 	state,
 	handleOk,
@@ -72,15 +88,16 @@ const NewOrderModal: FC<Props> = ({
 	// Initialize transfer order mutation
 	const transferOrder = useAdminDraftOrderTransferOrder();
 
-	// get customer user
-	const customerIdFromForm = form.getFieldValue('customer_id');
-	const { customer } = useAdminCustomer(customerIdFromForm || '', {
-		enabled: !!customerIdFromForm,
+	// Theo dõi customer_id trên form (getFieldValue tại render không đổi khi user chọn khách)
+	const watchedCustomerId = Form.useWatch('customer_id', form) as
+		| string
+		| undefined;
+	const { customer } = useAdminCustomer(watchedCustomerId || '', {
+		enabled: !!watchedCustomerId,
 	});
 
-	// Initialize add customer address mutation
 	const adminAddCustomerAddress = useAdminAddCustomerAddress(
-		customer?.id || ''
+		watchedCustomerId || customer?.id || ''
 	);
 
 	const uploadFile = useAdminUploadFile();
@@ -119,7 +136,7 @@ const NewOrderModal: FC<Props> = ({
 				sku: i?.sku || '',
 			})),
 			totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
-			countryCode: values.shipping_address.country_code.value,
+			countryCode: orderFormCountryCode(values.shipping_address?.country_code),
 			isSendEmail: false,
 		};
 
@@ -147,29 +164,26 @@ const NewOrderModal: FC<Props> = ({
 
 	const addCustomerAddress = async () => {
 		const values = form.getFieldsValue(true);
+		const sa = values.shipping_address;
+		if (!sa?.address_1 || !sa?.first_name) {
+			throw new Error('Thiếu thông tin địa chỉ giao hàng');
+		}
 
-		const shipping_addresses = {
-			first_name: values.shipping_address.first_name,
-			last_name: values.shipping_address.last_name,
-			phone: values.shipping_address.phone,
-			address_1: values.shipping_address.address_1,
-			address_2: values.shipping_address.address_2,
-			city: values.shipping_address.city,
-			company: values.shipping_address.company,
-			province: values.shipping_address.province,
-			postal_code: values.shipping_address.postal_code,
-			country_code: values.shipping_address.country_code,
+		const payload: AddressCreatePayload = {
+			first_name: sa.first_name,
+			last_name: sa.last_name ?? '',
+			phone: sa.phone ?? '',
+			company: sa.company ?? '',
+			address_1: sa.address_1,
+			address_2: sa.address_2 ?? '',
+			city: sa.city ?? '',
+			province: sa.province ?? '',
+			postal_code: sa.postal_code ?? '',
+			country_code: orderFormCountryCode(sa.country_code),
 			metadata: { is_default: true },
 		};
 
-		await adminAddCustomerAddress.mutateAsync(shipping_addresses, {
-			onSuccess: (response) => {
-				console.log('Address added successfully', response);
-			},
-			onError: (error) => {
-				console.error('Failed to add address', error);
-			},
-		});
+		await adminAddCustomerAddress.mutateAsync(payload);
 	};
 
 	const generateTransferOrderData = (tax: number) => {
@@ -191,11 +205,11 @@ const NewOrderModal: FC<Props> = ({
 			shipping_methods: [{ option_id: values.shipping_option }],
 			shipping_address: values.shipping_address_id || {
 				...values.shipping_address,
-				country_code: values.shipping_address?.country_code || 'vn',
+				country_code: orderFormCountryCode(values.shipping_address?.country_code),
 			},
 			billing_address: values.billing_address_id || {
 				...values.billing_address,
-				country_code: values.billing_address?.country_code.value || 'vn',
+				country_code: orderFormCountryCode(values.billing_address?.country_code),
 			},
 			customer_id: values.customer_id,
 			discounts: values.discount_code
@@ -209,9 +223,23 @@ const NewOrderModal: FC<Props> = ({
 	const handleFinish = async () => {
 		try {
 			const values = form.getFieldsValue(true);
-			// add shipping address for customer if not exist
-			if (customer && customer.shipping_addresses.length === 0) {
-				await addCustomerAddress();
+			// Lưu địa chỉ mới vào hồ sơ khách khi không chọn địa chỉ có sẵn (kể cả đã có địa chỉ cũ).
+			const shouldSaveAddressToCustomer =
+				!!values.customer_id &&
+				!values.shipping_address_id &&
+				!!values.shipping_address?.address_1 &&
+				!!values.shipping_address?.first_name;
+
+			if (shouldSaveAddressToCustomer) {
+				try {
+					await addCustomerAddress();
+					message.success('Đã lưu địa chỉ vào hồ sơ khách hàng');
+				} catch (e) {
+					message.error(
+						getErrorMessage(e) || 'Không thể lưu địa chỉ khách hàng'
+					);
+					return;
+				}
 			}
 
 			const address = `${values.shipping_address.address_1 ?? ''} ${values.shipping_address.address_2 ?? ''
