@@ -67,59 +67,33 @@ const ProductForm: FC<ProductFormProps> = ({
 		);
 
 	const handleRowSelectionChange = (selectedRowKeys: React.Key[]) => {
-		// Identify deselected products
-		const deselectedProducts = selectedProducts.filter(
-			(productId) => !selectedRowKeys.includes(productId)
-		);
+		const keys = selectedRowKeys as string[];
 
-		// Clear quantities and prices for deselected products
-		setItemQuantities((prevQuantities) =>
-			prevQuantities.filter(
-				(item) => !deselectedProducts.includes(item.variantId)
-			)
-		);
-
-		setItemPrices((prevPrices) =>
-			prevPrices.filter((item) => !deselectedProducts.includes(item.variantId))
-		);
-
-		// Add default quantities and prices for newly selected products
-		selectedRowKeys.forEach((productId) => {
-			// Check if this product already has a quantity or price set
-			const existingQuantity = itemQuantities.find(
-				(item) => item.variantId === productId
+		setItemQuantities((prevQuantities) => {
+			const filtered = prevQuantities.filter((item) =>
+				keys.includes(item.variantId)
 			);
-			const existingPrice = itemPrices.find(
-				(item) => item.variantId === productId
+			const byId = new Map(filtered.map((item) => [item.variantId, item]));
+			return keys.map(
+				(id) => byId.get(id) ?? { variantId: id, quantity: 1 }
 			);
-
-			// Find the selected product variant to get its default price
-			const selectedVariant = variants?.find(
-				(variant) => variant.id === productId
-			);
-
-			if (!existingQuantity) {
-				// Set default quantity to 1 if not already present
-				setItemQuantities((prevQuantities) => [
-					...prevQuantities,
-					{ variantId: productId as string, quantity: 1 },
-				]);
-			}
-
-			if (!existingPrice && selectedVariant) {
-				// Set the default price from the variant data if not already present
-				setItemPrices((prevPrices) => [
-					...prevPrices,
-					{
-						variantId: productId as string,
-						unit_price: (selectedVariant as any).supplier_price || 0,
-					},
-				]);
-			}
 		});
 
-		// Update selected products
-		setSelectedProducts(selectedRowKeys as string[]);
+		setItemPrices((prevPrices) => {
+			const filtered = prevPrices.filter((item) => keys.includes(item.variantId));
+			const byId = new Map(filtered.map((item) => [item.variantId, item]));
+			return keys.map((id) => {
+				const existing = byId.get(id);
+				if (existing !== undefined) {
+					return existing;
+				}
+				const selectedVariant = variants?.find((v) => v.id === id);
+				const fromList = (selectedVariant as any)?.supplier_price ?? 0;
+				return { variantId: id, unit_price: fromList };
+			});
+		});
+
+		setSelectedProducts(keys);
 	};
 
 	useEffect(() => {
@@ -127,6 +101,54 @@ const ProductForm: FC<ProductFormProps> = ({
 			setSelectedRowsProducts(selectedVariantsData as PricedVariant[]);
 		//eslint-disable-next-line
 	}, [selectedVariantsData]);
+
+	// Keep quantity/price state aligned with selection and API-loaded variants.
+	// Fixes: off-page selections (no row in current `variants`), and UI showing
+	// supplier_price while `itemPrices` had no entry until the user edits.
+	useEffect(() => {
+		if (!selectedProducts.length) {
+			return;
+		}
+
+		setItemQuantities((prev) => {
+			const byId = new Map(prev.map((x) => [x.variantId, x]));
+			const next = selectedProducts.map(
+				(id) => byId.get(id) ?? { variantId: id, quantity: 1 }
+			);
+			const same =
+				next.length === prev.length &&
+				next.every(
+					(item, i) =>
+						prev[i]?.variantId === item.variantId &&
+						prev[i]?.quantity === item.quantity
+				);
+			return same ? prev : next;
+		});
+
+		setItemPrices((prev) => {
+			const byId = new Map(prev.map((x) => [x.variantId, x]));
+			const next: ItemPrice[] = selectedProducts.map((id) => {
+				const existing = byId.get(id);
+				if (existing !== undefined) {
+					return existing;
+				}
+				const variant = selectedVariantsData?.find((v) => v.id === id);
+				const supplier = (variant as any)?.supplier_price ?? 0;
+				return { variantId: id, unit_price: supplier };
+			});
+			if (
+				next.length === prev.length &&
+				next.every(
+					(item, i) =>
+						prev[i]?.variantId === item.variantId &&
+						prev[i]?.unit_price === item.unit_price
+				)
+			) {
+				return prev;
+			}
+			return next;
+		});
+	}, [selectedProducts, selectedVariantsData]);
 
 	const handleChangeDebounce = _.debounce(
 		(e: React.ChangeEvent<HTMLInputElement>) => {

@@ -232,18 +232,14 @@ const SupplierOrdersModal: FC<Props> = ({
 			return;
 		}
 
-		// Check if itemQuantities and itemPrices have entries for all selected products
-		if (
-			itemQuantities.length !== selectedProducts.length ||
-			itemPrices.length !== selectedProducts.length ||
-			!selectedProducts.every(
-				(productId) =>
-					itemQuantities.some((item) => item.variantId === productId) &&
-					itemPrices.some((item) => item.variantId === productId)
-			)
-		) {
-			console.log('selectedProducts:', selectedProducts);
-			console.log('itemQuantities:', itemQuantities, itemPrices);
+		// Require quantity + price row per selected variant (length checks removed:
+		// orphan rows or ordering could fail equality even when data was valid)
+		const missingQtyOrPrice = !selectedProducts.every((productId) => {
+			const hasQty = itemQuantities.some((item) => item.variantId === productId);
+			const hasPrice = itemPrices.some((item) => item.variantId === productId);
+			return hasQty && hasPrice;
+		});
+		if (missingQtyOrPrice) {
 			message.error('Phải nhập số lượng và giá cho tất cả sản phẩm đã chọn');
 			return;
 		}
