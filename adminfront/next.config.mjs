@@ -28,6 +28,10 @@ const nextConfig = {
 				hostname: "api.chamdep.com",
 			},
 			{
+				protocol: "http",
+				hostname: "api.chamdep.com",
+			},
+			{
 				protocol: "https",
 				hostname: "medusa-public-images.s3.eu-west-1.amazonaws.com",
 			},
