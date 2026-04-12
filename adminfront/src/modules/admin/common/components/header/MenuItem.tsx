@@ -5,11 +5,13 @@ import {
 	Boxes,
 	Building,
 	CircleDollarSign,
+	CircleUser,
 	Container,
 	Earth,
 	Ellipsis,
 	Layers,
 	LayoutList,
+	Lock,
 	LogOut,
 	NotebookPen,
 	Package,
@@ -53,6 +55,16 @@ function getItem(
 
 // Item dropdown user
 const itemDropdown: MenuProps['items'] = [
+	{
+		key: 'profile',
+		label: 'Thông tin tài khoản',
+		icon: <CircleUser />,
+	},
+	{
+		key: 'change-password',
+		label: 'Đổi mật khẩu',
+		icon: <Lock />,
+	},
 	{
 		key: 'logout',
 		label: 'Đăng xuất',
