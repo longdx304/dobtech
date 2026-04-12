@@ -24,7 +24,7 @@ import { LineItem } from '@/types/lineItem';
 import { Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
 import { AdminPostOrdersOrderFulfillmentsReq } from '@medusajs/medusa';
-import { Divider, message } from 'antd';
+import { Alert, Divider, message } from 'antd';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash';
 import debounce from 'lodash/debounce';
@@ -37,7 +37,11 @@ import {
 	Search,
 	UserCheck,
 } from 'lucide-react';
-import { useAdminCreateFulfillment, useAdminCreateNote } from 'medusa-react';
+import {
+	useAdminAddShippingMethod,
+	useAdminCreateFulfillment,
+	useAdminCreateNote,
+} from 'medusa-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import ConfirmOrder from '../../components/confirm-order';
@@ -47,6 +51,10 @@ import { useUser } from '@/lib/providers/user-provider';
 type FulfillmentDetailProps = {
 	id: string;
 };
+
+/** ID shipping option trong Medusa (cùng region với đơn). Cấu hình trong .env. */
+const DEFAULT_SHIPPING_OPTION_ID =
+	process.env.NEXT_PUBLIC_DEFAULT_SHIPPING_OPTION_ID ?? '';
 
 const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 	const router = useRouter();
@@ -65,6 +73,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 	const [noteInput, setNoteInput] = useState<string>('');
 
 	const createOrderFulfillment = useAdminCreateFulfillment(id);
+	const addShippingMethod = useAdminAddShippingMethod(id);
 	const updateProductOutbound = useAdminUpdateProductOutbound(id);
 	const createNote = useAdminCreateNote();
 	const {
@@ -167,8 +176,37 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 		return items;
 	}, [order, searchValue]);
 
+	/**
+	 * Medusa OrderService.createFulfillment throws if order.shipping_methods is empty
+	 * ("Cannot fulfill an order that lacks shipping methods"). Chọn ship ở màn khác
+	 * mà không gắn shipping method lên Order thì vẫn lỗi — cần có bản ghi trên Order.
+	 */
+	const hasShippingMethods = useMemo(
+		() => (order?.shipping_methods?.length ?? 0) > 0,
+		[order?.shipping_methods]
+	);
+
 	const handleBackToList = () => {
 		router.push(ERoutes.WAREHOUSE_STOCK_CHECKER);
+	};
+
+	const handleAddDefaultShipping = async () => {
+		if (!DEFAULT_SHIPPING_OPTION_ID) {
+			message.error(
+				'Chưa cấu hình shipping option trong đơn hàng này. Vui lòng thêm phương thức giao hàng cho đơn trước.'
+			);
+			return;
+		}
+		try {
+			await addShippingMethod.mutateAsync({
+				option_id: DEFAULT_SHIPPING_OPTION_ID,
+				price: 0,
+			});
+			message.success('Đã gắn phương thức giao hàng lên đơn');
+			await refetch();
+		} catch (e) {
+			message.error(getErrorMessage(e));
+		}
 	};
 
 	const onConfirm = async () => {
@@ -185,6 +223,12 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 			FulfillmentStatus.EXPORTED
 		) {
 			message.warning('Đơn hàng chưa được xác nhận xuất kho');
+			return;
+		}
+		if (!hasShippingMethods) {
+			message.error(
+				'Đơn hàng chưa có phương thức vận chuyển (shipping_methods). Vào Admin → Orders → đơn này → thêm phương thức giao hàng, hoặc tạo đơn từ giỏ đã chọn ship trước khi hoàn tất.'
+			);
 			return;
 		}
 
@@ -233,7 +277,6 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					files: chunk,
 					prefix: 'warehouse/stock-checker',
 				});
-				console.log('🚀 ~ uploadPromises ~ uploads:', uploads);
 				return uploads.map((item) => item.url);
 			} catch (error) {
 				console.error('Error uploading chunk:', error);
@@ -275,6 +318,13 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 		);
 	};
 	const handleComplete = async () => {
+		if (!hasShippingMethods) {
+			message.error(
+				'Không thể tạo fulfillment: đơn thiếu shipping method. Vui lòng thêm phương thức giao hàng cho đơn trước.'
+			);
+			return;
+		}
+
 		let action: any = createOrderFulfillment;
 		let successText = 'Đơn hàng đã được kiêm hàng thành công.';
 		let requestObj;
@@ -306,7 +356,6 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 
 		// Check upload file before create fulfillment
 		const filesUrl = await handleUploadFile();
-		console.log('🚀 ~ handleComplete ~ filesUrl:', filesUrl);
 		if (!filesUrl) {
 			message.error('Có lỗi xảy ra khi tải ảnh lên');
 			return;
@@ -347,6 +396,31 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 			</Flex>
 			<Card loading={isLoadingOrder} className="w-full mb-10" rounded>
 				<OrderInfo order={order!} isProcessing={isProcessing} />
+				{isProcessing && !hasShippingMethods && (
+					<Alert
+						type="warning"
+						showIcon
+						className="mb-4"
+						message="Đơn chưa có phương thức vận chuyển trên Order"
+						description={
+							DEFAULT_SHIPPING_OPTION_ID
+								? 'Medusa cần bản ghi shipping_methods trên Order mới tạo được fulfillment. Bạn có thể gắn nhanh phương thức mặc định (theo cấu hình) hoặc thêm thủ công trong Orders.'
+								: 'Medusa cần bản ghi shipping_methods trên Order mới tạo được fulfillment.'
+						}
+						action={
+							isPermission && DEFAULT_SHIPPING_OPTION_ID ? (
+								<Button
+									size="small"
+									type="primary"
+									loading={addShippingMethod.isLoading}
+									onClick={handleAddDefaultShipping}
+								>
+									Gắn giao hàng tiêu chuẩn
+								</Button>
+							) : undefined
+						}
+					/>
+				)}
 				<Flex
 					vertical
 					align="flex-end"
@@ -412,7 +486,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					)}
 
 					<Button
-						disabled={!isProcessing || !isPermission}
+						disabled={!isProcessing || !isPermission || !hasShippingMethods}
 						onClick={onConfirm}
 						loading={
 							createOrderFulfillment.isLoading ||
