@@ -2,7 +2,9 @@ import type { MenuProps } from 'antd';
 import { Flex } from 'antd';
 import {
 	Boxes,
+	CircleUser,
 	Ellipsis,
+	Lock,
 	LogOut,
 	NotebookPen,
 	Package,
@@ -42,6 +44,16 @@ function getItem(
 
 // Item dropdown user
 const itemDropdown: MenuProps['items'] = [
+	{
+		key: 'profile',
+		label: 'Thông tin tài khoản',
+		icon: <CircleUser />,
+	},
+	{
+		key: 'change-password',
+		label: 'Đổi mật khẩu',
+		icon: <Lock />,
+	},
 	{
 		key: 'logout',
 		label: 'Đăng xuất',
