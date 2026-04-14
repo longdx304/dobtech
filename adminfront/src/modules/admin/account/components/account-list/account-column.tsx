@@ -35,7 +35,7 @@ const accountColumns = ({ handleDeleteUser, handleEditUser }: Props) => [
 		render: (_: any, record: any) => (
 			<Flex vertical gap="middle">
 				<Flex vertical>
-					<Text strong>{record.first_name}</Text>
+					<Text strong>{record.first_name} {record.last_name}</Text>
 					<Text type={'secondary'} className="text-xs">
 						{record.phone}
 					</Text>

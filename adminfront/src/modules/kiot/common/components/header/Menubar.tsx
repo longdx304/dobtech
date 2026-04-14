@@ -1,9 +1,13 @@
 import type { MenuProps } from 'antd';
 import { Menu, message } from 'antd';
 import { useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { removeCookie } from '@/actions/auth';
+import {
+	UserPasswordModal,
+	UserProfileModal,
+} from '@/modules/common/components/user-account';
 import { ERoutes } from '@/types/routes';
 import { User } from '@medusajs/medusa';
 import { useAdminDeleteSession } from 'medusa-react';
@@ -18,10 +22,11 @@ interface Props {
 
 const Menubar = ({ user, remove, className, onClose = () => {} }: Props) => {
 	const router = useRouter();
-	const [messageApi, contextHolder] = message.useMessage();
+	const [, contextHolder] = message.useMessage();
 	const { mutateAsync } = useAdminDeleteSession();
+	const [profileOpen, setProfileOpen] = useState(false);
+	const [passwordOpen, setPasswordOpen] = useState(false);
 
-	// Handle user click menu items
 	const handleClickMenu: MenuProps['onClick'] = (e) => {
 		const { key } = e;
 		if (menuRoutes[key]) {
@@ -31,41 +36,63 @@ const Menubar = ({ user, remove, className, onClose = () => {} }: Props) => {
 		}
 	};
 
-	const logOut = async () => {
+	const logOut = useCallback(async () => {
 		mutateAsync(undefined, {
 			onSuccess: async () => {
 				remove();
 				await removeCookie();
 				router.push(ERoutes.LOGIN);
 			},
-			onError: (err) => {
+			onError: () => {
 				message.error('Đăng xuất thất bại!');
 			},
 		});
-	};
+	}, [mutateAsync, remove, router]);
 
-	// Handle user click dropdown
-	const handleDropdownClick = (e: any) => {
-		const { key } = e;
-		if (key === 'logout') {
-			logOut();
-		}
-	};
-
-	// Render items menu
-	const _menuItems = useMemo(
-		() => menuItems(user, handleDropdownClick),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[user]
+	const handleDropdownClick = useCallback(
+		(e: { key: string }) => {
+			const { key } = e;
+			if (key === 'logout') {
+				logOut();
+			} else if (key === 'profile') {
+				setProfileOpen(true);
+			} else if (key === 'change-password') {
+				setPasswordOpen(true);
+			}
+		},
+		[logOut]
 	);
 
+	const _menuItems = useMemo(
+		() => menuItems(user, handleDropdownClick),
+		[user, handleDropdownClick]
+	);
+
+	const profileUser = {
+		first_name: user.first_name,
+		last_name: user.last_name,
+		phone: (user as { phone?: string | null }).phone ?? null,
+	};
+
 	return (
-		<Menu
-			className={className}
-			onClick={handleClickMenu}
-			mode="inline"
-			items={_menuItems as any}
-		/>
+		<>
+			{contextHolder}
+			<Menu
+				className={className}
+				onClick={handleClickMenu}
+				mode="inline"
+				items={_menuItems as any}
+			/>
+			<UserProfileModal
+				open={profileOpen}
+				onClose={() => setProfileOpen(false)}
+				user={profileUser}
+			/>
+			<UserPasswordModal
+				open={passwordOpen}
+				onClose={() => setPasswordOpen(false)}
+			/>
+		</>
 	);
 };
 

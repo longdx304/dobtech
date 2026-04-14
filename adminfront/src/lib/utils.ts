@@ -56,13 +56,20 @@ export const formatNumber = (
 
 export const getErrorMessage = (error: any) => {
 	let msg = error?.response?.data?.message;
-	if (msg[0] && msg[0]?.message) {
+	if (Array.isArray(msg) && msg[0] && typeof msg[0] === 'object' && msg[0]?.message) {
 		msg = msg[0].message;
 	}
-	if (!msg) {
-		msg = 'Đã xảy ra lỗi khi thực hiện thao tác. Vui lòng thử lại sau.';
+	if (msg == null || msg === '') {
+		const status = error?.response?.status;
+		if (status === 404) {
+			msg =
+				'Không tìm thấy API (404). Hãy build/restart Medusa backend và kiểm tra route /admin/me/profile.';
+		} else {
+			msg =
+				'Đã xảy ra lỗi khi thực hiện thao tác. Vui lòng thử lại sau.';
+		}
 	}
-	return msg;
+	return typeof msg === 'string' ? msg : String(msg);
 };
 
 const units: [string, number][] = [
