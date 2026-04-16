@@ -103,6 +103,34 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		color: '#999999',
 	},
+	signatureSection: {
+		marginTop: 30,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+	},
+	signatureBox: {
+		flex: 1,
+		alignItems: 'center',
+		paddingHorizontal: 10,
+	},
+	signatureLabel: {
+		fontSize: 10,
+		fontWeight: 'bold',
+		marginBottom: 50,
+		textAlign: 'center',
+	},
+	signatureLine: {
+		borderTopWidth: 1,
+		borderTopColor: '#333333',
+		width: '100%',
+		marginTop: 5,
+	},
+	signatureNote: {
+		fontSize: 8,
+		color: '#999999',
+		textAlign: 'center',
+		marginTop: 3,
+	},
 });
 
 interface OrderPDFProps {
@@ -229,6 +257,24 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hà
 						<Text style={styles.tableCell}>
 							{total.toLocaleString()} {region?.currency?.symbol}
 						</Text>
+					</View>
+				</View>
+
+				<View style={styles.signatureSection}>
+					<View style={styles.signatureBox}>
+						<Text style={styles.signatureLabel}>Người Lập Phiếu</Text>
+						<View style={styles.signatureLine} />
+						<Text style={styles.signatureNote}>(Ký, ghi rõ họ tên)</Text>
+					</View>
+					<View style={styles.signatureBox}>
+						<Text style={styles.signatureLabel}>Người Nhận</Text>
+						<View style={styles.signatureLine} />
+						<Text style={styles.signatureNote}>(Ký, ghi rõ họ tên)</Text>
+					</View>
+					<View style={styles.signatureBox}>
+						<Text style={styles.signatureLabel}>Người Giao</Text>
+						<View style={styles.signatureLine} />
+						<Text style={styles.signatureNote}>(Ký, ghi rõ họ tên)</Text>
 					</View>
 				</View>
 			</Page>

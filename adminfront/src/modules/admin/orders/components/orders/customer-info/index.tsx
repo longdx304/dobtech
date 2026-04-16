@@ -116,7 +116,7 @@ const CustomerInfo = ({ order, isLoading }: Props) => {
 						<Flex justify="space-between" align="center">
 							<Text className="text-gray-500 text-sm">Tên khách hàng:</Text>
 							<Text className="text-gray-500 text-sm">
-								{[order.customer?.first_name, order.customer?.last_name]
+								{[order.customer?.last_name, order.customer?.first_name]
 									.filter(Boolean)
 									.join(' ') || '-'}
 							</Text>
