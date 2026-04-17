@@ -408,7 +408,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 								: 'Medusa cần bản ghi shipping_methods trên Order mới tạo được fulfillment.'
 						}
 						action={
-							isPermission && DEFAULT_SHIPPING_OPTION_ID ? (
+							DEFAULT_SHIPPING_OPTION_ID && (
 								<Button
 									size="small"
 									type="primary"
@@ -417,7 +417,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 								>
 									Gắn giao hàng tiêu chuẩn
 								</Button>
-							) : undefined
+							) 
 						}
 					/>
 				)}

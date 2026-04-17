@@ -63,7 +63,7 @@ const Information = ({ order, isLoading }: Props) => {
 					<Flex vertical gap={4} className="pt-8">
 						<Flex justify="space-between" align="center">
 							<Text className="text-gray-500 text-sm">Tên khách hàng:</Text>
-							<Text className="text-gray-500 text-sm">{order.customer?.first_name} {order.customer?.last_name}</Text>
+							<Text className="text-gray-500 text-sm">{order.customer?.last_name} {order.customer?.first_name}</Text>
 						</Flex>
 						<Flex justify="space-between" align="center">
 							<Text className="text-gray-500 text-sm">Email:</Text>
