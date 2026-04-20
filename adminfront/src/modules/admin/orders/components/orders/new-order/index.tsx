@@ -53,6 +53,25 @@ type Props = {
 	refetch: () => void;
 };
 
+/** Antd Select `labelInValue` or similar may store `{ value, label }` instead of a plain id string. */
+function resolveFormCustomerId(raw: unknown): string | undefined {
+	if (raw == null || raw === '') {
+		return undefined;
+	}
+	if (typeof raw === 'string') {
+		const s = raw.trim();
+		return s || undefined;
+	}
+	if (typeof raw === 'object' && raw !== null && 'value' in raw) {
+		const v = (raw as { value?: unknown }).value;
+		if (typeof v === 'string') {
+			const s = v.trim();
+			return s || undefined;
+		}
+	}
+	return undefined;
+}
+
 function orderFormCountryCode(raw: unknown, fallback = 'vn'): string {
 	if (raw == null || raw === '') {
 		return fallback;
@@ -92,13 +111,12 @@ const NewOrderModal: FC<Props> = ({
 	const watchedCustomerId = Form.useWatch('customer_id', form) as
 		| string
 		| undefined;
-	const { customer } = useAdminCustomer(watchedCustomerId || '', {
-		enabled: !!watchedCustomerId,
+	const watchedId = resolveFormCustomerId(watchedCustomerId);
+	const { customer } = useAdminCustomer(watchedId || '', {
+		enabled: !!watchedId,
 	});
 
-	const adminAddCustomerAddress = useAdminAddCustomerAddress(
-		watchedCustomerId || customer?.id || ''
-	);
+	const adminAddCustomerAddress = useAdminAddCustomerAddress();
 
 	const uploadFile = useAdminUploadFile();
 
@@ -164,6 +182,10 @@ const NewOrderModal: FC<Props> = ({
 
 	const addCustomerAddress = async () => {
 		const values = form.getFieldsValue(true);
+		const customerId = resolveFormCustomerId(values.customer_id);
+		if (!customerId) {
+			throw new Error('Chưa chọn khách hàng để lưu địa chỉ');
+		}
 		const sa = values.shipping_address;
 		if (!sa?.address_1 || !sa?.first_name) {
 			throw new Error('Thiếu thông tin địa chỉ giao hàng');
@@ -183,7 +205,7 @@ const NewOrderModal: FC<Props> = ({
 			metadata: { is_default: true },
 		};
 
-		await adminAddCustomerAddress.mutateAsync(payload);
+		await adminAddCustomerAddress.mutateAsync({ customerId, payload });
 	};
 
 	const generateTransferOrderData = (tax: number) => {
@@ -225,7 +247,7 @@ const NewOrderModal: FC<Props> = ({
 			const values = form.getFieldsValue(true);
 			// Lưu địa chỉ mới vào hồ sơ khách khi không chọn địa chỉ có sẵn (kể cả đã có địa chỉ cũ).
 			const shouldSaveAddressToCustomer =
-				!!values.customer_id &&
+				!!resolveFormCustomerId(values.customer_id) &&
 				!values.shipping_address_id &&
 				!!values.shipping_address?.address_1 &&
 				!!values.shipping_address?.first_name;

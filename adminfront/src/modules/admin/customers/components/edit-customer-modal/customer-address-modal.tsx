@@ -42,7 +42,7 @@ const CustomerAddressModal: FC<Props> = ({
 	const [form] = Form.useForm<AddressModalFormType>();
 	const { regions } = useAdminRegions();
 
-	const addAddress = useAdminAddCustomerAddress(customerId);
+	const addAddress = useAdminAddCustomerAddress();
 	const updateAddress = useAdminUpdateCustomerAddress(customerId);
 
 	const countryOptions = useMemo(() => {
@@ -100,7 +100,10 @@ const CustomerAddressModal: FC<Props> = ({
 				});
 				message.success('Đã cập nhật địa chỉ');
 			} else {
-				await addAddress.mutateAsync(basePayload);
+				await addAddress.mutateAsync({
+					customerId,
+					payload: basePayload,
+				});
 				message.success('Đã thêm địa chỉ');
 			}
 			onSaved?.();
