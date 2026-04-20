@@ -471,13 +471,12 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 							getCheckboxProps: (record: any) => ({
 								disabled:
 									!isProcessing ||
-									record?.warehouse_quantity !== record.quantity ||
-									!isPermission,
+									record?.warehouse_quantity !== record.quantity
 							}),
 						}}
 					/>
 					<Divider />
-					{isPermission && (
+					{(
 						<UploadTemplate
 							files={files}
 							setFiles={setFiles}
@@ -486,7 +485,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					)}
 
 					<Button
-						disabled={!isProcessing || !isPermission || !hasShippingMethods}
+						disabled={!isProcessing || !hasShippingMethods}
 						onClick={onConfirm}
 						loading={
 							createOrderFulfillment.isLoading ||
