@@ -130,7 +130,7 @@ const Summary = ({
 				</Flex>
 			</div>
 			<div>
-				<Flex align="center" justify="flex-end" className="pb-4">
+				<Flex align="center" justify="flex-end" gap={12} className="pb-4">
 					<Input
 						placeholder="Tên sản phẩm..."
 						name="search"
@@ -138,6 +138,19 @@ const Summary = ({
 						onChange={handleChangeDebounce}
 						className="w-[300px]"
 					/>
+					<span className="text-xs text-gray-500 whitespace-nowrap">
+						{searchValue
+							? `${sortedItems.length}/${supplierOrder.items.length} dòng (đang lọc)${
+									sortedItems.length > pageSize
+										? ` · trang ${currentPage}/${Math.max(1, Math.ceil(sortedItems.length / pageSize))}`
+										: ''
+								}`
+							: `${supplierOrder.items.length} dòng${
+									supplierOrder.items.length > pageSize
+										? ` · trang ${currentPage}/${Math.max(1, Math.ceil(supplierOrder.items.length / pageSize))}`
+										: ''
+								}`}
+					</span>
 				</Flex>
 				{paginatedItems.length > 0 ? (
 					paginatedItems.map((item: any, i: number) => (

@@ -3,8 +3,8 @@ import Tooltip from '@/components/Tooltip/Tooltip';
 import { Text } from '@/components/Typography';
 import { formatAmountWithSymbol } from '@/utils/prices';
 import { ProductVariant } from '@medusajs/medusa';
-import { InputNumber, Popover, Radio, RadioChangeEvent, Space } from 'antd';
-import { MedusaImage } from '@/components/MedusaImage';
+import { Image, InputNumber, Popover, Radio, RadioChangeEvent, Space } from 'antd';
+import { normalizeMedusaAssetUrl } from '@/lib/utils/medusa-asset-url';
 import { useEffect, useState } from 'react';
 
 interface Props {
@@ -277,14 +277,18 @@ const productsColumns = ({
 					? variantImage?.image_url
 					: _?.thumbnail ?? '/images/product-img.png';
 
+				const thumbnailSrc = normalizeMedusaAssetUrl(thumbnail);
+
 				return (
 					<Flex className="flex items-center gap-3">
-						<MedusaImage
-							src={thumbnail}
+						<Image
+							src={thumbnailSrc}
 							alt="Product variant Thumbnail"
 							width={30}
 							height={40}
-							className="rounded-md cursor-pointer"
+							className="rounded-md cursor-pointer object-cover"
+							fallback="/images/product-img.png"
+							preview={{}}
 						/>
 						<Flex vertical className="">
 							<Tooltip title={_?.title ?? ''}>

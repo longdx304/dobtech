@@ -1,7 +1,9 @@
 // @ts-nocheck
 import { ProductVariant } from '@medusajs/medusa';
-import { MedusaImage } from '@/components/MedusaImage';
+import { Image } from 'antd';
 import React from 'react';
+
+import { normalizeMedusaAssetUrl } from '@/lib/utils/medusa-asset-url';
 
 import { Flex } from '@/components/Flex';
 import Tooltip from '@/components/Tooltip/Tooltip';
@@ -26,23 +28,31 @@ const productsColumns = ({
 		// width: 150,
 		className: 'text-xs',
 		fixed: 'left',
-		render: (_: any, record: ProductVariant) => (
-			<Flex className="flex items-center gap-3">
-				<MedusaImage
-					src={_?.thumbnail ?? '/images/product-img.png'}
-					alt="Product variant Thumbnail"
-					width={30}
-					height={40}
-					className="rounded-md cursor-pointer"
-				/>
-				<Flex vertical className="">
-					<Tooltip title={_.title}>
-						<Text className="text-xs line-clamp-2">{_.title}</Text>
-					</Tooltip>
-					<span className="text-gray-500">{record.title}</span>
+		render: (_: any, record: ProductVariant) => {
+			const thumbnailSrc = normalizeMedusaAssetUrl(
+				_?.thumbnail ?? '/images/product-img.png'
+			);
+
+			return (
+				<Flex className="flex items-center gap-3">
+					<Image
+						src={thumbnailSrc}
+						alt="Product variant Thumbnail"
+						width={30}
+						height={40}
+						className="rounded-md cursor-pointer object-cover"
+						fallback="/images/product-img.png"
+						preview={{}}
+					/>
+					<Flex vertical className="">
+						<Tooltip title={_.title}>
+							<Text className="text-xs line-clamp-2">{_.title}</Text>
+						</Tooltip>
+						<span className="text-gray-500">{record.title}</span>
+					</Flex>
 				</Flex>
-			</Flex>
-		),
+			);
+		},
 	},
 	{
 		title: 'Còn hàng',
