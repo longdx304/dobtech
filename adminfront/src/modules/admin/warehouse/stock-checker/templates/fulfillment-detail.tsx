@@ -34,7 +34,9 @@ import {
 	Clock,
 	Hash,
 	MapPin,
+	Phone,
 	Search,
+	User,
 	UserCheck,
 } from 'lucide-react';
 import {
@@ -417,7 +419,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 								>
 									Gắn giao hàng tiêu chuẩn
 								</Button>
-							) 
+							)
 						}
 					/>
 				)}
@@ -471,18 +473,18 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 							getCheckboxProps: (record: any) => ({
 								disabled:
 									!isProcessing ||
-									record?.warehouse_quantity !== record.quantity
+									record?.warehouse_quantity !== record.quantity,
 							}),
 						}}
 					/>
 					<Divider />
-					{(
+					{
 						<UploadTemplate
 							files={files}
 							setFiles={setFiles}
 							hiddenUpload={!isProcessing}
 						/>
-					)}
+					}
 
 					<Button
 						disabled={!isProcessing || !hasShippingMethods}
@@ -572,9 +574,15 @@ const OrderInfo = ({
 	const customerName = order.customer
 		? `${order.customer.last_name || ''} ${
 				order.customer.first_name || ''
-		  }`.trim()
+			}`.trim()
 		: '';
-	const customerPhone = order.customer?.phone || '';
+
+	// 1 số số điẹn thoại không có 0 đằng trước thì thêm vào
+	const customerPhone = order.customer?.phone?.startsWith('0')
+		? order.customer?.phone
+		: order.customer?.phone
+			? `0${order.customer?.phone}`
+			: '';
 
 	const checker = order?.checker
 		? `${order?.checker?.first_name}`
@@ -597,10 +605,21 @@ const OrderInfo = ({
 						<Hash size={14} color="#6b7280" />
 					</div>
 					<Text className="text-sm font-semibold">
-						{`${order?.display_id || ''} ${
-							customerName ? `- ${customerName}` : ''
-						} ${customerPhone ? `- ${customerPhone}` : ''}`}
+						{`Đơn hàng số: ${order?.display_id || ''}`}
 					</Text>
+				</Flex>
+				<Flex gap={4} className="" align="center">
+					<div className="flex items-center">
+						<User size={14} color="#6b7280" />
+					</div>
+					<Text className="text-sm font-semibold">{`Khách hàng: ${customerName}`}</Text>
+				</Flex>
+				<Flex gap={4} className="" align="center">
+					{/* Số điện thoại` */}
+					<div className="flex items-center">
+						<Phone size={14} color="#6b7280" />
+					</div>
+					<Text className="text-sm font-semibold">{`Số điện thoại: ${customerPhone}`}</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">
 					<div className="flex items-center">
@@ -618,12 +637,12 @@ const OrderInfo = ({
 				</Flex>
 				<Flex gap={4} className="" align="center">
 					<Text className="text-sm font-semibold">
-						{`Tổng số đôi: ${(
+						{`Tổng số đôi: ${
 							order.items?.reduce(
 								(sum, item) => sum + (item.quantity ?? 0),
 								0
 							) ?? 0
-						)}`}
+						}`}
 					</Text>
 				</Flex>
 			</Flex>

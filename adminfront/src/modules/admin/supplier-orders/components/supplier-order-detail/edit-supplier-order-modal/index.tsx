@@ -174,15 +174,14 @@ const SupplierOrderEditModal = (props: SupplierOrderEditModalProps) => {
 		);
 
 		try {
-			const promises = lineItems.map((lineItem) =>
-				addLineItem({
+			for (const lineItem of lineItems) {
+				await addLineItem({
 					variant_id: lineItem.variant_id,
 					quantity: lineItem.quantity,
 					unit_price: lineItem.unit_price,
-				})
-			);
-
-			await Promise.all(promises);
+				});
+			}
+			setCurrentPage(1);
 			message.success('Thêm biến thể sản phẩm thành công');
 		} catch (e: any) {
 			console.log('Error:', e);
@@ -190,15 +189,14 @@ const SupplierOrderEditModal = (props: SupplierOrderEditModalProps) => {
 		}
 	};
 
-	let displayItems =
-		supplierOrderEdit?.items?.sort((a, b) => {
-			const productIdA = a?.variant?.product_id || '';
-			const productIdB = b?.variant?.product_id || '';
-			return productIdA.localeCompare(productIdB);
-		}) || [];
+	const rawEditItems = supplierOrderEdit?.items ?? [];
+	let displayItems = [...rawEditItems].sort((a, b) => {
+		const productIdA = a?.variant?.product_id || '';
+		const productIdB = b?.variant?.product_id || '';
+		return productIdA.localeCompare(productIdB);
+	});
 
-	// sort with time
-	displayItems = displayItems.sort((a, b) => {
+	displayItems = [...displayItems].sort((a, b) => {
 		const createdAtA = a?.created_at || '';
 		const createdAtB = b?.created_at || '';
 		return new Date(createdAtB)
@@ -242,7 +240,7 @@ const SupplierOrderEditModal = (props: SupplierOrderEditModalProps) => {
 				{'Chỉnh sửa đơn hàng'}
 			</Title>
 			<Flex justify="space-between" className="mt-4">
-				<Flex align="center">
+				<Flex align="center" gap={12}>
 					<Input
 						placeholder="Tên sản phẩm..."
 						name="search"
@@ -250,6 +248,19 @@ const SupplierOrderEditModal = (props: SupplierOrderEditModalProps) => {
 						onChange={handleChangeDebounce}
 						className="w-[300px]"
 					/>
+					<span className="text-xs text-gray-500 whitespace-nowrap">
+						{filterTerm
+							? `${displayItems.length}/${rawEditItems.length} dòng (đang lọc)${
+									displayItems.length > pageSize
+										? ` · trang ${currentPage}/${Math.max(1, Math.ceil(displayItems.length / pageSize))}`
+										: ''
+								}`
+							: `${rawEditItems.length} dòng${
+									rawEditItems.length > pageSize
+										? ` · trang ${currentPage}/${Math.max(1, Math.ceil(rawEditItems.length / pageSize))}`
+										: ''
+								}`}
+					</span>
 				</Flex>
 				<Flex className="text-xs pt-4">
 					<Button type="default" className="w-fit" onClick={openAddProduct}>
@@ -286,7 +297,7 @@ const SupplierOrderEditModal = (props: SupplierOrderEditModalProps) => {
 							total={displayItems.length}
 							onChange={(page, size) => {
 								setCurrentPage(page);
-								setPageSize(size || 5);
+								setPageSize(size || PAGE_SIZE);
 							}}
 						/>
 					</div>
