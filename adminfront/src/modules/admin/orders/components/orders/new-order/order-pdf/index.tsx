@@ -217,8 +217,8 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hà
 					<View style={styles.tableHeader} wrap={false}>
 						<Text style={styles.tableCell}>#</Text>
 						<Text style={[styles.tableCell, { flex: 2 }]}>Sản Phẩm</Text>
-						<Text style={styles.tableCell}>Đơn Giá</Text>
 						<Text style={styles.tableCell}>Số Lượng</Text>
+						<Text style={styles.tableCell}>Đơn Giá</Text>
 						<Text style={styles.tableCell}>Tổng</Text>
 					</View>
 
@@ -231,10 +231,10 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hà
 									<Text>{item.title}</Text>
 								</View>
 								<Text style={styles.tableCell}>
-									{item.unit_price?.toLocaleString()} {region?.currency?.symbol}
+									{formatNumber(item.quantity)}
 								</Text>
 								<Text style={styles.tableCell}>
-									{formatNumber(item.quantity)}
+									{item.unit_price?.toLocaleString()} {region?.currency?.symbol}
 								</Text>
 								<Text style={styles.tableCell}>
 									{(item.quantity * (item.unit_price || 0)).toLocaleString()}{' '}
@@ -250,10 +250,10 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hà
 						<View style={[styles.tableCell, styles.productCell]}>
 							<Text>{'-'}</Text>
 						</View>
-						<Text style={styles.tableCell}>{'-'}</Text>
 						<Text style={styles.tableCell}>
 							{formatNumber(order.totalQuantity)}
 						</Text>
+						<Text style={styles.tableCell}>{'-'}</Text>
 						<Text style={styles.tableCell}>
 							{total.toLocaleString()} {region?.currency?.symbol}
 						</Text>

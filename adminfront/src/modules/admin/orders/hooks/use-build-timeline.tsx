@@ -116,6 +116,7 @@ export interface ItemsFulfilledEvent extends FulfillmentEvent {
 export interface ItemsShippedEvent extends FulfillmentEvent {
 	items: OrderItem[];
 	locationName?: string;
+	shippedUrls?: string[];
 }
 
 export interface RefundEvent extends TimelineEvent {
@@ -421,6 +422,13 @@ export const useBuildTimeline = (orderId: string) => {
 			} as ItemsFulfilledEvent);
 
 			if (event.shipped_at) {
+				const shippedUrls = typeof (event as any).shipped_url === 'string'
+					? (event as any).shipped_url
+						.split(',')
+						.map((url: string) => url.trim())
+						.filter(Boolean)
+					: [];
+
 				events.push({
 					id: event.id,
 					time: event.shipped_at,
@@ -431,6 +439,7 @@ export const useBuildTimeline = (orderId: string) => {
 					noNotification: event.no_notification,
 					orderId: order.id,
 					locationName: getLocationNameById(event.location_id),
+					shippedUrls,
 				} as ItemsShippedEvent);
 			}
 		}
