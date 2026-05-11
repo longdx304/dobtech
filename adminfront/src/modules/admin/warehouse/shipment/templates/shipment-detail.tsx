@@ -30,7 +30,7 @@ import {
 	Search,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import fulfillmentColumns from './columns';
 
 type ShipmentDetailProps = {
@@ -47,6 +47,20 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 	const uploadFile = useAdminUploadFile();
 
 	const isProcessing = fulfillment?.status === FulfullmentStatus.DELIVERING;
+
+	useEffect(() => {
+		if (!isProcessing && fulfillment?.shipped_url?.length) {
+			setFiles(
+				fulfillment.shipped_url
+					.split(',')
+					.map((url, index) => ({
+						id: url,
+						url,
+						name: `Ảnh giao hàng #${index + 1}`,
+					}))
+			);
+		}
+	}, [fulfillment?.shipped_url, isProcessing]);
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
 		const { value: inputValue } = e.target;
