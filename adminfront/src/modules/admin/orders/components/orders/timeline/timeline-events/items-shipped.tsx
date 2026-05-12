@@ -5,6 +5,7 @@ import Image from '@/components/Image/Image';
 import EventContainer from './event-container';
 import EventItemContainer from './event-item-container';
 
+
 type ItemsShippedProps = {
 	event: ItemsShippedEvent;
 };
