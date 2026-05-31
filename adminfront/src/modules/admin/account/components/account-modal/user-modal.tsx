@@ -4,13 +4,18 @@ import { Mail, Phone, UserRound } from 'lucide-react';
 import { useEffect } from 'react';
 
 // import { createUser, updateUser } from '@/actions/accounts';
-import { CheckboxGroup } from '@/components/Checkbox';
+import { Checkbox, CheckboxGroup } from '@/components/Checkbox';
 import { Input } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
 import {
-	EPermissions,
+	getPresetPagePermissions,
+	mergeAccessControlMetadata,
+	pagePermissionGroups,
+	resolvePagePermissions,
+} from '@/lib/access-control';
+import {
 	IAdminResponse,
 	IUserRequest,
 	rolesEmployee,
@@ -43,17 +48,13 @@ export default function UserModal({
 			email: user?.email ?? '',
 			phone: user?.phone ?? '',
 			fullName: user?.first_name ?? '',
-			permissions: user?.permissions?.split(',') ?? [
-				EPermissions.Warehouse,
-				EPermissions.Manager,
-				EPermissions.Driver,
-				EPermissions.Accountant,
-			],
+			permissions: user?.permissions?.split(',').filter(Boolean) ?? [],
+			pagePermissions: user ? resolvePagePermissions(user) : [],
 		});
 	}, [user, form]);
 
 	const createPayload = (values: IUserRequest) => {
-		const { email, fullName, phone, permissions } = values;
+		const { email, fullName, phone, permissions, pagePermissions } = values;
 
 		return {
 			email,
@@ -61,6 +62,7 @@ export default function UserModal({
 			first_name: fullName,
 			phone,
 			permissions: permissions.join(','),
+			metadata: mergeAccessControlMetadata(undefined, pagePermissions),
 		};
 	};
 
@@ -84,6 +86,10 @@ export default function UserModal({
 				first_name: values.fullName,
 				phone: values.phone,
 				permissions: values.permissions.join(','),
+				metadata: mergeAccessControlMetadata(
+					user?.metadata,
+					values.pagePermissions
+				),
 			};
 			updateUser.mutateAsync(payload, {
 				onSuccess: () => {
@@ -108,7 +114,19 @@ export default function UserModal({
 			<Title level={3} className="text-center">
 				{titleModal}
 			</Title>
-			<Form id="form-user" form={form} onFinish={onFinish}>
+			<Form
+				id="form-user"
+				form={form}
+				onFinish={onFinish}
+				onValuesChange={(changedValues) => {
+					if (changedValues.permissions) {
+						form.setFieldValue(
+							'pagePermissions',
+							getPresetPagePermissions(changedValues.permissions)
+						);
+					}
+				}}
+			>
 				<Form.Item
 					labelCol={{ span: 24 }}
 					name="email"
@@ -164,6 +182,29 @@ export default function UserModal({
 					]}
 				>
 					<CheckboxGroup data-testid="permissions" options={rolesEmployee} />
+				</Form.Item>
+				<Form.Item
+					labelCol={{ span: 24 }}
+					label="Quyền truy cập trang"
+					name="pagePermissions"
+					rules={[
+						{ required: true, message: 'Nhân viên phải có ít nhất 1 quyền truy cập!' },
+					]}
+				>
+					<CheckboxGroup className="flex flex-col gap-4">
+						{Object.entries(pagePermissionGroups).map(([group, definitions]) => (
+							<div key={group}>
+								<div className="font-semibold mb-2">{group}</div>
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+									{definitions.map(({ label, permission }) => (
+										<Checkbox key={permission} value={permission}>
+											{label}
+										</Checkbox>
+									))}
+								</div>
+							</div>
+						))}
+					</CheckboxGroup>
 				</Form.Item>
 			</Form>
 		</SubmitModal>
