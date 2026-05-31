@@ -3,16 +3,28 @@ import intersection from 'lodash/intersection';
 import { decodeJwt } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 
+import {
+	AccessPermission,
+	hasAdminRouteAccess,
+} from '@/lib/access-control';
 import { ERoutes, routesConfig } from '@/types/routes';
 import { ERole } from './types/account';
 
 // Environment variable to control user access paths
 const USER_ACCESS_TYPE = process.env.NEXT_PUBLIC_USER_ACCESS_TYPE || 'admin';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9000';
 const PUBLIC_ROUTES = ['/login'];
+const ACCESS_DENIED_ROUTE = '/access-denied';
 
 interface CachedUserData {
 	role: ERole;
 	permissions: string;
+}
+
+interface AdminAccessProfile {
+	role: ERole;
+	page_permissions: AccessPermission[];
+	default_route: string | null;
 }
 
 /**
@@ -106,6 +118,19 @@ function createRedirect(request: NextRequest, path: string): NextResponse {
 	return NextResponse.redirect(new URL(path, request.url), 307);
 }
 
+async function getAdminAccessProfile(
+	accessToken: string
+): Promise<AdminAccessProfile | null> {
+	const response = await fetch(`${BACKEND_URL}/admin/me/access`, {
+		headers: { Authorization: `Bearer ${accessToken}` },
+		cache: 'no-store',
+	});
+	if (!response.ok) {
+		return null;
+	}
+	return response.json();
+}
+
 export async function middleware(request: NextRequest) {
 	try {
 		const pathname = request.nextUrl.pathname;
@@ -126,6 +151,23 @@ export async function middleware(request: NextRequest) {
 
 		if (!isValid) {
 			return createRedirect(request, ERoutes.LOGIN);
+		}
+
+		if (pathname === ERoutes.HOME || pathname.startsWith(`${ERoutes.HOME}/`)) {
+			const accessProfile = await getAdminAccessProfile(accessToken!);
+			if (!accessProfile) {
+				return createRedirect(request, ACCESS_DENIED_ROUTE);
+			}
+			if (accessProfile.role === ERole.ADMIN) {
+				return NextResponse.next();
+			}
+			if (!hasAdminRouteAccess(pathname, accessProfile.page_permissions)) {
+				return createRedirect(
+					request,
+					accessProfile.default_route ?? ACCESS_DENIED_ROUTE
+				);
+			}
+			return NextResponse.next();
 		}
 
 		// Read user role/permissions from cookie cached at login time

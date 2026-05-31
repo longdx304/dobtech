@@ -1,3 +1,4 @@
+import type { AccessControlMetadata } from '@/lib/access-control';
 
 export interface IAdminAuth {
 	email: string;
@@ -14,7 +15,7 @@ export interface IAdminResponse {
 	first_name: string | null;
 	last_name: string | null;
 	api_token: string | null;
-	metadata: JSON | null;
+	metadata: AccessControlMetadata | null;
 	permissions?: any;
 	phone: string;
 }
@@ -44,4 +45,5 @@ export type IUserRequest = {
 	fullName: string;
 	phone: string;
 	permissions: string[];
+	pagePermissions: string[];
 };
