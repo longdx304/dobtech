@@ -3,10 +3,11 @@ import intersection from 'lodash/intersection';
 import { decodeJwt } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { hasAdminRouteAccess } from '@/lib/access-control';
 import {
-	AccessPermission,
-	hasAdminRouteAccess,
-} from '@/lib/access-control';
+	AdminAccessProfileResult,
+	classifyAdminAccessProfileStatus,
+} from '@/lib/admin-access-profile';
 import { ERoutes, routesConfig } from '@/types/routes';
 import { ERole } from './types/account';
 
@@ -19,12 +20,6 @@ const ACCESS_DENIED_ROUTE = '/access-denied';
 interface CachedUserData {
 	role: ERole;
 	permissions: string;
-}
-
-interface AdminAccessProfile {
-	role: ERole;
-	page_permissions: AccessPermission[];
-	default_route: string | null;
 }
 
 /**
@@ -118,17 +113,24 @@ function createRedirect(request: NextRequest, path: string): NextResponse {
 	return NextResponse.redirect(new URL(path, request.url), 307);
 }
 
+function createLoginRedirect(request: NextRequest): NextResponse {
+	const response = createRedirect(request, ERoutes.LOGIN);
+	response.cookies.delete('_jwt_token_');
+	response.cookies.delete('_user_data_');
+	return response;
+}
+
 async function getAdminAccessProfile(
 	accessToken: string
-): Promise<AdminAccessProfile | null> {
+): Promise<AdminAccessProfileResult> {
 	const response = await fetch(`${BACKEND_URL}/admin/me/access`, {
 		headers: { Authorization: `Bearer ${accessToken}` },
 		cache: 'no-store',
 	});
 	if (!response.ok) {
-		return null;
+		return { type: classifyAdminAccessProfileStatus(response.status) };
 	}
-	return response.json();
+	return { type: 'ok', profile: await response.json() };
 }
 
 export async function middleware(request: NextRequest) {
@@ -150,14 +152,18 @@ export async function middleware(request: NextRequest) {
 		const isValid = verifyToken(accessToken);
 
 		if (!isValid) {
-			return createRedirect(request, ERoutes.LOGIN);
+			return createLoginRedirect(request);
 		}
 
 		if (pathname === ERoutes.HOME || pathname.startsWith(`${ERoutes.HOME}/`)) {
-			const accessProfile = await getAdminAccessProfile(accessToken!);
-			if (!accessProfile) {
+			const accessProfileResult = await getAdminAccessProfile(accessToken!);
+			if (accessProfileResult.type === 'auth_failed') {
+				return createLoginRedirect(request);
+			}
+			if (accessProfileResult.type === 'unavailable') {
 				return createRedirect(request, ACCESS_DENIED_ROUTE);
 			}
+			const { profile: accessProfile } = accessProfileResult;
 			if (accessProfile.role === ERole.ADMIN) {
 				return NextResponse.next();
 			}
@@ -174,7 +180,7 @@ export async function middleware(request: NextRequest) {
 		const userData = getUserData(request);
 
 		if (!userData) {
-			return createRedirect(request, ERoutes.LOGIN);
+			return createLoginRedirect(request);
 		}
 
 		const { role, permissions } = userData;
