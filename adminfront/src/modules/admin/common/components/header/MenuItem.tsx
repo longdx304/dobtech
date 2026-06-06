@@ -30,11 +30,14 @@ import {
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
-import { EPermissions, IAdminResponse } from '@/types/account';
+import {
+	AccessPermission,
+	pagePermissionDefinitions,
+	resolvePagePermissions,
+} from '@/lib/access-control';
+import { IAdminResponse } from '@/types/account';
 import { ERoutes } from '@/types/routes';
 import { User } from '@medusajs/medusa';
-import intersection from 'lodash/intersection';
-import isEmpty from 'lodash/isEmpty';
 
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(
@@ -73,41 +76,38 @@ const itemDropdown: MenuProps['items'] = [
 ];
 
 // Item menu overview
-const itemSales = [
-	getItem('Đơn hàng', 'orders', <ShoppingCart />),
-	getItem('Danh mục', 'product-categories', <LayoutList />),
-	getItem('Sản phẩm', 'products', <Layers />),
-	getItem('Định giá', 'pricing', <CircleDollarSign />),
-	getItem('Khách hàng', 'customers', <UsersRound />),
-	getItem('Giảm giá', 'discounts', <SquarePercent />),
-].filter(() => true);
+const itemSales: Array<[AccessPermission, MenuItem]> = [
+	[AccessPermission.SalesOrders, getItem('Đơn hàng', 'orders', <ShoppingCart />)],
+	[AccessPermission.SalesCategories, getItem('Danh mục', 'product-categories', <LayoutList />)],
+	[AccessPermission.SalesProducts, getItem('Sản phẩm', 'products', <Layers />)],
+	[AccessPermission.SalesPricing, getItem('Định giá', 'pricing', <CircleDollarSign />)],
+	[AccessPermission.SalesCustomers, getItem('Khách hàng', 'customers', <UsersRound />)],
+	[AccessPermission.SalesDiscounts, getItem('Giảm giá', 'discounts', <SquarePercent />)],
+	[AccessPermission.SalesGiftCards, getItem('Thẻ quà tặng', 'gift-cards', <Package />)],
+];
 
-const itemPurchases = [
-	getItem('Nhà cung cấp', 'suppliers', <Building />),
-	getItem('Nhập hàng', 'supplier-orders', <Container />),
-].filter(() => true);
+const itemPurchases: Array<[AccessPermission, MenuItem]> = [
+	[AccessPermission.PurchasesSuppliers, getItem('Nhà cung cấp', 'suppliers', <Building />)],
+	[AccessPermission.PurchasesOrders, getItem('Nhập hàng', 'supplier-orders', <Container />)],
+];
 
 // Item menu warehouse
-const itemsWarehouse: MenuProps['items'] = [
-	getItem('Quản lý kho', 'warehouse-manage', <Warehouse />),
-
-	getItem('Kiểm kho', 'warehouse-inventory-checker', <Package />),
-	getItem('Nhập kho', 'warehouse-inbound', <PackagePlus />),
-	getItem('Xuất kho', 'warehouse-outbound', <PackageMinus />),
-	getItem('Kiểm hàng', 'warehouse-stock-checker', <PackageCheck />),
-	getItem('Vận chuyển', 'warehouse-ship', <Truck />),
-	getItem('Sổ kho', 'warehouse-transaction', <NotebookPen />),
+const itemsWarehouse: Array<[AccessPermission, MenuItem]> = [
+	[AccessPermission.WarehouseManage, getItem('Quản lý kho', 'warehouse-manage', <Warehouse />)],
+	[AccessPermission.WarehouseInventoryChecker, getItem('Kiểm kho', 'warehouse-inventory-checker', <Package />)],
+	[AccessPermission.WarehouseInbound, getItem('Nhập kho', 'warehouse-inbound', <PackagePlus />)],
+	[AccessPermission.WarehouseOutbound, getItem('Xuất kho', 'warehouse-outbound', <PackageMinus />)],
+	[AccessPermission.WarehouseStockChecker, getItem('Kiểm hàng', 'warehouse-stock-checker', <PackageCheck />)],
+	[AccessPermission.WarehouseShipment, getItem('Vận chuyển', 'warehouse-ship', <Truck />)],
+	[AccessPermission.WarehouseTransactions, getItem('Sổ kho', 'warehouse-transaction', <NotebookPen />)],
 ];
 
 // Item menu option
-const itemsAdmin: MenuProps['items'] = [
-	getItem('Quản lý nhân viên', 'accounts', <Users />),
-	getItem('Cài đặt', 'setting', <Settings />, [
-		getItem('Khu vực', 'regions', <Earth />),
-		getItem('Đơn vị hàng', 'item-unit', <Boxes />),
-		getItem('Tiền tệ', 'currencies', <BadgeDollarSign />),
-		getItem('Lý do trả hàng', 'return-reasons', <Undo2 />),
-	]),
+const itemSettings: Array<[AccessPermission, MenuItem]> = [
+	[AccessPermission.SettingsRegions, getItem('Khu vực', 'regions', <Earth />)],
+	[AccessPermission.SettingsItemUnits, getItem('Đơn vị hàng', 'item-unit', <Boxes />)],
+	[AccessPermission.SettingsCurrencies, getItem('Tiền tệ', 'currencies', <BadgeDollarSign />)],
+	[AccessPermission.SettingsReturnReasons, getItem('Lý do trả hàng', 'return-reasons', <Undo2 />)],
 ];
 
 // Item menu user
@@ -137,46 +137,32 @@ const itemUser = (
 // Generation menu
 export const menuItems = (
 	user: Omit<User, 'password_hash'>,
-	handleDropdownClick: (e: any) => void
+	handleDropdownClick: (e: any) => void,
+	pagePermissions?: AccessPermission[]
 ) => {
 	const role = user?.role;
-	let permissions = (user as any)?.permissions?.split(',');
-
-	if (role === 'admin') {
-		permissions = [
-			EPermissions.Manager,
-			EPermissions.Warehouse,
-			EPermissions.Driver,
-			EPermissions.Accountant,
-		];
-	}
-
-	const hasRequiredPermissionsSale = !isEmpty(
-		intersection(permissions, [EPermissions.Accountant, EPermissions.Manager])
-	);
-	// Check if user has required permissions for warehouse
-	const hasRequiredPermissionsWarehouse = !isEmpty(
-		intersection(permissions, [EPermissions.Manager, EPermissions.Warehouse])
-	);
-	const hasRequiredPermissionsShip = !isEmpty(
-		intersection(permissions, [EPermissions.Manager, EPermissions.Driver])
-	);
+	const permissions =
+		role === 'admin'
+			? pagePermissionDefinitions.map(({ permission }) => permission)
+			: pagePermissions ?? resolvePagePermissions(user as any);
+	const allowed = new Set(permissions);
+	const filterAllowed = (items: Array<[AccessPermission, MenuItem]>) =>
+		items.filter(([permission]) => allowed.has(permission)).map(([, item]) => item);
+	const sales = filterAllowed(itemSales);
+	const purchases = filterAllowed(itemPurchases);
+	const warehouse = filterAllowed(itemsWarehouse);
+	const settings = filterAllowed(itemSettings);
+	const adminItems = [
+		allowed.has(AccessPermission.AccountsManage) &&
+			getItem('Quản lý nhân viên', 'accounts', <Users />),
+		settings.length > 0 && getItem('Cài đặt', 'setting', <Settings />, settings),
+	].filter(Boolean) as MenuItem[];
 
 	return [
-		hasRequiredPermissionsSale &&
-			getItem('Bán hàng', 'sale', null, itemSales as MenuItem[], 'group'),
-		hasRequiredPermissionsSale &&
-			getItem(
-				'Mua hàng',
-				'purchase',
-				null,
-				itemPurchases as MenuItem[],
-				'group'
-			),
-		hasRequiredPermissionsWarehouse &&
-			getItem('Kho', 'inventory', null, itemsWarehouse as MenuItem[], 'group'),
-		role === 'admin' &&
-			getItem('Admin', 'admin', null, itemsAdmin as MenuItem[], 'group'),
+		sales.length > 0 && getItem('Bán hàng', 'sale', null, sales, 'group'),
+		purchases.length > 0 && getItem('Mua hàng', 'purchase', null, purchases, 'group'),
+		warehouse.length > 0 && getItem('Kho', 'inventory', null, warehouse, 'group'),
+		adminItems.length > 0 && getItem('Admin', 'admin', null, adminItems, 'group'),
 		getItem(
 			'',
 			'user',
@@ -197,6 +183,7 @@ export const menuRoutes: Record<string, string> = {
 	orders: ERoutes.ORDERS,
 	'return-reasons': ERoutes.RETURN_REASONS,
 	discounts: ERoutes.DISCOUNTS,
+	'gift-cards': ERoutes.GIFT_CARDS,
 	suppliers: ERoutes.SUPPLIERS,
 	'supplier-orders': ERoutes.SUPPLIER_ORDERS,
 	currencies: ERoutes.CURRENCIES,
