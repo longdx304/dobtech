@@ -173,13 +173,13 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 	};
 
 	let displayItems =
-		orderEdit?.items?.sort((a, b) => {
+		[...(orderEdit?.items || [])].sort((a, b) => {
 			const productIdA = a?.variant?.product_id || '';
 			const productIdB = b?.variant?.product_id || '';
 			return productIdA.localeCompare(productIdB);
 		}) || [];
 
-	displayItems = orderEdit.items.sort(
+	displayItems = [...displayItems].sort(
 		// @ts-ignore
 		(a, b) => new Date(a.created_at) - new Date(b.created_at)
 	);
