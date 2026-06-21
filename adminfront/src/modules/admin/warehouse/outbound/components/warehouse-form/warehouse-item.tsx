@@ -5,8 +5,8 @@ import { Text } from '@/components/Typography';
 import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
 import { ADMIN_PRODUCT_OUTBOUND } from '@/lib/hooks/api/product-outbound';
 import {
-	useAdminCreateInventory,
-	useAdminRemoveInventory,
+	useAdminPickOutboundItem,
+	useAdminUndoPickOutboundItem,
 } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
@@ -38,8 +38,8 @@ const WarehouseItem = ({
 }: WarehouseItemProps) => {
 	const { getSelectedUnitData, onReset, setSelectedUnit, setQuantity } =
 		useProductUnit();
-	const createOutboundInventory = useAdminCreateInventory();
-	const removeOutboundInventory = useAdminRemoveInventory();
+	const pickOutboundItem = useAdminPickOutboundItem();
+	const undoPickOutboundItem = useAdminUndoPickOutboundItem();
 	const queryClient = useQueryClient();
 
 	const unitData = getSelectedUnitData();
@@ -68,7 +68,7 @@ const WarehouseItem = ({
 		};
 
 		onReset();
-		await removeOutboundInventory.mutateAsync(itemData, {
+		await pickOutboundItem.mutateAsync(itemData, {
 			onSuccess: () => {
 				message.success(`Đã lấy hàng tại vị trí ${item.warehouse.location}`);
 				refetchInventory();
@@ -103,9 +103,9 @@ const WarehouseItem = ({
 		};
 
 		onReset();
-		await createOutboundInventory.mutateAsync(itemData, {
+		await undoPickOutboundItem.mutateAsync(itemData, {
 			onSuccess: () => {
-				message.success(`Đã nhập hàng vào vị trí ${item.warehouse.location}`);
+				message.success(`Đã hoàn hàng về vị trí ${item.warehouse.location}`);
 				refetchInventory();
 				queryClient.invalidateQueries([ADMIN_PRODUCT_OUTBOUND, 'detail']);
 				queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
@@ -132,7 +132,7 @@ const WarehouseItem = ({
 							type="OUTBOUND"
 						/>
 					}
-					isLoading={removeOutboundInventory.isLoading}
+					isLoading={pickOutboundItem.isLoading}
 					cancelText="Huỷ"
 					okText="Xác nhận"
 					handleOk={onRemoveInventory}
@@ -154,9 +154,9 @@ const WarehouseItem = ({
 			<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
 			{isPermission && (
 				<Popconfirm
-					title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
+					title={`Hoàn hàng về vị trí (${item.warehouse.location})`}
 					description={<VariantInventoryForm type="INBOUND" />}
-					isLoading={createOutboundInventory.isLoading}
+					isLoading={undoPickOutboundItem.isLoading}
 					cancelText="Huỷ"
 					okText="Xác nhận"
 					handleOk={onAddInventory}
