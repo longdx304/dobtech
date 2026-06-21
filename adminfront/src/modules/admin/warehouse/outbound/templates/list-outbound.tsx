@@ -28,6 +28,11 @@ import Link from 'next/link';
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
+const ACTIVE_OUTBOUND_STATUSES = [
+	FulfillmentStatus.NOT_FULFILLED,
+	FulfillmentStatus.PARTIALLY_FULFILLED,
+].join(',');
+
 const ListOutbound: FC<Props> = ({}) => {
 	const router = useRouter();
 	const [searchValue, setSearchValue] = useState<string>('');
@@ -43,7 +48,10 @@ const ListOutbound: FC<Props> = ({}) => {
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		fulfillment_status: activeKey,
+		fulfillment_status:
+			activeKey === FulfillmentStatus.NOT_FULFILLED
+				? ACTIVE_OUTBOUND_STATUSES
+				: activeKey,
 		isMyOrder: myOrder ? true : undefined,
 		order: sortOrder,
 	});
