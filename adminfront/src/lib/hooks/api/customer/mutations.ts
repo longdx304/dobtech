@@ -96,3 +96,35 @@ export const useAdminDeleteCustomerAddress = (
 		)
 	);
 };
+
+/** Manage a customer's inventory-app login (password reset / phone / enable-disable). */
+export type AdminUpdateCustomerAccountPayload = {
+	password?: string;
+	phone?: string;
+	is_active?: boolean;
+};
+
+export const useAdminUpdateCustomerAccount = (
+	customerId: string,
+	options?: UseMutationOptions<
+		Response<{ customer: Customer }>,
+		Error,
+		AdminUpdateCustomerAccountPayload
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminUpdateCustomerAccountPayload) =>
+			client.admin.custom.post(
+				`/admin/customer-accounts/${customerId}`,
+				payload
+			),
+		buildOptions(
+			queryClient,
+			[...customerListInvalidateKeys(customerId)],
+			options
+		)
+	);
+};

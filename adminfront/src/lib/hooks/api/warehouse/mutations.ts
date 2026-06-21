@@ -1,5 +1,6 @@
 import {
 	AdminInventoryRemoveRes,
+	AdminPostCreateOutboundInventoryReq,
 	AdminPostInboundInventoryReq,
 	AdminPostManageInventoryWarehouseReq,
 	AdminPostManageWarehouseVariantReq,
@@ -192,6 +193,46 @@ export const useAdminRemoveInventory = (
 	return useMutation(
 		(payload: AdminPostRemmoveInventoryReq) =>
 			client.admin.custom.post(`/admin/warehouse/outbound`, payload),
+		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
+	);
+};
+
+export const useAdminPickOutboundItem = (
+	options?: UseMutationOptions<
+		Response<AdminInventoryRemoveRes>,
+		Error,
+		AdminPostRemmoveInventoryReq
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminPostRemmoveInventoryReq) =>
+			client.admin.custom.post(
+				`/admin/warehouse/workflow/outbound/pick`,
+				payload
+			),
+		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
+	);
+};
+
+export const useAdminUndoPickOutboundItem = (
+	options?: UseMutationOptions<
+		Response<AdminWarehouseRes>,
+		Error,
+		AdminPostCreateOutboundInventoryReq
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminPostCreateOutboundInventoryReq) =>
+			client.admin.custom.post(
+				`/admin/warehouse/workflow/outbound/undo-pick`,
+				payload
+			),
 		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
 	);
 };

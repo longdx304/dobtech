@@ -2,6 +2,11 @@ import { EPermissions } from '@/types/account';
 
 export const ADMIN_ACCESS_PROFILE_REFRESH_EVENT = 'admin-access-profile-refresh';
 
+const adminAccessProfileRefreshExcludedApiPaths = [
+	'/admin/customer-import',
+	'/admin/customer-accounts',
+];
+
 export enum AccessPermission {
 	DashboardView = 'dashboard.view',
 	AccountsManage = 'accounts.manage',
@@ -131,6 +136,33 @@ export function getRequiredPagePermission(pathname: string): AccessPermission | 
 export function hasAdminRouteAccess(pathname: string, permissions: AccessPermission[]): boolean {
 	const requiredPermission = getRequiredPagePermission(pathname);
 	return requiredPermission !== undefined && permissions.includes(requiredPermission);
+}
+
+function getApiErrorPath(url: string): string {
+	if (!url) return '';
+
+	try {
+		return new URL(url).pathname;
+	} catch {
+		return url;
+	}
+}
+
+export function shouldRefreshAdminAccessProfileForApiError(
+	url: string,
+	status?: number
+): boolean {
+	const pathname = getApiErrorPath(url);
+
+	return (
+		status === 403 &&
+		pathname.startsWith('/admin/') &&
+		pathname !== '/admin/me/access' &&
+		!adminAccessProfileRefreshExcludedApiPaths.some(
+			(excludedPath) =>
+				pathname === excludedPath || pathname.startsWith(`${excludedPath}/`)
+		)
+	);
 }
 
 export function getDefaultAdminRoute(permissions: AccessPermission[]): string | null {

@@ -5,6 +5,7 @@ import {
 	hasAdminRouteAccess,
 	mergeAccessControlMetadata,
 	resolvePagePermissions,
+	shouldRefreshAdminAccessProfileForApiError,
 } from '@/lib/access-control';
 
 describe('access control', () => {
@@ -58,5 +59,26 @@ describe('access control', () => {
 				page_permissions: [AccessPermission.SettingsRegions],
 			},
 		});
+	});
+
+	it('does not refresh the whole access profile for customer import/account api errors', () => {
+		expect(
+			shouldRefreshAdminAccessProfileForApiError('/admin/customer-import', 403)
+		).toBe(false);
+		expect(
+			shouldRefreshAdminAccessProfileForApiError(
+				'/admin/customer-import/export',
+				403
+			)
+		).toBe(false);
+		expect(
+			shouldRefreshAdminAccessProfileForApiError(
+				'/admin/customer-accounts/cus_123',
+				403
+			)
+		).toBe(false);
+		expect(
+			shouldRefreshAdminAccessProfileForApiError('/admin/orders', 403)
+		).toBe(true);
 	});
 });
