@@ -1,14 +1,27 @@
 'use client';
 import { Button } from '@/components/Button';
-import { Input } from '@/components/Input';
+import { Input, InputPassword } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
-import { useAdminDeleteCustomerAddress } from '@/lib/hooks/api/customer/mutations';
+import {
+	useAdminDeleteCustomerAddress,
+	useAdminUpdateCustomerAccount,
+} from '@/lib/hooks/api/customer/mutations';
 import { getErrorMessage } from '@/lib/utils';
 import { ICustomerResponse } from '@/types/customer';
 import { Address } from '@medusajs/medusa';
 import { useQuery } from '@tanstack/react-query';
-import { Col, Divider, Form, List, Popconfirm, Row, message } from 'antd';
+import {
+	Col,
+	Divider,
+	Form,
+	List,
+	Popconfirm,
+	Row,
+	Switch,
+	Tag,
+	message,
+} from 'antd';
 import { adminCustomerKeys, useAdminUpdateCustomer, useMedusa } from 'medusa-react';
 import { FC, useEffect, useMemo, useState } from 'react';
 import CustomerAddressModal from './customer-address-modal';
@@ -26,6 +39,7 @@ type CustomerFormProps = {
 	last_name: string;
 	phone: string;
 	customer_code: string;
+	customer_note?: string;
 };
 
 function formatAddressLine(a: Address): string {
@@ -51,9 +65,11 @@ const EditCustomerModal: FC<Props> = ({
 }) => {
 	const [form] = Form.useForm();
 	const updateCustomer = useAdminUpdateCustomer(customer.id);
+	const updateAccount = useAdminUpdateCustomerAccount(customer.id);
 	const { client } = useMedusa();
 	const [addressModalOpen, setAddressModalOpen] = useState(false);
 	const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+	const [appPassword, setAppPassword] = useState('');
 
 	const { data: customerDetail, refetch: refetchCustomerDetail } = useQuery({
 		queryKey: [
@@ -93,6 +109,7 @@ const EditCustomerModal: FC<Props> = ({
 			last_name: customer?.last_name,
 			phone: customer?.phone,
 			customer_code: customer?.customer_code,
+			customer_note: customer?.metadata?.customer_note,
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [customer]);
@@ -104,6 +121,10 @@ const EditCustomerModal: FC<Props> = ({
 				last_name: values.last_name,
 				phone: values?.phone || undefined,
 				customer_code: values?.customer_code || undefined,
+				metadata: {
+					...(mergedCustomer.metadata ?? {}),
+					customer_note: values.customer_note || '',
+				},
 			} as any,
 			{
 				onSuccess: () => {
@@ -119,6 +140,39 @@ const EditCustomerModal: FC<Props> = ({
 	};
 
 	const addresses = mergedCustomer.shipping_addresses ?? [];
+
+	const hasAccount = !!(mergedCustomer as any)?.has_account;
+	const isActive = !!mergedCustomer?.is_active;
+
+	const handleSetPassword = async () => {
+		if (!appPassword || appPassword.length < 6) {
+			message.error('Mật khẩu phải có ít nhất 6 ký tự');
+			return;
+		}
+		const phone = form.getFieldValue('phone');
+		if (!phone) {
+			message.error('Cần có số điện thoại để khách đăng nhập app');
+			return;
+		}
+		try {
+			await updateAccount.mutateAsync({ password: appPassword, phone });
+			message.success('Đã đặt mật khẩu đăng nhập app');
+			setAppPassword('');
+			refetchCustomerDetail();
+		} catch (error) {
+			message.error(getErrorMessage(error));
+		}
+	};
+
+	const handleToggleAccess = async (enabled: boolean) => {
+		try {
+			await updateAccount.mutateAsync({ is_active: enabled });
+			message.success(enabled ? 'Đã cho phép đăng nhập app' : 'Đã khóa đăng nhập app');
+			refetchCustomerDetail();
+		} catch (error) {
+			message.error(getErrorMessage(error));
+		}
+	};
 
 	return (
 		<>
@@ -182,8 +236,71 @@ const EditCustomerModal: FC<Props> = ({
 								<Input placeholder="Mã khách hàng" />
 							</Form.Item>
 						</Col>
+						<Col xs={24}>
+							<Form.Item
+								labelCol={{ span: 24 }}
+								name="customer_note"
+								label="Ghi chú"
+							>
+								<Input placeholder="Ghi chú khách hàng" />
+							</Form.Item>
+						</Col>
 					</Row>
 				</Form>
+
+				<Divider className="my-4" />
+
+				<div className="flex items-center justify-between mb-2">
+					<Title level={5} className="!mb-0">
+						Đăng nhập App tồn kho
+					</Title>
+					{hasAccount ? (
+						isActive ? (
+							<Tag color="green">Đang bật</Tag>
+						) : (
+							<Tag color="red">Đã khóa</Tag>
+						)
+					) : (
+						<Tag>Chưa có tài khoản</Tag>
+					)}
+				</div>
+				<div className="text-xs text-gray-500 mb-3">
+					Khách dùng <b>số điện thoại + mật khẩu</b> ở trên để đăng nhập app xem
+					tồn kho. Đặt mật khẩu để cấp quyền truy cập.
+				</div>
+				<Row gutter={[16, 8]} align="bottom">
+					<Col xs={24} sm={14}>
+						<label className="text-sm">Mật khẩu đăng nhập app</label>
+						<InputPassword
+							placeholder={
+								hasAccount ? 'Nhập mật khẩu mới để đặt lại' : 'Tạo mật khẩu'
+							}
+							value={appPassword}
+							onChange={(e) => setAppPassword(e.target.value)}
+							autoComplete="new-password"
+						/>
+					</Col>
+					<Col xs={24} sm={10}>
+						<Button
+							type="primary"
+							onClick={handleSetPassword}
+							loading={updateAccount.isLoading}
+							block
+						>
+							{hasAccount ? 'Đặt lại mật khẩu' : 'Tạo tài khoản app'}
+						</Button>
+					</Col>
+				</Row>
+				{hasAccount && (
+					<div className="flex items-center gap-2 mt-3">
+						<Switch
+							checked={isActive}
+							onChange={handleToggleAccess}
+							loading={updateAccount.isLoading}
+						/>
+						<span className="text-sm">Cho phép đăng nhập app</span>
+					</div>
+				)}
 
 				<Divider className="my-4" />
 

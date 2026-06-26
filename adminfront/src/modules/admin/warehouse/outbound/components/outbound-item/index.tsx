@@ -24,8 +24,10 @@ const OutboundItem: React.FC<OutboundItemProps> = ({
 }) => {
 	const { user } = useUser();
 
-	const isProcessing =
-		item.fulfillment_status === FulfillmentStatus.NOT_FULFILLED;
+	const isProcessing = [
+		FulfillmentStatus.NOT_FULFILLED,
+		FulfillmentStatus.PARTIALLY_FULFILLED,
+	].includes(item.fulfillment_status as FulfillmentStatus);
 
 	const isStart = isProcessing && !item?.handler_id;
 
