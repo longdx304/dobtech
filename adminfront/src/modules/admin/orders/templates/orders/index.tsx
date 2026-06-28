@@ -21,7 +21,7 @@ import { FulfillmentStatus } from '@/types/fulfillments';
 
 type Props = {};
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 20;
 const defaultQueryProps = {
 	expand: 'customer,shipping_address',
 	fields:

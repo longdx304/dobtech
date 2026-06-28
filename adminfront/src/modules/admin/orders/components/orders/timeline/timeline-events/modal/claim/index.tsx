@@ -483,7 +483,7 @@ const SummaryLineItem = ({
 							height={48}
 							width={36}
 							alt={`Image summary ${
-								isReplace ? item?.product.title : item.product_title
+								isReplace ? item?.product?.title : item.product_title
 							}`}
 							className="object-cover"
 						/>
