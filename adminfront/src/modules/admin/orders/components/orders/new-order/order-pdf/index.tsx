@@ -66,6 +66,9 @@ const styles = StyleSheet.create({
 	text: {
 		fontSize: 10,
 	},
+	noteBlock: {
+		marginTop: 8,
+	},
 	tableHeader: {
 		flexDirection: 'row',
 		borderBottomWidth: 1,
@@ -144,6 +147,10 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hà
 		(sum, item) => sum + item.quantity * (item.unit_price || 0),
 		0
 	);
+	const customerNote =
+		typeof order.customer?.metadata?.customer_note === 'string'
+			? order.customer.metadata.customer_note.trim()
+			: '';
 
 	if (!order) {
 		return null;
@@ -192,6 +199,12 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hà
 						<View style={styles.column}>
 							<Text style={styles.label}>Số Điện Thoại</Text>
 							<Text style={styles.text}>{order.customer?.phone}</Text>
+							{!!customerNote && (
+								<View style={styles.noteBlock}>
+									<Text style={styles.label}>Ghi chú</Text>
+									<Text style={styles.text}>{customerNote}</Text>
+								</View>
+							)}
 						</View>
 					</View>
 				</View>

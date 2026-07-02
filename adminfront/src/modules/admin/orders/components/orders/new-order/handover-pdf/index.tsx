@@ -63,6 +63,9 @@ const styles = StyleSheet.create({
 	text: {
 		fontSize: 10,
 	},
+	noteBlock: {
+		marginTop: 8,
+	},
 	tableHeader: {
 		flexDirection: 'row',
 		borderBottomWidth: 1,
@@ -125,6 +128,11 @@ interface HandoverPDFProps {
 const HandoverPDFDocument: FC<HandoverPDFProps> = ({ order }) => {
 	if (!order) return null;
 
+	const customerNote =
+		typeof order.customer?.metadata?.customer_note === 'string'
+			? order.customer.metadata.customer_note.trim()
+			: '';
+
 	const sortedItems = [...order.lineItems].sort((a: any, b: any) =>
 		(a.sku || '').localeCompare(b.sku || '')
 	);
@@ -163,6 +171,12 @@ const HandoverPDFDocument: FC<HandoverPDFProps> = ({ order }) => {
 						<View style={styles.column}>
 							<Text style={styles.label}>Số Điện Thoại</Text>
 							<Text style={styles.text}>{order.customer?.phone}</Text>
+							{!!customerNote && (
+								<View style={styles.noteBlock}>
+									<Text style={styles.label}>Ghi chú</Text>
+									<Text style={styles.text}>{customerNote}</Text>
+								</View>
+							)}
 						</View>
 					</View>
 				</View>
