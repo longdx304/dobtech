@@ -83,13 +83,7 @@ const expandedColumns = ({
 		dataIndex: 'variant',
 		className: 'text-xs',
 		fixed: 'left',
-		render: (_: ProductVariant | null) => {
-			const productTitle = _?.product?.title;
-			const variantTitle = _?.title;
-			const productLabel =
-				[productTitle, variantTitle].filter(Boolean).join(' - ') ||
-				'Sản phẩm không xác định';
-
+		render: (_: ProductVariant) => {
 			return (
 				<Flex className="flex items-center gap-3">
 					<Image
@@ -100,10 +94,10 @@ const expandedColumns = ({
 						className="rounded-md cursor-pointer"
 					/>
 					<Flex vertical className="">
-						<Tooltip title={productLabel}>
-							<Text className="text-xs line-clamp-2">{productLabel}</Text>
+						<Tooltip title={`${_.product.title} - ${_.title}`}>
+							<Text className="text-xs line-clamp-2">{`${_.product.title} - ${_.title}`}</Text>
 						</Tooltip>
-						<span className="text-gray-500">{variantTitle}</span>
+						<span className="text-gray-500">{_.title}</span>
 					</Flex>
 				</Flex>
 			);

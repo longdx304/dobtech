@@ -45,19 +45,14 @@ export const useCheckInventoryKiot = (
 	);
 };
 
-type SyncInventoryPayload = {
-	variant_ids?: string[];
-};
-
 export const useSyncInventory = (
-	options?: UseMutationOptions<Response<any>, Error, SyncInventoryPayload | void>
+	options?: UseMutationOptions<Response<any>, Error, void>
 ) => {
 	const { client } = useMedusa();
 	const queryClient = useQueryClient();
 
 	return useMutation(
-		(payload?: SyncInventoryPayload) =>
-			client.admin.custom.post(`/admin/product/sync-inventory`, payload ?? {}),
+		() => client.admin.custom.post(`/admin/product/sync-inventory`, {}),
 		buildOptions(queryClient, [adminInventoryKeys.lists()], options)
 	);
 };
