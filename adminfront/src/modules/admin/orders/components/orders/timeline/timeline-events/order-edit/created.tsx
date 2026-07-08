@@ -293,14 +293,9 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 	quantity = Math.abs(quantity);
 
 	const lineItem = isAdd ? change.line_item : change.original_line_item;
-	const variantTitle = lineItem?.variant?.title;
-	const variantSku = lineItem?.variant?.sku;
-	const variantLabel = [variantTitle, variantSku ? `(${variantSku})` : '']
-		.filter(Boolean)
-		.join(' ');
-	const tooltipContent = [lineItem?.title, variantLabel]
-		.filter(Boolean)
-		.join(' - ');
+	const tooltipContent = `${lineItem?.title} - ${lineItem?.variant?.title} (${
+		lineItem?.variant?.sku || ''
+	})`;
 
 	return (
 		<div className="gap-x-4 flex items-center justify-between">
@@ -324,11 +319,11 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 								</span>
 							)}
 						</span>
-						{variantLabel && (
-							<span className="font-normal text-gray-500 flex truncate max-w-[185px]">
-								{variantLabel}
-							</span>
-						)}
+						<span className="font-normal text-gray-500 flex truncate max-w-[185px]">
+							{`${lineItem?.variant.title}${
+								lineItem?.variant.sku ? ` (${lineItem.variant.sku})` : ''
+							}`}
+						</span>
 					</div>
 				</Tooltip>
 			</div>
