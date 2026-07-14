@@ -8,7 +8,7 @@ import { Text, Title } from '@/components/Typography';
 import { useSyncInventory } from '@/lib/hooks/api/product/mutations';
 import { useAdminWarehousesInventoryVariant } from '@/lib/hooks/api/warehouse';
 import { useUser } from '@/lib/providers/user-provider';
-import { message } from 'antd';
+import { Alert, message, Spin } from 'antd';
 import debounce from 'lodash/debounce';
 import { RefreshCw, Search } from 'lucide-react';
 import { ChangeEvent, FC, useState } from 'react';
@@ -22,6 +22,7 @@ const InventoryChecker: FC<Props> = ({}) => {
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [offset, setOffset] = useState<number>(0);
 	const [numPages, setNumPages] = useState<number>(1);
+	const [syncingVariantId, setSyncingVariantId] = useState<string | null>(null);
 
 	const { user } = useUser();
 	const isAdmin = (user as any)?.role === 'admin';
@@ -32,7 +33,7 @@ const InventoryChecker: FC<Props> = ({}) => {
 		offset,
 	});
 
-	const { mutate: syncInventory, isLoading: isSyncing } = useSyncInventory({
+	const { mutate: syncAllInventory, isLoading: isSyncingAll } = useSyncInventory({
 		onSuccess: () => {
 			message.success('Đồng bộ kho thành công!');
 			refetch();
@@ -42,8 +43,28 @@ const InventoryChecker: FC<Props> = ({}) => {
 		},
 	});
 
+	const { mutateAsync: syncVariantInventory } = useSyncInventory();
+
 	const handleSyncInventory = () => {
-		syncInventory();
+		syncAllInventory(undefined);
+	};
+
+	const handleSyncVariant = async (record: any) => {
+		if (!record?.variant_id) {
+			message.error('Không tìm thấy sản phẩm cần đồng bộ');
+			return;
+		}
+
+		setSyncingVariantId(record.variant_id);
+		try {
+			await syncVariantInventory({ variant_ids: [record.variant_id] });
+			message.success('Đồng bộ sản phẩm thành công!');
+			refetch();
+		} catch (error: any) {
+			message.error(error?.message || 'Đồng bộ sản phẩm thất bại!');
+		} finally {
+			setSyncingVariantId(null);
+		}
 	};
 
 	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
@@ -62,43 +83,58 @@ const InventoryChecker: FC<Props> = ({}) => {
 		setNumPages(page);
 		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
 	};
-	const columns = inventoryColumns({});
+	const columns = inventoryColumns({
+		isAdmin,
+		onSyncVariant: handleSyncVariant,
+		syncingVariantId,
+		disabled: isSyncingAll || !!syncingVariantId,
+	});
+	const mismatchCount = Array.isArray(data) ? data.length : 0;
 
 	return (
 		<Flex vertical gap={12}>
+			<Spin fullscreen spinning={isSyncingAll} tip="Đang đồng bộ kho..." />
 			<Flex vertical align="flex-start" className="">
 				<Title level={3}>Danh sách vị trí kho</Title>
 				<Text className="text-gray-600">
 					Trang danh sách các sản phẩm ở từng vị trí kho.
 				</Text>
-		</Flex>
-		<Card loading={false} className="w-full" bordered={false}>
-			<Flex align="center" justify="space-between" className="mb-4">
-				<Title level={4}>Vị trí kho</Title>
-				{isAdmin && (
-					<Button
-						type="primary"
-						icon={<RefreshCw size={16} />}
-						onClick={handleSyncInventory}
-						loading={isSyncing}
-					>
-						Đồng bộ kho
-					</Button>
+			</Flex>
+			<Card loading={false} className="w-full" bordered={false}>
+				<Flex align="center" justify="space-between" className="mb-4">
+					<Title level={4}>Vị trí kho</Title>
+					{isAdmin && (
+						<Button
+							type="primary"
+							icon={<RefreshCw size={16} />}
+							onClick={handleSyncInventory}
+							loading={isSyncingAll}
+						>
+							Đồng bộ kho
+						</Button>
+					)}
+				</Flex>
+				<Flex align="center" justify="flex-end" className="py-4">
+					<Input
+						placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
+						name="search"
+						prefix={<Search size={16} />}
+						onChange={handleChangeDebounce}
+						className="w-[300px]"
+					/>
+				</Flex>
+				{mismatchCount > 0 && (
+					<Alert
+						type="warning"
+						showIcon
+						className="mb-4"
+						message={`Có ${mismatchCount} sản phẩm đang lệch giữa sổ kho và sổ sản phẩm trong trang này.`}
+					/>
 				)}
-			</Flex>
-			<Flex align="center" justify="flex-end" className="py-4">
-				<Input
-					placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
-					name="search"
-					prefix={<Search size={16} />}
-					onChange={handleChangeDebounce}
-					className="w-[300px]"
-				/>
-			</Flex>
 				<Table
 					dataSource={data}
 					loading={isLoading}
-					rowKey="id"
+					rowKey="variant_id"
 					columns={columns as any}
 					pagination={{
 						onChange: (page) => handleChangePage(page),

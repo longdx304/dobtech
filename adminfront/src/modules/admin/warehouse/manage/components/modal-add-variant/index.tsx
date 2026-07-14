@@ -11,7 +11,7 @@ import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
 import { ProductVariant } from '@/types/products';
 import { Warehouse } from '@/types/warehouse';
-import { message } from 'antd';
+import { message, Spin } from 'antd';
 import { debounce } from 'lodash';
 import { LoaderCircle } from 'lucide-react';
 import { FC, useEffect, useState } from 'react';
@@ -94,75 +94,82 @@ const ModalAddVariant: FC<Props> = ({
 		if (!selectedOption) {
 			return message.error('Vui lòng chọn vị trí kho');
 		}
-		await addWarehouseVariant.mutateAsync(
-			{
+		try {
+			await addWarehouseVariant.mutateAsync({
 				location: selectedOption.label,
 				variant_id: variant.id,
 				quantity: unitData.quantity,
 				unit_id: unitData.unitId,
 				type: 'INBOUND',
-			},
-			{
-				onSuccess: () => {
-					message.success(`Đã thêm sản phẩm vào kho thành công`);
-					setSearchValue(undefined);
-					setSelectedOption(undefined);
-					onReset();
-					refetch();
-				},
-				onError: (error: any) => {
-					message.error(getErrorMessage(error));
-				},
-			}
-		);
+			});
+			message.success(`Đã thêm sản phẩm vào kho thành công`);
+			setSearchValue(undefined);
+			setSelectedOption(undefined);
+			onReset();
+			refetch();
+		} catch (error: any) {
+			message.error(getErrorMessage(error));
+			return;
+		}
 		onClose();
 	};
 
 	return (
-		<Modal
-			open={isModalOpen}
-			handleCancel={() => {
-				onReset();
-				setSearchValue(undefined);
-				setSelectedOption(undefined);
-				onClose();
-			}}
-			handleOk={handleOkModal}
-			title={`Thêm vị trí cho sản phẩm`}
-			isLoading={addWarehouseVariant.isLoading}
-		>
-			<Flex vertical align="flex-start" className="w-full mb-2">
-				<Text className="text-[14px] text-gray-500">Tên vị trí:</Text>
-				<Select
-					className="w-full"
-					placeholder="Chọn vị trí"
-					allowClear
-					options={optionWarehouses}
-					labelInValue
-					filterOption={false}
-					value={selectedOption}
-					onSearch={debounceFetcher}
-					onSelect={handleSelect}
-					onClear={() => {
-						setSelectedOption(undefined);
+		<>
+			<Spin
+				fullscreen
+				spinning={addWarehouseVariant.isLoading}
+				tip="Đang thêm sản phẩm vào kho..."
+			/>
+			<Modal
+				open={isModalOpen}
+				handleCancel={() => {
+					if (!addWarehouseVariant.isLoading) {
+						onReset();
 						setSearchValue(undefined);
-					}}
-					showSearch
-					notFoundContent={
-						warehouseLoading ? (
-							<LoaderCircle
-								className="animate-spin w-full flex justify-center"
-								size={18}
-								strokeWidth={3}
-							/>
-						) : (
-							'Không tìm thấy vị trí. Tiếp tục nhập để tạo vị trí mới'
-						)
+						setSelectedOption(undefined);
+						onClose();
 					}
-				/>
-			</Flex>
-			<VariantInventoryForm type={'INBOUND'} />
-		</Modal>
+				}}
+				handleOk={handleOkModal}
+				title={`Thêm vị trí cho sản phẩm`}
+				isLoading={addWarehouseVariant.isLoading}
+				maskClosable={!addWarehouseVariant.isLoading}
+				closable={!addWarehouseVariant.isLoading}
+			>
+				<Flex vertical align="flex-start" className="w-full mb-2">
+					<Text className="text-[14px] text-gray-500">Tên vị trí:</Text>
+					<Select
+						className="w-full"
+						placeholder="Chọn vị trí"
+						allowClear
+						options={optionWarehouses}
+						labelInValue
+						filterOption={false}
+						value={selectedOption}
+						onSearch={debounceFetcher}
+						onSelect={handleSelect}
+						onClear={() => {
+							setSelectedOption(undefined);
+							setSearchValue(undefined);
+						}}
+						showSearch
+						notFoundContent={
+							warehouseLoading ? (
+								<LoaderCircle
+									className="animate-spin w-full flex justify-center"
+									size={18}
+									strokeWidth={3}
+								/>
+							) : (
+								'Không tìm thấy vị trí. Tiếp tục nhập để tạo vị trí mới'
+							)
+						}
+					/>
+				</Flex>
+				<VariantInventoryForm type={'INBOUND'} />
+			</Modal>
+		</>
 	);
 };
 

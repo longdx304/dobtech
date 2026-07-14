@@ -7,7 +7,7 @@ import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
 import { WarehouseInventory } from '@/types/warehouse';
-import { message } from 'antd';
+import { message, Spin } from 'antd';
 import { FC } from 'react';
 
 interface Props {
@@ -31,6 +31,8 @@ const ModalVariantInventory: FC<Props> = ({
 	const title = inventoryType === 'INBOUND' ? 'Nhập hàng' : 'Xuất hàng';
 	const addInventoryToWarehouse = useAdminAddInventoryToWarehouse();
 	const removeInventoryToWarehouse = useAdminRemoveInventoryToWarehouse();
+	const isSubmitting =
+		addInventoryToWarehouse.isLoading || removeInventoryToWarehouse.isLoading;
 
 	const handleOkModal = async () => {
 		if (!unitData) {
@@ -48,16 +50,15 @@ const ModalVariantInventory: FC<Props> = ({
 				type: 'INBOUND',
 			};
 
-			onReset();
-			await addInventoryToWarehouse.mutateAsync(itemData, {
-				onSuccess: () => {
-					refetch();
-					message.success(`Đã nhập hàng thành công`);
-				},
-				onError: (error: any) => {
-					message.error(getErrorMessage(error));
-				},
-			});
+			try {
+				await addInventoryToWarehouse.mutateAsync(itemData);
+				refetch();
+				onReset();
+				message.success(`Đã nhập hàng thành công`);
+			} catch (error: any) {
+				message.error(getErrorMessage(error));
+				return;
+			}
 		} else {
 			const itemData = {
 				warehouse_id: warehouseInventory.warehouse_id,
@@ -68,43 +69,46 @@ const ModalVariantInventory: FC<Props> = ({
 				type: 'OUTBOUND',
 			};
 
-			onReset();
-			await removeInventoryToWarehouse.mutateAsync(itemData, {
-				onSuccess: () => {
-					refetch();
-					message.success(`Đã xuất hàng thành công`);
-				},
-				onError: (error: any) => {
-					message.error(getErrorMessage(error));
-				},
-			});
+			try {
+				await removeInventoryToWarehouse.mutateAsync(itemData);
+				refetch();
+				onReset();
+				message.success(`Đã xuất hàng thành công`);
+			} catch (error: any) {
+				message.error(getErrorMessage(error));
+				return;
+			}
 		}
 		onClose();
 	};
 
 	return (
-		<Modal
-			open={isModalOpen}
-			handleCancel={() => {
-				onClose();
-			}}
-			handleOk={handleOkModal}
-			title={title}
-			isLoading={
-				addInventoryToWarehouse.isLoading ||
-				removeInventoryToWarehouse.isLoading
-			}
-		>
-			<VariantInventoryForm
-				type={inventoryType as 'INBOUND' | 'OUTBOUND'}
-				maxQuantity={
-					inventoryType === 'OUTBOUND'
-						? warehouseInventory.quantity /
-						  warehouseInventory.item_unit.quantity
-						: undefined
-				}
-			/>
-		</Modal>
+		<>
+			<Spin fullscreen spinning={isSubmitting} tip="Đang xử lý tồn kho..." />
+			<Modal
+				open={isModalOpen}
+				handleCancel={() => {
+					if (!isSubmitting) {
+						onClose();
+					}
+				}}
+				handleOk={handleOkModal}
+				title={title}
+				isLoading={isSubmitting}
+				maskClosable={!isSubmitting}
+				closable={!isSubmitting}
+			>
+				<VariantInventoryForm
+					type={inventoryType as 'INBOUND' | 'OUTBOUND'}
+					maxQuantity={
+						inventoryType === 'OUTBOUND'
+							? warehouseInventory.quantity /
+							  warehouseInventory.item_unit.quantity
+							: undefined
+					}
+				/>
+			</Modal>
+		</>
 	);
 };
 
