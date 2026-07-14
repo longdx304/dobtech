@@ -20,15 +20,14 @@ import { useAdminCreateDraftOrder, useAdminCustomer } from 'medusa-react';
 import { FC, useState } from 'react';
 import { generatePdfBlob } from './order-pdf';
 
-type PdfCustomer = Pick<Customer, 'last_name' | 'first_name' | 'email' | 'phone'> & {
-	metadata?: Record<string, unknown> | null;
-};
-
 export interface pdfOrderRes {
 	isSendEmail?: boolean;
 	lineItems: LineItemReq[];
 	userId: string;
-	customer?: PdfCustomer | null;
+	customer?: Pick<
+		Customer,
+		'last_name' | 'first_name' | 'email' | 'phone'
+	> | null;
 	address: string;
 	totalQuantity: number;
 	user?: Omit<User, 'password_hash'> | null;
@@ -136,7 +135,7 @@ const NewOrderModal: FC<Props> = ({
 	];
 
 	const generateFilePdf = async (
-		customer: PdfCustomer,
+		customer: Pick<Customer, 'last_name' | 'first_name' | 'email' | 'phone'>,
 		address: string
 	): Promise<string> => {
 		const values = form.getFieldsValue(true);
@@ -275,7 +274,6 @@ const NewOrderModal: FC<Props> = ({
 					first_name: values.shipping_address.first_name,
 					email: values.email,
 					phone: values.shipping_address.phone,
-					metadata: customer?.metadata,
 				},
 				address
 			);
