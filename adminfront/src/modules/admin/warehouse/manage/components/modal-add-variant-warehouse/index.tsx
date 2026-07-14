@@ -8,7 +8,7 @@ import { getErrorMessage } from '@/lib/utils';
 import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-inventory-form';
 import { Warehouse } from '@/types/warehouse';
 import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
-import { message } from 'antd';
+import { message, Spin } from 'antd';
 import { debounce, isEmpty } from 'lodash';
 import { LoaderCircle } from 'lucide-react';
 import { useAdminVariants } from 'medusa-react';
@@ -75,74 +75,81 @@ const ModalAddVariantWarehouse: FC<Props> = ({
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
 
-		await addWarehouseVariant.mutateAsync(
-			{
+		try {
+			await addWarehouseVariant.mutateAsync({
 				location: warehouse.location,
 				variant_id: variantValue,
 				warehouse_id: warehouse.id,
 				quantity: unitData.quantity,
 				unit_id: unitData.unitId,
 				type: 'INBOUND',
-			},
-			{
-				onSuccess: () => {
-					message.success(`Đã thêm sản phẩm vào kho thành công`);
-					setSearchValue(undefined);
-					setVariantValue(undefined);
-					onReset();
-				},
-				onError: (error: any) => {
-					message.error(getErrorMessage(error));
-				},
-			}
-		);
+			});
+			message.success(`Đã thêm sản phẩm vào kho thành công`);
+			setSearchValue(undefined);
+			setVariantValue(undefined);
+			onReset();
+		} catch (error: any) {
+			message.error(getErrorMessage(error));
+			return;
+		}
 		onClose();
 	};
 
 	return (
-		<Modal
-			open={isModalOpen}
-			handleCancel={() => {
-				onReset();
-				setSearchValue(undefined);
-				setVariantValue(undefined);
-				onClose();
-			}}
-			handleOk={handleOkModal}
-			title={`Thêm sản phẩm vào ${warehouse.location}`}
-			isLoading={addWarehouseVariant.isLoading}
-		>
-			<Flex vertical align="flex-start" className="w-full mb-2">
-				<Text className="text-[14px] text-gray-500">
-					Tên biến thể sản phẩm:
-				</Text>
-				<Select
-					className="w-full"
-					placeholder="Chọn biến thể sản phẩm"
-					allowClear
-					options={optionVaraint}
-					labelInValue
-					autoClearSearchValue={false}
-					filterOption={false}
-					value={!isEmpty(variantValue) ? variantValue : undefined}
-					onSearch={debounceFetcher}
-					onSelect={handleSelect}
-					showSearch
-					notFoundContent={
-						isLoading ? (
-							<LoaderCircle
-								className="animate-spin w-full flex justify-center"
-								size={18}
-								strokeWidth={3}
-							/>
-						) : (
-							'Không tìm thấy biến thể sản phẩm'
-						)
+		<>
+			<Spin
+				fullscreen
+				spinning={addWarehouseVariant.isLoading}
+				tip="Đang thêm sản phẩm vào kho..."
+			/>
+			<Modal
+				open={isModalOpen}
+				handleCancel={() => {
+					if (!addWarehouseVariant.isLoading) {
+						onReset();
+						setSearchValue(undefined);
+						setVariantValue(undefined);
+						onClose();
 					}
-				/>
-			</Flex>
-			<VariantInventoryForm type={'INBOUND'} />
-		</Modal>
+				}}
+				handleOk={handleOkModal}
+				title={`Thêm sản phẩm vào ${warehouse.location}`}
+				isLoading={addWarehouseVariant.isLoading}
+				maskClosable={!addWarehouseVariant.isLoading}
+				closable={!addWarehouseVariant.isLoading}
+			>
+				<Flex vertical align="flex-start" className="w-full mb-2">
+					<Text className="text-[14px] text-gray-500">
+						Tên biến thể sản phẩm:
+					</Text>
+					<Select
+						className="w-full"
+						placeholder="Chọn biến thể sản phẩm"
+						allowClear
+						options={optionVaraint}
+						labelInValue
+						autoClearSearchValue={false}
+						filterOption={false}
+						value={!isEmpty(variantValue) ? variantValue : undefined}
+						onSearch={debounceFetcher}
+						onSelect={handleSelect}
+						showSearch
+						notFoundContent={
+							isLoading ? (
+								<LoaderCircle
+									className="animate-spin w-full flex justify-center"
+									size={18}
+									strokeWidth={3}
+								/>
+							) : (
+								'Không tìm thấy biến thể sản phẩm'
+							)
+						}
+					/>
+				</Flex>
+				<VariantInventoryForm type={'INBOUND'} />
+			</Modal>
+		</>
 	);
 };
 
