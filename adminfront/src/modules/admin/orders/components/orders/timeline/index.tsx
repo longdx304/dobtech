@@ -110,7 +110,6 @@ const Timeline = ({
 					last_name: order!.customer.last_name,
 					email: order!.customer.email,
 					phone: order!.customer.phone,
-					metadata: (order!.customer as any).metadata,
 				},
 				address,
 				lineItems:
@@ -197,7 +196,6 @@ const Timeline = ({
 					last_name: order!.customer.last_name,
 					email: order!.customer.email,
 					phone: order!.customer.phone,
-					metadata: (order!.customer as any).metadata,
 				},
 				address,
 				lineItems: items?.map((i: LineItem) => ({
