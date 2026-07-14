@@ -96,15 +96,38 @@ const inventoryColumns = ({
 					className: 'text-xs',
 					render: (_: any, record: any) => {
 						const isSyncing = syncingVariantId === record.variant_id;
+						const hasExpectedQuantity =
+							record.expected_inventory_quantity !== undefined &&
+							record.expected_inventory_quantity !== null;
+						const inventoryQuantity = Number(record.inventory_quantity ?? 0);
+						const expectedQuantity = Number(
+							record.expected_inventory_quantity ?? inventoryQuantity
+						);
+						const committedQuantity = Number(record.committed_quantity ?? 0);
+						const canSync = hasExpectedQuantity
+							? expectedQuantity !== inventoryQuantity
+							: true;
+						const tooltipTitle = isSyncing
+							? 'Đang đồng bộ sản phẩm này'
+							: disabled
+							? 'Đang đồng bộ sản phẩm khác'
+							: canSync
+							? 'Đồng bộ sản phẩm này'
+							: committedQuantity > 0
+							? 'Lệch này do đơn bán đang chờ xuất kho; hoàn tất xuất kho thì hết lệch'
+							: 'Sổ sản phẩm đã đúng, không cần đồng bộ';
+
 						return (
-							<Tooltip title="Đồng bộ sản phẩm này">
-								<Button
-									type="default"
-									icon={<RefreshCw size={16} />}
-									onClick={() => onSyncVariant?.(record)}
-									loading={isSyncing}
-									disabled={disabled || isSyncing}
-								/>
+							<Tooltip title={tooltipTitle}>
+								<span>
+									<Button
+										type="default"
+										icon={<RefreshCw size={16} />}
+										onClick={() => onSyncVariant?.(record)}
+										loading={isSyncing}
+										disabled={disabled || isSyncing || !canSync}
+									/>
+								</span>
 							</Tooltip>
 						);
 					},

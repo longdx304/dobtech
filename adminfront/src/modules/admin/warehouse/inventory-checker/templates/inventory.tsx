@@ -8,6 +8,7 @@ import { Text, Title } from '@/components/Typography';
 import { useSyncInventory } from '@/lib/hooks/api/product/mutations';
 import { useAdminWarehousesInventoryVariant } from '@/lib/hooks/api/warehouse';
 import { useUser } from '@/lib/providers/user-provider';
+import { getErrorMessage } from '@/lib/utils';
 import { Alert, message, Spin } from 'antd';
 import debounce from 'lodash/debounce';
 import { RefreshCw, Search } from 'lucide-react';
@@ -35,11 +36,11 @@ const InventoryChecker: FC<Props> = ({}) => {
 
 	const { mutate: syncAllInventory, isLoading: isSyncingAll } = useSyncInventory({
 		onSuccess: () => {
-			message.success('Đồng bộ kho thành công!');
+			message.success('Đồng bộ kho thành công!', 5);
 			refetch();
 		},
 		onError: (error: any) => {
-			message.error(error?.message || 'Đồng bộ kho thất bại!');
+			message.error(getErrorMessage(error) || 'Đồng bộ kho thất bại!', 6);
 		},
 	});
 
@@ -51,17 +52,43 @@ const InventoryChecker: FC<Props> = ({}) => {
 
 	const handleSyncVariant = async (record: any) => {
 		if (!record?.variant_id) {
-			message.error('Không tìm thấy sản phẩm cần đồng bộ');
+			message.error('Không tìm thấy sản phẩm cần đồng bộ', 6);
+			return;
+		}
+
+		const inventoryQuantity = Number(record.inventory_quantity ?? 0);
+		const expectedQuantity = Number(
+			record.expected_inventory_quantity ?? inventoryQuantity
+		);
+		const committedQuantity = Number(record.committed_quantity ?? 0);
+
+		if (expectedQuantity === inventoryQuantity) {
+			if (committedQuantity > 0) {
+				message.info(
+					`Sổ sản phẩm đã đúng theo tồn khả dụng. Lệch này do còn ${committedQuantity} sản phẩm trong đơn chờ xuất kho.`,
+					7
+				);
+				return;
+			}
+
+			message.info('Sổ sản phẩm đã đúng, không cần đồng bộ.', 5);
 			return;
 		}
 
 		setSyncingVariantId(record.variant_id);
 		try {
 			await syncVariantInventory({ variant_ids: [record.variant_id] });
-			message.success('Đồng bộ sản phẩm thành công!');
+			if (committedQuantity > 0) {
+				message.success(
+					`Đã đồng bộ sổ sản phẩm. Sản phẩm vẫn có thể còn lệch do ${committedQuantity} sản phẩm đang chờ xuất kho.`,
+					7
+				);
+			} else {
+				message.success('Đồng bộ sản phẩm thành công!', 5);
+			}
 			refetch();
 		} catch (error: any) {
-			message.error(error?.message || 'Đồng bộ sản phẩm thất bại!');
+			message.error(getErrorMessage(error) || 'Đồng bộ sản phẩm thất bại!', 6);
 		} finally {
 			setSyncingVariantId(null);
 		}
