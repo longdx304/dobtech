@@ -185,6 +185,16 @@ export interface AdminPostCreateOutboundInventoryReq {
 	type: 'OUTBOUND';
 }
 
+export interface AdminPostSplitPickOutboundInventoryReq
+	extends AdminPostRemmoveInventoryReq {
+	surplus: {
+		warehouse_id?: string;
+		location?: string;
+		unit_id: string;
+		quantity?: number;
+	};
+}
+
 export type AdminWarehouseTransactionsRes = {
 	inventoryTransactions: WarehouseInventory[];
 	count: number;
