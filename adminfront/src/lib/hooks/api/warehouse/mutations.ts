@@ -5,6 +5,7 @@ import {
 	AdminPostManageInventoryWarehouseReq,
 	AdminPostManageWarehouseVariantReq,
 	AdminPostRemmoveInventoryReq,
+	AdminPostSplitPickOutboundInventoryReq,
 	AdminPostWarehouseInventoryKiotReq,
 	AdminPostWarehouseReq,
 	AdminWarehouseDeleteRes,
@@ -231,6 +232,26 @@ export const useAdminUndoPickOutboundItem = (
 		(payload: AdminPostCreateOutboundInventoryReq) =>
 			client.admin.custom.post(
 				`/admin/warehouse/workflow/outbound/undo-pick`,
+				payload
+			),
+		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)
+	);
+};
+
+export const useAdminSplitPickOutboundItem = (
+	options?: UseMutationOptions<
+		Response<any>,
+		Error,
+		AdminPostSplitPickOutboundInventoryReq
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminPostSplitPickOutboundInventoryReq) =>
+			client.admin.custom.post(
+				`/admin/warehouse/workflow/outbound/split-pick`,
 				payload
 			),
 		buildOptions(queryClient, [adminWarehouseKeys.lists()], options)

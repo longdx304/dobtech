@@ -1,11 +1,15 @@
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
+import { Input } from '@/components/Input';
+import { Modal } from '@/components/Modal';
 import { Popconfirm } from '@/components/Popconfirm';
+import { Select } from '@/components/Select';
 import { Text } from '@/components/Typography';
 import { ADMIN_LINEITEM } from '@/lib/hooks/api/line-item';
 import { ADMIN_PRODUCT_OUTBOUND } from '@/lib/hooks/api/product-outbound';
 import {
 	useAdminPickOutboundItem,
+	useAdminSplitPickOutboundItem,
 	useAdminUndoPickOutboundItem,
 } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
@@ -15,11 +19,13 @@ import { LineItem } from '@/types/lineItem';
 import {
 	AdminPostCreateOutboundInventoryReq,
 	AdminPostRemmoveInventoryReq,
+	AdminPostSplitPickOutboundInventoryReq,
 	WarehouseInventory,
 } from '@/types/warehouse';
 import { useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import { Minus, Plus } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 type UpdatedLineItem = LineItem & {
 	supplier_order_id: string;
@@ -36,13 +42,42 @@ const WarehouseItem = ({
 	refetchInventory,
 	isPermission,
 }: WarehouseItemProps) => {
-	const { getSelectedUnitData, onReset, setSelectedUnit, setQuantity } =
-		useProductUnit();
+	const {
+		getSelectedUnitData,
+		onReset,
+		setSelectedUnit,
+		setQuantity,
+		item_units,
+		optionItemUnits,
+		defaultUnit,
+	} = useProductUnit();
 	const pickOutboundItem = useAdminPickOutboundItem();
+	const splitPickOutboundItem = useAdminSplitPickOutboundItem();
 	const undoPickOutboundItem = useAdminUndoPickOutboundItem();
 	const queryClient = useQueryClient();
+	const [splitPick, setSplitPick] = useState<{
+		itemData: AdminPostRemmoveInventoryReq;
+		sourceQuantity: number;
+		remainingQuantity: number;
+		surplusQuantity: number;
+	} | null>(null);
+	const [surplusLocation, setSurplusLocation] = useState('');
+	const [surplusUnitId, setSurplusUnitId] = useState<string | null>(null);
 
 	const unitData = getSelectedUnitData();
+	const activeSurplusUnitId = surplusUnitId || defaultUnit;
+	const activeSurplusUnit = useMemo(
+		() => item_units.find((unit) => unit.id === activeSurplusUnitId),
+		[item_units, activeSurplusUnitId]
+	);
+	const surplusUnitQuantity =
+		splitPick && activeSurplusUnit
+			? splitPick.surplusQuantity / activeSurplusUnit.quantity
+			: 0;
+	const isValidSurplusUnit =
+		!!activeSurplusUnit &&
+		Number.isInteger(surplusUnitQuantity) &&
+		surplusUnitQuantity > 0;
 
 	const quantity =
 		item?.quantity === 0
@@ -67,6 +102,25 @@ const WarehouseItem = ({
 			type: 'OUTBOUND',
 		};
 
+		const pickedQuantity = lineItem.warehouse_quantity ?? 0;
+		const remainingQuantity = lineItem.quantity - pickedQuantity;
+
+		if (remainingQuantity <= 0) {
+			return message.error('Đơn hàng đã lấy đủ số lượng');
+		}
+
+		if (unitData.totalQuantity > remainingQuantity) {
+			setSplitPick({
+				itemData,
+				sourceQuantity: unitData.totalQuantity,
+				remainingQuantity,
+				surplusQuantity: unitData.totalQuantity - remainingQuantity,
+			});
+			setSurplusUnitId(defaultUnit);
+			setSurplusLocation('');
+			return;
+		}
+
 		onReset();
 		await pickOutboundItem.mutateAsync(itemData, {
 			onSuccess: () => {
@@ -74,6 +128,55 @@ const WarehouseItem = ({
 				refetchInventory();
 				queryClient.invalidateQueries([ADMIN_PRODUCT_OUTBOUND, 'detail']);
 				queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
+			},
+			onError: (error: any) => {
+				message.error(getErrorMessage(error));
+			},
+		});
+	};
+
+	const closeSplitPickModal = () => {
+		setSplitPick(null);
+		setSurplusLocation('');
+		setSurplusUnitId(null);
+	};
+
+	const onConfirmSplitPick = async () => {
+		if (!splitPick) return;
+
+		if (!surplusLocation.trim()) {
+			return message.error('Vui lòng nhập vị trí trả phần dư');
+		}
+
+		if (!activeSurplusUnitId || !activeSurplusUnit) {
+			return message.error('Vui lòng chọn loại hàng cho phần dư');
+		}
+
+		if (!isValidSurplusUnit) {
+			return message.error(
+				`Phần dư ${splitPick.surplusQuantity} đôi không chia hết cho ${activeSurplusUnit.unit}`
+			);
+		}
+
+		const payload: AdminPostSplitPickOutboundInventoryReq = {
+			...splitPick.itemData,
+			surplus: {
+				location: surplusLocation.trim(),
+				unit_id: activeSurplusUnitId,
+				quantity: surplusUnitQuantity,
+			},
+		};
+
+		await splitPickOutboundItem.mutateAsync(payload, {
+			onSuccess: () => {
+				message.success(
+					`Đã lấy ${splitPick.remainingQuantity} đôi cho đơn và trả phần dư ${surplusUnitQuantity} ${activeSurplusUnit.unit} vào ${surplusLocation.trim()}`
+				);
+				refetchInventory();
+				queryClient.invalidateQueries([ADMIN_PRODUCT_OUTBOUND, 'detail']);
+				queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
+				onReset();
+				closeSplitPickModal();
 			},
 			onError: (error: any) => {
 				message.error(getErrorMessage(error));
@@ -176,6 +279,60 @@ const WarehouseItem = ({
 					/>
 				</Popconfirm>
 			)}
+			<Modal
+				open={!!splitPick}
+				title="Tách bao và trả phần dư"
+				handleCancel={() => {
+					onReset();
+					closeSplitPickModal();
+				}}
+				handleOk={onConfirmSplitPick}
+				isLoading={splitPickOutboundItem.isLoading}
+				disabled={!isValidSurplusUnit || !surplusLocation.trim()}
+			>
+				<Flex vertical gap={10}>
+					<Text>
+						Lấy từ kho: <strong>{splitPick?.sourceQuantity ?? 0}</strong> đôi
+					</Text>
+					<Text>
+						Cần cho đơn: <strong>{splitPick?.remainingQuantity ?? 0}</strong>{' '}
+						đôi
+					</Text>
+					<Text>
+						Phần dư trả kho:{' '}
+						<strong>{splitPick?.surplusQuantity ?? 0}</strong> đôi
+					</Text>
+					<Flex vertical align="flex-start">
+						<Text className="text-[14px] text-gray-500">
+							Vị trí trả phần dư:
+						</Text>
+						<Input
+							value={surplusLocation}
+							onChange={(event) => setSurplusLocation(event.target.value)}
+							placeholder="Ví dụ: A1-lẻ, B1, vị trí mới..."
+						/>
+					</Flex>
+					<Flex vertical align="flex-start">
+						<Text className="text-[14px] text-gray-500">
+							Loại hàng phần dư:
+						</Text>
+						<Select
+							className="w-full"
+							options={optionItemUnits}
+							value={activeSurplusUnitId}
+							onChange={(value) => setSurplusUnitId(value)}
+						/>
+					</Flex>
+					<Text className={isValidSurplusUnit ? '' : 'text-red-500'}>
+						Số lượng phần dư:{' '}
+						<strong>
+							{isValidSurplusUnit
+								? `${surplusUnitQuantity} ${activeSurplusUnit?.unit}`
+								: 'Không chia hết theo loại hàng đã chọn'}
+						</strong>
+					</Text>
+				</Flex>
+			</Modal>
 		</Flex>
 	);
 };
