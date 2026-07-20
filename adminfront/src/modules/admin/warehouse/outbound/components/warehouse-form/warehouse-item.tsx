@@ -1,6 +1,5 @@
 import { Button } from '@/components/Button';
 import { Flex } from '@/components/Flex';
-import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { Popconfirm } from '@/components/Popconfirm';
 import { Select } from '@/components/Select';
@@ -11,6 +10,7 @@ import {
 	useAdminPickOutboundItem,
 	useAdminSplitPickOutboundItem,
 	useAdminUndoPickOutboundItem,
+	useAdminWarehouses,
 } from '@/lib/hooks/api/warehouse';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { getErrorMessage } from '@/lib/utils';
@@ -20,15 +20,23 @@ import {
 	AdminPostCreateOutboundInventoryReq,
 	AdminPostRemmoveInventoryReq,
 	AdminPostSplitPickOutboundInventoryReq,
+	Warehouse,
 	WarehouseInventory,
 } from '@/types/warehouse';
 import { useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
-import { Minus, Plus } from 'lucide-react';
+import debounce from 'lodash/debounce';
+import isEmpty from 'lodash/isEmpty';
+import { LoaderCircle, Minus, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 type UpdatedLineItem = LineItem & {
 	supplier_order_id: string;
+};
+type ValueType = {
+	key?: string;
+	label: string;
+	value: string;
 };
 type WarehouseItemProps = {
 	item: WarehouseInventory;
@@ -61,8 +69,21 @@ const WarehouseItem = ({
 		remainingQuantity: number;
 		surplusQuantity: number;
 	} | null>(null);
-	const [surplusLocation, setSurplusLocation] = useState('');
+	const [surplusLocation, setSurplusLocation] = useState<ValueType | null>(null);
+	const [surplusSearchValue, setSurplusSearchValue] = useState<
+		string | undefined
+	>();
 	const [surplusUnitId, setSurplusUnitId] = useState<string | null>(null);
+
+	const { warehouse, isLoading: warehouseLoading } = useAdminWarehouses(
+		{
+			q: surplusSearchValue || undefined,
+			limit: 300,
+		},
+		{
+			enabled: !!splitPick,
+		}
+	);
 
 	const unitData = getSelectedUnitData();
 	const activeSurplusUnitId = surplusUnitId || defaultUnit;
@@ -78,6 +99,38 @@ const WarehouseItem = ({
 		!!activeSurplusUnit &&
 		Number.isInteger(surplusUnitQuantity) &&
 		surplusUnitQuantity > 0;
+	const optionWarehouses = useMemo(() => {
+		if (!warehouse) return [];
+		return warehouse.map((warehouse: Warehouse) => ({
+			label: warehouse.location,
+			value: warehouse.id,
+		}));
+	}, [warehouse]);
+
+	const debounceSurplusFetcher = debounce((value: string) => {
+		if (!value.trim()) {
+			setSurplusSearchValue(undefined);
+			setSurplusLocation(null);
+			return;
+		}
+
+		setSurplusSearchValue(value);
+		setSurplusLocation({
+			label: value,
+			value: '',
+		});
+	}, 800);
+
+	const handleSurplusLocationSelect = (data: ValueType) => {
+		const { label, value } = data;
+		if (!value || !label) return;
+
+		setSurplusSearchValue(label);
+		setSurplusLocation({
+			label,
+			value,
+		});
+	};
 
 	const quantity =
 		item?.quantity === 0
@@ -117,7 +170,8 @@ const WarehouseItem = ({
 				surplusQuantity: unitData.totalQuantity - remainingQuantity,
 			});
 			setSurplusUnitId(defaultUnit);
-			setSurplusLocation('');
+			setSurplusLocation(null);
+			setSurplusSearchValue(undefined);
 			return;
 		}
 
@@ -137,15 +191,16 @@ const WarehouseItem = ({
 
 	const closeSplitPickModal = () => {
 		setSplitPick(null);
-		setSurplusLocation('');
+		setSurplusLocation(null);
+		setSurplusSearchValue(undefined);
 		setSurplusUnitId(null);
 	};
 
 	const onConfirmSplitPick = async () => {
 		if (!splitPick) return;
 
-		if (!surplusLocation.trim()) {
-			return message.error('Vui lòng nhập vị trí trả phần dư');
+		if (!surplusLocation?.label?.trim()) {
+			return message.error('Vui lòng chọn hoặc nhập vị trí trả phần dư');
 		}
 
 		if (!activeSurplusUnitId || !activeSurplusUnit) {
@@ -161,7 +216,8 @@ const WarehouseItem = ({
 		const payload: AdminPostSplitPickOutboundInventoryReq = {
 			...splitPick.itemData,
 			surplus: {
-				location: surplusLocation.trim(),
+				warehouse_id: surplusLocation.value || undefined,
+				location: surplusLocation.label.trim(),
 				unit_id: activeSurplusUnitId,
 				quantity: surplusUnitQuantity,
 			},
@@ -170,7 +226,7 @@ const WarehouseItem = ({
 		await splitPickOutboundItem.mutateAsync(payload, {
 			onSuccess: () => {
 				message.success(
-					`Đã lấy ${splitPick.remainingQuantity} đôi cho đơn và trả phần dư ${surplusUnitQuantity} ${activeSurplusUnit.unit} vào ${surplusLocation.trim()}`
+					`Đã lấy ${splitPick.remainingQuantity} đôi cho đơn và trả phần dư ${surplusUnitQuantity} ${activeSurplusUnit.unit} vào ${surplusLocation.label.trim()}`
 				);
 				refetchInventory();
 				queryClient.invalidateQueries([ADMIN_PRODUCT_OUTBOUND, 'detail']);
@@ -288,7 +344,7 @@ const WarehouseItem = ({
 				}}
 				handleOk={onConfirmSplitPick}
 				isLoading={splitPickOutboundItem.isLoading}
-				disabled={!isValidSurplusUnit || !surplusLocation.trim()}
+				disabled={!isValidSurplusUnit || !surplusLocation?.label?.trim()}
 			>
 				<Flex vertical gap={10}>
 					<Text>
@@ -306,10 +362,44 @@ const WarehouseItem = ({
 						<Text className="text-[14px] text-gray-500">
 							Vị trí trả phần dư:
 						</Text>
-						<Input
-							value={surplusLocation}
-							onChange={(event) => setSurplusLocation(event.target.value)}
-							placeholder="Ví dụ: A1-lẻ, B1, vị trí mới..."
+						<Select
+							className="w-full"
+							placeholder="Chọn vị trí hoặc nhập vị trí mới"
+							allowClear
+							options={optionWarehouses}
+							labelInValue
+							filterOption={false}
+							value={!isEmpty(surplusLocation) ? surplusLocation : undefined}
+							onSearch={debounceSurplusFetcher}
+							onSelect={handleSurplusLocationSelect}
+							onClear={() => {
+								setSurplusLocation(null);
+								setSurplusSearchValue(undefined);
+							}}
+							showSearch
+							dropdownRender={(menu) => (
+								<div>
+									{menu}
+									{!isEmpty(surplusLocation?.label) && (
+										<div className="flex items-center justify-start p-2">
+											<Text className="text-gray-300 cursor-pointer">
+												Chọn thêm để tạo vị trí mới
+											</Text>
+										</div>
+									)}
+								</div>
+							)}
+							notFoundContent={
+								warehouseLoading ? (
+									<LoaderCircle
+										className="animate-spin w-full flex justify-center"
+										size={18}
+										strokeWidth={3}
+									/>
+								) : (
+									'Không tìm thấy vị trí'
+								)
+							}
 						/>
 					</Flex>
 					<Flex vertical align="flex-start">
