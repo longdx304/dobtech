@@ -24,7 +24,8 @@ import supplierOrdersColumn from './supplier-order-column';
 
 type Props = {};
 
-const DEFAULT_PAGE_SIZE = 10;
+const SUPPLIER_ORDER_PAGE_SIZE = 10;
+const SUPPLIER_LOOKUP_PAGE_SIZE = 1000;
 
 const SupplierOrdersList: FC<Props> = () => {
 	const {
@@ -57,15 +58,15 @@ const SupplierOrdersList: FC<Props> = () => {
 			status: filters.status || undefined,
 			fulfillment_status: filters.fulfillment_status || undefined,
 			offset,
-			limit: DEFAULT_PAGE_SIZE,
+			limit: SUPPLIER_ORDER_PAGE_SIZE,
 			expand: 'supplier',
 		});
 
 	// fetch suppliers for choosing supplier in order
 	const { suppliers } = useAdminSuppliers({
 		q: '',
-		offset,
-		limit: 100,
+		offset: 0,
+		limit: SUPPLIER_LOOKUP_PAGE_SIZE,
 	});
 
 	const handleChangeDebounce = _.debounce(
@@ -78,7 +79,7 @@ const SupplierOrdersList: FC<Props> = () => {
 
 	const handleChangePage = (page: number) => {
 		setNumPages(page);
-		setOffset((page - 1) * DEFAULT_PAGE_SIZE);
+		setOffset((page - 1) * SUPPLIER_ORDER_PAGE_SIZE);
 	};
 
 	const handleCreateSupplierOrders = () => {
@@ -154,7 +155,8 @@ const SupplierOrdersList: FC<Props> = () => {
 					selectedRowKeys,
 					onChange: (selectedKeys) => setSelectedRowKeys(selectedKeys),
 					getCheckboxProps: (record: any) => ({
-						disabled: record.fulfillment_status !== FulfillSupplierOrderStt.INVENTORIED,
+						disabled:
+							record.fulfillment_status !== FulfillSupplierOrderStt.INVENTORIED,
 					}),
 				}}
 				onRow={(record) => ({
@@ -171,7 +173,7 @@ const SupplierOrdersList: FC<Props> = () => {
 				onChange={handleOnChange}
 				pagination={{
 					total: count ?? 0,
-					pageSize: DEFAULT_PAGE_SIZE,
+					pageSize: SUPPLIER_ORDER_PAGE_SIZE,
 					current: numPages,
 					onChange: handleChangePage,
 					showTotal: (total, range) =>
