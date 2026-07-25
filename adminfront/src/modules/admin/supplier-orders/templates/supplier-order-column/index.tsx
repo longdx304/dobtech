@@ -100,10 +100,10 @@ const supplierOrdersColumn = ({ supplier }: Props) => [
 		key: 'supplier_id',
 		width: 150,
 		className: 'text-xs text-wrap',
-		render: (_: SupplierOrders['id'], record: SupplierOrders) => {
-			const supplierName = supplier?.find(
-				(item) => item.id === _
-			)?.supplier_name;
+		render: (_: SupplierOrders['supplier_id'], record: SupplierOrders) => {
+			const supplierName =
+				record.supplier?.supplier_name ||
+				supplier?.find((item) => item.id === _)?.supplier_name;
 
 			return supplierName || '-';
 		},
