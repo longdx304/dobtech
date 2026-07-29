@@ -34,6 +34,7 @@ import { FileDown, RotateCcw, Warehouse } from 'lucide-react';
 import { useAdminOrder, useAdminUpdateOrder } from 'medusa-react';
 import { useState } from 'react';
 import { pdfOrderRes } from '../new-order';
+import { getCustomerNote } from '../new-order/customer-note';
 import { generateHandoverPdfBlob } from '../new-order/handover-pdf';
 import { generatePdfBlob } from '../new-order/order-pdf';
 import useOrdersExpandParam from '../utils/use-admin-expand-parameter';
@@ -123,6 +124,7 @@ const Timeline = ({
 				totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
 				countryCode: shipping_address!.country_code!,
 				isSendEmail: false,
+				customerNote: getCustomerNote(order!.customer),
 			};
 
 			// Generate pdf blob
@@ -208,6 +210,7 @@ const Timeline = ({
 				totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
 				countryCode: shipping_address!.country_code!,
 				isSendEmail: false,
+				customerNote: getCustomerNote(order!.customer),
 			};
 			const pdfBlob = await generateHandoverPdfBlob(pdfReq);
 			const files_upload = new File([pdfBlob], 'handover.pdf', { type: 'application/pdf' });

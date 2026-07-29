@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import { generatePdfBlob } from '../../../orders/components/orders/new-order/order-pdf';
 import { pdfOrderRes } from '../../../orders/components/orders/new-order';
+import { getCustomerNote } from '../../../orders/components/orders/new-order/customer-note';
 import DraftOrderModal from '../../components/draft-order-modal';
 import NewDraftOrderFormProvider from '../../hooks/use-new-draft-form';
 import draftOrderColumns from './draft-order-column';
@@ -100,6 +101,7 @@ const DraftOrderList: FC<Props> = () => {
 			totalQuantity: items.reduce((sum: number, item: any) => sum + item.quantity, 0),
 			countryCode: shippingAddress?.country_code || 'vn',
 			isSendEmail: false,
+			customerNote: getCustomerNote(customer),
 		};
 
 		// Generate pdf blob
