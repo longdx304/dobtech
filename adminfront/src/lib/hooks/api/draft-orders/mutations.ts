@@ -16,6 +16,7 @@ export type AdminDraftOrderTransferReq = {
 	id: string;
 	isSendEmail?: boolean;
 	urlPdf: string;
+	sales_person_id?: string | null;
 };
 
 export const useAdminDraftOrderTransferOrder = (
@@ -34,6 +35,7 @@ export const useAdminDraftOrderTransferOrder = (
 			client.admin.custom.post(`/admin/draft-orders/${payload.id}/transfer`, {
 				isSendEmail: payload.isSendEmail,
 				urlPdf: payload.urlPdf,
+				sales_person_id: payload.sales_person_id,
 			}),
 		buildOptions(
 			queryClient,
