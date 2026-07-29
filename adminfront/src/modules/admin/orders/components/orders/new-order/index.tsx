@@ -19,6 +19,7 @@ import { Form, message } from 'antd';
 import { useAdminCreateDraftOrder, useAdminCustomer } from 'medusa-react';
 import { FC, useState } from 'react';
 import { generatePdfBlob } from './order-pdf';
+import SalesPersonSelect from './sales-person-select';
 
 export interface pdfOrderRes {
 	isSendEmail?: boolean;
@@ -126,6 +127,7 @@ const NewOrderModal: FC<Props> = ({
 			content: (
 				<div className="flex flex-col">
 					<SelectRegion />
+					<SalesPersonSelect />
 				</div>
 			),
 		},
@@ -285,7 +287,12 @@ const NewOrderModal: FC<Props> = ({
 			await createDraftOrder(transformedData as any, {
 				onSuccess: async (response) => {
 					await transferOrder.mutateAsync(
-						{ id: response.draft_order.id, isSendEmail: isSendEmail, urlPdf },
+						{
+							id: response.draft_order.id,
+							isSendEmail: isSendEmail,
+							urlPdf,
+							sales_person_id: values.sales_person_id,
+						},
 						{
 							onSuccess: () => {
 								message.success('Admin tạo đơn hàng thành công');

@@ -1,4 +1,4 @@
-import { Order } from '@medusajs/medusa';
+import { Order } from '@/types/order';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Text, Title } from '@/components/Typography';
@@ -17,6 +17,18 @@ type Props = {
 
 const Information = ({ order, isLoading }: Props) => {
 	const cancelOrder = useAdminCancelOrder(order?.id!);
+	const salesPersonName = [
+		order?.sales_person?.first_name,
+		order?.sales_person?.last_name,
+	]
+		.filter(Boolean)
+		.join(' ')
+		.trim();
+	const salesPersonDisplay = order?.sales_person
+		? salesPersonName
+			? `${salesPersonName} (${order.sales_person.email})`
+			: order.sales_person.email
+		: '-';
 
 	const handleCancelOrder = () => {
 		AntdModal.confirm({
@@ -75,6 +87,14 @@ const Information = ({ order, isLoading }: Props) => {
 								{order?.shipping_address?.phone ??
 									order?.customer?.phone ??
 									'-'}
+							</Text>
+						</Flex>
+						<Flex justify="space-between" align="center">
+							<Text className="text-gray-500 text-sm">
+								Nhân viên bán hàng:
+							</Text>
+							<Text className="text-gray-500 text-sm">
+								{salesPersonDisplay}
 							</Text>
 						</Flex>
 						{/* <Flex justify="space-between" align="center"> */}
