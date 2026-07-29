@@ -16,6 +16,7 @@ import DraftCreated from './timeline-events/draft-created';
 import DraftCompleted from './timeline-events/draft-completed';
 import DraftCanceled from './timeline-events/draft-canceled';
 import { pdfOrderRes } from '@/modules/admin/orders/components/orders/new-order';
+import { getCustomerNote } from '@/modules/admin/orders/components/orders/new-order/customer-note';
 import { generatePdfBlob } from '@/modules/admin/orders/components/orders/new-order/order-pdf';
 
 type Props = {
@@ -64,6 +65,7 @@ const DraftTimeline = ({ draftOrderId, isLoading, events, refetchDraftOrder }: P
 				totalQuantity: cart?.items?.reduce((acc: number, i: LineItem) => acc + i.quantity, 0) ?? 0,
 				countryCode: shipping_address?.country_code ?? 'vn',
 				isSendEmail: false,
+				customerNote: getCustomerNote(cart?.customer),
 			};
 
 			// Generate pdf blob

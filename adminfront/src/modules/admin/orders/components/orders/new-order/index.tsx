@@ -18,6 +18,7 @@ import { AddressCreatePayload, Customer, User } from '@medusajs/medusa';
 import { Form, message } from 'antd';
 import { useAdminCreateDraftOrder, useAdminCustomer } from 'medusa-react';
 import { FC, useState } from 'react';
+import { getCustomerNote } from './customer-note';
 import { generatePdfBlob } from './order-pdf';
 import SalesPersonSelect from './sales-person-select';
 
@@ -35,6 +36,7 @@ export interface pdfOrderRes {
 	email: string;
 	countryCode?: string;
 	metadata?: Record<string, unknown>;
+	customerNote?: string;
 }
 
 interface LineItemForm {
@@ -113,7 +115,7 @@ const NewOrderModal: FC<Props> = ({
 		| string
 		| undefined;
 	const watchedId = resolveFormCustomerId(watchedCustomerId);
-	const { customer } = useAdminCustomer(watchedId || '', {
+	const { customer: selectedCustomer } = useAdminCustomer(watchedId || '', {
 		enabled: !!watchedId,
 	});
 
@@ -158,6 +160,7 @@ const NewOrderModal: FC<Props> = ({
 			totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
 			countryCode: orderFormCountryCode(values.shipping_address?.country_code),
 			isSendEmail: false,
+			customerNote: getCustomerNote(selectedCustomer),
 		};
 
 		// Generate pdf blob

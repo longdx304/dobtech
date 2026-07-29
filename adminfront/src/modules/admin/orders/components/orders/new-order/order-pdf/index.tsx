@@ -194,6 +194,12 @@ const OrderPDFDocument: FC<OrderPDFProps> = ({ order, region, title = 'Đơn Hà
 							<Text style={styles.text}>{order.customer?.phone}</Text>
 						</View>
 					</View>
+					{order.customerNote && (
+						<View>
+							<Text style={styles.label}>Ghi Chú Khách Hàng</Text>
+							<Text style={styles.text}>{order.customerNote}</Text>
+						</View>
+					)}
 				</View>
 
 				<View style={styles.section}>
