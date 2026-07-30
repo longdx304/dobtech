@@ -1,4 +1,5 @@
 import { buildOptions } from '@/utils/build-options';
+import { Order } from '@/types/order';
 import { Response } from '@medusajs/medusa-js';
 import {
 	useMutation,
@@ -33,6 +34,32 @@ export const useAdminAsignOrder = (
 	return useMutation(
 		(payload: AdminPostOrderAssignReq) =>
 			client.admin.custom.post(`/admin/order/${id}`, payload),
+		buildOptions(queryClient, [adminOrderKeys.lists()], options)
+	);
+};
+
+interface AdminOrderSalesPersonRes {
+	order: Order;
+}
+
+interface AdminPostOrderSalesPersonReq {
+	sales_person_id: string | null;
+}
+
+export const useAdminUpdateOrderSalesPerson = (
+	id: string,
+	options?: UseMutationOptions<
+		Response<AdminOrderSalesPersonRes>,
+		Error,
+		AdminPostOrderSalesPersonReq
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation(
+		(payload: AdminPostOrderSalesPersonReq) =>
+			client.admin.custom.post(`/admin/orders/${id}/sales-person`, payload),
 		buildOptions(queryClient, [adminOrderKeys.lists()], options)
 	);
 };
