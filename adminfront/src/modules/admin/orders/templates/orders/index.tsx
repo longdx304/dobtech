@@ -23,9 +23,9 @@ type Props = {};
 
 const DEFAULT_PAGE_SIZE = 10;
 const defaultQueryProps = {
-	expand: 'customer,shipping_address',
+	expand: 'customer,shipping_address,sales_person',
 	fields:
-		'id,status,display_id,created_at,email,fulfillment_status,payment_status,total,currency_code',
+		'id,status,display_id,created_at,email,fulfillment_status,payment_status,total,currency_code,sales_person_id',
 };
 
 const OrderList: FC<Props> = () => {
@@ -54,7 +54,7 @@ const OrderList: FC<Props> = () => {
 			limit: DEFAULT_PAGE_SIZE,
 			payment_status: filters?.payment_status || undefined,
 			fulfillment_status: filters?.fulfillment_status || undefined,
-			expand: 'items,customer',
+			expand: 'items,customer,sales_person',
 		},
 		{
 			keepPreviousData: true,

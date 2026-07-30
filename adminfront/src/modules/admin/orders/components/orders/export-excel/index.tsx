@@ -1,4 +1,4 @@
-import { Order } from '@medusajs/medusa';
+import { Order } from '@/types/order';
 import dayjs from 'dayjs';
 import { ICustomerResponse } from '@/types/customer';
 
@@ -259,6 +259,16 @@ export const generateSmeExcelData = (ordersData: ExportOrderData[]): ExcelFile[]
 		// Get customer code from order
 		const customer = order.customer as ICustomerResponse | undefined;
 		const finalCustomerCode = customer?.customer_code || '';
+		const salesPersonName =
+			[
+				order.sales_person?.first_name,
+				order.sales_person?.last_name,
+			]
+				.filter(Boolean)
+				.join(' ')
+				.trim() ||
+			order.sales_person?.email ||
+			'';
 
 		// Format dates
 		const ngayHachToan = dayjs(order.created_at).format('DD/MM/YYYY');
@@ -310,7 +320,7 @@ export const generateSmeExcelData = (ordersData: ExportOrderData[]): ExcelFile[]
 				'Mã số thuế': '',
 				'Diễn giải': `Bán hàng ${customerName}`,
 				'Nộp vào TK': '',
-				'NV bán hàng': '',
+				'NV bán hàng': salesPersonName,
 				'Loại tiền': '',
 				'Tỷ giá': '',
 

@@ -56,6 +56,7 @@ export interface PagePermissionDefinition {
 
 const ALL_ROLES = [
 	EPermissions.Manager,
+	EPermissions.Sale,
 	EPermissions.Warehouse,
 	EPermissions.Driver,
 	EPermissions.Accountant,
@@ -64,11 +65,11 @@ const ALL_ROLES = [
 export const pagePermissionDefinitions: PagePermissionDefinition[] = [
 	{ permission: AccessPermission.DashboardView, label: 'Tổng quan', group: 'Tổng quan', route: '/admin', roles: ALL_ROLES },
 	{ permission: AccessPermission.AccountsManage, label: 'Quản lý nhân viên', group: 'Admin', route: '/admin/accounts', roles: [EPermissions.Manager] },
-	{ permission: AccessPermission.SalesOrders, label: 'Đơn hàng và đơn nháp', group: 'Bán hàng', route: '/admin/orders', roles: [EPermissions.Manager] },
+	{ permission: AccessPermission.SalesOrders, label: 'Đơn hàng và đơn nháp', group: 'Bán hàng', route: '/admin/orders', roles: [EPermissions.Manager, EPermissions.Sale] },
 	{ permission: AccessPermission.SalesCategories, label: 'Danh mục', group: 'Bán hàng', route: '/admin/product-categories', roles: [EPermissions.Manager] },
 	{ permission: AccessPermission.SalesProducts, label: 'Sản phẩm', group: 'Bán hàng', route: '/admin/products', roles: ALL_ROLES },
 	{ permission: AccessPermission.SalesPricing, label: 'Định giá', group: 'Bán hàng', route: '/admin/pricing', roles: [EPermissions.Manager] },
-	{ permission: AccessPermission.SalesCustomers, label: 'Khách hàng', group: 'Bán hàng', route: '/admin/customers', roles: [EPermissions.Manager] },
+	{ permission: AccessPermission.SalesCustomers, label: 'Khách hàng', group: 'Bán hàng', route: '/admin/customers', roles: [EPermissions.Manager, EPermissions.Sale] },
 	{ permission: AccessPermission.SalesDiscounts, label: 'Giảm giá', group: 'Bán hàng', route: '/admin/discounts', roles: [EPermissions.Manager] },
 	{ permission: AccessPermission.SalesGiftCards, label: 'Thẻ quà tặng', group: 'Bán hàng', route: '/admin/gift-cards', roles: [EPermissions.Manager] },
 	{ permission: AccessPermission.PurchasesSuppliers, label: 'Nhà cung cấp', group: 'Mua hàng', route: '/admin/suppliers', roles: [EPermissions.Manager, EPermissions.Accountant] },
