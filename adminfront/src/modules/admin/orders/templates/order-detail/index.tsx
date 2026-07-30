@@ -39,7 +39,11 @@ export default function OrderDetail({ id }: Readonly<Props>) {
 			</Col>
 			{order?.id && (
 				<Col xs={24} lg={14} className="flex flex-col gap-y-4">
-					<Information order={order} isLoading={isLoading} />
+					<Information
+						order={order}
+						isLoading={isLoading}
+						refetch={refetchOrder}
+					/>
 					<Summary
 						order={order}
 						isLoading={isLoading}
