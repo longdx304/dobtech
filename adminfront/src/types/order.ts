@@ -3,7 +3,7 @@ import { Order as MedusaOrder, User } from '@medusajs/medusa';
 
 export type Order = MedusaOrder & {
 	sales_person_id?: string | null;
-	sales_person?: User | null;
+	sales_person?: (User & { permissions?: string | null }) | null;
 	handler_id?: string;
 	handler?: User;
 	handled_at?: string;

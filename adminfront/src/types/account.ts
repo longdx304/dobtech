@@ -27,14 +27,25 @@ export enum ERole {
 
 export enum EPermissions {
 	Manager = 'manager',
+	Sale = 'sale',
 	Warehouse = 'Warehouse',
 	Driver = 'driver',
 	Accountant = 'accountant',
 }
 
-// Quản lý, Nhân viên kho, Tài xế, Kế toán
+export const hasEmployeePermission = (
+	permissions: string | null | undefined,
+	permission: EPermissions
+): boolean =>
+	(permissions ?? '')
+		.split(',')
+		.map((value) => value.trim())
+		.includes(permission);
+
+// Quản lý, Nhân viên bán hàng, Nhân viên kho, Tài xế, Kế toán
 export const rolesEmployee = Object.freeze([
 	{ label: 'Quản lý', value: EPermissions.Manager },
+	{ label: 'Nhân viên bán hàng', value: EPermissions.Sale },
 	{ label: 'Nhân viên kho', value: EPermissions.Warehouse },
 	{ label: 'Tài xế', value: EPermissions.Driver },
 	{ label: 'Kế toán', value: EPermissions.Accountant },

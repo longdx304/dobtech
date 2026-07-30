@@ -1,4 +1,5 @@
 import { Select } from '@/components/Select';
+import { EPermissions, hasEmployeePermission } from '@/types/account';
 import { Form } from 'antd';
 import debounce from 'lodash/debounce';
 import { useAdminUsers } from 'medusa-react';
@@ -28,17 +29,24 @@ const SalesPersonSelect = () => {
 
 	const options = useMemo(
 		() =>
-			(users ?? []).map((user) => {
-				const fullName = [user.first_name, user.last_name]
-					.filter(Boolean)
-					.join(' ')
-					.trim();
+			(users ?? [])
+				.filter((user) =>
+					hasEmployeePermission(
+						(user as typeof user & { permissions?: string }).permissions,
+						EPermissions.Sale
+					)
+				)
+				.map((user) => {
+					const fullName = [user.first_name, user.last_name]
+						.filter(Boolean)
+						.join(' ')
+						.trim();
 
-				return {
-					value: user.id,
-					label: fullName ? `${fullName} (${user.email})` : user.email,
-				};
-			}),
+					return {
+						value: user.id,
+						label: fullName ? `${fullName} (${user.email})` : user.email,
+					};
+				}),
 		[users]
 	);
 

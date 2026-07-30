@@ -1,4 +1,4 @@
-import { Order } from '@medusajs/medusa';
+import { Order } from '@/types/order';
 import { message } from 'antd';
 import dayjs from 'dayjs';
 import { useState } from 'react';
