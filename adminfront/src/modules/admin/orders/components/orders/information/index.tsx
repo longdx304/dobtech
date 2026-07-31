@@ -1,22 +1,43 @@
-import { Order } from '@medusajs/medusa';
+import { Order } from '@/types/order';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Text, Title } from '@/components/Typography';
 import { ActionAbles } from '@/components/Dropdown';
-import { Ban } from 'lucide-react';
+import { Ban, UserRound } from 'lucide-react';
 import StatusIndicator from '@/modules/admin/common/components/status-indicator';
-import { Empty, Modal as AntdModal, message } from 'antd';
+import { Empty, Form, Modal as AntdModal, message } from 'antd';
 import dayjs from 'dayjs';
 import { useAdminCancelOrder } from 'medusa-react';
 import { getErrorMessage } from '@/lib/utils';
+import { useState } from 'react';
+import { useAdminUpdateOrderSalesPerson } from '@/lib/hooks/api/order';
+import SalesPersonSelect from '../new-order/sales-person-select';
 
 type Props = {
 	order: Order | undefined;
 	isLoading: boolean;
+	refetch: () => void;
 };
 
-const Information = ({ order, isLoading }: Props) => {
+const Information = ({ order, isLoading, refetch }: Props) => {
+	const [salesPersonForm] = Form.useForm<{
+		sales_person_id?: string | null;
+	}>();
+	const [isSalesPersonModalOpen, setIsSalesPersonModalOpen] = useState(false);
 	const cancelOrder = useAdminCancelOrder(order?.id!);
+	const updateSalesPerson = useAdminUpdateOrderSalesPerson(order?.id ?? '');
+	const salesPersonName = [
+		order?.sales_person?.first_name,
+		order?.sales_person?.last_name,
+	]
+		.filter(Boolean)
+		.join(' ')
+		.trim();
+	const salesPersonDisplay = order?.sales_person
+		? salesPersonName
+			? `${salesPersonName} (${order.sales_person.email})`
+			: order.sales_person.email
+		: '-';
 
 	const handleCancelOrder = () => {
 		AntdModal.confirm({
@@ -35,7 +56,40 @@ const Information = ({ order, isLoading }: Props) => {
 		});
 	};
 
+	const handleOpenSalesPersonModal = () => {
+		salesPersonForm.setFieldValue(
+			'sales_person_id',
+			order?.sales_person_id ?? undefined
+		);
+		setIsSalesPersonModalOpen(true);
+	};
+
+	const handleUpdateSalesPerson = async () => {
+		try {
+			const values = await salesPersonForm.validateFields();
+
+			await updateSalesPerson.mutateAsync({
+				sales_person_id: values.sales_person_id ?? null,
+			});
+
+			message.success('Cập nhật nhân viên bán hàng thành công');
+			setIsSalesPersonModalOpen(false);
+			refetch();
+		} catch (error: any) {
+			if (error?.errorFields) {
+				return;
+			}
+			message.error(getErrorMessage(error));
+		}
+	};
+
 	const actions = [
+		{
+			label: <span className="w-full">{'Cập nhật nhân viên bán hàng'}</span>,
+			key: 'update-sales-person',
+			icon: <UserRound />,
+			onClick: handleOpenSalesPersonModal,
+		},
 		{
 			label: <span className="w-full">{'Huỷ đơn hàng'}</span>,
 			key: 'cancel',
@@ -46,45 +100,66 @@ const Information = ({ order, isLoading }: Props) => {
 	];
 
 	return (
-		<Card loading={isLoading} className="px-4">
-			{!order && <Empty description="Không tìm thấy đơn hàng" />}
-			{order && (
-				<div>
-					<Flex align="center" justify="space-between" className="pb-2">
-						<Title level={4}>{`Đơn hàng #${order?.display_id}`}</Title>
-						<div className="flex justify-end items-center gap-4">
-							<OrderStatus status={order!.status} />
-							<ActionAbles actions={actions} />
-						</div>
-					</Flex>
-					<span className="text-gray-500 text-xs">
-						{dayjs(order.created_at).format('hh:mm D/MM/YYYY')}
-					</span>
-					<Flex vertical gap={4} className="pt-8">
-						<Flex justify="space-between" align="center">
-							<Text className="text-gray-500 text-sm">Tên khách hàng:</Text>
-							<Text className="text-gray-500 text-sm">{order.customer?.last_name} {order.customer?.first_name}</Text>
+		<>
+			<Card loading={isLoading} className="px-4">
+				{!order && <Empty description="Không tìm thấy đơn hàng" />}
+				{order && (
+					<div>
+						<Flex align="center" justify="space-between" className="pb-2">
+							<Title level={4}>{`Đơn hàng #${order?.display_id}`}</Title>
+							<div className="flex justify-end items-center gap-4">
+								<OrderStatus status={order!.status} />
+								<ActionAbles actions={actions} />
+							</div>
 						</Flex>
-						<Flex justify="space-between" align="center">
-							<Text className="text-gray-500 text-sm">Email:</Text>
-							<Text className="text-gray-500 text-sm">{order.email}</Text>
+						<span className="text-gray-500 text-xs">
+							{dayjs(order.created_at).format('hh:mm D/MM/YYYY')}
+						</span>
+						<Flex vertical gap={4} className="pt-8">
+							<Flex justify="space-between" align="center">
+								<Text className="text-gray-500 text-sm">Tên khách hàng:</Text>
+								<Text className="text-gray-500 text-sm">{order.customer?.last_name} {order.customer?.first_name}</Text>
+							</Flex>
+							<Flex justify="space-between" align="center">
+								<Text className="text-gray-500 text-sm">Email:</Text>
+								<Text className="text-gray-500 text-sm">{order.email}</Text>
+							</Flex>
+							<Flex justify="space-between" align="center">
+								<Text className="text-gray-500 text-sm">Điện thoại:</Text>
+								<Text className="text-gray-500 text-sm">
+									{order?.shipping_address?.phone ??
+										order?.customer?.phone ??
+										'-'}
+								</Text>
+							</Flex>
+							<Flex justify="space-between" align="center">
+								<Text className="text-gray-500 text-sm">
+									Nhân viên bán hàng:
+								</Text>
+								<Text className="text-gray-500 text-sm">
+									{salesPersonDisplay}
+								</Text>
+							</Flex>
 						</Flex>
-						<Flex justify="space-between" align="center">
-							<Text className="text-gray-500 text-sm">Điện thoại:</Text>
-							<Text className="text-gray-500 text-sm">
-								{order?.shipping_address?.phone ??
-									order?.customer?.phone ??
-									'-'}
-							</Text>
-						</Flex>
-						{/* <Flex justify="space-between" align="center"> */}
-						{/* 	<Text className="text-gray-500 text-sm">Thanh toán:</Text> */}
-						{/* 	<Text className="text-gray-500 text-sm">{order.email}</Text> */}
-						{/* </Flex> */}
-					</Flex>
-				</div>
-			)}
-		</Card>
+					</div>
+				)}
+			</Card>
+
+			<AntdModal
+				title="Cập nhật nhân viên bán hàng"
+				open={isSalesPersonModalOpen}
+				onCancel={() => setIsSalesPersonModalOpen(false)}
+				onOk={handleUpdateSalesPerson}
+				confirmLoading={updateSalesPerson.isLoading}
+				okText="Xác nhận"
+				cancelText="Huỷ"
+				destroyOnClose
+			>
+				<Form form={salesPersonForm}>
+					<SalesPersonSelect />
+				</Form>
+			</AntdModal>
+		</>
 	);
 };
 

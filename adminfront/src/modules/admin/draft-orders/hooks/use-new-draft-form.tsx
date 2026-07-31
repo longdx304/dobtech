@@ -31,6 +31,7 @@ export type NewDraftOrderForm = {
 	}[];
 	shipping_option: string | null;
 	customer_id?: any | null;
+	sales_person_id?: string | null;
 	email: string;
 	custom_shipping_price?: number;
 	discount_code?: string;

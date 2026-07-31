@@ -9,6 +9,7 @@ import { IAdminResponse, rolesEmployee } from '@/types/account';
 
 const COLOR_PERMISSION = {
 	manager: 'red',
+	sale: 'green',
 	Warehouse: 'orange',
 	driver: 'lime',
 	accountant: 'blue',

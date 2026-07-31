@@ -7,6 +7,7 @@ import {
 	resolvePagePermissions,
 	shouldRefreshAdminAccessProfileForApiError,
 } from '@/lib/access-control';
+import { EPermissions, hasEmployeePermission } from '@/types/account';
 
 describe('access control', () => {
 	it('falls back to role presets for legacy users', () => {
@@ -16,6 +17,26 @@ describe('access control', () => {
 				AccessPermission.WarehouseInbound,
 			])
 		);
+	});
+
+	it('gives sales employees the sales workspace preset', () => {
+		expect(resolvePagePermissions({ permissions: EPermissions.Sale })).toEqual(
+			expect.arrayContaining([
+				AccessPermission.DashboardView,
+				AccessPermission.SalesOrders,
+				AccessPermission.SalesProducts,
+				AccessPermission.SalesCustomers,
+			])
+		);
+	});
+
+	it('recognizes only users with the sale permission as sales people', () => {
+		expect(
+			hasEmployeePermission('Warehouse, sale ', EPermissions.Sale)
+		).toBe(true);
+		expect(
+			hasEmployeePermission('Warehouse,manager', EPermissions.Sale)
+		).toBe(false);
 	});
 
 	it('uses metadata page permissions as an override', () => {
