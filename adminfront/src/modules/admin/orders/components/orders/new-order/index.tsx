@@ -306,18 +306,22 @@ const NewOrderModal: FC<Props> = ({
 								window.location.reload();
 							},
 							onError: (error) => {
-								console.error('Transfer order error', getErrorMessage(error));
+								const errorMessage = getErrorMessage(error);
+								message.error(errorMessage, 8);
+								console.error('Transfer order error', errorMessage);
 							},
 						}
 					);
 				},
 				onError: (error) => {
-					message.error('Đã xảy ra lỗi khi tạo bản nháp đơn hàng');
-					console.log('error', getErrorMessage(error));
+					const errorMessage = getErrorMessage(error);
+					message.error(errorMessage, 8);
+					console.error('Create draft order error', errorMessage);
 				},
 			});
 		} catch (error) {
-			console.log('error catch', error);
+			message.error(getErrorMessage(error), 8);
+			console.error('Create order error', error);
 		}
 	};
 

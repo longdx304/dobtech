@@ -148,7 +148,7 @@ const DraftOrderList: FC<Props> = () => {
 			// Refresh the page to reload prices
 			window.location.reload();
 		} catch (error) {
-			message.error('Có lỗi xảy ra khi chuyển đơn hàng, vui lòng kiểm tra số lượng tồn kho');
+			message.error(getErrorMessage(error), 8);
 			console.error('Error transferring order:', error);
 
 			// Clean up the uploaded file if exists
