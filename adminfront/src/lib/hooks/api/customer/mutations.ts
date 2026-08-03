@@ -97,6 +97,30 @@ export const useAdminDeleteCustomerAddress = (
 	);
 };
 
+export const useAdminDeleteCustomer = (
+	customerId: string,
+	options?: UseMutationOptions<
+		Response<{ id: string; object: 'customer'; deleted: boolean }>,
+		Error,
+		void
+	>
+) => {
+	const { client } = useMedusa();
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		...options,
+		mutationFn: () =>
+			client.admin.custom.delete(`/admin/customers/${customerId}/delete`),
+		onSuccess: (data, variables, context) => {
+			customerListInvalidateKeys(customerId).forEach((key) =>
+				queryClient.invalidateQueries({ queryKey: key })
+			);
+			options?.onSuccess?.(data, variables, context);
+		},
+	});
+};
+
 /** Manage a customer's inventory-app login (password reset / phone / enable-disable). */
 export type AdminUpdateCustomerAccountPayload = {
 	password?: string;

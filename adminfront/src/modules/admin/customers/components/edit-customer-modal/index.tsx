@@ -4,6 +4,7 @@ import { Input, InputPassword } from '@/components/Input';
 import { SubmitModal } from '@/components/Modal';
 import { Title } from '@/components/Typography';
 import {
+	useAdminDeleteCustomer,
 	useAdminDeleteCustomerAddress,
 	useAdminUpdateCustomerAccount,
 } from '@/lib/hooks/api/customer/mutations';
@@ -66,6 +67,7 @@ const EditCustomerModal: FC<Props> = ({
 	const [form] = Form.useForm();
 	const updateCustomer = useAdminUpdateCustomer(customer.id);
 	const updateAccount = useAdminUpdateCustomerAccount(customer.id);
+	const deleteCustomer = useAdminDeleteCustomer(customer.id);
 	const { client } = useMedusa();
 	const [addressModalOpen, setAddressModalOpen] = useState(false);
 	const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -140,6 +142,10 @@ const EditCustomerModal: FC<Props> = ({
 	};
 
 	const addresses = mergedCustomer.shipping_addresses ?? [];
+	const customerName = [mergedCustomer.first_name, mergedCustomer.last_name]
+		.filter(Boolean)
+		.join(' ')
+		.trim();
 
 	const hasAccount = !!(mergedCustomer as any)?.has_account;
 	const isActive = !!mergedCustomer?.is_active;
@@ -155,7 +161,10 @@ const EditCustomerModal: FC<Props> = ({
 			return;
 		}
 		try {
-			await updateAccount.mutateAsync({ password: appPassword, phone });
+			await updateAccount.mutateAsync({
+				password: appPassword,
+				...(phone !== mergedCustomer.phone ? { phone } : {}),
+			});
 			message.success('Đã đặt mật khẩu đăng nhập app');
 			setAppPassword('');
 			refetchCustomerDetail();
@@ -169,6 +178,16 @@ const EditCustomerModal: FC<Props> = ({
 			await updateAccount.mutateAsync({ is_active: enabled });
 			message.success(enabled ? 'Đã cho phép đăng nhập app' : 'Đã khóa đăng nhập app');
 			refetchCustomerDetail();
+		} catch (error) {
+			message.error(getErrorMessage(error));
+		}
+	};
+
+	const handleDeleteCustomer = async () => {
+		try {
+			await deleteCustomer.mutateAsync();
+			message.success('Đã xóa khách hàng');
+			handleOk();
 		} catch (error) {
 			message.error(getErrorMessage(error));
 		}
@@ -364,6 +383,32 @@ const EditCustomerModal: FC<Props> = ({
 						</List.Item>
 					)}
 				/>
+
+				<Divider className="my-4" />
+
+				<div className="flex items-center justify-between gap-4">
+					<div>
+						<div className="text-sm font-medium text-red-600">Xóa khách hàng</div>
+						<div className="mt-1 text-xs text-gray-500">
+							Chỉ xóa được hồ sơ chưa có đơn hàng và bị trùng số điện thoại
+							 với một hồ sơ khác.
+						</div>
+					</div>
+					<Popconfirm
+						title={`Xóa khách hàng ${customerName || mergedCustomer.phone || ''}?`}
+						description={`Hồ sơ: ${
+							mergedCustomer.customer_code || 'không có mã'
+						} · ${mergedCustomer.email || 'không có email'} · ID ${mergedCustomer.id}`}
+						okText="Xóa"
+						okType="danger"
+						cancelText="Hủy"
+						onConfirm={handleDeleteCustomer}
+					>
+						<Button danger loading={deleteCustomer.isLoading}>
+							Xóa khách hàng
+						</Button>
+					</Popconfirm>
+				</div>
 			</SubmitModal>
 
 			<CustomerAddressModal
