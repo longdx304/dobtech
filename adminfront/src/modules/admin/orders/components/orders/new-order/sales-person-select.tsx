@@ -5,7 +5,11 @@ import debounce from 'lodash/debounce';
 import { useAdminUsers } from 'medusa-react';
 import { useEffect, useMemo, useState } from 'react';
 
-const SalesPersonSelect = () => {
+type Props = {
+	required?: boolean;
+};
+
+const SalesPersonSelect = ({ required = false }: Props) => {
 	const [searchValue, setSearchValue] = useState('');
 	const { users, isLoading } = useAdminUsers(
 		{
@@ -55,6 +59,16 @@ const SalesPersonSelect = () => {
 			name="sales_person_id"
 			label="Nhân viên bán hàng"
 			className="mt-6"
+			rules={
+				required
+					? [
+							{
+								required: true,
+								message: 'Vui lòng chọn nhân viên bán hàng',
+							},
+					  ]
+					: undefined
+			}
 		>
 			<Select
 				allowClear

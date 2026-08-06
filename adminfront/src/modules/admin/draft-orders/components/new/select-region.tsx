@@ -7,7 +7,11 @@ import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 
 const { Option } = Select;
 
-const SelectRegion = () => {
+type Props = {
+	requireSalesPerson?: boolean;
+};
+
+const SelectRegion = ({ requireSalesPerson = false }: Props) => {
 	const { regions } = useAdminRegions();
 	const { enableNext, disableNext } = useStepModal();
 	const { form, context } = useNewDraftOrderForm();
@@ -15,6 +19,7 @@ const SelectRegion = () => {
 
 	const reg = Form.useWatch('region', form);
 	const selectedShippingOption = Form.useWatch('shipping_option', form);
+	const selectedSalesPerson = Form.useWatch('sales_person_id', form);
 
 	const regionOptions = useMemo(() => {
 		if (!regions) return [];
@@ -48,13 +53,17 @@ const SelectRegion = () => {
 
 	useEffect(() => {
 		// Handle next button state
-		if (!reg || !selectedShippingOption) {
+		if (
+			!reg ||
+			!selectedShippingOption ||
+			(requireSalesPerson && !selectedSalesPerson)
+		) {
 			disableNext();
 		} else {
 			enableNext();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [reg, selectedShippingOption]);
+	}, [reg, selectedShippingOption, selectedSalesPerson, requireSalesPerson]);
 
 	const handleRegionChange = (value: string) => {
 		form.setFieldValue('region', value);
