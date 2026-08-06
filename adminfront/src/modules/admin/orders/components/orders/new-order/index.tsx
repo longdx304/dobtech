@@ -128,8 +128,8 @@ const NewOrderModal: FC<Props> = ({
 			title: '',
 			content: (
 				<div className="flex flex-col">
-					<SelectRegion />
-					<SalesPersonSelect />
+					<SelectRegion requireSalesPerson />
+					<SalesPersonSelect required />
 				</div>
 			),
 		},
