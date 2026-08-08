@@ -34,6 +34,12 @@ const DEFAULT_PAGE_SIZE = 300;
 const normalizeInventories = (inventories: unknown): WarehouseInventory[] =>
 	Array.isArray(inventories) ? inventories.filter(Boolean) : [];
 
+const toDisplayText = (value: unknown, fallback: string): string => {
+	if (typeof value === 'string' && value.trim()) return value;
+	if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+	return fallback;
+};
+
 const LocationManage: FC<Props> = ({}) => {
 	const deleteWarehouse = useAdminDeleteWarehouse();
 	const { setSelectedUnit, setQuantity } = useProductUnit();
@@ -80,7 +86,12 @@ const LocationManage: FC<Props> = ({}) => {
 	);
 
 	useEffect(() => {
-		setExpandedKeys(warehouseList.map((item) => item.id));
+		setExpandedKeys(
+			warehouseList
+				.filter((item) => normalizeInventories(item?.inventories).length > 0)
+				.map((item) => item.id)
+				.filter((id): id is string => typeof id === 'string' && id.length > 0)
+		);
 	}, [warehouseList]);
 
 	const handleChangeDebounce = useMemo(
@@ -194,8 +205,8 @@ const LocationManage: FC<Props> = ({}) => {
 		if (!searchValue) return warehouseList;
 		const q = searchValue.toLowerCase();
 		return [...warehouseList].sort((a, b) => {
-			const aLoc = (a.location || '').toLowerCase();
-			const bLoc = (b.location || '').toLowerCase();
+			const aLoc = String(a?.location ?? '').toLowerCase();
+			const bLoc = String(b?.location ?? '').toLowerCase();
 			const aExact = aLoc === q;
 			const bExact = bLoc === q;
 			if (aExact !== bExact) return aExact ? -1 : 1;
@@ -228,8 +239,19 @@ const LocationManage: FC<Props> = ({}) => {
 					<Button
 						type="dashed"
 						onClick={() => {
-							setExpandedKeys((prev) =>
-								prev.length ? [] : warehouse?.map((item) => item.id) || []
+						setExpandedKeys((prev) =>
+								prev.length
+									? []
+									: warehouseList
+											.filter(
+												(item) =>
+													normalizeInventories(item?.inventories).length > 0
+											)
+											.map((item) => item.id)
+											.filter(
+												(id): id is string =>
+													typeof id === 'string' && id.length > 0
+											)
 							);
 						}}
 					>
@@ -243,6 +265,8 @@ const LocationManage: FC<Props> = ({}) => {
 						expandable={{
 							expandedRowRender: expandedRowRender as any,
 							expandedRowKeys: expandedKeys,
+							rowExpandable: (record) =>
+								normalizeInventories(record?.inventories).length > 0,
 							onExpandedRowsChange: (keys) => {
 								setExpandedKeys(keys as string[]);
 							},
@@ -275,7 +299,7 @@ const LocationManage: FC<Props> = ({}) => {
 							<Flex className="items-center justify-between gap-2">
 								<Flex vertical className="min-w-0">
 									<Text className="text-sm font-semibold break-words">
-										{item.location}
+										{toDisplayText(item.location, 'Vị trí không xác định')}
 									</Text>
 									<Text className="text-xs text-gray-500">
 										{item.inventories?.length ?? 0} sản phẩm
@@ -310,7 +334,15 @@ const LocationManage: FC<Props> = ({}) => {
 									>
 										<div className="min-w-0">
 											<p className="text-xs font-medium break-words">
-												{inv.variant?.product?.title} - {inv.variant?.title}
+												{toDisplayText(
+													inv.variant?.product?.title,
+													'Sản phẩm không xác định'
+												)}{' '}
+												-{' '}
+												{toDisplayText(
+													inv.variant?.title,
+													'Biến thể không xác định'
+												)}
 											</p>
 											<p
 												className={`text-[11px] ${

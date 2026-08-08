@@ -13,6 +13,17 @@ import {
 
 export interface WarehouseDataType {}
 
+const toDisplayText = (value: unknown, fallback: string): string => {
+	if (typeof value === 'string' && value.trim()) return value;
+	if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+	return fallback;
+};
+
+const toImageSource = (value: unknown): string =>
+	typeof value === 'string' && value.trim()
+		? value
+		: '/images/product-img.png';
+
 interface Props {
 	handleEditWarehouse: (item: ProductVariant) => void;
 	handleOpenTransactionHistory: (id: string) => void;
@@ -27,21 +38,28 @@ const productColumns = ({
 		key: 'title',
 		className: 'text-xs',
 		fixed: 'left',
-		render: (_: ProductVariant) => {
+		render: (_: ProductVariant | null) => {
+			const productName = toDisplayText(
+				_?.product?.title,
+				'Sản phẩm không xác định'
+			);
+			const variantName = toDisplayText(_?.title, 'Biến thể không xác định');
 			return (
 				<Flex className="flex items-center gap-3">
 					<Image
-						src={_?.product?.thumbnail ?? '/images/product-img.png'}
+						src={toImageSource(_?.product?.thumbnail)}
+						fallback="/images/product-img.png"
+						preview={false}
 						alt="Product variant Thumbnail"
 						width={30}
 						height={40}
 						className="rounded-md cursor-pointer"
 					/>
 					<Flex vertical className="">
-						<Tooltip title={`${_?.product?.title} - ${_?.title}`}>
-							<Text className="text-xs line-clamp-2">{`${_?.product?.title} - ${_?.title}`}</Text>
+						<Tooltip title={`${productName} - ${variantName}`}>
+							<Text className="text-xs line-clamp-2">{`${productName} - ${variantName}`}</Text>
 						</Tooltip>
-						<span className="text-gray-500">{_?.title}</span>
+						<span className="text-gray-500">{variantName}</span>
 					</Flex>
 				</Flex>
 			);
