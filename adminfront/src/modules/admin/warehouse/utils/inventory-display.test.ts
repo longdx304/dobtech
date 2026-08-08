@@ -49,4 +49,22 @@ describe('warehouse inventory display helpers', () => {
 			'Đơn vị hàng có số lượng quy đổi không hợp lệ'
 		);
 	});
+
+	it('does not throw for an invalid inventory record', () => {
+		expect(formatInventoryQuantity(null)).toBe('Không xác định');
+		expect(getInventoryMaxQuantity(undefined)).toBeUndefined();
+		expect(getInventoryUnitIssue(null)).toBe(
+			'Bản ghi tồn kho đang thiếu đơn vị hàng'
+		);
+	});
+
+	it('falls back when the unit label has an unexpected runtime type', () => {
+		const inventory = {
+			quantity: 12,
+			unit_id: 'unit_1',
+			item_unit: { id: 'unit_1', unit: 32 as any, quantity: 6 },
+		};
+
+		expect(formatInventoryQuantity(inventory)).toBe('2 đơn vị (12 đôi)');
+	});
 });

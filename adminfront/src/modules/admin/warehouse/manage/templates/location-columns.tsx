@@ -13,6 +13,17 @@ import {
 
 export interface WarehouseDataType {}
 
+const toDisplayText = (value: unknown, fallback: string): string => {
+	if (typeof value === 'string' && value.trim()) return value;
+	if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+	return fallback;
+};
+
+const toImageSource = (value: unknown): string =>
+	typeof value === 'string' && value.trim()
+		? value
+		: '/images/product-img.png';
+
 interface Props {
 	handleRemoveWarehouse: (id: string) => void;
 	handleEditWarehouse: (item: Warehouse) => void;
@@ -29,7 +40,7 @@ const warehouseColumns = ({
 		className: 'text-xs',
 		fixed: 'left',
 		render: (_: Warehouse['location']) => {
-			return _;
+			return toDisplayText(_, 'Vị trí không xác định');
 		},
 	},
 	{
@@ -38,7 +49,7 @@ const warehouseColumns = ({
 		dataIndex: 'inventories',
 		className: 'text-xs text-center text-bold',
 		render: (_: Warehouse['inventories']) => {
-			return _?.length ?? 0;
+			return Array.isArray(_) ? _.filter(Boolean).length : 0;
 		},
 	},
 	{
@@ -88,13 +99,18 @@ const expandedColumns = ({
 		className: 'text-xs',
 		fixed: 'left',
 		render: (_: ProductVariant | null) => {
-			const productName = _?.product?.title || 'Sản phẩm không còn tồn tại';
-			const variantName = _?.title || 'Biến thể không xác định';
+			const productName = toDisplayText(
+				_?.product?.title,
+				'Sản phẩm không còn tồn tại'
+			);
+			const variantName = toDisplayText(_?.title, 'Biến thể không xác định');
 
 			return (
 				<Flex className="flex items-center gap-3">
 					<Image
-						src={_?.product?.thumbnail ?? '/images/product-img.png'}
+						src={toImageSource(_?.product?.thumbnail)}
+						fallback="/images/product-img.png"
+						preview={false}
 						alt="Product variant Thumbnail"
 						width={30}
 						height={40}
