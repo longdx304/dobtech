@@ -6,6 +6,10 @@ import { Text } from '@/components/Typography';
 import { ProductVariant } from '@/types/products';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import { Minus, Pen, Plus, Trash2 } from 'lucide-react';
+import {
+	formatInventoryQuantity,
+	getInventoryUnitIssue,
+} from '../../utils/inventory-display';
 
 export interface WarehouseDataType {}
 
@@ -83,7 +87,10 @@ const expandedColumns = ({
 		dataIndex: 'variant',
 		className: 'text-xs',
 		fixed: 'left',
-		render: (_: ProductVariant) => {
+		render: (_: ProductVariant | null) => {
+			const productName = _?.product?.title || 'Sản phẩm không còn tồn tại';
+			const variantName = _?.title || 'Biến thể không xác định';
+
 			return (
 				<Flex className="flex items-center gap-3">
 					<Image
@@ -94,10 +101,10 @@ const expandedColumns = ({
 						className="rounded-md cursor-pointer"
 					/>
 					<Flex vertical className="">
-						<Tooltip title={`${_.product.title} - ${_.title}`}>
-							<Text className="text-xs line-clamp-2">{`${_.product.title} - ${_.title}`}</Text>
+						<Tooltip title={`${productName} - ${variantName}`}>
+							<Text className="text-xs line-clamp-2">{`${productName} - ${variantName}`}</Text>
 						</Tooltip>
-						<span className="text-gray-500">{_.title}</span>
+						<span className="text-gray-500">{variantName}</span>
 					</Flex>
 				</Flex>
 			);
@@ -109,8 +116,16 @@ const expandedColumns = ({
 		dataIndex: 'quantity',
 		className: 'text-xs',
 		render: (_: WarehouseInventory['quantity'], record: WarehouseInventory) => {
-			const quantity = _ / record.item_unit.quantity;
-			return `${quantity} ${record.item_unit.unit} (${_} đôi)`;
+			const issue = getInventoryUnitIssue(record);
+			const value = formatInventoryQuantity(record);
+
+			return issue ? (
+				<Tooltip title={`${issue}. Vui lòng cập nhật lại đơn vị cho tồn kho này.`}>
+					<Text className="text-xs text-amber-600">{value}</Text>
+				</Tooltip>
+			) : (
+				value
+			);
 		},
 	},
 	{
@@ -121,21 +136,24 @@ const expandedColumns = ({
 		className: 'text-xs',
 		align: 'center',
 		render: (_: any, record: WarehouseInventory) => {
+			const issue = getInventoryUnitIssue(record);
 			return (
-				<Flex>
-					<Minus
-						onClick={() => handleRemoveInventory(record)}
-						size={18}
-						color="red"
-						className="cursor-pointer"
-					/>
-					<Plus
-						onClick={() => handleAddInventory(record)}
-						size={18}
-						color="green"
-						className="cursor-pointer"
-					/>
-				</Flex>
+				<Tooltip title={issue || undefined}>
+					<Flex className={issue ? 'opacity-40' : undefined}>
+						<Minus
+							onClick={() => handleRemoveInventory(record)}
+							size={18}
+							color="red"
+							className="cursor-pointer"
+						/>
+						<Plus
+							onClick={() => handleAddInventory(record)}
+							size={18}
+							color="green"
+							className="cursor-pointer"
+						/>
+					</Flex>
+				</Tooltip>
 			);
 		},
 	},

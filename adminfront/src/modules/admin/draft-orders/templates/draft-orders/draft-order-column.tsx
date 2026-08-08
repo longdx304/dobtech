@@ -43,9 +43,11 @@ const draftOrderColumns = ({
 			// width: 150,
 			className: 'text-xs',
 			render: (_: any, record: DraftOrder) => {
-				const items = record.cart?.items || [];
+				const items = Array.isArray(record.cart?.items)
+					? record.cart.items
+					: [];
 				const total = items.reduce((sum: number, item: any) => {
-					return sum + (item.unit_price * item.quantity);
+					return sum + (Number(item.unit_price) || 0) * (Number(item.quantity) || 0);
 				}, 0);
 				return new Intl.NumberFormat('vi-VN', {
 					style: 'currency',
@@ -61,7 +63,12 @@ const draftOrderColumns = ({
 			className: 'text-xs',
 			render: (_: any, record: DraftOrder) => {
 				const customerEmail = record.cart?.email;
-				const customerName = record.cart?.customer?.first_name + ' ' + record.cart?.customer?.last_name;
+				const customerName = [
+					record.cart?.customer?.first_name,
+					record.cart?.customer?.last_name,
+				]
+					.filter(Boolean)
+					.join(' ');
 				return customerName || customerEmail || '-';
 			},
 		},

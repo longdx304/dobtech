@@ -65,7 +65,7 @@ const Summary = ({
 			let returnRefund = 0;
 
 			const swapAmount = _.sum(
-				order?.swaps.map((s) => s.difference_due) || [0]
+				order?.swaps?.map((s) => s.difference_due) || [0]
 			);
 
 			if (order?.refunds?.length) {
@@ -114,14 +114,15 @@ const Summary = ({
 	}
 
 	const isAllocatable = !['canceled', 'archived'].includes(order.status);
+	const orderItems = Array.isArray(order.items) ? order.items : [];
 
-	const totalQuantity = order.items.reduce(
+	const totalQuantity = orderItems.reduce(
 		(acc, item) => acc + item.quantity,
 		0
 	);
 
 	// Filter items based on the search term
-	const filteredItems = order.items.filter(
+	const filteredItems = orderItems.filter(
 		(item) =>
 			item.variant?.product_id
 				?.toLowerCase()
@@ -203,7 +204,7 @@ const Summary = ({
 				<Divider className="my-2" />
 				<DisplayTotalQuantity
 					productTitle={'Tổng sản phẩm'}
-					productQuantity={order.items.length}
+					productQuantity={orderItems.length}
 					totalAmount={totalQuantity}
 					quantityTitle={'Tổng số lượng'}
 				/>
@@ -236,7 +237,7 @@ const Summary = ({
 							<div className="font-normal text-gray-900 flex items-center">
 								Gift card:
 								{/* <Badge className="ml-3" variant="default"> */}
-								{gcTransaction.gift_card.code}
+								{gcTransaction.gift_card?.code || 'Không xác định'}
 								{/* </Badge> */}
 								{/* <div className="ml-2">
                   <CopyToClipboard

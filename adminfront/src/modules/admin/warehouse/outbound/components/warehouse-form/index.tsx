@@ -21,7 +21,7 @@ import { Col, message, Row } from 'antd';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import { LoaderCircle } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import WarehouseItem from './warehouse-item';
 import { ADMIN_PRODUCT_OUTBOUND } from '@/lib/hooks/api/product-outbound';
 
@@ -67,21 +67,28 @@ const WarehouseForm = ({
 	const unitData = getSelectedUnitData();
 
 	// Debounce fetcher
-	const debounceFetcher = debounce((value: string) => {
-		if (!value.trim()) {
-			return;
-		}
-		setSearchValue({
-			label: value,
-			value: '',
-		});
-	}, 800);
+	const debounceFetcher = useMemo(
+		() =>
+			debounce((value: string) => {
+				if (!value.trim()) return;
+				setSearchValue({ label: value, value: '' });
+			}, 800),
+		[]
+	);
+
+	useEffect(() => () => debounceFetcher.cancel(), [debounceFetcher]);
+
+	const inventoryList = Array.isArray(warehouseInventory)
+		? warehouseInventory.filter(Boolean)
+		: [];
 
 	// Format options warehouse
 	const optionWarehouses = useMemo(() => {
-		if (!warehouse) return [];
-		return warehouse.map((warehouse: Warehouse) => ({
-			label: warehouse.location,
+		const warehouseList = Array.isArray(warehouse)
+			? warehouse.filter(Boolean)
+			: [];
+		return warehouseList.map((warehouse: Warehouse) => ({
+			label: warehouse.location || 'Vị trí chưa xác định',
 			value: warehouse.id,
 		}));
 	}, [warehouse]);
@@ -167,13 +174,13 @@ const WarehouseForm = ({
 				<Text strong className="">
 					Vị trí sản phẩm trong kho
 				</Text>
-				{warehouseInventory?.length === 0 && (
+				{inventoryList.length === 0 && (
 					<Text className="text-gray-500">
 						Sản phẩm chưa có vị trí ở trong kho
 					</Text>
 				)}
 				<Row gutter={[8, 8]}>
-					{warehouseInventory?.map((item: any) => (
+					{inventoryList.map((item: any) => (
 						<Col xs={24} sm={12} key={item.id}>
 							<WarehouseItem
 								item={item}

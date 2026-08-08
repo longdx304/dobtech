@@ -43,6 +43,9 @@ const ListInbound: FC<Props> = ({}) => {
 		status: activeKey || undefined,
 		myOrder: myOrder ? true : undefined,
 	});
+	const supplierOrderList = Array.isArray(supplierOrder)
+		? supplierOrder.filter(Boolean)
+		: [];
 
 	const productInboundHandler = useAdminProductInboundHandler();
 	const productInboundRemoveHandler = useAdminProductInboundRemoveHandler();
@@ -136,7 +139,7 @@ const ListInbound: FC<Props> = ({}) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
-					dataSource={supplierOrder}
+					dataSource={supplierOrderList}
 					loading={isLoading || productInboundHandler.isLoading}
 					renderItem={(item: SupplierOrder) => (
 						<List.Item>

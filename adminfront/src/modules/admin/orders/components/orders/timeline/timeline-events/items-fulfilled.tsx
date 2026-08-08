@@ -24,7 +24,7 @@ const ItemsFulfilled: React.FC<ItemsFulfilledProps> = ({ event }) => {
 		icon: <Package size={20} />,
 		time: event.time,
 		title: title,
-		children: event.items.map((item, index) => (
+		children: (Array.isArray(event.items) ? event.items : []).map((item, index) => (
 			<EventItemContainer item={item} key={index} />
 		)),
 		noNotification: event.noNotification,

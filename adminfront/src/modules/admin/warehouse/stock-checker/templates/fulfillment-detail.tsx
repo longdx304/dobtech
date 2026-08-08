@@ -145,7 +145,9 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 	useEffect(() => {
 		if (!isProcessing && order) {
 			// Map item IDs for selection
-			const items = order.items.map((item) => item.id);
+			const items = Array.isArray(order.items)
+				? order.items.map((item) => item.id)
+				: [];
 			setSelectedRowKeys(items);
 
 			// Handle checker_url if it exists
@@ -514,7 +516,7 @@ const FulfillmentDetail = ({ id }: FulfillmentDetailProps) => {
 					}
 				>
 					{/* Danh sách san pham */}
-					{order?.items.map((item, idx) => {
+					{(Array.isArray(order?.items) ? order.items : []).map((item, idx) => {
 						return (
 							<FulfillmentLine
 								item={item as LineItem}

@@ -320,8 +320,8 @@ const OrderEditChangeItem: React.FC<OrderEditChangeItemProps> = ({
 							)}
 						</span>
 						<span className="font-normal text-gray-500 flex truncate max-w-[185px]">
-							{`${lineItem?.variant.title}${
-								lineItem?.variant.sku ? ` (${lineItem.variant.sku})` : ''
+							{`${lineItem?.variant?.title ?? 'Biến thể chưa xác định'}${
+								lineItem?.variant?.sku ? ` (${lineItem.variant.sku})` : ''
 							}`}
 						</span>
 					</div>

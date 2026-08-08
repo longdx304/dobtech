@@ -22,6 +22,11 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import { Minus, Plus } from 'lucide-react';
+import {
+	formatInventoryQuantity,
+	getInventoryMaxQuantity,
+	getInventoryUnitIssue,
+} from '../../../utils/inventory-display';
 
 type UpdatedLineItem = LineItem & {
 	supplier_order_id: string;
@@ -44,16 +49,20 @@ const WarehouseItem = ({
 	const removeInboundInventory = useAdminRemoveInventory();
 
 	const unitData = getSelectedUnitData();
+	const inventoryIssue = getInventoryUnitIssue(item);
+	const warehouseLocation = item.warehouse?.location || 'Vị trí không xác định';
 
 	const queryClient = useQueryClient();
-	const quantity =
-		item?.quantity === 0
-			? `0`
-			: `${item?.quantity / item?.item_unit?.quantity} ${
-					item?.item_unit?.unit
-			  }`;
+	const quantity = formatInventoryQuantity(item);
+
+	const validateInventory = () => {
+		if (!inventoryIssue) return true;
+		message.error(`${inventoryIssue}. Không thể thao tác tồn kho.`);
+		return false;
+	};
 
 	const onAddUnit = async () => {
+		if (!validateInventory()) return;
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
@@ -79,7 +88,7 @@ const WarehouseItem = ({
 			onReset();
 			await createInboundInventory.mutateAsync(itemData, {
 				onSuccess: () => {
-					message.success(`Đã nhập hàng vào vị trí ${item.warehouse.location}`);
+					message.success(`Đã nhập hàng vào vị trí ${warehouseLocation}`);
 					refetchInventory();
 					queryClient.invalidateQueries([ADMIN_PRODUCT_INBOUND, 'detail']);
 					queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
@@ -92,6 +101,7 @@ const WarehouseItem = ({
 	};
 
 	const onRemoveUnit = async () => {
+		if (!validateInventory()) return;
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
@@ -111,7 +121,7 @@ const WarehouseItem = ({
 			onReset();
 			await removeInboundInventory.mutateAsync(itemData, {
 				onSuccess: () => {
-					message.success(`Đã xuất hàng tại vị trí ${item.warehouse.location}`);
+					message.success(`Đã xuất hàng tại vị trí ${warehouseLocation}`);
 					refetchInventory();
 					queryClient.invalidateQueries([ADMIN_PRODUCT_INBOUND, 'detail']);
 					queryClient.invalidateQueries([ADMIN_LINEITEM, 'detail']);
@@ -130,12 +140,12 @@ const WarehouseItem = ({
 			justify="space-between"
 			className="border-solid border-[1px] border-gray-400 rounded-md py-2 bg-[#2F5CFF] hover:bg-[#3D74FF] cursor-pointer px-4"
 		>
-			{isPermission && (
+			{isPermission && !inventoryIssue && (
 				<Popconfirm
-					title={`Lấy hàng tại vị trí (${item.warehouse.location})`}
+					title={`Lấy hàng tại vị trí (${warehouseLocation})`}
 					description={
 						<VariantInventoryForm
-							maxQuantity={item.quantity / item.item_unit.quantity}
+							maxQuantity={getInventoryMaxQuantity(item)}
 							type="OUTBOUND"
 						/>
 					}
@@ -158,10 +168,12 @@ const WarehouseItem = ({
 					/>
 				</Popconfirm>
 			)}
-			<Text className="text-white">{`${quantity} (${item.warehouse.location})`}</Text>
-			{isPermission && (
+			<Text className={inventoryIssue ? 'text-amber-200' : 'text-white'}>
+				{`${quantity} (${warehouseLocation})`}
+			</Text>
+			{isPermission && !inventoryIssue && (
 				<Popconfirm
-					title={`Nhập hàng tại vị trí (${item.warehouse.location})`}
+					title={`Nhập hàng tại vị trí (${warehouseLocation})`}
 					description={<VariantInventoryForm type="INBOUND" />}
 					isLoading={createInboundInventory.isLoading}
 					cancelText="Huỷ"

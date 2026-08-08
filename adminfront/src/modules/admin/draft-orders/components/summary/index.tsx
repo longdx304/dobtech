@@ -29,6 +29,15 @@ const Summary = ({ dorder, isLoading }: Props) => {
 			</Card>
 		);
 	}
+	const cart = dorder.cart;
+	if (!cart) {
+		return (
+			<Card loading={isLoading}>
+				<Empty description="Đơn nháp chưa có dữ liệu giỏ hàng" />
+			</Card>
+		);
+	}
+	const cartItems = Array.isArray(cart.items) ? cart.items : [];
 
 	return (
 		<>
@@ -49,33 +58,33 @@ const Summary = ({ dorder, isLoading }: Props) => {
 				</Flex>
 			</div>
 			<div>
-				{dorder?.cart?.items?.map((item: any, i: number) => (
+				{cartItems.map((item: any) => (
 					<OrderLine
 						key={item.id}
 						item={item}
-						currencyCode={dorder.cart?.region?.currency_code}
+						currencyCode={cart.region?.currency_code || 'vnd'}
 					/>
 				))}
 				<Divider className="my-2" />
 				<DisplayTotal
-					currency={dorder.cart?.region?.currency_code}
-					totalAmount={dorder.cart?.subtotal}
+					currency={cart.region?.currency_code || 'vnd'}
+					totalAmount={cart.subtotal ?? 0}
 					totalTitle={'Tạm tính'}
 				/>
 				<DisplayTotal
-					currency={dorder.cart?.region?.currency_code}
-					totalAmount={dorder.cart?.shipping_total}
+					currency={cart.region?.currency_code || 'vnd'}
+					totalAmount={cart.shipping_total ?? 0}
 					totalTitle={'Vận chuyển'}
 				/>
 				<DisplayTotal
-					currency={dorder.cart?.region?.currency_code}
-					totalAmount={dorder.cart.tax_total}
+					currency={cart.region?.currency_code || 'vnd'}
+					totalAmount={cart.tax_total ?? 0}
 					totalTitle={'Thuế'}
 				/>
 				<DisplayTotal
 					variant={'large'}
-					currency={dorder.cart?.region?.currency_code}
-					totalAmount={dorder.cart.total}
+					currency={cart.region?.currency_code || 'vnd'}
+					totalAmount={cart.total ?? 0}
 					totalTitle={'Tổng tiền'}
 				/>
 			</div>
@@ -84,10 +93,10 @@ const Summary = ({ dorder, isLoading }: Props) => {
 			state={editState}
 			onClose={closeEdit}
 			draftOrderId={dorder.id}
-			cartItems={(dorder.cart?.items as any) ?? []}
-			currencyCode={dorder.cart?.region?.currency_code ?? 'vnd'}
-			regionId={dorder.cart?.region_id ?? ''}
-			customerId={dorder.cart?.customer_id ?? ''}
+			cartItems={cartItems as any}
+			currencyCode={cart.region?.currency_code ?? 'vnd'}
+			regionId={cart.region_id ?? ''}
+			customerId={cart.customer_id ?? ''}
 		/>
 		</>
 	);

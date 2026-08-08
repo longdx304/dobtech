@@ -79,7 +79,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	};
 
 	const lineItems = useMemo(() => {
-		if (!supplierOrder?.items) return [];
+		if (!Array.isArray(supplierOrder?.items)) return [];
 
 		const itemsByStatus = supplierOrder.items.filter((item: LineItem) => {
 			const warehouse_quantity = item.warehouse_quantity ?? 0;
@@ -91,10 +91,10 @@ const InboundDetail: FC<Props> = ({ id }) => {
 
 		return itemsByStatus
 			.filter((item: LineItem) => {
-				const title = item.title.toLowerCase();
-				const description = item?.description?.toLowerCase();
+				const title = (item.title || '').toLowerCase();
+				const description = (item.description || '').toLowerCase();
 				const search = searchValue.toLowerCase();
-				return title.includes(search) || description?.includes(search);
+				return title.includes(search) || description.includes(search);
 			})
 			.sort((a, b) => {
 				return (
@@ -130,7 +130,10 @@ const InboundDetail: FC<Props> = ({ id }) => {
 	};
 
 	const handleComplete = async () => {
-		const isProcessing = supplierOrder?.items.some(
+		const supplierItems = Array.isArray(supplierOrder?.items)
+			? supplierOrder.items
+			: [];
+		const isProcessing = supplierItems.some(
 			(item) => item.warehouse_quantity < 0
 		);
 		if (isProcessing) {
@@ -138,7 +141,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 			return;
 		}
 
-		const isUnsufficientQuantity = supplierOrder?.items.some(
+		const isUnsufficientQuantity = supplierItems.some(
 			(item) => item.warehouse_quantity < item.quantity
 		);
 
@@ -295,7 +298,7 @@ const InboundDetail: FC<Props> = ({ id }) => {
 					handleCancel={onCloseConfirm}
 				>
 					{/* Danh sách san pham */}
-					{supplierOrder?.items.map((item, idx) => {
+					{supplierOrder?.items?.map((item, idx) => {
 						return (
 							<FulfillmentLine
 								item={item as LineItem}

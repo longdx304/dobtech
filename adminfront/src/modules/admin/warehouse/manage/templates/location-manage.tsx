@@ -17,15 +17,22 @@ import { Modal as AntdModal, message, Pagination } from 'antd';
 import debounce from 'lodash/debounce';
 import { ActionAbles } from '@/components/Dropdown';
 import { Minus, Pen, Plus, Search, Trash2 } from 'lucide-react';
-import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import ModalAddVariantWarehouse from '../components/modal-add-variant-warehouse';
 import ModalAddWarehouse from '../components/modal-add-warehouse';
 import ModalVariantInventory from '../components/modal-variant-inventory';
 import { expandedColumns, warehouseColumns } from './location-columns';
+import {
+	formatInventoryQuantity,
+	getInventoryUnitIssue,
+} from '../../utils/inventory-display';
 
 type Props = {};
 
 const DEFAULT_PAGE_SIZE = 300;
+
+const normalizeInventories = (inventories: unknown): WarehouseInventory[] =>
+	Array.isArray(inventories) ? inventories.filter(Boolean) : [];
 
 const LocationManage: FC<Props> = ({}) => {
 	const deleteWarehouse = useAdminDeleteWarehouse();
@@ -67,18 +74,31 @@ const LocationManage: FC<Props> = ({}) => {
 		offset,
 		order: '-inventories.updated_at',
 	});
+	const warehouseList = useMemo(
+		() => (Array.isArray(warehouse) ? warehouse.filter(Boolean) : []),
+		[warehouse]
+	);
 
 	useEffect(() => {
-		if (warehouse?.length) {
-			const keys = warehouse.map((item) => item.id);
-			setExpandedKeys(keys);
-		}
-	}, [warehouse]);
+		setExpandedKeys(warehouseList.map((item) => item.id));
+	}, [warehouseList]);
 
-	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
-		const { value: inputValue } = e.target;
-		setSearchValue(inputValue);
-	}, 500);
+	const handleChangeDebounce = useMemo(
+		() =>
+			debounce((inputValue: string) => {
+				setSearchValue(inputValue.trim());
+				setOffset(0);
+				setNumPages(1);
+			}, 500),
+		[]
+	);
+
+	useEffect(
+		() => () => {
+			handleChangeDebounce.cancel();
+		},
+		[handleChangeDebounce]
+	);
 
 	const handleChangePage = (page: number) => {
 		setNumPages(page);
@@ -115,7 +135,13 @@ const LocationManage: FC<Props> = ({}) => {
 
 	// Add variant inventory
 	const handleAddInventory = (item: WarehouseInventory) => {
-		item && item.item_unit && setSelectedUnit(item.item_unit.id);
+		const issue = getInventoryUnitIssue(item);
+		if (issue) {
+			message.error(`${issue}. Không thể nhập hàng cho bản ghi này.`);
+			return;
+		}
+
+		setSelectedUnit(item.item_unit!.id);
 		setQuantity(1);
 		setWarehouseInventory(item);
 		setInventoryType('INBOUND');
@@ -123,7 +149,13 @@ const LocationManage: FC<Props> = ({}) => {
 	};
 	// Remove variant inventory
 	const handleRemoveInventory = (item: WarehouseInventory) => {
-		item && item.item_unit && setSelectedUnit(item.item_unit.id);
+		const issue = getInventoryUnitIssue(item);
+		if (issue) {
+			message.error(`${issue}. Không thể xuất hàng cho bản ghi này.`);
+			return;
+		}
+
+		setSelectedUnit(item.item_unit!.id);
 		setQuantity(1);
 		setWarehouseInventory(item);
 		setInventoryType('OUTBOUND');
@@ -144,12 +176,13 @@ const LocationManage: FC<Props> = ({}) => {
 	});
 
 	const expandedRowRender = (record: Warehouse) => {
-		if (!record.inventories?.length) return null;
+		const inventories = normalizeInventories(record.inventories);
+		if (!inventories.length) return null;
 
 		return (
 			<Table
 				columns={expandColumns as any}
-				dataSource={record.inventories}
+				dataSource={inventories}
 				rowKey="id"
 				pagination={false}
 			/>
@@ -158,12 +191,11 @@ const LocationManage: FC<Props> = ({}) => {
 
 	// Use warehouse for display, sorted by search relevance
 	const displayWarehouse = useMemo(() => {
-		if (!warehouse) return [];
-		if (!searchValue) return warehouse;
+		if (!searchValue) return warehouseList;
 		const q = searchValue.toLowerCase();
-		return [...warehouse].sort((a, b) => {
-			const aLoc = a.location.toLowerCase();
-			const bLoc = b.location.toLowerCase();
+		return [...warehouseList].sort((a, b) => {
+			const aLoc = (a.location || '').toLowerCase();
+			const bLoc = (b.location || '').toLowerCase();
 			const aExact = aLoc === q;
 			const bExact = bLoc === q;
 			if (aExact !== bExact) return aExact ? -1 : 1;
@@ -172,8 +204,8 @@ const LocationManage: FC<Props> = ({}) => {
 			if (aStarts !== bStarts) return aStarts ? -1 : 1;
 			return aLoc.localeCompare(bLoc);
 		});
-	}, [warehouse, searchValue]);
-	const displayCount = count || 0;
+	}, [warehouseList, searchValue]);
+	const displayCount = Number(count) || 0;
 
 	return (
 		<Flex vertical gap={12}>
@@ -190,7 +222,7 @@ const LocationManage: FC<Props> = ({}) => {
 						placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
 						name="search"
 						prefix={<Search size={16} />}
-						onChange={handleChangeDebounce}
+						onChange={(event) => handleChangeDebounce(event.target.value)}
 						className="w-[300px] mr-2"
 					/>
 					<Button
@@ -268,11 +300,8 @@ const LocationManage: FC<Props> = ({}) => {
 								/>
 							</Flex>
 
-							{item.inventories?.map((inv) => {
-								const baseQuantity =
-									inv.item_unit?.quantity && inv.item_unit.quantity > 0
-										? inv.quantity / inv.item_unit.quantity
-										: inv.quantity;
+							{normalizeInventories(item.inventories).map((inv) => {
+								const issue = getInventoryUnitIssue(inv);
 
 								return (
 									<div
@@ -283,14 +312,19 @@ const LocationManage: FC<Props> = ({}) => {
 											<p className="text-xs font-medium break-words">
 												{inv.variant?.product?.title} - {inv.variant?.title}
 											</p>
-											<p className="text-[11px] text-gray-500">
-												{baseQuantity}{' '}
-												{inv.item_unit?.unit
-													? `${inv.item_unit.unit} (${inv.quantity} đôi)`
-													: inv.quantity}
+											<p
+												className={`text-[11px] ${
+													issue ? 'text-amber-600' : 'text-gray-500'
+												}`}
+											>
+												{formatInventoryQuantity(inv)}
 											</p>
 										</div>
-										<div className="flex items-center gap-3">
+										<div
+											className={`flex items-center gap-3 ${
+												issue ? 'opacity-40' : ''
+											}`}
+										>
 											<Minus
 												onClick={() => handleRemoveInventory(inv)}
 												size={18}

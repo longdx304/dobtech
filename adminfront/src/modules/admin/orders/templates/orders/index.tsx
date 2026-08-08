@@ -60,6 +60,7 @@ const OrderList: FC<Props> = () => {
 			keepPreviousData: true,
 		}
 	);
+	const orderList = Array.isArray(orders) ? orders.filter(Boolean) : [];
 
 	const handleChangeDebounce = _.debounce(
 		(e: ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +110,9 @@ const OrderList: FC<Props> = () => {
 		setFilters(formattedFilters);
 	};
 
-	const selectedOrders = orders?.filter(order => selectedRowKeys.includes(order.id)) || [];
+	const selectedOrders = orderList.filter((order) =>
+		selectedRowKeys.includes(order.id)
+	);
 
 
 	return (
@@ -131,7 +134,7 @@ const OrderList: FC<Props> = () => {
 		<Table
 			loading={isLoading}
 			columns={columns as any}
-			dataSource={orders ?? []}
+			dataSource={orderList}
 			rowKey="id"
 			scroll={{ x: 700 }}
 			rowSelection={{
