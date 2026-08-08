@@ -73,13 +73,13 @@ const FulfillmentLine = ({
 		{ enabled: isLocationFulfillmentEnabled }
 	);
 
-	const hasInventoryItem = !!variant?.inventory.length;
+	const hasInventoryItem = Array.isArray(variant?.inventory) && variant.inventory.length > 0;
 
 	const { availableQuantity, inStockQuantity } = useMemo(() => {
 		if (!isLocationFulfillmentEnabled) {
 			return {
-				availableQuantity: item.variant.inventory_quantity,
-				inStockQuantity: item.variant.inventory_quantity,
+				availableQuantity: item.variant?.inventory_quantity ?? 0,
+				inStockQuantity: item.variant?.inventory_quantity ?? 0,
 			};
 		}
 

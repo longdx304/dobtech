@@ -78,7 +78,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 	};
 
 	const lineItems = useMemo(() => {
-		if (!order?.items) return [];
+		if (!Array.isArray(order?.items)) return [];
 
 		const itemsByStatus = order.items.filter((item: any) => {
 			const lineItem = item as LineItem;
@@ -92,10 +92,10 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 		return itemsByStatus
 			.filter((item: any) => {
 				const lineItem = item as LineItem;
-				const title = lineItem.title.toLowerCase();
-				const description = lineItem?.description?.toLowerCase();
+				const title = (lineItem.title || '').toLowerCase();
+				const description = (lineItem.description || '').toLowerCase();
 				const search = searchValue.toLowerCase();
-				return title.includes(search) || description?.includes(search);
+				return title.includes(search) || description.includes(search);
 			})
 			.sort((a, b) => {
 				return (
@@ -279,7 +279,7 @@ const OutboundDetail: FC<Props> = ({ id }) => {
 					handleCancel={onCloseConfirm}
 				>
 					{/* Danh sách san pham */}
-					{order?.items.map((item, idx) => {
+					{order?.items?.map((item, idx) => {
 						return (
 							<FulfillmentLine
 								item={item as LineItem}

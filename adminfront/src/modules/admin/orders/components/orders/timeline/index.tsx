@@ -29,8 +29,7 @@ import {
 	Region
 } from '@medusajs/medusa';
 import { Empty, message } from 'antd';
-import { isEmpty } from 'lodash';
-import { FileDown, RotateCcw, Warehouse } from 'lucide-react';
+import { FileDown, Warehouse } from 'lucide-react';
 import { useAdminOrder, useAdminUpdateOrder } from 'medusa-react';
 import { useState } from 'react';
 import { pdfOrderRes } from '../new-order';
@@ -87,79 +86,79 @@ const Timeline = ({
 		orderId,
 		{
 			expand: orderRelations,
-		},
-		{
-			enabled: showRequestReturn || showCreateSwap || showRegisterClaim,
 		}
 	);
 
-	const generateFilePdf = async (): Promise<string> => {
-		let pdfUrl = '';
-		let pdfReq = {} as pdfOrderRes;
-		if (!isEmpty(order)) {
-			const { items, shipping_address } = order!;
-			const address = `${shipping_address?.address_1 ?? ''}, ${shipping_address?.address_2 ?? ''
-				}, ${shipping_address?.province ?? ''}, ${shipping_address?.city ?? ''
-				}, ${shipping_address?.country_code ?? ''}`;
-
-			pdfReq = {
-				email: order!.customer.email,
-				userId: user!.id,
-				user: user,
-				customer: {
-					first_name: order!.customer.first_name,
-					last_name: order!.customer.last_name,
-					email: order!.customer.email,
-					phone: order!.customer.phone,
-				},
-				address,
-				lineItems:
-					items?.map((i: LineItem) => ({
-						variantId: i.variant_id ?? '',
-						quantity: i.quantity,
-						unit_price: i.unit_price,
-						title: `${i.title} - ${i.description}`,
-						sku: i.variant?.sku || '',
-					})) ?? [],
-				totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
-				countryCode: shipping_address!.country_code!,
-				isSendEmail: false,
-				customerNote: getCustomerNote(order!.customer),
-			};
-
-			// Generate pdf blob
-			const pdfBlob = await generatePdfBlob(pdfReq!);
-
-			// Create a File object
-			const fileName = `purchase-order.pdf`;
-
-			// Create a File object
-			const files = new File([pdfBlob], fileName, {
-				type: 'application/pdf',
-			});
-
-			// Upload pdf to s3 using Medusa uploads API
-			const uploadRes = await uploadFile.mutateAsync({
-				files,
-				prefix: 'orders',
-			});
-
-			pdfUrl = uploadRes.uploads[0].url;
+	const buildPdfRequest = (): pdfOrderRes => {
+		if (!order?.customer) {
+			throw new Error('Đơn hàng không có thông tin khách hàng');
+		}
+		if (!user) {
+			throw new Error('Không thể xác định người dùng hiện tại');
 		}
 
+		const items = Array.isArray(order.items) ? order.items : [];
+		const shippingAddress = order.shipping_address;
+		const address = [
+			shippingAddress?.address_1,
+			shippingAddress?.address_2,
+			shippingAddress?.province,
+			shippingAddress?.city,
+			shippingAddress?.country_code,
+		]
+			.filter(Boolean)
+			.join(', ');
+
+		return {
+			email: order.customer.email || '',
+			userId: user.id,
+			user,
+			customer: {
+				first_name: order.customer.first_name,
+				last_name: order.customer.last_name,
+				email: order.customer.email,
+				phone: order.customer.phone,
+			},
+			address,
+			lineItems: items.map((item: LineItem) => ({
+				variantId: item.variant_id ?? '',
+				quantity: Number(item.quantity) || 0,
+				unit_price: Number(item.unit_price) || 0,
+				title: `${item.title || 'Sản phẩm chưa xác định'} - ${
+					item.description || ''
+				}`,
+				sku: item.variant?.sku || '',
+			})),
+			totalQuantity: items.reduce(
+				(total, item) => total + (Number(item.quantity) || 0),
+				0
+			),
+			countryCode: shippingAddress?.country_code || '',
+			isSendEmail: false,
+			customerNote: getCustomerNote(order.customer),
+		};
+	};
+
+	const generateFilePdf = async (): Promise<string> => {
+		const pdfBlob = await generatePdfBlob(buildPdfRequest());
+		const files = new File([pdfBlob], 'purchase-order.pdf', {
+			type: 'application/pdf',
+		});
+		const uploadRes = await uploadFile.mutateAsync({ files, prefix: 'orders' });
+		const pdfUrl = uploadRes.uploads?.[0]?.url;
+		if (!pdfUrl) throw new Error('Không nhận được đường dẫn file PDF');
 		return pdfUrl;
 	};
 
 	const updateDocFileOrder = async () => {
-		message.loading('Đang cập nhật file order...');
-		const pdfUrl = await generateFilePdf();
+		try {
+			message.loading('Đang cập nhật file order...');
+			const pdfUrl = await generateFilePdf();
+			const files: any[] = Array.isArray(order?.metadata?.files)
+				? order.metadata.files
+				: [];
 
-		let files: any[] = Array.isArray(order?.metadata?.files)
-			? order.metadata.files
-			: [];
-
-		await updateOrder.mutateAsync(
-			{
+			await updateOrder.mutateAsync({
 				metadata: {
 					files: [
 						...files,
@@ -170,57 +169,32 @@ const Timeline = ({
 						},
 					],
 				},
-			} as AdminPostOrdersOrderReq & { metadata: { files: any[] } },
-			{
-				onSuccess: () => {
-					refetchOrder();
-					message.success('Cập nhật file order thành công');
-				},
-				onError: (err: any) => {
-					message.error(getErrorMessage(err));
-				},
-			}
-		);
+			} as AdminPostOrdersOrderReq & { metadata: { files: any[] } });
+			refetchOrder();
+			message.success('Cập nhật file order thành công');
+		} catch (error) {
+			message.error(getErrorMessage(error));
+		}
 	};
 
 	const updateHandoverFileOrder = async () => {
-		message.loading('Đang tạo biên bản bàn giao...');
-		let pdfUrl = '';
-		if (!isEmpty(order)) {
-			const { items, shipping_address } = order!;
-			const address = `${shipping_address?.address_1 ?? ''}, ${shipping_address?.address_2 ?? ''}, ${shipping_address?.province ?? ''}, ${shipping_address?.city ?? ''}, ${shipping_address?.country_code ?? ''}`;
-			const pdfReq: pdfOrderRes = {
-				email: order!.customer.email,
-				userId: user!.id,
-				user: user,
-				customer: {
-					first_name: order!.customer.first_name,
-					last_name: order!.customer.last_name,
-					email: order!.customer.email,
-					phone: order!.customer.phone,
-				},
-				address,
-				lineItems: items?.map((i: LineItem) => ({
-					variantId: i.variant_id ?? '',
-					quantity: i.quantity,
-					unit_price: i.unit_price,
-					title: `${i.title} - ${i.description}`,
-					sku: i.variant?.sku || '',
-				})) ?? [],
-				totalQuantity: items.reduce((acc, i) => acc + i.quantity, 0),
-				countryCode: shipping_address!.country_code!,
-				isSendEmail: false,
-				customerNote: getCustomerNote(order!.customer),
-			};
-			const pdfBlob = await generateHandoverPdfBlob(pdfReq);
-			const files_upload = new File([pdfBlob], 'handover.pdf', { type: 'application/pdf' });
-			const uploadRes = await uploadFile.mutateAsync({ files: files_upload, prefix: 'orders' });
-			pdfUrl = uploadRes.uploads[0].url;
-		}
+		try {
+			message.loading('Đang tạo biên bản bàn giao...');
+			const pdfBlob = await generateHandoverPdfBlob(buildPdfRequest());
+			const handoverFile = new File([pdfBlob], 'handover.pdf', {
+				type: 'application/pdf',
+			});
+			const uploadRes = await uploadFile.mutateAsync({
+				files: handoverFile,
+				prefix: 'orders',
+			});
+			const pdfUrl = uploadRes.uploads?.[0]?.url;
+			if (!pdfUrl) throw new Error('Không nhận được đường dẫn file PDF');
 
-		let files: any[] = Array.isArray(order?.metadata?.files) ? order.metadata.files : [];
-		await updateOrder.mutateAsync(
-			{
+			const files: any[] = Array.isArray(order?.metadata?.files)
+				? order.metadata.files
+				: [];
+			await updateOrder.mutateAsync({
 				metadata: {
 					files: [
 						...files,
@@ -231,26 +205,20 @@ const Timeline = ({
 						},
 					],
 				},
-			} as AdminPostOrdersOrderReq & { metadata: { files: any[] } },
-			{
-				onSuccess: () => {
-					refetchOrder();
-					message.success('Tạo biên bản bàn giao thành công');
-				},
-				onError: (err: any) => {
-					message.error(getErrorMessage(err));
-				},
-			}
-		);
+			} as AdminPostOrdersOrderReq & { metadata: { files: any[] } });
+			refetchOrder();
+			message.success('Tạo biên bản bàn giao thành công');
+		} catch (error) {
+			message.error(getErrorMessage(error));
+		}
 	};
 
 	const handleTransferToWarehouse = async () => {
-		message.loading('Đang chuyển đơn hàng sang kho...');
+		try {
+			message.loading('Đang chuyển đơn hàng sang kho...');
+			const currentMetadata = order?.metadata ? { ...order.metadata } : {};
 
-		const currentMetadata = order?.metadata ? { ...order.metadata } : {};
-
-		await updateOrder.mutateAsync(
-			{
+			await updateOrder.mutateAsync({
 				metadata: {
 					...currentMetadata,
 					transferred_to_warehouse: true,
@@ -258,17 +226,12 @@ const Timeline = ({
 					transferred_by_user_id: user?.id,
 					transferred_by_user_name: `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim(),
 				},
-			} as AdminPostOrdersOrderReq & { metadata: any },
-			{
-				onSuccess: () => {
-					refetchOrder();
-					message.success('Chuyển đơn hàng sang kho thành công');
-				},
-				onError: (err: any) => {
-					message.error(getErrorMessage(err));
-				},
-			}
-		);
+			} as AdminPostOrdersOrderReq & { metadata: any });
+			refetchOrder();
+			message.success('Chuyển đơn hàng sang kho thành công');
+		} catch (error) {
+			message.error(getErrorMessage(error));
+		}
 	};
 
 	const actions = [

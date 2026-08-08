@@ -56,8 +56,8 @@ const ModalAddVariant: FC<Props> = ({
 		if (warehouse) {
 			const q = (searchValue || '').toLowerCase();
 			const sorted = [...warehouse].sort((a, b) => {
-				const aLoc = a.location.toLowerCase();
-				const bLoc = b.location.toLowerCase();
+				const aLoc = (a.location || '').toLowerCase();
+				const bLoc = (b.location || '').toLowerCase();
 				const aExact = aLoc === q;
 				const bExact = bLoc === q;
 				if (aExact !== bExact) return aExact ? -1 : 1;
@@ -67,7 +67,7 @@ const ModalAddVariant: FC<Props> = ({
 				return aLoc.localeCompare(bLoc);
 			});
 			const options = sorted.map((w: Warehouse) => ({
-				label: w.location,
+				label: w.location || 'Vị trí không xác định',
 				value: w.id,
 			}));
 			setOptionWarehouses(options);

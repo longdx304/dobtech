@@ -28,12 +28,20 @@ const ShipmentItem: React.FC<ShipmentItemProps> = ({
 		FulfullmentStatus.CANCELED,
 	].includes(item?.status);
 	const isStart = !item?.shipped_id;
+	const order = item.order;
+	const customer = order?.customer;
 
-	const address = `${item.order.shipping_address?.address_2 ?? ''} ${
-		item.order.shipping_address?.city ?? ''
-	} ${item.order.shipping_address?.address_1 ?? ''} ${
-		item.order.shipping_address?.province ?? ''
-	} ${item.order.shipping_address?.country_code ?? ''}`;
+	const address = order?.shipping_address
+		? [
+				order.shipping_address.address_2,
+				order.shipping_address.city,
+				order.shipping_address.address_1,
+				order.shipping_address.province,
+				order.shipping_address.country_code,
+		  ]
+				.filter(Boolean)
+				.join(' ')
+		: 'Chưa có địa chỉ giao hàng';
 
 	const shipper = item.shipper?.first_name || 'Chưa có người giao hàng';
 	const actions = [
@@ -96,22 +104,24 @@ const ShipmentItem: React.FC<ShipmentItemProps> = ({
 					<div className="flex items-center">
 						<Hash size={14} color="#6b7280" />
 					</div>
-					<Text className="text-sm font-semibold">{item.order.display_id}</Text>
+					<Text className="text-sm font-semibold">{order?.display_id ?? '-'}</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">
 					<div className="flex items-center">
 						<User size={18} color="#6b7280" />
 					</div>
-					<Text className="text-sm font-semibold">{`${
-						item.order.customer.last_name ?? ''
-					} ${item.order.customer.first_name ?? ''}`}</Text>
+					<Text className="text-sm font-semibold">
+						{[customer?.last_name, customer?.first_name]
+							.filter(Boolean)
+							.join(' ') || 'Khách hàng không xác định'}
+					</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">
 					<div className="flex items-center">
 						<Phone size={18} color="#6b7280" />
 					</div>
 					<Text className="text-sm font-semibold">
-						{item.order.customer.phone}
+						{customer?.phone || 'Không có SĐT'}
 					</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">

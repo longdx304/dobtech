@@ -181,6 +181,9 @@ export interface NotificationEvent extends TimelineEvent {
 	title: string;
 }
 
+const asArray = <T,>(value: T[] | null | undefined): T[] =>
+	Array.isArray(value) ? value : [];
+
 export const useBuildTimeline = (orderId: string) => {
 	const { orderRelations } = useOrdersExpandParam();
 
@@ -219,17 +222,17 @@ export const useBuildTimeline = (orderId: string) => {
 			return undefined;
 		}
 
-		let allItems = [...order.items];
+		let allItems = [...asArray(order.items)];
 
-		if (order.swaps && order.swaps.length) {
+		if (order.swaps?.length) {
 			for (const swap of order.swaps) {
-				allItems = [...allItems, ...swap.additional_items];
+				allItems = [...allItems, ...asArray(swap.additional_items)];
 			}
 		}
 
 		if (order.claims && order.claims.length) {
 			for (const claim of order.claims) {
-				allItems = [...allItems, ...claim.additional_items];
+				allItems = [...allItems, ...asArray(claim.additional_items)];
 			}
 		}
 
@@ -259,7 +262,7 @@ export const useBuildTimeline = (orderId: string) => {
 					type: 'edit-created',
 					edit: edit,
 					currency_code: order.currency_code,
-					taxRate: order.region.tax_rate ?? 0,
+					taxRate: order.region?.tax_rate ?? 0,
 				} as OrderEditEvent);
 
 				if (edit.requested_at) {
@@ -340,7 +343,7 @@ export const useBuildTimeline = (orderId: string) => {
 			}
 		}
 
-		for (const event of order.refunds) {
+		for (const event of asArray(order.refunds)) {
 			events.push({
 				amount: event.amount,
 				currencyCode: order.currency_code,
@@ -392,7 +395,7 @@ export const useBuildTimeline = (orderId: string) => {
 			} as TransferredToWarehouseEvent);
 		}
 
-		for (const payment of order.payments) {
+		for (const payment of asArray(order.payments)) {
 			const paidData = payment.data?.paid;
 			if (_.isArray(paidData) && paidData.length > 0) {
 				for (const paid of paidData) {
@@ -408,14 +411,14 @@ export const useBuildTimeline = (orderId: string) => {
 			}
 		}
 
-		for (const event of order.fulfillments) {
+		for (const event of asArray(order.fulfillments)) {
 			events.push({
 				id: event.id,
 				time: event.created_at,
 				type: 'fulfilled',
-				items: event.items.map((item: any) =>
-					getFulfilmentItem(allItems, edits, item)
-				),
+				items: asArray(event.items)
+					.map((item: any) => getFulfilmentItem(allItems, edits, item))
+					.filter(Boolean),
 				noNotification: event.no_notification,
 				orderId: order.id,
 				locationName: getLocationNameById(event.location_id),
@@ -433,9 +436,9 @@ export const useBuildTimeline = (orderId: string) => {
 					id: event.id,
 					time: event.shipped_at,
 					type: 'shipped',
-					items: event.items.map((item: any) =>
-						getFulfilmentItem(allItems, edits, item)
-					),
+					items: asArray(event.items)
+						.map((item: any) => getFulfilmentItem(allItems, edits, item))
+						.filter(Boolean),
 					noNotification: event.no_notification,
 					orderId: order.id,
 					locationName: getLocationNameById(event.location_id),
@@ -444,10 +447,10 @@ export const useBuildTimeline = (orderId: string) => {
 			}
 		}
 
-		for (const event of order.returns) {
+		for (const event of asArray(order.returns)) {
 			events.push({
 				id: event.id,
-				items: event.items
+				items: asArray(event.items)
 					.map((i: any) => getReturnItems(allItems, edits, i))
 					// Can be undefined while `edits` is loading
 					.filter((i: any) => !!i),
@@ -465,7 +468,7 @@ export const useBuildTimeline = (orderId: string) => {
 			if (event.status !== 'requested') {
 				events.push({
 					id: event.id,
-					items: event.items
+					items: asArray(event.items)
 						.map((i: any) => getReturnItems(allItems, edits, i))
 						// Can be undefined while `edits` is loading
 						.filter((i: any) => !!i),
@@ -481,20 +484,23 @@ export const useBuildTimeline = (orderId: string) => {
 			}
 		}
 
-		for (const event of order.swaps) {
+		for (const event of asArray(order.swaps)) {
+			const returnOrder = event.return_order;
+			const swapFulfillments = asArray<any>(event.fulfillments);
+			const firstFulfillment = swapFulfillments[0];
 			events.push({
 				id: event.id,
 				time: event.canceled_at ? event.canceled_at : event.created_at,
 				noNotification: event.no_notification === true,
 				fulfillmentStatus: event.fulfillment_status,
-				returnId: event.return_order.id,
+				returnId: returnOrder?.id,
 				paymentStatus: event.payment_status,
-				returnStatus: event.return_order.status,
+				returnStatus: returnOrder?.status,
 				type: 'exchange',
-				newItems: event.additional_items.map((i: any) => getSwapItem(i)),
-				returnItems: event.return_order.items.map((i: any) =>
+				newItems: asArray(event.additional_items).map((i: any) => getSwapItem(i)),
+				returnItems: asArray(returnOrder?.items).map((i: any) =>
 					getReturnItems(allItems, edits, i)
-				),
+				).filter(Boolean),
 				exchangeCartId:
 					event.payment_status !== 'captured' ? event.cart_id : undefined,
 				canceledAt: event.canceled_at,
@@ -508,20 +514,20 @@ export const useBuildTimeline = (orderId: string) => {
 			) {
 				events.push({
 					id: event.id,
-					time: event.fulfillments[0]?.created_at,
+					time: firstFulfillment?.created_at || event.updated_at,
 					type: 'fulfilled',
-					items: event.additional_items.map((i: any) => getSwapItem(i)),
+					items: asArray(event.additional_items).map((i: any) => getSwapItem(i)),
 					noNotification: event.no_notification,
 					orderId: order.id,
 					sourceType: 'exchange',
 				} as ItemsFulfilledEvent);
 
-				if (event.fulfillments[0]?.shipped_at) {
+				if (firstFulfillment?.shipped_at) {
 					events.push({
 						id: event.id,
-						time: event.fulfillments[0].shipped_at,
+						time: firstFulfillment.shipped_at,
 						type: 'shipped',
-						items: event.additional_items.map((i: any) => getSwapItem(i)),
+						items: asArray(event.additional_items).map((i: any) => getSwapItem(i)),
 						noNotification: event.no_notification,
 						orderId: order.id,
 						sourceType: 'exchange',
@@ -530,12 +536,13 @@ export const useBuildTimeline = (orderId: string) => {
 			}
 		}
 
-		if (order.claims) {
-			for (const claim of order.claims) {
+		for (const claim of asArray(order.claims)) {
+				const claimFulfillments = asArray<any>(claim.fulfillments);
+				const firstFulfillment = claimFulfillments[0];
 				events.push({
 					id: claim.id,
 					type: 'claim',
-					newItems: claim.additional_items.map((i: any) => ({
+					newItems: asArray(claim.additional_items).map((i: any) => ({
 						quantity: i.quantity,
 						title: i.title,
 						thumbnail: i.thumbnail,
@@ -548,7 +555,7 @@ export const useBuildTimeline = (orderId: string) => {
 					refundStatus: claim.payment_status,
 					refundAmount: claim.refund_amount,
 					currencyCode: order.currency_code,
-					claimItems: claim.claim_items.map((i: any) => getClaimItem(i)),
+					claimItems: asArray(claim.claim_items).map((i: any) => getClaimItem(i)),
 					time: claim.canceled_at ? claim.canceled_at : claim.created_at,
 					noNotification: claim.no_notification,
 					claimType: claim.type,
@@ -564,20 +571,20 @@ export const useBuildTimeline = (orderId: string) => {
 				) {
 					events.push({
 						id: claim.id,
-						time: claim.fulfillments[0].created_at,
+						time: firstFulfillment?.created_at || claim.updated_at,
 						type: 'fulfilled',
-						items: claim.additional_items.map((i: any) => getSwapItem(i)),
+						items: asArray(claim.additional_items).map((i: any) => getSwapItem(i)),
 						noNotification: claim.no_notification,
 						orderId: order.id,
 						sourceType: 'claim',
 					} as ItemsFulfilledEvent);
 
-					if (claim.fulfillments[0].shipped_at) {
+					if (firstFulfillment?.shipped_at) {
 						events.push({
 							id: claim.id,
-							time: claim.fulfillments[0].shipped_at,
+							time: firstFulfillment.shipped_at,
 							type: 'shipped',
-							items: claim.additional_items.map((i: any) => getSwapItem(i)),
+							items: asArray(claim.additional_items).map((i: any) => getSwapItem(i)),
 							noNotification: claim.no_notification,
 							orderId: order.id,
 							sourceType: 'claim',
@@ -588,7 +595,7 @@ export const useBuildTimeline = (orderId: string) => {
 					events.push({
 						id: `${claim.id}-created`,
 						type: 'claim',
-						newItems: claim.additional_items.map((i: any) => ({
+						newItems: asArray(claim.additional_items).map((i: any) => ({
 							quantity: i.quantity,
 							title: i.title,
 							thumbnail: i.thumbnail,
@@ -600,7 +607,7 @@ export const useBuildTimeline = (orderId: string) => {
 						refundStatus: claim.payment_status,
 						refundAmount: claim.refund_amount,
 						currencyCode: order.currency_code,
-						claimItems: claim.claim_items.map((i: any) => getClaimItem(i)),
+						claimItems: asArray(claim.claim_items).map((i: any) => getClaimItem(i)),
 						time: claim.created_at,
 						noNotification: claim.no_notification,
 						claimType: claim.type,
@@ -608,7 +615,6 @@ export const useBuildTimeline = (orderId: string) => {
 						orderId: order.id,
 					} as ClaimEvent);
 				}
-			}
 		}
 
 		if (notifications) {
@@ -661,7 +667,7 @@ export const useBuildTimeline = (orderId: string) => {
 };
 
 function getLineItem(allItems: any, itemId: any) {
-	const line = allItems.find((line: any) => line.id === itemId);
+	const line = asArray<any>(allItems).find((line: any) => line.id === itemId);
 
 	if (!line) {
 		return;
@@ -678,7 +684,7 @@ function getLineItem(allItems: any, itemId: any) {
 function findOriginalItemId(edits: any, originalId: any) {
 	let currentId = originalId;
 
-	edits = edits
+	edits = asArray<any>(edits)
 		.filter((e: any) => !!e.confirmed_at) // only confirmed OEs are cloning line items
 		.sort(
 			// (a: any, b: any) => new Date(a.confirmed_at) - new Date(b.confirmed_at)
@@ -687,7 +693,7 @@ function findOriginalItemId(edits: any, originalId: any) {
 		);
 
 	for (const edit of edits) {
-		const clonedItem = edit.items.find(
+		const clonedItem = asArray<any>(edit.items).find(
 			(e: any) => e.original_item_id === currentId
 		);
 		if (clonedItem) {
@@ -706,7 +712,7 @@ function getReturnItems(allItems: any, edits: any, item: any) {
 		id = findOriginalItemId(edits, id);
 	}
 
-	const line = allItems.find((li: any) => li.id === id);
+	const line = asArray<any>(allItems).find((li: any) => li.id === id);
 
 	if (!line) {
 		return;
@@ -725,12 +731,13 @@ function getReturnItems(allItems: any, edits: any, item: any) {
 }
 
 function getClaimItem(claimItem: any) {
+	const item = claimItem?.item;
 	return {
-		title: claimItem.item.title,
-		quantity: claimItem.quantity,
-		thumbnail: claimItem.item.thumbnail,
+		title: item?.title || 'Sản phẩm không xác định',
+		quantity: claimItem?.quantity ?? 0,
+		thumbnail: item?.thumbnail,
 		variant: {
-			title: claimItem.item.variant?.title,
+			title: item?.variant?.title || '-',
 		},
 	};
 }
@@ -745,7 +752,7 @@ function getSwapItem(item: any) {
 }
 
 function getWasRefundClaim(claimId: any, order: any) {
-	const claim = order.claims.find((c: any) => c.id === claimId);
+	const claim = asArray<any>(order?.claims).find((c: any) => c.id === claimId);
 
 	if (!claim) {
 		return false;
@@ -760,7 +767,7 @@ function getFulfilmentItem(allItems: any, edits: any, item: any) {
 		id = findOriginalItemId(edits, id);
 	}
 
-	const line = allItems.find((line: any) => line.id === id);
+	const line = asArray<any>(allItems).find((line: any) => line.id === id);
 
 	if (!line) {
 		return;

@@ -16,7 +16,8 @@ export const getAllReturnableItems = (
 	isClaim: boolean
 ): Omit<LineItem, 'beforeInsert'>[] => {
 	// Initialize the map of order items and claimed items
-	let orderItems = order.items.reduce(
+	const baseItems = Array.isArray(order.items) ? order.items : [];
+	let orderItems = baseItems.reduce(
 		(map, obj) => map.set(obj.id, { ...obj }),
 
 		new Map<string, Omit<LineItem, 'beforeInsert'>>()
@@ -25,12 +26,15 @@ export const getAllReturnableItems = (
 	let claimedItems: ClaimItem[] = [];
 
 	// Process claims
-	if (order?.claims?.length) {
-		for (const claim of order.claims) {
+	const claims = Array.isArray(order?.claims) ? order.claims : [];
+	if (claims.length) {
+		for (const claim of claims) {
 			// Skip claims with canceled return orders
 			if (claim.return_order?.status !== 'canceled') {
-				claim.claim_items = claim.claim_items ?? [];
-				claimedItems = [...claimedItems, ...claim.claim_items];
+				const claimItems = Array.isArray(claim.claim_items)
+					? claim.claim_items
+					: [];
+				claimedItems = [...claimedItems, ...claimItems];
 			}
 
 			// Skip claims with not fulfilled fulfillment status or payment status 'na'
@@ -42,7 +46,7 @@ export const getAllReturnableItems = (
 			}
 
 			// Add additional items to the order items map
-			if (claim?.additional_items?.length) {
+			if (Array.isArray(claim?.additional_items)) {
 				orderItems = claim.additional_items
 					.filter(
 						(it: any) =>
@@ -59,15 +63,19 @@ export const getAllReturnableItems = (
 
 	// Process swaps for non-claim orders
 	if (!isClaim) {
-		if (order?.swaps?.length) {
-			for (const swap of order.swaps) {
+		const swaps = Array.isArray(order?.swaps) ? order.swaps : [];
+		if (swaps.length) {
+			for (const swap of swaps) {
 				// Skip swaps with not fulfilled fulfillment status
 				if (swap.fulfillment_status === 'not_fulfilled') {
 					continue;
 				}
 
 				// Add additional items to the order items map
-				orderItems = swap.additional_items.reduce(
+				const additionalItems = Array.isArray(swap.additional_items)
+					? swap.additional_items
+					: [];
+				orderItems = additionalItems.reduce(
 					(map: any, obj: any) =>
 						map.set(obj.id, {
 							...obj,

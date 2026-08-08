@@ -9,6 +9,10 @@ import VariantInventoryForm from '@/modules/admin/warehouse/components/variant-i
 import { WarehouseInventory } from '@/types/warehouse';
 import { message, Spin } from 'antd';
 import { FC } from 'react';
+import {
+	getInventoryMaxQuantity,
+	getInventoryUnitIssue,
+} from '../../../utils/inventory-display';
 
 interface Props {
 	isModalOpen: boolean;
@@ -35,6 +39,13 @@ const ModalVariantInventory: FC<Props> = ({
 		addInventoryToWarehouse.isLoading || removeInventoryToWarehouse.isLoading;
 
 	const handleOkModal = async () => {
+		const inventoryIssue = getInventoryUnitIssue(warehouseInventory);
+		if (inventoryIssue) {
+			return message.error(
+				`${inventoryIssue}. Vui lòng cập nhật lại dữ liệu tồn kho trước khi thao tác.`
+			);
+		}
+
 		if (!unitData) {
 			return message.error('Vui lòng chọn loại hàng và số lượng');
 		}
@@ -102,8 +113,7 @@ const ModalVariantInventory: FC<Props> = ({
 					type={inventoryType as 'INBOUND' | 'OUTBOUND'}
 					maxQuantity={
 						inventoryType === 'OUTBOUND'
-							? warehouseInventory.quantity /
-							  warehouseInventory.item_unit.quantity
+							? getInventoryMaxQuantity(warehouseInventory)
 							: undefined
 					}
 				/>

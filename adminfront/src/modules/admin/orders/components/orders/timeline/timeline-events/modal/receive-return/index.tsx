@@ -64,7 +64,8 @@ export const ReceiveReturnModal = ({
 	 */
 	const isRefundedClaim = useMemo(() => {
 		if (returnRequest.claim_order_id) {
-			const claim = order.claims.find(
+			const claims = Array.isArray(order.claims) ? order.claims : [];
+			const claim = claims.find(
 				(c) => c.id === returnRequest.claim_order_id
 			);
 			if (!claim) {

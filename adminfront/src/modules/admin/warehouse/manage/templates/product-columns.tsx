@@ -6,6 +6,10 @@ import { Text } from '@/components/Typography';
 import { ProductVariant } from '@/types/products';
 import { Warehouse, WarehouseInventory } from '@/types/warehouse';
 import { History, Minus, Pen, Plus } from 'lucide-react';
+import {
+	formatInventoryQuantity,
+	getInventoryUnitIssue,
+} from '../../utils/inventory-display';
 
 export interface WarehouseDataType {}
 
@@ -87,8 +91,8 @@ const expandedColumns = ({
 		dataIndex: 'warehouse',
 		className: 'text-xs',
 		fixed: 'left',
-		render: (_: Warehouse) => {
-			return _.location;
+		render: (_: Warehouse | null) => {
+			return _?.location || 'Vị trí không còn tồn tại';
 		},
 	},
 	{
@@ -97,8 +101,16 @@ const expandedColumns = ({
 		dataIndex: 'quantity',
 		className: 'text-xs',
 		render: (_: WarehouseInventory['quantity'], record: WarehouseInventory) => {
-			const quantity = _ / record.item_unit.quantity;
-			return `${quantity} ${record.item_unit.unit} (${_} đôi)`;
+			const issue = getInventoryUnitIssue(record);
+			const value = formatInventoryQuantity(record);
+
+			return issue ? (
+				<Tooltip title={`${issue}. Vui lòng cập nhật lại đơn vị cho tồn kho này.`}>
+					<Text className="text-xs text-amber-600">{value}</Text>
+				</Tooltip>
+			) : (
+				value
+			);
 		},
 	},
 	{
@@ -109,21 +121,24 @@ const expandedColumns = ({
 		className: 'text-xs',
 		align: 'center',
 		render: (_: any, record: WarehouseInventory) => {
+			const issue = getInventoryUnitIssue(record);
 			return (
-				<Flex>
-					<Minus
-						onClick={() => handleRemoveInventory(record)}
-						size={18}
-						color="red"
-						className="cursor-pointer"
-					/>
-					<Plus
-						onClick={() => handleAddInventory(record)}
-						size={18}
-						color="green"
-						className="cursor-pointer"
-					/>
-				</Flex>
+				<Tooltip title={issue || undefined}>
+					<Flex className={issue ? 'opacity-40' : undefined}>
+						<Minus
+							onClick={() => handleRemoveInventory(record)}
+							size={18}
+							color="red"
+							className="cursor-pointer"
+						/>
+						<Plus
+							onClick={() => handleAddInventory(record)}
+							size={18}
+							color="green"
+							className="cursor-pointer"
+						/>
+					</Flex>
+				</Tooltip>
 			);
 		},
 	},

@@ -29,9 +29,17 @@ const InboundModal = ({
 }: Props) => {
 	const layeredModalContext = useContext(LayeredModalContext);
 	const { lineItem, isLoading, refetch } = useAdminLineItem(item.id);
+	const resolvedLineItem = lineItem as LineItem | undefined;
 
 	const handleOk = () => {
-		if ((lineItem.warehouse_quantity ?? 0) > lineItem.quantity) {
+		if (!resolvedLineItem) {
+			message.error('Không thể tải thông tin sản phẩm. Vui lòng thử lại.');
+			return;
+		}
+		if (
+			(resolvedLineItem.warehouse_quantity ?? 0) >
+			resolvedLineItem.quantity
+		) {
 			message.error('Số lượng đã nhập không được lớn hơn số lượng giao');
 			return;
 		}
@@ -48,16 +56,27 @@ const InboundModal = ({
 			className="layered-modal"
 			width={800}
 			loading={isLoading}
+			okButtonProps={{ disabled: isLoading || !resolvedLineItem }}
 			cancelButtonProps={{ className: 'hidden' }}
 			maskClosable={false}
 			closable={false}
 		>
-			<VariantInfo lineItem={lineItem} refetch={refetch} />
-			<WarehouseForm
-				variantId={variantId}
-				lineItem={lineItem}
-				isPermission={isPermission}
-			/>
+			{resolvedLineItem ? (
+				<>
+					<VariantInfo lineItem={resolvedLineItem} refetch={refetch} />
+					<WarehouseForm
+						variantId={variantId}
+						lineItem={resolvedLineItem as LineItem & { supplier_order_id: string }}
+						isPermission={isPermission}
+					/>
+				</>
+			) : (
+				!isLoading && (
+					<Text className="py-6 text-gray-500">
+						Không thể tải thông tin sản phẩm. Vui lòng đóng và thử lại.
+					</Text>
+				)
+			)}
 		</LayeredModal>
 	);
 };

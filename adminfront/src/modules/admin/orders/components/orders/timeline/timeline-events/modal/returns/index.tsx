@@ -86,7 +86,8 @@ const ReturnMenu: React.FC<ReturnMenuProps> = ({ order, state, onClose }) => {
 	}, [order]);
 
 	const itemMap = React.useMemo(() => {
-		return new Map<string, LineItem>(order.items.map((i) => [i.id, i]));
+		const orderItems = Array.isArray(order.items) ? order.items : [];
+		return new Map<string, LineItem>(orderItems.map((i) => [i.id, i]));
 	}, [order.items]);
 
 	const [inventoryMap, setInventoryMap] = useState<

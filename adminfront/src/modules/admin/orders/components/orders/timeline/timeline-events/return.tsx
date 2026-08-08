@@ -91,6 +91,7 @@ function buildReturn(
 	onCancel: () => void,
 	onReceive: () => void
 ) {
+	const eventItems = Array.isArray(event.items) ? event.items : [];
 	let title: string = '';
 	let icon: React.ReactNode;
 	let button: React.ReactNode;
@@ -143,14 +144,14 @@ function buildReturn(
 		children:
 			event.status === 'requested'
 				? [
-						event.items.map((i, index) => {
+						eventItems.map((i, index) => {
 							return <EventItemContainer key={index} item={i} />;
 						}),
 						React.createElement(React.Fragment, { key: 'button' }, button),
 				  ]
 				: event.status === 'received'
 				? [
-						event.items.map((i, index) => (
+						eventItems.map((i, index) => (
 							<EventItemContainer
 								key={index}
 								item={{ ...i, quantity: i.receivedQuantity ?? i.quantity }}

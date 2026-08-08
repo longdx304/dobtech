@@ -153,7 +153,7 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 				</div>
 			</div>
 			<div className="mt-6">
-				{order.shipping_methods.map((method: any) => (
+				{(Array.isArray(order.shipping_methods) ? order.shipping_methods : []).map((method: any) => (
 					<div className="flex flex-col text-xs" key={method.id}>
 						<span className="font-normal text-gray-500">
 							{'Phương thức vận chuyển'}

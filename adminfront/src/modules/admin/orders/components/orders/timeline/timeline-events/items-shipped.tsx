@@ -28,12 +28,12 @@ const ItemsShipped: React.FC<ItemsShippedProps> = ({ event }) => {
 		title: title,
 		children: (
 			<div className="space-y-2">
-				{event.items.map((item, index) => (
+				{(Array.isArray(event.items) ? event.items : []).map((item, index) => (
 					<EventItemContainer item={item} key={index} />
 				))}
 				{!!event.shippedUrls?.length && (
 					<div className="flex flex-wrap gap-2 pt-1">
-						{event.shippedUrls.map((url, index) => (
+						{event.shippedUrls?.map((url, index) => (
 							<Image
 								key={`${url}-${index}`}
 								src={url}

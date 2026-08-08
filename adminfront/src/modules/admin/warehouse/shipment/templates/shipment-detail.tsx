@@ -69,8 +69,10 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 
 	const itemTable = useMemo(() => {
 		if (!fulfillment) return [];
-		return fulfillment.items.filter(({ item }: any) =>
-			item.title.toLowerCase().includes(searchValue.toLowerCase())
+		const items = Array.isArray(fulfillment.items) ? fulfillment.items : [];
+		const search = searchValue.toLowerCase();
+		return items.filter(({ item }: any) =>
+			(item?.title || '').toLowerCase().includes(search)
 		);
 	}, [fulfillment, searchValue]);
 
@@ -227,6 +229,7 @@ const OrderInfo = ({
 	isProcessing: boolean;
 }) => {
 	const order = fulfillment.order;
+	const customer = order?.customer;
 	const statusText = () => {
 		switch (fulfillment.status) {
 			case FulfullmentStatus.AWAITING:
@@ -258,11 +261,17 @@ const OrderInfo = ({
 
 	const shipper = fulfillment.shipper?.first_name || 'Chưa có người giao hàng';
 
-	const address = `${order.shipping_address?.address_2 ?? ''} ${
-		order.shipping_address?.city ?? ''
-	} ${order.shipping_address?.address_1 ?? ''} ${
-		order.shipping_address?.province ?? ''
-	} ${order.shipping_address?.country_code ?? ''}`;
+	const address = order?.shipping_address
+		? [
+				order.shipping_address.address_2,
+				order.shipping_address.city,
+				order.shipping_address.address_1,
+				order.shipping_address.province,
+				order.shipping_address.country_code,
+		  ]
+				.filter(Boolean)
+				.join(' ')
+		: 'Chưa có địa chỉ giao hàng';
 
 	return (
 		<div>
@@ -279,9 +288,14 @@ const OrderInfo = ({
 						<Hash size={14} color="#6b7280" />
 					</div>
 					<Text className="text-sm font-semibold">
-						{`${order?.display_id} - ${order.customer.last_name ?? ''} ${
-							order.customer.first_name ?? ''
-						} - ${order.customer.phone}`}
+						{`#${order?.display_id ?? '-'} - ${[
+							customer?.last_name,
+							customer?.first_name,
+						]
+							.filter(Boolean)
+							.join(' ') || 'Khách hàng không xác định'} - ${
+							customer?.phone || 'Không có SĐT'
+						}`}
 					</Text>
 				</Flex>
 				<Flex gap={4} className="" align="center">
