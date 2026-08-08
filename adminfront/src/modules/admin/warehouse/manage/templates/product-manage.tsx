@@ -37,14 +37,30 @@ const DEFAULT_PAGE_SIZE = 20;
 // Helper function to sort inventories by location priority
 const sortInventoriesByLocationPriority = (inventories: WarehouseInventory[]) => {
 	return [...inventories].sort((a, b) => {
-		const locationA = a.warehouse?.location || '';
-		const locationB = b.warehouse?.location || '';
+		const locationA = String(a?.warehouse?.location ?? '');
+		const locationB = String(b?.warehouse?.location ?? '');
 		return locationA.localeCompare(locationB);
 	});
 };
 
 const normalizeInventories = (inventories: unknown): WarehouseInventory[] =>
 	Array.isArray(inventories) ? inventories.filter(Boolean) : [];
+
+const getVariantInventories = (variant: unknown): WarehouseInventory[] =>
+	normalizeInventories(
+		(variant as { inventories?: unknown } | null | undefined)?.inventories
+	);
+
+const toDisplayText = (value: unknown, fallback: string): string => {
+	if (typeof value === 'string' && value.trim()) return value;
+	if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+	return fallback;
+};
+
+const toImageSource = (value: unknown): string =>
+	typeof value === 'string' && value.trim()
+		? value
+		: '/images/product-img.png';
 
 const ProductManage: FC<Props> = ({}) => {
 	const { setSelectedUnit, setQuantity } = useProductUnit();
@@ -89,7 +105,10 @@ const ProductManage: FC<Props> = ({}) => {
 	);
 
 	useEffect(() => {
-		const keys = variantList.map((item) => item.id);
+		const keys = variantList
+			.filter((item) => getVariantInventories(item).length > 0)
+			.map((item) => item.id)
+			.filter((id): id is string => typeof id === 'string' && id.length > 0);
 		setExpandedKeys(keys as string[]);
 	}, [variantList]);
 
@@ -248,10 +267,19 @@ const ProductManage: FC<Props> = ({}) => {
 				<Button
 					type="dashed"
 					onClick={() => {
-						setExpandedKeys((prev) =>
+					setExpandedKeys((prev) =>
 							prev.length
 								? []
-								: (variants?.map((item) => item.id) as string[]) || []
+								: variantList
+										.filter(
+											(item) =>
+												getVariantInventories(item).length > 0
+										)
+										.map((item) => item.id)
+										.filter(
+											(id): id is string =>
+												typeof id === 'string' && id.length > 0
+										)
 						);
 					}}
 				>
@@ -261,10 +289,12 @@ const ProductManage: FC<Props> = ({}) => {
 
 			<div className="hidden md:block">
 				<Table
-					dataSource={variants}
+					dataSource={displayVariants}
 					expandable={{
 						expandedRowRender: expandedRowRender as any,
 						expandedRowKeys: expandedKeys,
+						rowExpandable: (record) =>
+							getVariantInventories(record).length > 0,
 						onExpandedRowsChange: (keys) => {
 							setExpandedKeys(keys as string[]);
 						},
@@ -291,7 +321,7 @@ const ProductManage: FC<Props> = ({}) => {
 			<div className="block md:hidden">
 				{displayVariants?.map((variantItem) => {
 					const sortedInventories = sortInventoriesByLocationPriority(
-						normalizeInventories((variantItem as any).inventories)
+						getVariantInventories(variantItem)
 					);
 					return (
 						<Flex
@@ -302,9 +332,7 @@ const ProductManage: FC<Props> = ({}) => {
 							<Flex className="items-center justify-between gap-2">
 								<Flex className="items-center gap-3 min-w-0">
 									<Image
-										src={
-											variantItem.product?.thumbnail ?? '/images/product-img.png'
-										}
+										src={toImageSource(variantItem.product?.thumbnail)}
 										fallback="/images/product-img.png"
 										preview={false}
 										alt="Product variant Thumbnail"
@@ -314,10 +342,18 @@ const ProductManage: FC<Props> = ({}) => {
 									/>
 									<Flex vertical className="min-w-0">
 										<Text className="text-sm font-semibold break-words">
-											{variantItem.product?.title} - {variantItem.title}
+											{toDisplayText(
+												variantItem.product?.title,
+												'Sản phẩm không xác định'
+											)}{' '}
+											-{' '}
+											{toDisplayText(
+												variantItem.title,
+												'Biến thể không xác định'
+											)}
 										</Text>
 										<Text className="text-xs text-gray-500 break-words">
-											SKU: {variantItem.sku}
+											SKU: {toDisplayText(variantItem.sku, '-')}
 										</Text>
 									</Flex>
 								</Flex>
@@ -351,8 +387,12 @@ const ProductManage: FC<Props> = ({}) => {
 												className="items-center justify-between gap-2 border-t pt-2 first:mt-0 first:border-t-0"
 											>
 												<Flex vertical className="min-w-0">
-													<Text className="text-xs font-medium break-words">
-														Vị trí: {inv.warehouse?.location}
+											<Text className="text-xs font-medium break-words">
+												Vị trí:{' '}
+												{toDisplayText(
+													inv.warehouse?.location,
+													'Không xác định'
+												)}
 													</Text>
 													<Text
 														className={`text-[11px] ${
