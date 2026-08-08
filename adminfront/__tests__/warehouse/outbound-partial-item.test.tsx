@@ -42,6 +42,6 @@ describe('OutboundItem', () => {
 			/>
 		);
 
-		expect(screen.getByText('Đang tiến hành')).toBeInTheDocument();
+		expect(screen.getByText('Đang tiến hành')).toBeTruthy();
 	});
 });

@@ -185,10 +185,11 @@ const OrderEditModal = (props: OrderEditModalProps) => {
 	);
 
 	if (filterTerm) {
+		const normalizedFilter = filterTerm.toLowerCase();
 		displayItems = displayItems.filter(
 			(i) =>
-				i.title.toLowerCase().includes(filterTerm) ||
-				i.variant?.sku.toLowerCase().includes(filterTerm)
+				(i.title || '').toLowerCase().includes(normalizedFilter) ||
+				(i.variant?.sku || '').toLowerCase().includes(normalizedFilter)
 		);
 	}
 

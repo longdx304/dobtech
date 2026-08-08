@@ -16,6 +16,8 @@ type OrderLineProps = {
 };
 
 const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
+	const quantity = Number(item.quantity) || 0;
+	const unitAmount = quantity > 0 ? Math.round(item.total ?? 0) / quantity : 0;
 	const tooltipContent = `${item?.title} - ${item?.variant?.title} (${
 		item?.variant?.sku || ''
 	})`;
@@ -68,7 +70,7 @@ const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
 				<div className="text-center">
 					<div className="text-xs text-gray-500 mb-1">Số lượng</div>
 					<div className="text-sm font-semibold text-gray-900">
-						{item.quantity}
+						{quantity}
 					</div>
 				</div>
 
@@ -77,7 +79,7 @@ const OrderLine = ({ item, currencyCode }: OrderLineProps) => {
 					<div className="text-xs text-gray-500 mb-1">Đơn giá</div>
 					<div className="text-sm font-medium text-gray-700">
 						{formatAmountWithSymbol({
-							amount: Math.round(item?.total ?? 0) / item.quantity,
+							amount: unitAmount,
 							currency: currencyCode,
 							tax: [],
 						})}

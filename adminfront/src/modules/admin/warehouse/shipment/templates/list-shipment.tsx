@@ -42,6 +42,9 @@ const ListShipment: FC<Props> = ({}) => {
 		status: activeKey,
 		isMyOrder: myOrder ? true : undefined,
 	});
+	const fulfillmentList = Array.isArray(fulfillments)
+		? fulfillments.filter(Boolean)
+		: [];
 
 	const updateFulfillment = useAdminAssignShipment();
 
@@ -150,7 +153,7 @@ const ListShipment: FC<Props> = ({}) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
-					dataSource={fulfillments}
+					dataSource={fulfillmentList}
 					loading={isLoading}
 					renderItem={(item: Fulfillment) => (
 						<List.Item>

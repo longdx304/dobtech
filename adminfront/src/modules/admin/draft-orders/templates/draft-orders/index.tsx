@@ -59,6 +59,10 @@ const DraftOrderList: FC<Props> = () => {
 			keepPreviousData: true,
 		}
 	);
+	const draftOrderList = useMemo(
+		() => (Array.isArray(draft_orders) ? draft_orders.filter(Boolean) : []),
+		[draft_orders]
+	);
 
 	const handleChangeDebounce = _.debounce(
 		(e: ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +79,9 @@ const DraftOrderList: FC<Props> = () => {
 
 	const generateFilePdf = async (draftOrder: any): Promise<{ url: string; key: string }> => {
 		// Get items from cart, not directly from draft order
-		const items = draftOrder.cart?.items || [];
+		const items = Array.isArray(draftOrder.cart?.items)
+			? draftOrder.cart.items
+			: [];
 		const customer = draftOrder.cart?.customer;
 		const shippingAddress = draftOrder.cart?.shipping_address;
 
@@ -98,7 +104,10 @@ const DraftOrderList: FC<Props> = () => {
 				title: item.title,
 				sku: item.variant?.sku || '',
 			})),
-			totalQuantity: items.reduce((sum: number, item: any) => sum + item.quantity, 0),
+			totalQuantity: items.reduce(
+				(sum: number, item: any) => sum + (Number(item.quantity) || 0),
+				0
+			),
 			countryCode: shippingAddress?.country_code || 'vn',
 			isSendEmail: false,
 			customerNote: getCustomerNote(customer),
@@ -121,7 +130,10 @@ const DraftOrderList: FC<Props> = () => {
 			prefix: 'orders',
 		});
 
-		const result = uploadRes.uploads[0];
+		const result = uploadRes.uploads?.[0];
+		if (!result?.url || !result.key) {
+			throw new Error('Không nhận được thông tin file PDF đã tải lên');
+		}
 		return { url: result.url, key: result.key };
 	};
 
@@ -129,7 +141,7 @@ const DraftOrderList: FC<Props> = () => {
 		let uploadedFileKey: string | null = null;
 		try {
 			// Find the draft order from the current data
-			const draftOrder = draft_orders?.find((order: any) => order.id === id);
+			const draftOrder = draftOrderList.find((order: any) => order.id === id);
 
 			if (!draftOrder) {
 				message.error('Không tìm thấy thông tin draft order');
@@ -153,8 +165,11 @@ const DraftOrderList: FC<Props> = () => {
 
 			// Clean up the uploaded file if exists
 			if (uploadedFileKey) {
-				await deleteFile.mutateAsync({ file_key: uploadedFileKey });
-				console.log('Cleaned up uploaded file due to error:', uploadedFileKey);
+				try {
+					await deleteFile.mutateAsync({ file_key: uploadedFileKey });
+				} catch (cleanupError) {
+					console.error('Không thể xoá file PDF tạm:', cleanupError);
+				}
 			}
 		} finally {
 			setCurrentDraftOrderId(null);
@@ -185,7 +200,7 @@ const DraftOrderList: FC<Props> = () => {
 			handleDeleteDraftOrder,
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [draft_orders]);
+	}, [draftOrderList]);
 
 	const handleRowClick = (record: any) => {
 		router.push(`${ERoutes.DRAFT_ORDERS}/${record.id}`);
@@ -213,7 +228,7 @@ const DraftOrderList: FC<Props> = () => {
 			<Table
 				loading={isLoading}
 				columns={columns as any}
-				dataSource={draft_orders ?? []}
+				dataSource={draftOrderList}
 				rowKey="id"
 				scroll={{ x: 700 }}
 				onRow={(record) => ({

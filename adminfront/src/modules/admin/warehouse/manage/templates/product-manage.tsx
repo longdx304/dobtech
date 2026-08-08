@@ -6,23 +6,31 @@ import { Table } from '@/components/Table';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useProductUnit } from '@/lib/providers/product-unit-provider';
 import { ProductVariant } from '@/types/products';
-import { Warehouse, WarehouseInventory } from '@/types/warehouse';
+import { WarehouseInventory } from '@/types/warehouse';
 import debounce from 'lodash/debounce';
 import { ActionAbles } from '@/components/Dropdown';
 import { History, Minus, Pen, Plus, Search } from 'lucide-react';
 import { useAdminVariants, useMedusa } from 'medusa-react';
 import * as XLSX from 'xlsx';
-import { ChangeEvent, FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import ModalAddVariant from '../components/modal-add-variant';
 import ModalVariantInventory from '../components/modal-variant-inventory';
 import { expandedColumns, productColumns } from './product-columns';
 import ModalTransactionHistory from '../components/modal-transaction-history';
-import { MedusaImage } from '@/components/MedusaImage';
-import { Typography, Pagination } from 'antd';
+import { Image } from '@/components/Image';
+import { Typography, Pagination, message } from 'antd';
+import {
+	formatInventoryQuantity,
+	getInventoryUnitIssue,
+} from '../../utils/inventory-display';
 
 const { Text } = Typography;
 
 type Props = {};
+
+type ProductVariantWithInventories = ProductVariant & {
+	inventories?: WarehouseInventory[];
+};
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -34,6 +42,9 @@ const sortInventoriesByLocationPriority = (inventories: WarehouseInventory[]) =>
 		return locationA.localeCompare(locationB);
 	});
 };
+
+const normalizeInventories = (inventories: unknown): WarehouseInventory[] =>
+	Array.isArray(inventories) ? inventories.filter(Boolean) : [];
 
 const ProductManage: FC<Props> = ({}) => {
 	const { setSelectedUnit, setQuantity } = useProductUnit();
@@ -72,18 +83,32 @@ const ProductManage: FC<Props> = ({}) => {
 		offset: offset,
 		expand: 'product,inventories,inventories.item_unit,inventories.warehouse',
 	});
+	const variantList = useMemo(
+		() => (Array.isArray(variants) ? variants.filter(Boolean) : []),
+		[variants]
+	);
 
 	useEffect(() => {
-		if (variants?.length) {
-			const keys = variants.map((item) => item.id);
-			setExpandedKeys(keys as string[]);
-		}
-	}, [variants]);
+		const keys = variantList.map((item) => item.id);
+		setExpandedKeys(keys as string[]);
+	}, [variantList]);
 
-	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
-		const { value: inputValue } = e.target;
-		setSearchValue(inputValue);
-	}, 500);
+	const handleChangeDebounce = useMemo(
+		() =>
+			debounce((inputValue: string) => {
+				setSearchValue(inputValue.trim());
+				setOffset(0);
+				setNumPages(1);
+			}, 500),
+		[]
+	);
+
+	useEffect(
+		() => () => {
+			handleChangeDebounce.cancel();
+		},
+		[handleChangeDebounce]
+	);
 
 	const handleChangePage = (page: number) => {
 		setNumPages(page);
@@ -106,7 +131,13 @@ const ProductManage: FC<Props> = ({}) => {
 
 	// Add variant inventory
 	const handleAddInventory = (item: WarehouseInventory) => {
-		item && item.item_unit && setSelectedUnit(item.item_unit.id);
+		const issue = getInventoryUnitIssue(item);
+		if (issue) {
+			message.error(`${issue}. Không thể nhập hàng cho bản ghi này.`);
+			return;
+		}
+
+		setSelectedUnit(item.item_unit!.id);
 		setQuantity(1);
 		setWarehouseInventory(item);
 		setInventoryType('INBOUND');
@@ -114,7 +145,13 @@ const ProductManage: FC<Props> = ({}) => {
 	};
 	// Remove variant inventory
 	const handleRemoveInventory = (item: WarehouseInventory) => {
-		item && item.item_unit && setSelectedUnit(item.item_unit.id);
+		const issue = getInventoryUnitIssue(item);
+		if (issue) {
+			message.error(`${issue}. Không thể xuất hàng cho bản ghi này.`);
+			return;
+		}
+
+		setSelectedUnit(item.item_unit!.id);
 		setQuantity(1);
 		setWarehouseInventory(item);
 		setInventoryType('OUTBOUND');
@@ -138,10 +175,12 @@ const ProductManage: FC<Props> = ({}) => {
 					'product,inventories,inventories.item_unit,inventories.warehouse',
 			});
 
-			const data = variants.flatMap((variant: any) => {
-				if (!variant.inventories?.length) return [];
+			const variantList = Array.isArray(variants) ? variants : [];
+			const data = variantList.flatMap((variant: any) => {
+				const inventories = normalizeInventories(variant.inventories);
+				if (!inventories.length) return [];
 
-				return variant.inventories.map((inv: any) => ({
+				return inventories.map((inv: any) => ({
 					'Mã': variant.sku,
 					'Model': `${variant.product?.title || ''} - ${variant.title}`,
 					'Số lượng': inv.quantity,
@@ -170,13 +209,14 @@ const ProductManage: FC<Props> = ({}) => {
 		handleRemoveInventory,
 	});
 
-	const expandedRowRender = (record: Warehouse) => {
-		if (!record.inventories?.length) return null;
+	const expandedRowRender = (record: ProductVariantWithInventories) => {
+		const inventories = normalizeInventories(record.inventories);
+		if (!inventories.length) return null;
 
 		return (
 			<Table
 				columns={expandColumns as any}
-				dataSource={record.inventories}
+				dataSource={inventories}
 				rowKey="id"
 				pagination={false}
 			/>
@@ -184,8 +224,8 @@ const ProductManage: FC<Props> = ({}) => {
 	};
 
 	// Use variants for display
-	const displayVariants = variants || [];
-	const displayCount = count || 0;
+	const displayVariants = variantList;
+	const displayCount = Number(count) || 0;
 
 	return (
 		<Flex vertical gap={12}>
@@ -194,7 +234,7 @@ const ProductManage: FC<Props> = ({}) => {
 					placeholder="Tìm kiếm vị trí hoặc sản phẩm..."
 					name="search"
 					prefix={<Search size={16} />}
-					onChange={handleChangeDebounce}
+					onChange={(event) => handleChangeDebounce(event.target.value)}
 					className="w-[300px] mr-2"
 				/>
 				<Button
@@ -251,7 +291,7 @@ const ProductManage: FC<Props> = ({}) => {
 			<div className="block md:hidden">
 				{displayVariants?.map((variantItem) => {
 					const sortedInventories = sortInventoriesByLocationPriority(
-						(variantItem as any).inventories ?? []
+						normalizeInventories((variantItem as any).inventories)
 					);
 					return (
 						<Flex
@@ -261,10 +301,12 @@ const ProductManage: FC<Props> = ({}) => {
 						>
 							<Flex className="items-center justify-between gap-2">
 								<Flex className="items-center gap-3 min-w-0">
-									<MedusaImage
+									<Image
 										src={
 											variantItem.product?.thumbnail ?? '/images/product-img.png'
 										}
+										fallback="/images/product-img.png"
+										preview={false}
 										alt="Product variant Thumbnail"
 										width={40}
 										height={50}
@@ -301,10 +343,7 @@ const ProductManage: FC<Props> = ({}) => {
 							{sortedInventories.length ? (
 								<Flex vertical className="mt-2 gap-2">
 									{sortedInventories.map((inv: WarehouseInventory) => {
-										const baseQuantity =
-											inv.item_unit?.quantity && inv.item_unit.quantity > 0
-												? inv.quantity / inv.item_unit.quantity
-												: inv.quantity;
+										const issue = getInventoryUnitIssue(inv);
 
 										return (
 											<Flex
@@ -315,14 +354,19 @@ const ProductManage: FC<Props> = ({}) => {
 													<Text className="text-xs font-medium break-words">
 														Vị trí: {inv.warehouse?.location}
 													</Text>
-													<Text className="text-[11px] text-gray-500">
-														{baseQuantity}{' '}
-														{inv.item_unit?.unit
-															? `${inv.item_unit.unit} (${inv.quantity} đôi)`
-															: inv.quantity}
+													<Text
+														className={`text-[11px] ${
+															issue ? 'text-amber-600' : 'text-gray-500'
+														}`}
+													>
+														{formatInventoryQuantity(inv)}
 													</Text>
 												</Flex>
-												<Flex className="items-center gap-3">
+												<Flex
+													className={`items-center gap-3 ${
+														issue ? 'opacity-40' : ''
+													}`}
+												>
 													<Minus
 														onClick={() => handleRemoveInventory(inv)}
 														size={18}

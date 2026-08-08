@@ -79,7 +79,8 @@ export const getAllReturnableItems = (
 	order: Omit<Order, 'beforeInserts'>,
 	isClaim: boolean
 ) => {
-	let orderItems = order.items.reduce(
+	const baseItems = Array.isArray(order.items) ? order.items : [];
+	let orderItems = baseItems.reduce(
 		(map, obj) => map.set(obj.id, { ...obj }),
 
 		new Map<string, Omit<LineItem, 'beforeInsert'>>()
@@ -87,10 +88,13 @@ export const getAllReturnableItems = (
 
 	let claimedItems: ClaimItem[] = [];
 
-	if (order?.claims?.length) {
-		for (const claim of order.claims) {
-			claim.claim_items = claim.claim_items ?? [];
-			claimedItems = [...claimedItems, ...claim.claim_items];
+	const claims = Array.isArray(order?.claims) ? order.claims : [];
+	if (claims.length) {
+		for (const claim of claims) {
+			const claimItems = Array.isArray(claim.claim_items)
+				? claim.claim_items
+				: [];
+			claimedItems = [...claimedItems, ...claimItems];
 
 			if (
 				claim.fulfillment_status === 'not_fulfilled' &&
@@ -99,7 +103,7 @@ export const getAllReturnableItems = (
 				continue;
 			}
 
-			if (claim?.additional_items?.length) {
+			if (Array.isArray(claim?.additional_items)) {
 				orderItems = claim.additional_items
 					.filter(
 						(it: any) =>
@@ -115,9 +119,13 @@ export const getAllReturnableItems = (
 	}
 
 	if (!isClaim) {
-		if (order?.swaps?.length) {
-			for (const swap of order.swaps) {
-				orderItems = swap.additional_items.reduce(
+		const swaps = Array.isArray(order?.swaps) ? order.swaps : [];
+		if (swaps.length) {
+			for (const swap of swaps) {
+				const additionalItems = Array.isArray(swap.additional_items)
+					? swap.additional_items
+					: [];
+				orderItems = additionalItems.reduce(
 					(map: any, obj: any) =>
 						map.set(obj.id, {
 							...obj,
@@ -132,7 +140,7 @@ export const getAllReturnableItems = (
 		const i = orderItems.get(item.item_id);
 
 		if (i) {
-			i.quantity = i.quantity - (item.item.returned_quantity || 0);
+			i.quantity = i.quantity - (item.item?.returned_quantity || 0);
 			i.quantity !== 0 ? orderItems.set(i.id, i) : orderItems.delete(i.id);
 		}
 	}

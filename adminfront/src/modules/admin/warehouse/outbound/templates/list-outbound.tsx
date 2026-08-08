@@ -55,6 +55,7 @@ const ListOutbound: FC<Props> = ({}) => {
 		isMyOrder: myOrder ? true : undefined,
 		order: sortOrder,
 	});
+	const orderList = Array.isArray(orders) ? orders.filter(Boolean) : [];
 	const productOutboundHandler = useAdminProductOutboundHandler();
 	const productOutboundRemoveHandler = useAdminProductOutboundRemoveHandler();
 
@@ -177,7 +178,7 @@ const ListOutbound: FC<Props> = ({}) => {
 				/>
 				<List
 					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
-					dataSource={orders}
+					dataSource={orderList}
 					loading={isLoading}
 					renderItem={(item: Order) => (
 						<List.Item>
