@@ -3,6 +3,7 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
+import DatePicker from '@/components/Input/DatePicker';
 import List from '@/components/List';
 import { Tabs } from '@/components/Tabs';
 import { Text, Title } from '@/components/Typography';
@@ -12,6 +13,7 @@ import {
 } from '@/lib/hooks/api/fulfullment';
 import { Fulfillment, FulfullmentStatus } from '@/types/fulfillments';
 import { ERoutes } from '@/types/routes';
+import dayjs, { Dayjs } from 'dayjs';
 import debounce from 'lodash/debounce';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -35,6 +37,7 @@ const ListShipment: FC<Props> = ({}) => {
 		FulfullmentStatus.AWAITING
 	);
 	const [myOrder, setMyOrder] = useState(false);
+	const [createdFrom, setCreatedFrom] = useState<Dayjs | null>(null);
 	const [pendingFulfillment, setPendingFulfillment] =
 		useState<Fulfillment | null>(null);
 
@@ -47,6 +50,9 @@ const ListShipment: FC<Props> = ({}) => {
 				'order,order.customer,order.shipping_address,shipper,delivery_assistant,checker',
 			status: activeKey,
 			isMyOrder: myOrder ? true : undefined,
+			created_at: createdFrom
+				? { gte: createdFrom.startOf('day').toDate() }
+				: undefined,
 		});
 	const fulfillmentList = Array.isArray(fulfillments)
 		? fulfillments.filter(Boolean)
@@ -102,6 +108,12 @@ const ListShipment: FC<Props> = ({}) => {
 
 	const handleMyOrderChange = (checked: boolean) => {
 		setMyOrder(checked);
+		setNumPages(1);
+		setOffset(0);
+	};
+
+	const handleCreatedFromChange = (date: Dayjs | null) => {
+		setCreatedFrom(date);
 		setNumPages(1);
 		setOffset(0);
 	};
@@ -173,13 +185,28 @@ const ListShipment: FC<Props> = ({}) => {
 							onChange={handleMyOrderChange}
 						/>
 					</Flex>
-					<Input
-						placeholder="Tìm kiếm đơn hàng..."
-						name="search"
-						prefix={<Search size={16} />}
-						onChange={(event) => handleChangeDebounce(event.target.value)}
-						className="w-full sm:w-[300px]"
-					/>
+					<Flex
+						align="center"
+						gap={8}
+						className="w-full flex-col sm:w-auto sm:flex-row"
+					>
+						<DatePicker
+							value={createdFrom}
+							onChange={handleCreatedFromChange}
+							disabledDate={(date) => date.isAfter(dayjs(), 'day')}
+							placeholder="Từ ngày tạo"
+							className="w-full sm:w-[180px]"
+						/>
+						<Input
+							placeholder="Tìm kiếm đơn hàng..."
+							name="search"
+							prefix={<Search size={16} />}
+							onChange={(event) =>
+								handleChangeDebounce(event.target.value)
+							}
+							className="w-full sm:w-[300px]"
+						/>
+					</Flex>
 				</Flex>
 				<Tabs
 					defaultActiveKey={activeKey as any}
