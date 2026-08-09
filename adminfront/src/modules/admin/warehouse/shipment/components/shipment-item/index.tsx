@@ -8,6 +8,7 @@ import { useUser } from '@/lib/providers/user-provider';
 import { Fulfillment, FulfullmentStatus } from '@/types/fulfillments';
 import clsx from 'clsx';
 import { Bike, Check, Clock, Hash, MapPin, Phone, User } from 'lucide-react';
+import { canStartDelivery } from '../../utils/delivery-assignment';
 
 type ShipmentItemProps = {
 	item: Fulfillment;
@@ -28,6 +29,7 @@ const ShipmentItem: React.FC<ShipmentItemProps> = ({
 		FulfullmentStatus.CANCELED,
 	].includes(item?.status);
 	const isStart = !item?.shipped_id;
+	const canStart = canStartDelivery(item.status, item.shipped_id);
 	const order = item.order;
 	const customer = order?.customer;
 
@@ -48,11 +50,11 @@ const ShipmentItem: React.FC<ShipmentItemProps> = ({
 		{
 			label: <span className="w-full">{'Thêm vào danh sách giao hàng'}</span>,
 			key: 'handle',
-			disabled: !isStart,
+			disabled: !canStart,
 			onClick: () => handleConfirm(item),
 		},
 		{
-			label: <span className="w-full">{'Xoá khỏi danh sách chờ'}</span>,
+			label: <span className="w-full">{'Đưa về Chờ giao'}</span>,
 			key: 'remove',
 			disabled: user?.id !== item?.shipped_id || isStart || !isProcessing,
 			danger: true,

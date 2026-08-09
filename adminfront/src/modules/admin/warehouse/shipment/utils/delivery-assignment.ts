@@ -34,3 +34,8 @@ export const validateDeliveryAssignment = (
 export const canEditDeliveryAssignment = (
 	status: FulfullmentStatus
 ): boolean => status === FulfullmentStatus.DELIVERING;
+
+export const canStartDelivery = (
+	status: FulfullmentStatus,
+	shipperId?: string | null
+): boolean => status === FulfullmentStatus.AWAITING && !shipperId;

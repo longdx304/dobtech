@@ -22,13 +22,14 @@ import clsx from 'clsx';
 import debounce from 'lodash/debounce';
 import {
 	ArrowLeft,
-	Bike,
 	Check,
 	Clock,
 	Hash,
 	MapPin,
 	Pencil,
 	Search,
+	UserRound,
+	UsersRound,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
@@ -49,7 +50,7 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 	const [files, setFiles] = useState<FormImage[]>([]);
 	const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false);
 
-	const { fulfillment, isLoading } = useAdminFulfillment(id);
+	const { fulfillment, isLoading, isError, refetch } = useAdminFulfillment(id);
 	const updateFulfillment = useAdminUpdateFulfillment(id);
 	const uploadFile = useAdminUploadFile();
 
@@ -111,8 +112,6 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 		}
 
 		const { uploadImages } = splitFiles(files);
-		console.log('uploadImages', uploadImages);
-
 		// Split images into chunks of maximum 3 images each
 		const CHUNK_SIZE = 10;
 		const chunks: File[][] = [];
@@ -170,7 +169,33 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 		return;
 	};
 
-	if (!fulfillment) return null;
+	if (isLoading) {
+		return <Card loading className="min-h-[320px] w-full" rounded />;
+	}
+
+	if (isError || !fulfillment) {
+		return (
+			<Card className="w-full" rounded>
+				<Flex
+					vertical
+					align="center"
+					justify="center"
+					gap={12}
+					className="min-h-[280px] text-center"
+				>
+					<Text className="text-base font-semibold">
+						Không thể tải chi tiết đơn giao hàng
+					</Text>
+					<Text className="max-w-md text-sm text-gray-500">
+						Vui lòng kiểm tra kết nối và thử tải lại dữ liệu.
+					</Text>
+					<Button type="primary" onClick={() => refetch()}>
+						Thử lại
+					</Button>
+				</Flex>
+			</Card>
+		);
+	}
 
 	const buttonText = () => {
 		switch (fulfillment.status) {
@@ -352,27 +377,42 @@ const OrderInfo = ({
 			<Flex
 				align="flex-start"
 				justify="space-between"
-				className="mt-2 gap-4"
+				className="mt-4 flex-col gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 sm:flex-row"
 			>
-				<Flex vertical gap={4}>
-					<Flex gap={4} align="center">
-						<Bike color="#6b7280" width={18} height={18} />
-						<Text className="text-sm text-gray-500">
-							Người phụ trách giao:
-						</Text>
-						<Text
-							className={clsx('text-sm font-semibold', {
-								'text-red-500': !fulfillment.shipped_id,
-								'text-green-500': fulfillment.shipped_id,
-							})}
-						>
-							{shipper}
-						</Text>
+				<Flex vertical gap={10} className="min-w-0">
+					<Text className="text-sm font-semibold text-gray-700">
+						Phân công giao hàng
+					</Text>
+					<Flex gap={8} align="center">
+						<UserRound className="shrink-0 text-gray-500" size={18} />
+						<div className="min-w-0">
+							<Text className="block text-xs text-gray-500">
+								Người phụ trách giao
+							</Text>
+							<Text
+								className={clsx('block truncate text-sm font-semibold', {
+									'text-red-500': !fulfillment.shipped_id,
+									'text-green-600': fulfillment.shipped_id,
+								})}
+							>
+								{shipper}
+							</Text>
+						</div>
 					</Flex>
-					<Flex gap={4} align="center">
-						<Bike color="#6b7280" width={18} height={18} />
-						<Text className="text-sm text-gray-500">Người phụ xe:</Text>
-						<Text className="text-sm font-semibold">{deliveryAssistant}</Text>
+					<Flex gap={8} align="center">
+						<UsersRound className="shrink-0 text-gray-500" size={18} />
+						<div className="min-w-0">
+							<Text className="block text-xs text-gray-500">Người phụ xe</Text>
+							{fulfillment.delivery_assistant_id ? (
+								<Text className="block truncate text-sm font-semibold">
+									{deliveryAssistant}
+								</Text>
+							) : (
+								<Tag color="default" className="mt-1 w-fit">
+									Không có phụ xe
+								</Tag>
+							)}
+						</div>
 					</Flex>
 				</Flex>
 				{canEditDeliveryAssignment(fulfillment.status) && (
@@ -380,8 +420,9 @@ const OrderInfo = ({
 						type="default"
 						icon={<Pencil size={16} />}
 						onClick={onEditAssignment}
+						className="w-full sm:w-auto"
 					>
-						Thay đổi người giao hàng
+						Chỉnh sửa phân công
 					</Button>
 				)}
 			</Flex>

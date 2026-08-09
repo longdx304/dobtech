@@ -4,6 +4,7 @@ import DeliveryAssistantModal from '@/modules/admin/warehouse/shipment/component
 import DeliveryAssignmentModal from '@/modules/admin/warehouse/shipment/components/delivery-assignment-modal';
 import {
 	canEditDeliveryAssignment,
+	canStartDelivery,
 	validateDeliveryAssignment,
 } from '@/modules/admin/warehouse/shipment/utils/delivery-assignment';
 import { FulfullmentStatus } from '@/types/fulfillments';
@@ -55,6 +56,7 @@ describe('DeliveryAssistantModal', () => {
 		render(
 			<DeliveryAssistantModal
 				open
+				fulfillment={{ id: 'ful_1', order: { display_id: 32 } } as any}
 				onClose={onClose}
 				onConfirm={onConfirm}
 				isLoading={false}
@@ -71,6 +73,7 @@ describe('DeliveryAssistantModal', () => {
 		render(
 			<DeliveryAssistantModal
 				open
+				fulfillment={{ id: 'ful_1', order: { display_id: 32 } } as any}
 				onClose={jest.fn()}
 				onConfirm={onConfirm}
 				isLoading={false}
@@ -100,6 +103,12 @@ describe('delivery assignment validation', () => {
 		expect(canEditDeliveryAssignment(FulfullmentStatus.AWAITING)).toBe(false);
 		expect(canEditDeliveryAssignment(FulfullmentStatus.SHIPPED)).toBe(false);
 		expect(canEditDeliveryAssignment(FulfullmentStatus.CANCELED)).toBe(false);
+	});
+
+	it('only allows starting an unassigned awaiting shipment', () => {
+		expect(canStartDelivery(FulfullmentStatus.AWAITING, null)).toBe(true);
+		expect(canStartDelivery(FulfullmentStatus.AWAITING, 'usr_1')).toBe(false);
+		expect(canStartDelivery(FulfullmentStatus.CANCELED, null)).toBe(false);
 	});
 });
 

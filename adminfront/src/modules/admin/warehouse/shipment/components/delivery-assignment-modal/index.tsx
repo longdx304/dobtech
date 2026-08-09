@@ -3,9 +3,7 @@ import { Text } from '@/components/Typography';
 import { Fulfillment } from '@/types/fulfillments';
 import { message } from 'antd';
 import { useEffect, useState } from 'react';
-import {
-	validateDeliveryAssignment,
-} from '../../utils/delivery-assignment';
+import { validateDeliveryAssignment } from '../../utils/delivery-assignment';
 import DeliveryStaffSelect from '../delivery-staff-select';
 
 type DeliveryAssignmentModalProps = {
@@ -28,6 +26,12 @@ const DeliveryAssignmentModal = ({
 }: DeliveryAssignmentModalProps) => {
 	const [shipperId, setShipperId] = useState<string>();
 	const [deliveryAssistantId, setDeliveryAssistantId] = useState<string>();
+	const customerName = [
+		fulfillment.order?.customer?.last_name,
+		fulfillment.order?.customer?.first_name,
+	]
+		.filter(Boolean)
+		.join(' ') || 'Khách hàng không xác định';
 
 	useEffect(() => {
 		if (!open) return;
@@ -59,14 +63,20 @@ const DeliveryAssignmentModal = ({
 	return (
 		<Modal
 			open={open}
-			title="Thay đổi người giao hàng"
+			title="Chỉnh sửa phân công"
 			handleCancel={onClose}
 			handleOk={handleConfirm}
 			isLoading={isLoading}
 			maskClosable={!isLoading}
 			closable={!isLoading}
+			okText="Lưu phân công"
 		>
 			<div className="space-y-4 py-4">
+				<div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+					<Text className="text-sm font-semibold">
+						Đơn #{fulfillment.order?.display_id ?? '-'} · {customerName}
+					</Text>
+				</div>
 				<div>
 					<Text className="mb-2 block text-sm font-medium">
 						Người phụ trách giao <span className="text-red-500">*</span>

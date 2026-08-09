@@ -1,3 +1,4 @@
+import { Button } from '@/components/Button';
 import { Select } from '@/components/Select';
 import { useAdminDeliveryStaff } from '@/lib/hooks/api/fulfullment';
 import debounce from 'lodash/debounce';
@@ -22,7 +23,7 @@ const DeliveryStaffSelect = ({
 	disabled = false,
 }: DeliveryStaffSelectProps) => {
 	const [searchValue, setSearchValue] = useState('');
-	const { delivery_staff: deliveryStaff, isLoading } =
+	const { delivery_staff: deliveryStaff, isLoading, isError, refetch } =
 		useAdminDeliveryStaff(searchValue);
 
 	const handleSearch = useMemo(
@@ -56,7 +57,23 @@ const DeliveryStaffSelect = ({
 			loading={isLoading}
 			disabled={disabled}
 			notFoundContent={
-				isLoading ? 'Đang tải nhân sự...' : 'Không tìm thấy nhân sự phù hợp'
+				isLoading ? (
+					'Đang tải nhân sự...'
+				) : isError ? (
+					<div className="flex flex-col items-center gap-2 py-2">
+						<span>Không thể tải danh sách nhân sự</span>
+						<Button
+							type="link"
+							size="small"
+							onMouseDown={(event) => event.preventDefault()}
+							onClick={() => refetch()}
+						>
+							Thử lại
+						</Button>
+					</div>
+				) : (
+					'Không tìm thấy nhân sự phù hợp'
+				)
 			}
 			className="w-full"
 		/>
