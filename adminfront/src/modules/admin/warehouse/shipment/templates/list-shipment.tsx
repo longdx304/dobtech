@@ -18,6 +18,7 @@ import { ChangeEvent, FC, useState } from 'react';
 import ShipmentItem from '../components/shipment-item';
 import { message, Switch } from 'antd';
 import { getErrorMessage } from '@/lib/utils';
+import DeliveryAssistantModal from '../components/delivery-assistant-modal';
 
 type Props = {};
 
@@ -33,12 +34,15 @@ const ListShipment: FC<Props> = ({}) => {
 		FulfullmentStatus.AWAITING
 	);
 	const [myOrder, setMyOrder] = useState(false);
+	const [pendingFulfillment, setPendingFulfillment] =
+		useState<Fulfillment | null>(null);
 
 	const { fulfillments, isLoading, count } = useAdminFulfillments({
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		expand: 'order,order.customer,order.shipping_address,shipper,checker',
+		expand:
+			'order,order.customer,order.shipping_address,shipper,delivery_assistant,checker',
 		status: activeKey,
 		isMyOrder: myOrder ? true : undefined,
 	});
@@ -86,37 +90,37 @@ const ListShipment: FC<Props> = ({}) => {
 	};
 
 	const handleConfirm = async (item: Fulfillment) => {
-		await updateFulfillment.mutateAsync(
-			{
-				fulfillment_id: item.id,
+		setPendingFulfillment(item);
+	};
+
+	const handleConfirmDeliveryAssistant = async (
+		deliveryAssistantId: string | null
+	) => {
+		if (!pendingFulfillment) return;
+		try {
+			await updateFulfillment.mutateAsync({
+				fulfillment_id: pendingFulfillment.id,
 				status: FulfullmentStatus.DELIVERING,
-			},
-			{
-				onSuccess: () => {
-					message.success('Đã thêm vào danh sách giao hàng');
-				},
-				onError: (error) => {
-					message.error(getErrorMessage(error));
-				},
-			}
-		);
+				delivery_assistant_id: deliveryAssistantId,
+			});
+			message.success('Đã thêm vào danh sách giao hàng');
+			setPendingFulfillment(null);
+		} catch (error) {
+			message.error(getErrorMessage(error));
+			throw error;
+		}
 	};
 
 	const handleRemoveHandler = async (item: Fulfillment) => {
-		await updateFulfillment.mutateAsync(
-			{
+		try {
+			await updateFulfillment.mutateAsync({
 				fulfillment_id: item.id,
 				status: FulfullmentStatus.AWAITING,
-			},
-			{
-				onSuccess: () => {
-					message.success('Đã thêm vào danh sách giao hàng');
-				},
-				onError: (error) => {
-					message.error(getErrorMessage(error));
-				},
-			}
-		);
+			});
+			message.success('Đã xoá khỏi danh sách giao hàng');
+		} catch (error) {
+			message.error(getErrorMessage(error));
+		}
 	};
 
 	return (
@@ -175,6 +179,12 @@ const ListShipment: FC<Props> = ({}) => {
 					}}
 				/>
 			</Card>
+			<DeliveryAssistantModal
+				open={!!pendingFulfillment}
+				onClose={() => setPendingFulfillment(null)}
+				onConfirm={handleConfirmDeliveryAssistant}
+				isLoading={updateFulfillment.isLoading}
+			/>
 		</Flex>
 	);
 };

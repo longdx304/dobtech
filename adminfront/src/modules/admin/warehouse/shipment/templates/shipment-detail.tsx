@@ -27,11 +27,17 @@ import {
 	Clock,
 	Hash,
 	MapPin,
+	Pencil,
 	Search,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import fulfillmentColumns from './columns';
+import DeliveryAssignmentModal from '../components/delivery-assignment-modal';
+import {
+	canEditDeliveryAssignment,
+	getDeliveryStaffName,
+} from '../utils/delivery-assignment';
 
 type ShipmentDetailProps = {
 	id: string;
@@ -41,6 +47,7 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 	const router = useRouter();
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [files, setFiles] = useState<FormImage[]>([]);
+	const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false);
 
 	const { fulfillment, isLoading } = useAdminFulfillment(id);
 	const updateFulfillment = useAdminUpdateFulfillment(id);
@@ -78,6 +85,23 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 
 	const handleBackToList = () => {
 		router.push(ERoutes.WAREHOUSE_SHIPMENT);
+	};
+
+	const handleUpdateAssignment = async (
+		shipperId: string,
+		deliveryAssistantId: string | null
+	) => {
+		try {
+			await updateFulfillment.mutateAsync({
+				shipped_id: shipperId,
+				delivery_assistant_id: deliveryAssistantId,
+			});
+			message.success('Cập nhật người giao hàng thành công');
+			setIsAssignmentModalOpen(false);
+		} catch (error) {
+			message.error(getErrorMessage(error));
+			throw error;
+		}
 	};
 
 	const onConfirm = async () => {
@@ -176,7 +200,11 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 				</Button>
 			</Flex>
 			<Card loading={isLoading} className="w-full mb-10" rounded>
-				<OrderInfo fulfillment={fulfillment} isProcessing={isProcessing} />
+				<OrderInfo
+					fulfillment={fulfillment}
+					isProcessing={isProcessing}
+					onEditAssignment={() => setIsAssignmentModalOpen(true)}
+				/>
 				<Flex
 					vertical
 					align="flex-end"
@@ -215,6 +243,13 @@ const ShipmentDetail = ({ id }: ShipmentDetailProps) => {
 					</Button>
 				</Flex>
 			</Card>
+			<DeliveryAssignmentModal
+				open={isAssignmentModalOpen}
+				fulfillment={fulfillment}
+				onClose={() => setIsAssignmentModalOpen(false)}
+				onConfirm={handleUpdateAssignment}
+				isLoading={updateFulfillment.isLoading}
+			/>
 		</Flex>
 	);
 };
@@ -224,9 +259,11 @@ export default ShipmentDetail;
 const OrderInfo = ({
 	fulfillment,
 	isProcessing = false,
+	onEditAssignment,
 }: {
 	fulfillment: Fulfillment;
 	isProcessing: boolean;
+	onEditAssignment: () => void;
 }) => {
 	const order = fulfillment.order;
 	const customer = order?.customer;
@@ -259,7 +296,14 @@ const OrderInfo = ({
 		}
 	};
 
-	const shipper = fulfillment.shipper?.first_name || 'Chưa có người giao hàng';
+	const shipper = getDeliveryStaffName(
+		fulfillment.shipper,
+		'Chưa có người giao hàng'
+	);
+	const deliveryAssistant = getDeliveryStaffName(
+		fulfillment.delivery_assistant,
+		'Không có người phụ xe'
+	);
 
 	const address = order?.shipping_address
 		? [
@@ -305,18 +349,41 @@ const OrderInfo = ({
 					<Text className="text-sm font-semibold">{address}</Text>
 				</Flex>
 			</Flex>
-			<Flex gap={4} className="" align="center">
-				<div className="flex items-center">
-					<Bike color="#6b7280" width={18} height={18} />
-				</div>
-				<Text
-					className={clsx('text-sm font-semibold', {
-						'text-red-500': !fulfillment?.shipped_id,
-						'text-green-500': fulfillment?.shipped_id,
-					})}
-				>
-					{shipper}
-				</Text>
+			<Flex
+				align="flex-start"
+				justify="space-between"
+				className="mt-2 gap-4"
+			>
+				<Flex vertical gap={4}>
+					<Flex gap={4} align="center">
+						<Bike color="#6b7280" width={18} height={18} />
+						<Text className="text-sm text-gray-500">
+							Người phụ trách giao:
+						</Text>
+						<Text
+							className={clsx('text-sm font-semibold', {
+								'text-red-500': !fulfillment.shipped_id,
+								'text-green-500': fulfillment.shipped_id,
+							})}
+						>
+							{shipper}
+						</Text>
+					</Flex>
+					<Flex gap={4} align="center">
+						<Bike color="#6b7280" width={18} height={18} />
+						<Text className="text-sm text-gray-500">Người phụ xe:</Text>
+						<Text className="text-sm font-semibold">{deliveryAssistant}</Text>
+					</Flex>
+				</Flex>
+				{canEditDeliveryAssignment(fulfillment.status) && (
+					<Button
+						type="default"
+						icon={<Pencil size={16} />}
+						onClick={onEditAssignment}
+					>
+						Thay đổi người giao hàng
+					</Button>
+				)}
 			</Flex>
 		</div>
 	);
