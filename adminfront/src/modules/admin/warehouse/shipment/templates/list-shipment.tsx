@@ -1,4 +1,5 @@
 'use client';
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
@@ -14,10 +15,11 @@ import { ERoutes } from '@/types/routes';
 import debounce from 'lodash/debounce';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, FC, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import ShipmentItem from '../components/shipment-item';
-import { message, Switch } from 'antd';
+import { Alert, message, Modal as AntdModal, Switch } from 'antd';
 import { getErrorMessage } from '@/lib/utils';
+import DeliveryAssistantModal from '../components/delivery-assistant-modal';
 
 type Props = {};
 
@@ -33,25 +35,36 @@ const ListShipment: FC<Props> = ({}) => {
 		FulfullmentStatus.AWAITING
 	);
 	const [myOrder, setMyOrder] = useState(false);
+	const [pendingFulfillment, setPendingFulfillment] =
+		useState<Fulfillment | null>(null);
 
-	const { fulfillments, isLoading, count } = useAdminFulfillments({
-		q: searchValue || undefined,
-		offset,
-		limit: DEFAULT_PAGE_SIZE,
-		expand: 'order,order.customer,order.shipping_address,shipper,checker',
-		status: activeKey,
-		isMyOrder: myOrder ? true : undefined,
-	});
+	const { fulfillments, isLoading, isError, refetch, count } =
+		useAdminFulfillments({
+			q: searchValue || undefined,
+			offset,
+			limit: DEFAULT_PAGE_SIZE,
+			expand:
+				'order,order.customer,order.shipping_address,shipper,delivery_assistant,checker',
+			status: activeKey,
+			isMyOrder: myOrder ? true : undefined,
+		});
 	const fulfillmentList = Array.isArray(fulfillments)
 		? fulfillments.filter(Boolean)
 		: [];
 
 	const updateFulfillment = useAdminAssignShipment();
 
-	const handleChangeDebounce = debounce((e: ChangeEvent<HTMLInputElement>) => {
-		const { value: inputValue } = e.target;
-		setSearchValue(inputValue);
-	}, 500);
+	const handleChangeDebounce = useMemo(
+		() =>
+			debounce((inputValue: string) => {
+				setSearchValue(inputValue.trim());
+				setNumPages(1);
+				setOffset(0);
+			}, 500),
+		[]
+	);
+
+	useEffect(() => () => handleChangeDebounce.cancel(), [handleChangeDebounce]);
 
 	const handleChangePage = (page: number) => {
 		setNumPages(page);
@@ -83,40 +96,59 @@ const ListShipment: FC<Props> = ({}) => {
 
 	const handleChangeTab = (key: FulfullmentStatus) => {
 		setActiveKey(key);
+		setNumPages(1);
+		setOffset(0);
+	};
+
+	const handleMyOrderChange = (checked: boolean) => {
+		setMyOrder(checked);
+		setNumPages(1);
+		setOffset(0);
 	};
 
 	const handleConfirm = async (item: Fulfillment) => {
-		await updateFulfillment.mutateAsync(
-			{
-				fulfillment_id: item.id,
-				status: FulfullmentStatus.DELIVERING,
-			},
-			{
-				onSuccess: () => {
-					message.success('Đã thêm vào danh sách giao hàng');
-				},
-				onError: (error) => {
-					message.error(getErrorMessage(error));
-				},
-			}
-		);
+		setPendingFulfillment(item);
 	};
 
-	const handleRemoveHandler = async (item: Fulfillment) => {
-		await updateFulfillment.mutateAsync(
-			{
-				fulfillment_id: item.id,
-				status: FulfullmentStatus.AWAITING,
-			},
-			{
-				onSuccess: () => {
-					message.success('Đã thêm vào danh sách giao hàng');
-				},
-				onError: (error) => {
+	const handleConfirmDeliveryAssistant = async (
+		deliveryAssistantId: string | null
+	) => {
+		if (!pendingFulfillment) return;
+		try {
+			await updateFulfillment.mutateAsync({
+				fulfillment_id: pendingFulfillment.id,
+				status: FulfullmentStatus.DELIVERING,
+				delivery_assistant_id: deliveryAssistantId,
+			});
+			message.success('Đã thêm vào danh sách giao hàng');
+			setPendingFulfillment(null);
+		} catch (error) {
+			message.error(getErrorMessage(error));
+			throw error;
+		}
+	};
+
+	const handleRemoveHandler = (item: Fulfillment) => {
+		AntdModal.confirm({
+			title: 'Đưa đơn về Chờ giao?',
+			content:
+				'Thao tác này sẽ xóa người phụ trách giao và người phụ xe hiện tại.',
+			okText: 'Đưa về Chờ giao',
+			cancelText: 'Hủy',
+			okButtonProps: { danger: true },
+			onOk: async () => {
+				try {
+					await updateFulfillment.mutateAsync({
+						fulfillment_id: item.id,
+						status: FulfullmentStatus.AWAITING,
+					});
+					message.success('Đã đưa đơn về Chờ giao');
+				} catch (error) {
 					message.error(getErrorMessage(error));
-				},
-			}
-		);
+					throw error;
+				}
+			},
+		});
 	};
 
 	return (
@@ -129,20 +161,24 @@ const ListShipment: FC<Props> = ({}) => {
 			</Flex>
 			<Card loading={false} className="w-full" bordered={false}>
 				<Title level={4}>Theo dõi các đơn hàng</Title>
-				<Flex align="center" justify="space-between" className="py-4">
+				<Flex
+					align="center"
+					justify="space-between"
+					className="flex-col gap-3 py-4 sm:flex-row"
+				>
 					<Flex align="center" gap={8}>
 						<Text className="text-gray-700 font-medium">Đơn hàng của tôi</Text>
 						<Switch
 							checked={myOrder}
-							onChange={(checked) => setMyOrder(checked)}
+							onChange={handleMyOrderChange}
 						/>
 					</Flex>
 					<Input
 						placeholder="Tìm kiếm đơn hàng..."
 						name="search"
 						prefix={<Search size={16} />}
-						onChange={handleChangeDebounce}
-						className="w-[300px]"
+						onChange={(event) => handleChangeDebounce(event.target.value)}
+						className="w-full sm:w-[300px]"
 					/>
 				</Flex>
 				<Tabs
@@ -151,30 +187,61 @@ const ListShipment: FC<Props> = ({}) => {
 					onChange={handleChangeTab as any}
 					centered
 				/>
-				<List
-					grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 5 }}
-					dataSource={fulfillmentList}
-					loading={isLoading}
-					renderItem={(item: Fulfillment) => (
-						<List.Item>
-							<ShipmentItem
-								item={item}
-								handleClickDetail={handleClickDetail}
-								handleConfirm={handleConfirm}
-								handleRemoveHandler={handleRemoveHandler}
-							/>
-						</List.Item>
-					)}
-					pagination={{
-						onChange: (page) => handleChangePage(page),
-						pageSize: DEFAULT_PAGE_SIZE,
-						current: numPages || 1,
-						total: count,
-						showTotal: (total, range) =>
-							`${range[0]}-${range[1]} trong ${total} đơn hàng`,
-					}}
-				/>
+				{isError ? (
+					<Alert
+						type="error"
+						showIcon
+						message="Không thể tải danh sách giao hàng"
+						description="Vui lòng kiểm tra kết nối và thử tải lại dữ liệu."
+						action={
+							<Button type="default" onClick={() => refetch()}>
+								Thử lại
+							</Button>
+						}
+					/>
+				) : (
+					<List
+						grid={{
+							gutter: 12,
+							xs: 1,
+							sm: 2,
+							md: 2,
+							lg: 3,
+							xl: 4,
+							xxl: 5,
+						}}
+						dataSource={fulfillmentList}
+						loading={isLoading}
+						renderItem={(item: Fulfillment) => (
+							<List.Item>
+								<ShipmentItem
+									item={item}
+									handleClickDetail={handleClickDetail}
+									handleConfirm={handleConfirm}
+									handleRemoveHandler={handleRemoveHandler}
+								/>
+							</List.Item>
+						)}
+						pagination={{
+							onChange: (page) => handleChangePage(page),
+							pageSize: DEFAULT_PAGE_SIZE,
+							current: numPages || 1,
+							total: count,
+							showTotal: (total, range) =>
+								`${range[0]}-${range[1]} trong ${total} đơn hàng`,
+						}}
+					/>
+				)}
 			</Card>
+			{pendingFulfillment && (
+				<DeliveryAssistantModal
+					open
+					fulfillment={pendingFulfillment}
+					onClose={() => setPendingFulfillment(null)}
+					onConfirm={handleConfirmDeliveryAssistant}
+					isLoading={updateFulfillment.isLoading}
+				/>
+			)}
 		</Flex>
 	);
 };

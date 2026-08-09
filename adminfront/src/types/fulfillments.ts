@@ -77,6 +77,8 @@ export enum FulfullmentStatus {
 export type Fulfillment = MedusaFulfillment & {
 	shipped_id: string | null;
 	shipper: User | null;
+	delivery_assistant_id: string | null;
+	delivery_assistant: User | null;
 	checker: User | null;
 
 	checker_id: string | null;
@@ -99,6 +101,16 @@ export type AdminUpdateFulfillment = Partial<Fulfillment>;
 export type AdminAssignShipment = {
 	fulfillment_id: string;
 	status: FulfullmentStatus;
+	delivery_assistant_id?: string | null;
+};
+
+export type DeliveryStaff = Pick<
+	User,
+	'id' | 'first_name' | 'last_name' | 'email'
+>;
+
+export type AdminDeliveryStaffListRes = {
+	delivery_staff: DeliveryStaff[];
 };
 
 export enum FulfillmentStatus {

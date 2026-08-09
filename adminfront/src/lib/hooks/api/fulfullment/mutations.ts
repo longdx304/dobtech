@@ -49,6 +49,9 @@ export const useAdminAssignShipment = (
 		(payload: AdminAssignShipment) =>
 			client.admin.custom.post(`/admin/fulfillment/${payload.fulfillment_id}`, {
 				status: payload.status,
+				...(payload.delivery_assistant_id !== undefined
+					? { delivery_assistant_id: payload.delivery_assistant_id }
+					: {}),
 			}),
 		buildOptions(
 			queryClient,

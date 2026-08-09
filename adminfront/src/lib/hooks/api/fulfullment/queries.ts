@@ -1,6 +1,7 @@
 import {
 	AdminFulfillmentsListRes,
 	AdminGetFulfillmentsParams,
+	AdminDeliveryStaffListRes,
 	Fulfillment,
 } from '@/types/fulfillments';
 import generateParams from '@/utils/generate-params';
@@ -14,8 +15,10 @@ import {
 } from 'medusa-react';
 
 const ADMIN_FULFILLMENT = `admin-fulfillments` as const;
+const ADMIN_DELIVERY_STAFF = `admin-delivery-staff` as const;
 
 export const fulfillmentKeys = queryKeysFactory(ADMIN_FULFILLMENT);
+export const deliveryStaffKeys = queryKeysFactory(ADMIN_DELIVERY_STAFF);
 
 type fulfillmentQueryKey = typeof fulfillmentKeys;
 
@@ -58,5 +61,24 @@ export const useAdminFulfillment = (
 		() => client.admin.custom.get(`/admin/fulfillment/${id}`),
 		options
 	);
+	return { ...data, ...rest } as const;
+};
+
+export const useAdminDeliveryStaff = (q?: string) => {
+	const { client } = useMedusa();
+	const normalizedSearch = q?.trim() || undefined;
+	const { data, ...rest } = useQuery(
+		deliveryStaffKeys.list({ q: normalizedSearch }),
+		() => {
+			const params = normalizedSearch
+				? `?q=${encodeURIComponent(normalizedSearch)}`
+				: '';
+			return client.admin.custom.get(
+				`/admin/fulfillment/delivery-staff${params}`
+			) as Promise<Response<AdminDeliveryStaffListRes>>;
+		},
+		{ keepPreviousData: true }
+	);
+
 	return { ...data, ...rest } as const;
 };
