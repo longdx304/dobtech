@@ -13,6 +13,8 @@ interface Props extends ModalProps {
 	disabled?: boolean;
 	footer?: React.ReactNode;
 	id?: string;
+	okText?: ReactNode;
+	cancelText?: ReactNode;
 }
 
 export default function Modal({
@@ -24,6 +26,8 @@ export default function Modal({
 	disabled = false,
 	footer = null,
 	id,
+	okText = 'Xác nhận',
+	cancelText = 'Huỷ',
 	...props
 }: Props) {
 	const renderFooter = () => {
@@ -36,7 +40,7 @@ export default function Modal({
 				onClick={handleCancel}
 				loading={isLoading}
 			>
-				Huỷ
+				{cancelText}
 			</Button>,
 			<Button
 				key="submit"
@@ -45,7 +49,7 @@ export default function Modal({
 				disabled={disabled}
 				data-testid="submitButton"
 			>
-				Xác nhận
+				{okText}
 			</Button>,
 		];
 	};

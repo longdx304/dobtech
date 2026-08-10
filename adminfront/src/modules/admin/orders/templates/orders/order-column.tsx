@@ -52,7 +52,11 @@ const decideFulfillmentStatus = (status: string, className?: string) => {
 		case 'not_fulfilled':
 			return <Tag color="warning">Chưa hoàn thành</Tag>;
 		case 'exported':
-			return <Tag color="default">Đã xuất kho</Tag>;
+			return (
+				<Tag color="purple" className={className}>
+					Đã xuất kho
+				</Tag>
+			);
 		case 'partially_fulfilled':
 			return (
 				<Tag color="processing" className={className}>
@@ -61,7 +65,7 @@ const decideFulfillmentStatus = (status: string, className?: string) => {
 			);
 		case 'fulfilled':
 			return (
-				<Tag color="success" className={className}>
+				<Tag color="cyan" className={className}>
 					Đã hoàn thành
 				</Tag>
 			);
@@ -74,7 +78,7 @@ const decideFulfillmentStatus = (status: string, className?: string) => {
 		case 'shipped':
 			return (
 				<Tag color="success" className={className}>
-					Đã gửi hàng
+					Đã giao hàng
 				</Tag>
 			);
 		case 'partially_returned':
@@ -91,7 +95,7 @@ const decideFulfillmentStatus = (status: string, className?: string) => {
 			);
 		case 'canceled':
 			return (
-				<Tag color="default" className={className}>
+				<Tag color="error" className={className}>
 					Đã hủy
 				</Tag>
 			);
@@ -150,8 +154,9 @@ const orderColumns = ({}: Props) => [
 			{ text: 'Chưa hoàn thành', value: 'not_fulfilled' },
 			{ text: 'Hoàn thành một phần', value: 'partially_fulfilled' },
 			{ text: 'Đã hoàn thành', value: 'fulfilled' },
+			{ text: 'Đã xuất kho', value: 'exported' },
 			{ text: 'Gửi hàng một phần', value: 'partially_shipped' },
-			{ text: 'Đã gửi hàng', value: 'shipped' },
+			{ text: 'Đã giao hàng', value: 'shipped' },
 			{ text: 'Trả lại một phần', value: 'partially_returned' },
 			{ text: 'Đã trả lại', value: 'returned' },
 			{ text: 'Đã hủy', value: 'canceled' },
@@ -162,7 +167,7 @@ const orderColumns = ({}: Props) => [
 		},
 	},
 	{
-		title: 'Trạng thái đơn hàng',
+		title: 'Trạng thái thanh toán',
 		dataIndex: 'payment_status',
 		key: 'payment_status',
 		className: 'text-xs text-wrap',
