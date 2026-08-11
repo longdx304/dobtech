@@ -141,7 +141,7 @@ const OrderList: FC<Props> = () => {
 				selectedRowKeys,
 				onChange: (selectedKeys) => setSelectedRowKeys(selectedKeys),
 				getCheckboxProps: (record: any) => ({
-					disabled: record.fulfillment_status !== FulfillmentStatus.FULFILLED,
+					disabled: record.fulfillment_status === FulfillmentStatus.NOT_FULFILLED,
 				}),
 			}}
 			onRow={(record) => ({
