@@ -6,8 +6,11 @@ import { ICustomerResponse } from '@/types/customer';
 import { downloadExcelFiles } from '../components/orders/export-excel/download';
 import { generateAmisExcelData, generateSmeExcelData } from '../components/orders/export-excel';
 import { ExportType } from '../components/orders/export-excel/export-modals';
+import { AdminPostOrdersOrderReq } from '@medusajs/medusa';
+import { useMedusa } from 'medusa-react';
 
 export const useOrderExport = () => {
+	const { client } = useMedusa();
 	const [vatModalVisible, setVatModalVisible] = useState<boolean>(false);
 	const [exportModalVisible, setExportModalVisible] = useState<boolean>(false);
 	const [exportTypeModalVisible, setExportTypeModalVisible] = useState<boolean>(false);
@@ -78,7 +81,7 @@ export const useOrderExport = () => {
 		setPendingExportData({ orders: selectedOrders, onComplete });
 	};
 
-	const handleExportTypeNext = (type: ExportType) => {
+	const handleExportTypeNext = async (type: ExportType) => {
 		if (!pendingExportData) return;
 		
 		const { orders, onComplete } = pendingExportData;
@@ -101,22 +104,52 @@ export const useOrderExport = () => {
 		
 		console.log(`=== EXCEL EXPORT DATA (${type}) ===`);
 		console.log(`Total Files to Export: ${excelFiles.length}`);
-		
-		// Download Excel files
-		downloadExcelFiles(excelFiles).then((success) => {
-			if (success) {
-				console.log('✅ Excel files downloaded successfully!');
-				message.success('Xuất file Excel thành công!');
-			} else {
+
+		let didDownload = false;
+		try {
+			const success = await downloadExcelFiles(excelFiles);
+
+			if (!success) {
 				console.error('❌ Failed to download Excel files.');
 				message.error('Có lỗi xảy ra khi xuất file Excel.');
+				return;
 			}
-		});
-		
-		// Clear selection and state
-		setExportTypeModalVisible(false);
-		setPendingExportData(null);
-		onComplete();
+			didDownload = true;
+
+			const exportedAt = new Date().toISOString();
+			await Promise.all(
+				orders.map((order) => {
+					const parsedExportCount = Number(
+						order.metadata?.misa_export_count ?? 0
+					);
+					const currentExportCount = Number.isFinite(parsedExportCount)
+						? parsedExportCount
+						: 0;
+
+					return client.admin.orders.update(order.id, {
+						metadata: {
+							misa_export_count: currentExportCount + 1,
+							misa_last_exported_at: exportedAt,
+							misa_last_export_type: type,
+						},
+					} as AdminPostOrdersOrderReq);
+				})
+			);
+
+			console.log('✅ Excel files downloaded successfully!');
+			message.success('Xuất file Excel thành công!');
+		} catch (error) {
+			console.error('❌ Failed to save MISA export status.', error);
+			message.error(
+				'File Excel đã được tạo nhưng không thể lưu trạng thái đã xuất.'
+			);
+		} finally {
+			setExportTypeModalVisible(false);
+			setPendingExportData(null);
+			if (didDownload) {
+				onComplete();
+			}
+		}
 	};
 
 	const handleExportTypeCancel = () => {

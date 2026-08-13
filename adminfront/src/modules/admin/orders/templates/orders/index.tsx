@@ -25,7 +25,7 @@ const DEFAULT_PAGE_SIZE = 10;
 const defaultQueryProps = {
 	expand: 'customer,shipping_address,sales_person',
 	fields:
-		'id,status,display_id,created_at,email,fulfillment_status,payment_status,total,currency_code,sales_person_id',
+		'id,status,display_id,created_at,email,fulfillment_status,payment_status,total,currency_code,sales_person_id,metadata',
 };
 
 const OrderList: FC<Props> = () => {
@@ -203,7 +203,12 @@ const OrderList: FC<Props> = () => {
 			soPhieuXuatValues={exportHook.soPhieuXuatValues}
 			onSoChungTuChange={exportHook.handleSoChungTuChange}
 			onSoPhieuXuatChange={exportHook.handleSoPhieuXuatChange}
-			onDocumentNext={() => exportHook.handleDocumentModalNext(selectedOrders, () => setSelectedRowKeys([]))}
+			onDocumentNext={() =>
+				exportHook.handleDocumentModalNext(selectedOrders, () => {
+					setSelectedRowKeys([]);
+					void refetch();
+				})
+			}
 			onDocumentCancel={exportHook.handleCloseExportModal}
 			exportTypeModalVisible={exportHook.exportTypeModalVisible}
 			onExportTypeNext={exportHook.handleExportTypeNext}
