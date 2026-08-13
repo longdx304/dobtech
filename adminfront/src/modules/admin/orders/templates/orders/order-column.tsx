@@ -122,8 +122,14 @@ const orderColumns = ({}: Props) => [
 		fixed: 'left',
 		width: 100,
 		className: 'text-xs',
-		render: (_: Order['display_id']) => {
-			return <Tag bordered={false}>#{_}</Tag>;
+		render: (_: Order['display_id'], record: Order) => {
+			const hasMisaExport = Number(record.metadata?.misa_export_count ?? 0) > 0;
+
+			return (
+				<Tag bordered={false} color={hasMisaExport ? 'success' : undefined}>
+					#{_}
+				</Tag>
+			);
 		},
 	},
 	{
