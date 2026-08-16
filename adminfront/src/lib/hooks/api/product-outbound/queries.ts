@@ -35,6 +35,7 @@ export type ProductOutboundQueryKeyParams = {
 	limit?: number;
 	fulfillment_status?: string | string[];
 	isMyOrder?: boolean;
+	checked?: boolean;
 	order?: string;
 };
 
