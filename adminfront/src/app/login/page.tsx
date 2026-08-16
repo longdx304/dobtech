@@ -2,8 +2,8 @@ import LoginTemplate from '@/modules/admin/account/components/login';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Sign in',
-	description: 'Sign in to your Admin account.',
+	title: 'Đăng nhập | DOB Warehouse',
+	description: 'Đăng nhập hệ thống quản lý kho DOB Warehouse.',
 };
 
 export default function Login() {

@@ -3,6 +3,7 @@ import { Image } from '@/components/Image';
 import { Text } from '@/components/Typography';
 import { LineItem } from '@/types/lineItem';
 import { FulfillmentItem } from '@medusajs/medusa';
+import { getLineItemVariantImage } from '../../utils/variant-image';
 
 type Props = {};
 
@@ -11,16 +12,17 @@ const fulfillmentColumns = [
 		title: '',
 		key: 'image',
 		dataIndex: 'image',
-		width: 40,
+		width: 80,
 		className: 'w-fit text-xs',
 		fixed: 'left',
 		render: (_: any, record: LineItem) => (
 			<Image
-				src={record.thumbnail ?? '/images/product-img.png'}
-				alt="Product Thumbnail"
-				width={40}
-				height={40}
-				className="rounded-md hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer"
+				src={getLineItemVariantImage(record)}
+				fallback="/images/product-img.png"
+				alt={`Hình biến thể ${record.description || record.title}`}
+				width={64}
+				height={64}
+				className="rounded-md object-cover hover:scale-105 transition-transform duration-300 ease-in-out cursor-zoom-in"
 			/>
 		),
 	},
