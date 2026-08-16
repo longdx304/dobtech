@@ -12,6 +12,18 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
 	manifest: '/manifest.json',
+	applicationName: 'DOB Warehouse',
+	icons: {
+		icon: [
+			{
+				url: '/images/dob-warehouse-icon.png',
+				type: 'image/png',
+				sizes: '512x512',
+			},
+		],
+		shortcut: '/images/dob-warehouse-icon.png',
+		apple: '/images/dob-warehouse-icon.png',
+	},
 };
 
 export default async function RootLayout({

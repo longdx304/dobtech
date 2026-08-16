@@ -1,12 +1,14 @@
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Flex } from '@/components/Flex';
+import { Image } from '@/components/Image';
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import { LineItem } from '@/types/lineItem';
 import { Tooltip } from 'antd';
 import clsx from 'clsx';
 import { Check, Clock } from 'lucide-react';
+import { getLineItemVariantImage } from '../../../utils/variant-image';
 
 type InboundItemProps = {
 	item: LineItem;
@@ -34,6 +36,14 @@ const InboundDetailItem: React.FC<InboundItemProps> = ({
 				</span>
 				{isProcessing ? <Clock size={16} /> : <Check />}
 			</Tag>
+			<Image
+				src={getLineItemVariantImage(item)}
+				fallback="/images/product-img.png"
+				alt={`Hình biến thể ${item.description || item.title}`}
+				width="100%"
+				height={180}
+				className="mt-3 rounded-md object-cover cursor-zoom-in"
+			/>
 			<Flex gap={2} vertical className="py-4">
 				<Flex vertical align="flex-start">
 					<Text className="text-[14px] text-gray-500">Tên sản phẩm:</Text>
