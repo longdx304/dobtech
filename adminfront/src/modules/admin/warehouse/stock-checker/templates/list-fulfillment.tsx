@@ -40,12 +40,14 @@ const ListFulfillment: FC<Props> = ({}) => {
 
 	const stockAssignChecker = useAdminStockAssignChecker();
 	const stockRemoveChecker = useAdminStockRemoveChecker();
+	const isCompletedTab = activeKey === FulfillmentStatus.FULFILLED;
 
 	const { orders, isLoading, count } = useAdminCheckerStocks({
 		q: searchValue || undefined,
 		offset,
 		limit: DEFAULT_PAGE_SIZE,
-		fulfillment_status: activeKey,
+		fulfillment_status: isCompletedTab ? undefined : activeKey,
+		checked: isCompletedTab,
 		isMyOrder: myOrder ? true : undefined,
 		order: sortOrder,
 	});
@@ -73,6 +75,8 @@ const ListFulfillment: FC<Props> = ({}) => {
 
 	const handleChangeTab = (key: string) => {
 		setActiveKey(key);
+		setNumPages(1);
+		setOffset(0);
 	};
 
 	const handleClickDetail = async (item: Order) => {
