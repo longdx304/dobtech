@@ -21,7 +21,7 @@ import { FulfillmentStatus } from '@/types/fulfillments';
 
 type Props = {};
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 50;
 const defaultQueryProps = {
 	expand: 'customer,shipping_address,sales_person',
 	fields:
@@ -141,7 +141,10 @@ const OrderList: FC<Props> = () => {
 				selectedRowKeys,
 				onChange: (selectedKeys) => setSelectedRowKeys(selectedKeys),
 				getCheckboxProps: (record: any) => ({
-					disabled: record.fulfillment_status === FulfillmentStatus.NOT_FULFILLED,
+					disabled: ![
+						FulfillmentStatus.FULFILLED,
+						FulfillmentStatus.SHIPPED,
+					].includes(record.fulfillment_status),
 				}),
 			}}
 			onRow={(record) => ({

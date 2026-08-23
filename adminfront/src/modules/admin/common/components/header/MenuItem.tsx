@@ -165,10 +165,10 @@ export const menuItems = (
 	].filter(Boolean) as MenuItem[];
 
 	return [
+		management.length > 0 && getItem('Quản lý', 'management', null, management, 'group'),
 		sales.length > 0 && getItem('Bán hàng', 'sale', null, sales, 'group'),
 		purchases.length > 0 && getItem('Mua hàng', 'purchase', null, purchases, 'group'),
 		warehouse.length > 0 && getItem('Kho', 'inventory', null, warehouse, 'group'),
-		management.length > 0 && getItem('Quản lý', 'management', null, management, 'group'),
 		adminItems.length > 0 && getItem('Admin', 'admin', null, adminItems, 'group'),
 		getItem(
 			'',
