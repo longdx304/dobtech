@@ -156,7 +156,7 @@ const SupplierOrdersList: FC<Props> = () => {
 					onChange: (selectedKeys) => setSelectedRowKeys(selectedKeys),
 					getCheckboxProps: (record: any) => ({
 						disabled:
-							record.fulfillment_status !== FulfillSupplierOrderStt.INVENTORIED,
+							record.fulfillment_status === FulfillSupplierOrderStt.NOT_FULFILLED,
 					}),
 				}}
 				onRow={(record) => ({
