@@ -121,36 +121,79 @@ export default function DashboardTemplate() {
 
 	const indicators = [
 		{
+			permission: AccessPermission.SalesOrders,
 			label: 'Đơn mới hôm nay',
 			value: summary?.orders_today ?? 0,
 			description: 'Đơn được tạo từ 00:00 đến hiện tại',
 			className: 'border-blue-100 bg-blue-50 text-blue-700',
 		},
 		{
+			permission: AccessPermission.WarehouseOutbound,
 			label: 'Chờ soạn',
 			value: summary?.awaiting_pick ?? 0,
 			description: 'Đơn chưa hoàn tất khâu xuất kho',
 			className: 'border-amber-100 bg-amber-50 text-amber-700',
 		},
 		{
+			permission: AccessPermission.WarehouseStockChecker,
 			label: 'Chờ kiểm',
 			value: summary?.awaiting_check ?? 0,
 			description: 'Đơn đã có người soạn, chưa kiểm',
 			className: 'border-violet-100 bg-violet-50 text-violet-700',
 		},
 		{
+			permission: AccessPermission.WarehouseShipment,
 			label: 'Đang giao',
 			value: summary?.delivering ?? 0,
 			description: 'Đơn đã tạo phiếu giao, chưa hoàn tất',
 			className: 'border-cyan-100 bg-cyan-50 text-cyan-700',
 		},
 		{
+			permission: AccessPermission.WarehouseShipment,
 			label: 'Đã giao hôm nay',
 			value: summary?.shipped_today ?? 0,
 			description: 'Đơn được xác nhận giao trong hôm nay',
 			className: 'border-emerald-100 bg-emerald-50 text-emerald-700',
 		},
 	];
+	const visibleIndicators = indicators.filter(({ permission }) =>
+		allowedPermissions.has(permission)
+	);
+	const canViewQueue =
+		allowedPermissions.has(AccessPermission.SalesOrders) ||
+		allowedPermissions.has(AccessPermission.WarehouseOutbound) ||
+		allowedPermissions.has(AccessPermission.WarehouseStockChecker);
+	const visibleOperationalOrders = (dashboard?.operational_orders ?? []).filter(
+		(order) => {
+			if (allowedPermissions.has(AccessPermission.SalesOrders)) return true;
+			return order.stage === 'picking'
+				? allowedPermissions.has(AccessPermission.WarehouseOutbound)
+				: allowedPermissions.has(AccessPermission.WarehouseStockChecker);
+		}
+	);
+	const queueHref = allowedPermissions.has(AccessPermission.SalesOrders)
+		? ERoutes.ORDERS
+		: allowedPermissions.has(AccessPermission.WarehouseOutbound)
+			? ERoutes.WAREHOUSE_OUTBOUND
+			: ERoutes.WAREHOUSE_STOCK_CHECKER;
+	const getOrderHref = (order: DashboardData['operational_orders'][number]) => {
+		if (allowedPermissions.has(AccessPermission.SalesOrders)) {
+			return `${ERoutes.ORDERS}/${order.id}`;
+		}
+		if (
+			order.stage === 'picking' &&
+			allowedPermissions.has(AccessPermission.WarehouseOutbound)
+		) {
+			return `${ERoutes.WAREHOUSE_OUTBOUND}/${order.id}`;
+		}
+		if (
+			order.stage === 'checking' &&
+			allowedPermissions.has(AccessPermission.WarehouseStockChecker)
+		) {
+			return `${ERoutes.WAREHOUSE_STOCK_CHECKER}/${order.id}`;
+		}
+		return null;
+	};
 
 	return (
 		<div className="w-full space-y-5">
@@ -186,8 +229,9 @@ export default function DashboardTemplate() {
 				</div>
 			)}
 
-			<section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
-				{indicators.map((indicator) => (
+			{visibleIndicators.length > 0 && (
+				<section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+				{visibleIndicators.map((indicator) => (
 					<Card key={indicator.label} loading={dashboardQuery.isLoading} className="h-full border border-slate-100 shadow-sm">
 						<p className="mb-3 text-sm font-medium text-slate-600">{indicator.label}</p>
 						<p className={`mb-2 inline-flex rounded-lg px-3 py-1 text-3xl font-semibold ${indicator.className}`}>
@@ -196,17 +240,23 @@ export default function DashboardTemplate() {
 						<p className="mb-0 text-xs leading-5 text-slate-500">{indicator.description}</p>
 					</Card>
 				))}
-			</section>
+				</section>
+			)}
 
-			<section className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+			<section className={`grid grid-cols-1 gap-5 ${canViewQueue ? 'xl:grid-cols-3' : ''}`}>
+				{canViewQueue && (
 				<Card className="xl:col-span-2 border border-slate-100 shadow-sm" loading={dashboardQuery.isLoading}>
 					<div className="mb-4 flex items-center justify-between gap-3">
 						<div>
 							<h2 className="m-0 text-lg font-semibold text-slate-900">Hàng đợi vận hành</h2>
-							<p className="mb-0 mt-1 text-sm text-slate-500">Các đơn mới nhất đang chờ soạn hoặc kiểm.</p>
+							<p className="mb-0 mt-1 text-sm text-slate-500">Các đơn thuộc công đoạn bạn được phép xử lý.</p>
 						</div>
-						{allowedPermissions.has(AccessPermission.SalesOrders) && (
-							<Link href={ERoutes.ORDERS} className="whitespace-nowrap text-sm font-medium text-blue-600 hover:text-blue-700">
+						{(
+							allowedPermissions.has(AccessPermission.SalesOrders) ||
+							allowedPermissions.has(AccessPermission.WarehouseOutbound) ||
+							allowedPermissions.has(AccessPermission.WarehouseStockChecker)
+						) && (
+							<Link href={queueHref} className="whitespace-nowrap text-sm font-medium text-blue-600 hover:text-blue-700">
 								Xem tất cả
 							</Link>
 						)}
@@ -223,7 +273,7 @@ export default function DashboardTemplate() {
 								</tr>
 							</thead>
 							<tbody>
-								{(dashboard?.operational_orders ?? []).map((order) => (
+								{visibleOperationalOrders.map((order) => (
 									<tr key={order.id} className="border-b border-slate-50 last:border-0">
 										<td className="py-3 font-semibold text-slate-800">#{order.display_id}</td>
 										<td className="max-w-[220px] truncate py-3 text-slate-600">{order.customer_name}</td>
@@ -234,21 +284,22 @@ export default function DashboardTemplate() {
 										</td>
 										<td className="py-3 text-slate-500">{createdTime.format(new Date(order.created_at))}</td>
 										<td className="py-3 text-right">
-											{allowedPermissions.has(AccessPermission.SalesOrders) && (
-												<Link href={`${ERoutes.ORDERS}/${order.id}`} className="text-sm font-medium text-blue-600 hover:text-blue-700">Mở đơn</Link>
+											{getOrderHref(order) && (
+												<Link href={getOrderHref(order)!} className="text-sm font-medium text-blue-600 hover:text-blue-700">Mở đơn</Link>
 											)}
 										</td>
 									</tr>
 								))}
-								{!dashboardQuery.isLoading && (dashboard?.operational_orders ?? []).length === 0 && (
+								{!dashboardQuery.isLoading && visibleOperationalOrders.length === 0 && (
 									<tr><td colSpan={5} className="py-10 text-center text-sm text-slate-500">Không có đơn nào đang chờ xử lý.</td></tr>
 								)}
 							</tbody>
 						</table>
 					</div>
 				</Card>
+				)}
 
-				<Card className="border border-slate-100 shadow-sm">
+				<Card className={`${canViewQueue ? '' : 'max-w-xl'} border border-slate-100 shadow-sm`}>
 					<h2 className="m-0 text-lg font-semibold text-slate-900">Truy cập nhanh</h2>
 					<p className="mb-4 mt-1 text-sm text-slate-500">Đi tới đúng công đoạn ngay khi cần xử lý.</p>
 					<div className="space-y-2">
