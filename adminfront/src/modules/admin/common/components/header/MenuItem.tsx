@@ -10,6 +10,7 @@ import {
 	Earth,
 	Ellipsis,
 	Layers,
+	LayoutDashboard,
 	LayoutList,
 	Lock,
 	LogOut,
@@ -165,6 +166,8 @@ export const menuItems = (
 	].filter(Boolean) as MenuItem[];
 
 	return [
+		allowed.has(AccessPermission.DashboardView) &&
+			getItem('Bảng điều khiển', 'dashboard', <LayoutDashboard />),
 		management.length > 0 && getItem('Quản lý', 'management', null, management, 'group'),
 		sales.length > 0 && getItem('Bán hàng', 'sale', null, sales, 'group'),
 		purchases.length > 0 && getItem('Mua hàng', 'purchase', null, purchases, 'group'),
@@ -181,6 +184,7 @@ export const menuItems = (
 };
 
 export const menuRoutes: Record<string, string> = {
+	dashboard: ERoutes.HOME,
 	accounts: ERoutes.ACCOUNTS,
 	'product-categories': ERoutes.PRODUCT_CATEGORIES,
 	products: ERoutes.PRODUCTS,
