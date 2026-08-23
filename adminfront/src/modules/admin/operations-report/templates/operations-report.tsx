@@ -94,6 +94,10 @@ export default function OperationsReport() {
 	], [page, downloadSnapshot]);
 
 	const exportExcel = async () => {
+		if ((report?.operations?.length ?? 0) === 0) {
+			message.warning('Chưa có đơn MISA đã xác nhận để xuất báo cáo Excel');
+			return;
+		}
 		try {
 			const response = await client.admin.custom.get(`/admin/management/operations-report${toParams({
 				q: q.trim() || undefined, from: range[0], to: range[1], offset: 0, limit: 200,
@@ -115,6 +119,24 @@ export default function OperationsReport() {
 		} catch {
 			message.error('Không thể xuất báo cáo Excel');
 		}
+	};
+
+	const confirmAllLegacy = () => {
+		Modal.confirm({
+			title: 'Xác nhận tất cả đơn MISA cũ?',
+			content: 'Hệ thống sẽ dùng mã gợi ý BHYYMM-display_id và XKYYMM-display_id. Các đơn có mã MISA thực tế khác cần chỉnh riêng sau đó.',
+			okText: 'Xác nhận tất cả',
+			cancelText: 'Hủy',
+			onOk: async () => {
+				const response = await client.admin.custom.post('/admin/management/operations-report/legacy/confirm-all', {}) as any;
+				const result = response.data ?? response;
+				message.success(`Đã xác nhận ${result.confirmed ?? 0} đơn MISA cũ`);
+				if (result.failed?.length) {
+					message.warning(`${result.failed.length} đơn cần xác nhận riêng`);
+				}
+				await Promise.all([query.refetch(), legacyQuery.refetch()]);
+			},
+		});
 	};
 
 	const openLegacy = (record: LegacyRow) => {
@@ -157,7 +179,10 @@ export default function OperationsReport() {
 			{legacyRows.length > 0 && (
 				<div className="mb-4 rounded border border-amber-200 bg-amber-50 p-3 text-sm">
 					<div className="mb-2 font-medium">{legacyRows.length} đơn đã xuất MISA cũ cần xác nhận mã</div>
-					<Space wrap>{legacyRows.slice(0, 10).map((item) => <Button key={item.id} size="small" onClick={() => openLegacy(item)}>#{item.display_id}</Button>)}</Space>
+					<Space wrap>
+						<Button type="primary" size="small" onClick={confirmAllLegacy}>Xác nhận tất cả theo mã gợi ý</Button>
+						{legacyRows.slice(0, 10).map((item) => <Button key={item.id} size="small" onClick={() => openLegacy(item)}>#{item.display_id}</Button>)}
+					</Space>
 				</div>
 			)}
 			<Table loading={query.isLoading || query.isFetching} columns={columns as any} dataSource={report?.operations ?? []} rowKey="id" scroll={{ x: 1000 }} pagination={{ total: report?.count ?? 0, pageSize: 50, current: page, onChange: setPage }} />
