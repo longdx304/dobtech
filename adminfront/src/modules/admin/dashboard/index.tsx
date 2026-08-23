@@ -97,15 +97,19 @@ export default function DashboardTemplate() {
 	const dashboardQuery = useQuery({
 		queryKey: ['admin-dashboard-overview'],
 		queryFn: () => client.admin.custom.get('/admin/dashboard/overview'),
+		enabled: Boolean(user),
 		refetchInterval: 60_000,
 	});
 	const dashboard = dashboardQuery.data as DashboardData | undefined;
 	const summary = dashboard?.summary;
 	const allowedPermissions = useMemo(
-		() =>
-			user?.role === 'admin'
+		() => {
+			if (!user) return new Set<AccessPermission>();
+
+			return user.role === 'admin'
 				? new Set(Object.values(AccessPermission))
-				: new Set(resolvePagePermissions(user as any)),
+				: new Set(resolvePagePermissions(user));
+		},
 		[user]
 	);
 	const visibleQuickLinks = quickLinks.filter(({ permission }) =>
