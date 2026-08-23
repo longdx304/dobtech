@@ -10,6 +10,7 @@ import { DatePicker, Form, Modal, Space, message } from 'antd';
 import dayjs from 'dayjs';
 import { Download, Search } from 'lucide-react';
 import { useMedusa } from 'medusa-react';
+import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import * as XLSX from 'xlsx';
 
@@ -48,6 +49,7 @@ export default function OperationsReport() {
 	const [q, setQ] = useState('');
 	const [range, setRange] = useState<[string | undefined, string | undefined]>([undefined, undefined]);
 	const [page, setPage] = useState(1);
+	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 	const [legacy, setLegacy] = useState<LegacyRow | null>(null);
 	const [legacyForm] = Form.useForm();
 	const query = useQuery({
@@ -82,6 +84,17 @@ export default function OperationsReport() {
 
 	const columns = useMemo(() => [
 		{ title: 'STT', key: 'stt', width: 70, render: (_: unknown, __: OperationsRow, index: number) => (page - 1) * 50 + index + 1 },
+		{
+			title: 'Số đơn',
+			dataIndex: 'display_id',
+			key: 'display_id',
+			width: 110,
+			render: (displayId: number, record: OperationsRow) => (
+				<Link className="text-blue-600 hover:underline" href={`/admin/orders/${record.id}`}>
+					#{displayId}
+				</Link>
+			),
+		},
 		{ title: 'Đơn hàng', dataIndex: 'misa_document_number', key: 'misa_document_number', width: 150 },
 		{ title: 'Bao', key: 'bags', width: 90, render: () => '' },
 		{ title: 'Bịch', key: 'packs', width: 90, render: () => '' },
@@ -93,16 +106,14 @@ export default function OperationsReport() {
 		{ title: 'File MISA', key: 'snapshot', width: 130, render: (_: unknown, record: OperationsRow) => record.has_misa_snapshot ? <Button size="small" onClick={() => downloadSnapshot(record)}>Tải lại</Button> : 'Chưa lưu' },
 	], [page, downloadSnapshot]);
 
-	const exportExcel = async () => {
-		if ((report?.operations?.length ?? 0) === 0) {
-			message.warning('Chưa có đơn MISA đã xác nhận để xuất báo cáo Excel');
+	const exportExcel = () => {
+		const selectedRows = (report?.operations ?? []).filter((item) => selectedRowKeys.includes(item.id));
+		if (selectedRows.length === 0) {
+			message.warning('Chọn ít nhất một đơn hàng để xuất báo cáo Excel');
 			return;
 		}
 		try {
-			const response = await client.admin.custom.get(`/admin/management/operations-report${toParams({
-				q: q.trim() || undefined, from: range[0], to: range[1], offset: 0, limit: 200,
-			})}`) as { operations?: OperationsRow[] };
-			const rows = (response.operations ?? []).map((item, index) => ({
+			const rows = selectedRows.map((item, index) => ({
 				STT: index + 1,
 				'Đơn hàng': item.misa_document_number,
 				Bao: '',
@@ -170,7 +181,9 @@ export default function OperationsReport() {
 		<Card className="w-full" bordered={false}>
 			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
 				<Title level={3}>Báo cáo vận hành</Title>
-				<Button icon={<Download size={16} />} onClick={exportExcel}>Xuất Excel</Button>
+				<Button icon={<Download size={16} />} disabled={selectedRowKeys.length === 0} onClick={exportExcel}>
+					Xuất Excel{selectedRowKeys.length ? ` (${selectedRowKeys.length})` : ''}
+				</Button>
 			</div>
 			<Space wrap className="mb-4">
 				<Input value={q} onChange={(event) => { setQ(event.target.value); setPage(1); }} placeholder="Tìm mã BH..." prefix={<Search size={16} />} className="w-[260px]" />
@@ -185,7 +198,15 @@ export default function OperationsReport() {
 					</Space>
 				</div>
 			)}
-			<Table loading={query.isLoading || query.isFetching} columns={columns as any} dataSource={report?.operations ?? []} rowKey="id" scroll={{ x: 1000 }} pagination={{ total: report?.count ?? 0, pageSize: 50, current: page, onChange: setPage }} />
+			<Table
+				loading={query.isLoading || query.isFetching}
+				columns={columns as any}
+				dataSource={report?.operations ?? []}
+				rowKey="id"
+				rowSelection={{ selectedRowKeys, onChange: setSelectedRowKeys }}
+				scroll={{ x: 1000 }}
+				pagination={{ total: report?.count ?? 0, pageSize: 50, current: page, onChange: (nextPage) => { setPage(nextPage); setSelectedRowKeys([]); } }}
+			/>
 			<Modal title="Xác nhận đơn MISA cũ" open={Boolean(legacy)} onCancel={() => setLegacy(null)} onOk={confirmLegacy} okText="Xác nhận" cancelText="Hủy">
 				<Form form={legacyForm} layout="vertical">
 					<Form.Item name="misa_document_number" label="Số chứng từ BH" rules={[{ required: true }]}><Input /></Form.Item>

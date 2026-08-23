@@ -1,7 +1,7 @@
 import { Tag } from '@/components/Tag';
 import { Text } from '@/components/Typography';
 import { getCurrencyInfo } from '@/lib/utils';
-import { Order } from '@medusajs/medusa';
+import { Order } from '@/types/order';
 import dayjs from 'dayjs';
 
 type Props = {};
@@ -131,6 +131,14 @@ const orderColumns = ({}: Props) => [
 				</Tag>
 			);
 		},
+	},
+	{
+		title: 'Số MISA',
+		dataIndex: 'misa_document_number',
+		key: 'misa_document_number',
+		width: 150,
+		className: 'text-xs',
+		render: (value: Order['misa_document_number']) => value || '—',
 	},
 	{
 		title: 'Khách hàng',
