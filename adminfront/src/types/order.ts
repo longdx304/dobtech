@@ -2,6 +2,10 @@ import { FormImage, Option } from '@/types/shared';
 import { Order as MedusaOrder, User } from '@medusajs/medusa';
 
 export type Order = MedusaOrder & {
+	misa_document_number?: string | null;
+	misa_stock_out_number?: string | null;
+	misa_first_exported_at?: string | null;
+	misa_pair_quantity?: number | null;
 	sales_person_id?: string | null;
 	sales_person?: (User & { permissions?: string | null }) | null;
 	handler_id?: string;

@@ -26,6 +26,7 @@ export enum ERoutes {
 	WAREHOUSE_SHIPMENT = '/admin/warehouse/shipment',
 	WAREHOUSE_MANAGE = '/admin/warehouse/manage',
 	WAREHOUSE_INVENTORY_CHECKER = '/admin/warehouse/inventory-checker',
+	OPERATIONS_REPORT = '/admin/management/operations-report',
 
 	// KIOT system routes
 	KIOT_HOME = '/kiot',
@@ -142,6 +143,10 @@ export const routesConfig: TRouteConfig[] = [
 	{
 		path: ERoutes.WAREHOUSE_INVENTORY_CHECKER,
 		mode: [EPermissions.Driver, EPermissions.Manager],
+	},
+	{
+		path: ERoutes.OPERATIONS_REPORT,
+		mode: [EPermissions.Manager],
 	},
 	{
 		path: ERoutes.KIOT_WAREHOUSE_MANAGE,

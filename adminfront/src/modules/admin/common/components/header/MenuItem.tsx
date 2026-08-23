@@ -27,6 +27,7 @@ import {
 	Users,
 	UsersRound,
 	Warehouse,
+	BarChart3,
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -110,6 +111,10 @@ const itemSettings: Array<[AccessPermission, MenuItem]> = [
 	[AccessPermission.SettingsReturnReasons, getItem('Lý do trả hàng', 'return-reasons', <Undo2 />)],
 ];
 
+const itemManagement: Array<[AccessPermission, MenuItem]> = [
+	[AccessPermission.ManagementOperationsReport, getItem('Báo cáo vận hành', 'operations-report', <BarChart3 />)],
+];
+
 // Item menu user
 const itemUser = (
 	user: IAdminResponse,
@@ -152,6 +157,7 @@ export const menuItems = (
 	const purchases = filterAllowed(itemPurchases);
 	const warehouse = filterAllowed(itemsWarehouse);
 	const settings = filterAllowed(itemSettings);
+	const management = filterAllowed(itemManagement);
 	const adminItems = [
 		allowed.has(AccessPermission.AccountsManage) &&
 			getItem('Quản lý nhân viên', 'accounts', <Users />),
@@ -162,6 +168,7 @@ export const menuItems = (
 		sales.length > 0 && getItem('Bán hàng', 'sale', null, sales, 'group'),
 		purchases.length > 0 && getItem('Mua hàng', 'purchase', null, purchases, 'group'),
 		warehouse.length > 0 && getItem('Kho', 'inventory', null, warehouse, 'group'),
+		management.length > 0 && getItem('Quản lý', 'management', null, management, 'group'),
 		adminItems.length > 0 && getItem('Admin', 'admin', null, adminItems, 'group'),
 		getItem(
 			'',
@@ -195,4 +202,5 @@ export const menuRoutes: Record<string, string> = {
 	'warehouse-ship': ERoutes.WAREHOUSE_SHIPMENT,
 	'warehouse-manage': ERoutes.WAREHOUSE_MANAGE,
 	'warehouse-inventory-checker': ERoutes.WAREHOUSE_INVENTORY_CHECKER,
+	'operations-report': ERoutes.OPERATIONS_REPORT,
 };
