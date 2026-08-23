@@ -3,7 +3,7 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { Text } from '@/components/Typography';
-import { Order } from '@medusajs/medusa';
+import { Order } from '@/types/order';
 import { Radio, Space } from 'antd';
 import { FC, useState } from 'react';
 
@@ -110,11 +110,13 @@ const ExportModals: FC<ExportModalsProps> = ({
 							<Input
 								placeholder="Nhập số chứng từ..."
 								value={soChungTuValues[order.id] || ''}
+								disabled={Boolean(order.misa_document_number)}
 								onChange={(e) => onSoChungTuChange(order.id, e.target.value)}
 							/>
 							<Input
 								placeholder="Nhập số phiếu xuất kho..."
 								value={soPhieuXuatValues[order.id] || ''}
+								disabled={Boolean(order.misa_stock_out_number)}
 								onChange={(e) => onSoPhieuXuatChange(order.id, e.target.value)}
 							/>
 						</div>
