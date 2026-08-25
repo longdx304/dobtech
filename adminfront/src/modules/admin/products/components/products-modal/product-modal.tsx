@@ -248,6 +248,9 @@ const createPayload = (
 		description: data?.general?.description || undefined,
 		discountable: data?.general?.discounted,
 		is_giftcard: false,
+		metadata: {
+			show_in_customer_app: true,
+		},
 		// Organize
 		collection_id: (data?.organize?.collection as any) || undefined,
 		categories: data?.organize?.categories?.length
