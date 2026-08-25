@@ -13,6 +13,7 @@ import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Select } from '@/components/Select';
+import { Switch } from '@/components/Switch';
 import { Tag } from '@/components/Tag';
 import { Text, Title } from '@/components/Typography';
 import useToggleState from '@/lib/hooks/use-toggle-state';
@@ -28,6 +29,7 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 	const [statusValue, setStatusValue] = useState<string | undefined>(
 		product?.status
 	);
+	const [showInCustomerApp, setShowInCustomerApp] = useState(true);
 	const { state, onOpen, onClose } = useToggleState(false);
 	const { product_categories, isLoading: isLoadingCategory } =
 		useAdminProductCategories({
@@ -39,6 +41,7 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 
 	useEffect(() => {
 		setStatusValue(product?.status);
+		setShowInCustomerApp(product?.metadata?.show_in_customer_app !== false);
 	}, [product]);
 
 	const actions = [
@@ -89,6 +92,30 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 		);
 	};
 
+	const onChangeCustomerAppVisibility = (checked: boolean) => {
+		updateProduct.mutateAsync(
+			{
+				metadata: {
+					...(product?.metadata ?? {}),
+					show_in_customer_app: checked,
+				},
+			},
+			{
+				onSuccess: () => {
+					setShowInCustomerApp(checked);
+					message.success(
+						checked
+							? 'Sản phẩm đã hiển thị trên Customer App'
+							: 'Sản phẩm đã được ẩn khỏi Customer App'
+					);
+				},
+				onError: () => {
+					message.error('Cập nhật hiển thị Customer App thất bại');
+				},
+			}
+		);
+	};
+
 	return (
 		<Card
 			loading={loadingProduct || isLoadingCategory || isLoadingCollection}
@@ -104,6 +131,16 @@ const GeneralInfo: FC<Props> = ({ product, loadingProduct }) => {
 							gap="40px"
 							className="max-[390px]:w-full"
 						>
+							<Flex align="center" gap="8px">
+								<Text className="text-sm text-gray-600">
+									Hiển thị Customer App
+								</Text>
+								<Switch
+									checked={showInCustomerApp}
+									disabled={updateProduct.isLoading}
+									onChange={onChangeCustomerAppVisibility}
+								/>
+							</Flex>
 							<Select
 								value={statusValue}
 								suffixIcon={null}

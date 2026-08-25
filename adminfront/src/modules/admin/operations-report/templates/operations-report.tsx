@@ -21,6 +21,7 @@ type OperationsRow = {
 	misa_stock_out_number: string;
 	misa_first_exported_at: string;
 	misa_pair_quantity: number | null;
+	sales_person: string;
 	preparers: string;
 	checkers: string;
 	shippers: string;
@@ -44,12 +45,39 @@ const toParams = (values: Record<string, string | number | undefined>) => {
 	return query ? `?${query}` : '';
 };
 
+const exportRows = (operations: OperationsRow[]) =>
+	operations.map((item, index) => ({
+		STT: index + 1,
+		'Đơn hàng': item.misa_document_number,
+		Bao: '',
+		Bịch: '',
+		Đôi: item.misa_pair_quantity ?? '',
+		'Người soạn': item.preparers,
+		'Người Kiểm': item.checkers,
+		'Người giao': item.shippers,
+		'Phụ xe': item.delivery_assistants,
+	}));
+
+const downloadReport = (operations: OperationsRow[]) => {
+	const workbook = XLSX.utils.book_new();
+	XLSX.utils.book_append_sheet(
+		workbook,
+		XLSX.utils.json_to_sheet(exportRows(operations)),
+		'Báo cáo vận hành'
+	);
+	XLSX.writeFile(
+		workbook,
+		`bao-cao-van-hanh-${dayjs().format('YYYYMMDD-HHmm')}.xlsx`
+	);
+};
+
 export default function OperationsReport() {
 	const { client } = useMedusa();
 	const [q, setQ] = useState('');
 	const [range, setRange] = useState<[string | undefined, string | undefined]>([undefined, undefined]);
 	const [page, setPage] = useState(1);
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+	const [isExportingAll, setIsExportingAll] = useState(false);
 	const [legacy, setLegacy] = useState<LegacyRow | null>(null);
 	const [legacyForm] = Form.useForm();
 	const query = useQuery({
@@ -95,6 +123,7 @@ export default function OperationsReport() {
 				</Link>
 			),
 		},
+		{ title: 'NV bán hàng', dataIndex: 'sales_person', key: 'sales_person', width: 180 },
 		{ title: 'Đơn hàng', dataIndex: 'misa_document_number', key: 'misa_document_number', width: 150 },
 		{ title: 'Bao', key: 'bags', width: 90, render: () => '' },
 		{ title: 'Bịch', key: 'packs', width: 90, render: () => '' },
@@ -113,22 +142,49 @@ export default function OperationsReport() {
 			return;
 		}
 		try {
-			const rows = selectedRows.map((item, index) => ({
-				STT: index + 1,
-				'Đơn hàng': item.misa_document_number,
-				Bao: '',
-				Bịch: '',
-				Đôi: item.misa_pair_quantity ?? '',
-				'Người soạn': item.preparers,
-				'Người Kiểm': item.checkers,
-				'Người giao': item.shippers,
-				'Phụ xe': item.delivery_assistants,
-			}));
-			const workbook = XLSX.utils.book_new();
-			XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(rows), 'Báo cáo vận hành');
-			XLSX.writeFile(workbook, `bao-cao-van-hanh-${dayjs().format('YYYYMMDD-HHmm')}.xlsx`);
+			downloadReport(selectedRows);
 		} catch {
 			message.error('Không thể xuất báo cáo Excel');
+		}
+	};
+
+	const exportAllExcel = async () => {
+		setIsExportingAll(true);
+		try {
+			const operations: OperationsRow[] = [];
+			const limit = 200;
+			let offset = 0;
+			let count = 0;
+
+			do {
+				const response = (await client.admin.custom.get(
+					`/admin/management/operations-report${toParams({
+						q: q.trim() || undefined,
+						from: range[0],
+						to: range[1],
+						offset,
+						limit,
+					})}`
+				)) as any;
+				const page = response.operations ?? response.data?.operations ?? [];
+				count = Number(response.count ?? response.data?.count ?? 0);
+				operations.push(...page);
+				offset += page.length;
+				// Avoid a retry loop if an incomplete API response reports a count
+				// but does not return any rows for the requested page.
+				if (page.length === 0) break;
+			} while (offset < count);
+
+			if (operations.length === 0) {
+				message.warning('Không có đơn nào đủ thông tin nhân sự để xuất Excel');
+				return;
+			}
+
+			downloadReport(operations);
+		} catch (error: any) {
+			message.error(error?.response?.data?.message || 'Không thể xuất toàn bộ báo cáo Excel');
+		} finally {
+			setIsExportingAll(false);
 		}
 	};
 
@@ -181,9 +237,19 @@ export default function OperationsReport() {
 		<Card className="w-full" bordered={false}>
 			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
 				<Title level={3}>Báo cáo vận hành</Title>
-				<Button icon={<Download size={16} />} disabled={selectedRowKeys.length === 0} onClick={exportExcel}>
-					Xuất Excel{selectedRowKeys.length ? ` (${selectedRowKeys.length})` : ''}
-				</Button>
+				<Space wrap>
+					<Button
+						icon={<Download size={16} />}
+						loading={isExportingAll}
+						disabled={(report?.count ?? 0) === 0}
+						onClick={exportAllExcel}
+					>
+						Xuất toàn bộ Excel
+					</Button>
+					<Button icon={<Download size={16} />} disabled={selectedRowKeys.length === 0} onClick={exportExcel}>
+						Xuất Excel{selectedRowKeys.length ? ` (${selectedRowKeys.length})` : ''}
+					</Button>
+				</Space>
 			</div>
 			<Space wrap className="mb-4">
 				<Input value={q} onChange={(event) => { setQ(event.target.value); setPage(1); }} placeholder="Tìm mã BH..." prefix={<Search size={16} />} className="w-[260px]" />
