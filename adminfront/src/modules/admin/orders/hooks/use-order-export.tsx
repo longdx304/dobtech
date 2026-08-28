@@ -8,6 +8,16 @@ import { generateAmisExcelData, generateSmeExcelData } from '../components/order
 import { ExportType } from '../components/orders/export-excel/export-modals';
 import { useMedusa } from 'medusa-react';
 
+export const mergePreparedMisaCodes = (
+	order: Order,
+	preparedOrder: Order
+): Order =>
+	({
+		...order,
+		misa_document_number: preparedOrder.misa_document_number,
+		misa_stock_out_number: preparedOrder.misa_stock_out_number,
+	} as Order);
+
 export const useOrderExport = () => {
 	const { client } = useMedusa();
 	const [vatModalVisible, setVatModalVisible] = useState<boolean>(false);
@@ -96,12 +106,26 @@ export const useOrderExport = () => {
 						misa_document_number: soChungTuValues[order.id] || '',
 						misa_stock_out_number: soPhieuXuatValues[order.id] || '',
 					});
-					return (response.order ?? response.data?.order) as Order;
+					const preparedOrder = (response.order ?? response.data?.order) as
+						| Order
+						| undefined;
+
+					if (!preparedOrder) {
+						throw new Error('API không trả về đơn hàng sau khi lưu mã MISA');
+					}
+
+					// The prepare endpoint only returns the persisted order fields. Keep
+					// the fully expanded order from the list so items/customer/variants
+					// are still available when generating the Excel rows.
+					return mergePreparedMisaCodes(order, preparedOrder);
 				})
 			);
-		} catch (error) {
+		} catch (error: any) {
 			console.error('❌ Failed to reserve MISA numbers.', error);
-			message.error('Không thể lưu mã MISA. Kiểm tra mã BH/XK có bị trùng không.');
+			message.error(
+				error?.response?.data?.message ||
+					'Không thể lưu mã MISA. Kiểm tra mã BH/XK có bị trùng không.'
+			);
 			return;
 		}
 
@@ -118,6 +142,16 @@ export const useOrderExport = () => {
 			excelFiles = generateAmisExcelData(ordersData);
 		} else {
 			excelFiles = generateSmeExcelData(ordersData);
+		}
+
+		const emptyFiles = excelFiles.filter((file) => file.rows.length === 0);
+		if (emptyFiles.length > 0) {
+			message.error(
+				`Không thể xuất: đơn #${emptyFiles
+					.map((file) => file.displayId)
+					.join(', #')} không có dòng sản phẩm.`
+			);
+			return;
 		}
 		
 		console.log(`=== EXCEL EXPORT DATA (${type}) ===`);
@@ -150,10 +184,11 @@ export const useOrderExport = () => {
 
 			console.log('✅ Excel files downloaded successfully!');
 			message.success('Xuất file Excel thành công!');
-		} catch (error) {
+		} catch (error: any) {
 			console.error('❌ Failed to save MISA export status.', error);
 			message.error(
-				'File Excel đã được tạo nhưng không thể lưu trạng thái đã xuất.'
+				error?.response?.data?.message ||
+					'File Excel đã được tạo nhưng không thể lưu trạng thái đã xuất.'
 			);
 		} finally {
 			setExportTypeModalVisible(false);
