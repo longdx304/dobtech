@@ -9,6 +9,7 @@ import Fulfillment from '@/modules/admin/orders/components/orders/fulfillment';
 import Information from '@/modules/admin/orders/components/orders/information';
 import Payment from '@/modules/admin/orders/components/orders/payment';
 import Summary from '@/modules/admin/orders/components/orders/summary';
+import OperationalStaff from '@/modules/admin/orders/components/orders/operational-staff';
 import Timeline from '@/modules/admin/orders/components/orders/timeline';
 import { useBuildTimeline } from '../../hooks/use-build-timeline';
 
@@ -51,6 +52,7 @@ export default function OrderDetail({ id }: Readonly<Props>) {
 						refetch={refetchOrder}
 					/>
 					<Payment order={order} isLoading={isLoading} refetch={refetchOrder} />
+					<OperationalStaff order={order as any} refetch={refetchOrder} />
 					<Fulfillment order={order} isLoading={isLoading} refetch={refetch} />
 					<CustomerInfo order={order} isLoading={isLoading} />
 				</Col>

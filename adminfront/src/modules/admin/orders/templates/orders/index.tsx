@@ -21,11 +21,11 @@ import { FulfillmentStatus } from '@/types/fulfillments';
 
 type Props = {};
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 50;
 const defaultQueryProps = {
 	expand: 'customer,shipping_address,sales_person',
 	fields:
-		'id,status,display_id,created_at,email,fulfillment_status,payment_status,total,currency_code,sales_person_id,metadata',
+		'id,status,display_id,created_at,email,fulfillment_status,payment_status,total,currency_code,sales_person_id,metadata,misa_document_number,misa_stock_out_number,misa_first_exported_at,misa_pair_quantity',
 };
 
 const OrderList: FC<Props> = () => {
@@ -141,7 +141,10 @@ const OrderList: FC<Props> = () => {
 				selectedRowKeys,
 				onChange: (selectedKeys) => setSelectedRowKeys(selectedKeys),
 				getCheckboxProps: (record: any) => ({
-					disabled: record.fulfillment_status === FulfillmentStatus.NOT_FULFILLED,
+					disabled: ![
+						FulfillmentStatus.FULFILLED,
+						FulfillmentStatus.SHIPPED,
+					].includes(record.fulfillment_status),
 				}),
 			}}
 			onRow={(record) => ({

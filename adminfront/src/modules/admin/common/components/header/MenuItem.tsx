@@ -10,6 +10,7 @@ import {
 	Earth,
 	Ellipsis,
 	Layers,
+	LayoutDashboard,
 	LayoutList,
 	Lock,
 	LogOut,
@@ -27,6 +28,7 @@ import {
 	Users,
 	UsersRound,
 	Warehouse,
+	BarChart3,
 } from 'lucide-react';
 
 import { Dropdown } from '@/components/Dropdown';
@@ -110,6 +112,10 @@ const itemSettings: Array<[AccessPermission, MenuItem]> = [
 	[AccessPermission.SettingsReturnReasons, getItem('Lý do trả hàng', 'return-reasons', <Undo2 />)],
 ];
 
+const itemManagement: Array<[AccessPermission, MenuItem]> = [
+	[AccessPermission.ManagementOperationsReport, getItem('Báo cáo vận hành', 'operations-report', <BarChart3 />)],
+];
+
 // Item menu user
 const itemUser = (
 	user: IAdminResponse,
@@ -152,6 +158,7 @@ export const menuItems = (
 	const purchases = filterAllowed(itemPurchases);
 	const warehouse = filterAllowed(itemsWarehouse);
 	const settings = filterAllowed(itemSettings);
+	const management = filterAllowed(itemManagement);
 	const adminItems = [
 		allowed.has(AccessPermission.AccountsManage) &&
 			getItem('Quản lý nhân viên', 'accounts', <Users />),
@@ -159,6 +166,9 @@ export const menuItems = (
 	].filter(Boolean) as MenuItem[];
 
 	return [
+		allowed.has(AccessPermission.DashboardView) &&
+			getItem('Bảng điều khiển', 'dashboard', <LayoutDashboard />),
+		management.length > 0 && getItem('Quản lý', 'management', null, management, 'group'),
 		sales.length > 0 && getItem('Bán hàng', 'sale', null, sales, 'group'),
 		purchases.length > 0 && getItem('Mua hàng', 'purchase', null, purchases, 'group'),
 		warehouse.length > 0 && getItem('Kho', 'inventory', null, warehouse, 'group'),
@@ -174,6 +184,7 @@ export const menuItems = (
 };
 
 export const menuRoutes: Record<string, string> = {
+	dashboard: ERoutes.HOME,
 	accounts: ERoutes.ACCOUNTS,
 	'product-categories': ERoutes.PRODUCT_CATEGORIES,
 	products: ERoutes.PRODUCTS,
@@ -195,4 +206,5 @@ export const menuRoutes: Record<string, string> = {
 	'warehouse-ship': ERoutes.WAREHOUSE_SHIPMENT,
 	'warehouse-manage': ERoutes.WAREHOUSE_MANAGE,
 	'warehouse-inventory-checker': ERoutes.WAREHOUSE_INVENTORY_CHECKER,
+	'operations-report': ERoutes.OPERATIONS_REPORT,
 };

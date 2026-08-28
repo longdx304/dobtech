@@ -6,7 +6,6 @@ import { ICustomerResponse } from '@/types/customer';
 import { downloadExcelFiles } from '../components/orders/export-excel/download';
 import { generateAmisExcelData, generateSmeExcelData } from '../components/orders/export-excel';
 import { ExportType } from '../components/orders/export-excel/export-modals';
-import { AdminPostOrdersOrderReq } from '@medusajs/medusa';
 import { useMedusa } from 'medusa-react';
 
 export const useOrderExport = () => {
@@ -41,10 +40,12 @@ export const useOrderExport = () => {
 			const displayId = order.display_id;
 			
 			// Format: BH + year + month + -display_id (e.g., BH2511-1)
-			soChungTuInitial[order.id] = `BH${year}${month}-${displayId}`;
+			soChungTuInitial[order.id] =
+				order.misa_document_number || `BH${year}${month}-${displayId}`;
 			
 			// Format: XK + year + month + -display_id (e.g., XK2511-1)
-			soPhieuXuatInitial[order.id] = `XK${year}${month}-${displayId}`;
+			soPhieuXuatInitial[order.id] =
+				order.misa_stock_out_number || `XK${year}${month}-${displayId}`;
 		});
 		
 		setSoChungTuValues(soChungTuInitial);
@@ -86,11 +87,28 @@ export const useOrderExport = () => {
 		
 		const { orders, onComplete } = pendingExportData;
 
-		// Prepare data for Excel generation
-		const ordersData = orders.map(order => ({
+		let preparedOrders: Order[];
+		try {
+			preparedOrders = await Promise.all(
+				orders.map(async (order) => {
+					const response = await client.admin.custom.post('/admin/orders/misa-export/prepare', {
+						order_id: order.id,
+						misa_document_number: soChungTuValues[order.id] || '',
+						misa_stock_out_number: soPhieuXuatValues[order.id] || '',
+					});
+					return (response.order ?? response.data?.order) as Order;
+				})
+			);
+		} catch (error) {
+			console.error('❌ Failed to reserve MISA numbers.', error);
+			message.error('Không thể lưu mã MISA. Kiểm tra mã BH/XK có bị trùng không.');
+			return;
+		}
+
+		const ordersData = preparedOrders.map(order => ({
 			order,
-			soChungTu: soChungTuValues[order.id] || '',
-			soPhieuXuat: soPhieuXuatValues[order.id] || '',
+			soChungTu: order.misa_document_number || '',
+			soPhieuXuat: order.misa_stock_out_number || '',
 			vatRate: vatRate,
 		}));
 
@@ -116,23 +134,17 @@ export const useOrderExport = () => {
 			}
 			didDownload = true;
 
-			const exportedAt = new Date().toISOString();
 			await Promise.all(
-				orders.map((order) => {
-					const parsedExportCount = Number(
-						order.metadata?.misa_export_count ?? 0
-					);
-					const currentExportCount = Number.isFinite(parsedExportCount)
-						? parsedExportCount
-						: 0;
-
-					return client.admin.orders.update(order.id, {
-						metadata: {
-							misa_export_count: currentExportCount + 1,
-							misa_last_exported_at: exportedAt,
-							misa_last_export_type: type,
+				preparedOrders.map((order) => {
+					const file = excelFiles.find((item) => item.orderId === order.id);
+					return client.admin.custom.post('/admin/orders/misa-export/confirm', {
+						order_id: order.id,
+						export_type: type,
+						snapshot: {
+							vat_rate: vatRate,
+							rows: file?.rows ?? [],
 						},
-					} as AdminPostOrdersOrderReq);
+					});
 				})
 			);
 
