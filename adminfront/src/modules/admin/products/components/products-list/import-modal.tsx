@@ -23,6 +23,7 @@ import { Modal } from '@/components/Modal';
 import { Text, Title } from '@/components/Typography';
 import { cn } from '@/lib/utils';
 import { downloadProductImportCSVTemplate } from './download-template';
+import { readProductImportWorkbook } from './product-import-file';
 
 /**
  * Hook returns a batch job. The endpoint is polled every 2s while the job is processing.
@@ -108,7 +109,7 @@ const ImportModal: FC<Props> = ({ state, handleOk, handleCancel }) => {
 			const reader = new FileReader();
 			reader.onload = async (e) => {
 				const data = new Uint8Array(e.target?.result as ArrayBuffer);
-				const workbook = XLSX.read(data, { type: 'array' });
+				const workbook = readProductImportWorkbook(data);
 				// Assume we want to process the first sheet
 				const firstSheetName = workbook.SheetNames[0];
 				const worksheet = workbook.Sheets[firstSheetName];
