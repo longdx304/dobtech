@@ -8,7 +8,7 @@ import {
 	extractOptionPrice,
 	formatAmountWithSymbol,
 } from '@/utils/prices';
-import { Avatar, Button, Table } from 'antd';
+import { Alert, Avatar, Button, Table } from 'antd';
 import { useAdminShippingOptions } from 'medusa-react';
 import { MedusaImage } from '@/components/MedusaImage';
 import { useContext, useMemo } from 'react';
@@ -20,7 +20,14 @@ type Props = {
 const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 	const {
 		form,
-		context: { items, region: regionObj, selectedShippingOption },
+		context: {
+			items,
+			region: regionObj,
+			selectedShippingOption,
+			shippingPolicyQuote,
+			isShippingPolicyLoading,
+			shippingPolicyError,
+		},
 	} = useNewDraftOrderForm();
 
 	const shipping = form.getFieldValue('shipping_address');
@@ -129,6 +136,35 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 
 	return (
 		<div className="min-h-[705px]">
+			{shippingPolicyError && (
+				<Alert
+					type="error"
+					showIcon
+					className="mb-4"
+					message="Cấu hình phí vận chuyển chưa hợp lệ"
+					description="Các khoảng giá trị đơn đang bị hở hoặc chồng nhau. Vui lòng kiểm tra lại tại Cài đặt → Khu vực → Vận chuyển."
+				/>
+			)}
+			{shippingPolicyQuote?.configured && (
+				<Alert
+					type="info"
+					showIcon
+					className="mb-4"
+					message={
+						shippingPolicyQuote.option.customer_pays_external
+							? 'Khách tự thanh toán phí vận chuyển ngoài hệ thống'
+							: `${shippingPolicyQuote.option.name}: ${extractOptionPrice(
+									shippingPolicyQuote.option.amount,
+									regionObj!
+							  )}`
+					}
+					description={
+						isShippingPolicyLoading
+							? 'Đang kiểm tra lại chính sách vận chuyển...'
+							: 'Backend sẽ tính lại theo giá trị hàng sau chiết khấu khi tạo đơn.'
+					}
+				/>
+			)}
 			<Flex className="flex items-center gap-2">
 				<Tooltip title={titleContent}>
 					<Text strong>Gửi email:</Text>

@@ -1,3 +1,7 @@
+import {
+	ShippingPolicyQuote,
+	useAdminShippingPolicyQuote,
+} from '@/lib/hooks/api/shipping-policy';
 import { Option } from '@/types/products';
 import { AddressPayload, Region, ShippingOption } from '@medusajs/medusa';
 import { Form } from 'antd';
@@ -44,6 +48,9 @@ type NewDraftOrderContextValue = {
 	selectedShippingOption: ShippingOption | undefined;
 	items: NewDraftOrderForm['items'];
 	shippingOptions: ShippingOption[];
+	shippingPolicyQuote: ShippingPolicyQuote | undefined;
+	isShippingPolicyLoading: boolean;
+	shippingPolicyError: unknown;
 	setDataFromExcel: (data: any[]) => void;
 	dataFromExcel: any[];
 	setItems: React.Dispatch<React.SetStateAction<NewDraftOrderForm['items']>>;
@@ -106,15 +113,34 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 		}
 	);
 
+	const itemsSubtotal = useMemo(
+		() =>
+			itemsSelected.reduce(
+				(total, item) => total + item.quantity * item.unit_price,
+				0
+			),
+		[itemsSelected]
+	);
+	const {
+		quote: shippingPolicyQuote,
+		isLoading: isShippingPolicyLoading,
+		error: shippingPolicyError,
+	} = useAdminShippingPolicyQuote(
+		cachedRegion?.id,
+		itemsSubtotal,
+		itemsSelected.length > 0
+	);
+
+	useEffect(() => {
+		if (shippingPolicyQuote?.configured) {
+			form.setFieldValue('shipping_option', shippingPolicyQuote.option.id);
+		}
+	}, [form, shippingPolicyQuote]);
+
 	const validShippingOptions = useMemo(() => {
 		if (!shipping_options) {
 			return [];
 		}
-
-		const formValues = form.getFieldsValue();
-		const total = formValues.items?.reduce((acc, next) => {
-			return acc + next.quantity * next.unit_price;
-		}, 0);
 
 		return shipping_options?.reduce((acc, next) => {
 			if (next.requirements) {
@@ -126,8 +152,8 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 				);
 
 				if (
-					(minSubtotal && total <= minSubtotal.amount) ||
-					(maxSubtotal && total >= maxSubtotal.amount)
+					(minSubtotal && itemsSubtotal < minSubtotal.amount) ||
+					(maxSubtotal && itemsSubtotal >= maxSubtotal.amount)
 				) {
 					return acc;
 				}
@@ -136,11 +162,11 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 			return acc;
 		}, [] as ShippingOption[]);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [shipping_options, form]);
+	}, [shipping_options, itemsSubtotal]);
 
 	useEffect(() => {
 		const formValues = form.getFieldsValue();
-		setItemsSelected(formValues.items);
+		setItemsSelected(formValues.items ?? []);
 	}, [form]);
 
 	const contextValue = useMemo(
@@ -150,6 +176,9 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 			selectedShippingOption: cachedShippingOption,
 			items: itemsSelected,
 			shippingOptions: validShippingOptions,
+			shippingPolicyQuote,
+			isShippingPolicyLoading,
+			shippingPolicyError,
 			setDataFromExcel,
 			dataFromExcel,
 			setItems: setItemsSelected,
@@ -160,6 +189,9 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 			cachedShippingOption,
 			itemsSelected,
 			validShippingOptions,
+			shippingPolicyQuote,
+			isShippingPolicyLoading,
+			shippingPolicyError,
 			setItemsSelected,
 			setDataFromExcel,
 			dataFromExcel,
