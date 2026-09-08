@@ -5,7 +5,7 @@ import { Switch } from '@/components/Switch';
 import { Text } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
 import { AdminPostShippingOptionsReq, ShippingOption } from '@medusajs/medusa';
-import { Col, Divider, Form, message, Row } from 'antd';
+import { Alert, Col, Divider, Form, message, Row } from 'antd';
 import _ from 'lodash';
 import {
 	useAdminCreateShippingOption,
@@ -31,6 +31,7 @@ const ShippingOptionModal: FC<Props> = ({
 }) => {
 	const [form] = Form.useForm();
 	const [visibleInStore, setVisibleInStore] = useState(false);
+	const automaticPolicy = Form.useWatch('automatic_policy', form);
 	const createShippingOption = useAdminCreateShippingOption();
 	const updateShippingOption = useAdminUpdateShippingOption(
 		shippingOption?.id || ''
@@ -84,6 +85,7 @@ const ShippingOptionModal: FC<Props> = ({
 				name: payload.name,
 				amount: payload.amount,
 				admin_only: payload.admin_only,
+				metadata: payload.metadata,
 			};
 
 			await updateShippingOption.mutateAsync(updatedPayload as any, {
@@ -104,6 +106,7 @@ const ShippingOptionModal: FC<Props> = ({
 
 	useEffect(() => {
 		if (!isCreate && shippingOption) {
+			setVisibleInStore(!shippingOption.admin_only);
 			const requirements = getRequirementsData(shippingOption as any);
 
 			const requirementsMap = requirements?.reduce((acc, curr) => {
@@ -120,11 +123,16 @@ const ShippingOptionModal: FC<Props> = ({
 				price_type: shippingOption?.price_type,
 				amount: shippingOption?.amount,
 				store_option: !shippingOption?.admin_only,
+				automatic_policy:
+					shippingOption?.metadata?.automatic_shipping_policy === true,
+				customer_pays_external:
+					shippingOption?.metadata?.customer_pays_external === true,
 				shipping_profile: shippingOption?.profile?.name,
 				fulfillment_provider: fulfillment_provider,
 				requirements: requirementsMap,
 			});
 		} else {
+			setVisibleInStore(false);
 			form.resetFields();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -178,6 +186,45 @@ const ShippingOptionModal: FC<Props> = ({
 					<Divider />
 
 					<Col xs={24}>
+						<Form.Item
+							name="automatic_policy"
+							label="Tự động áp dụng theo giá trị đơn"
+							help="Bật cho các mức phí mà hệ thống phải tự chọn. Nếu các khoảng bị hở hoặc chồng nhau, backend sẽ chặn tạo đơn an toàn."
+							valuePropName="checked"
+							initialValue={false}
+						>
+							<Switch />
+						</Form.Item>
+					</Col>
+
+					{automaticPolicy && (
+						<>
+							<Col xs={24}>
+								<Alert
+									type="info"
+									showIcon
+									message="Cách nhập 3 mức hiện tại"
+									description="≤ 5 triệu: tối đa 5.000.001, giá 0; trên 5 đến dưới 10 triệu: tối thiểu 5.000.001, tối đa 10.000.000, giá 30.000; từ 10 triệu: tối thiểu 10.000.000, giá 0."
+									className="mb-4"
+								/>
+							</Col>
+							<Col xs={24}>
+								<Form.Item
+									name="customer_pays_external"
+									label="Khách tự trả phí vận chuyển ngoài hệ thống"
+									help="Dùng cho mức đơn ≤ 5 triệu: phí lưu trên đơn là 0, khách thanh toán trực tiếp cho đơn vị giao hàng."
+									valuePropName="checked"
+									initialValue={false}
+								>
+									<Switch />
+								</Form.Item>
+							</Col>
+						</>
+					)}
+
+					<Divider />
+
+					<Col xs={24}>
 						<Text strong>Chi tiết</Text>
 					</Col>
 
@@ -218,10 +265,7 @@ const ShippingOptionModal: FC<Props> = ({
 										>
 											<Select
 												placeholder="Chọn loại giá"
-												options={[
-													{ label: 'Giá cố định', value: 'flat_rate' },
-													{ label: 'Tính toán', value: 'calculated' },
-												]}
+												options={[{ label: 'Giá cố định', value: 'flat_rate' }]}
 											/>
 										</Form.Item>
 									</Col>
@@ -316,7 +360,7 @@ const ShippingOptionModal: FC<Props> = ({
 						<Form.Item
 							labelCol={{ span: 24 }}
 							name={['requirements', 'min_subtotal', 'amount']}
-							label="Giá trị đơn hàng tối thiểu"
+							label="Giá trị đơn hàng tối thiểu (có tính bằng)"
 							rules={[
 								{ type: 'number', min: 0, message: 'Giá trị phải là số dương' },
 								({ getFieldValue }) => ({
@@ -326,7 +370,7 @@ const ShippingOptionModal: FC<Props> = ({
 											'max_subtotal',
 											'amount',
 										]);
-										if (maxSubtotal && value > maxSubtotal) {
+										if (maxSubtotal && value >= maxSubtotal) {
 											return Promise.reject(
 												'Giá trị tối thiểu phải nhỏ hơn giá trị tối đa'
 											);
@@ -350,7 +394,7 @@ const ShippingOptionModal: FC<Props> = ({
 						<Form.Item
 							labelCol={{ span: 24 }}
 							name={['requirements', 'max_subtotal', 'amount']}
-							label="Giá trị đơn hàng tối đa"
+							label="Giá trị đơn hàng tối đa (không tính bằng)"
 							rules={[
 								{ type: 'number', min: 0, message: 'Giá trị phải là số dương' },
 								({ getFieldValue }) => ({
@@ -360,7 +404,7 @@ const ShippingOptionModal: FC<Props> = ({
 											'min_subtotal',
 											'amount',
 										]);
-										if (minSubtotal && value < minSubtotal) {
+										if (minSubtotal && value <= minSubtotal) {
 											return Promise.reject(
 												'Giá trị tối đa phải lớn hơn giá trị tối thiểu'
 											);

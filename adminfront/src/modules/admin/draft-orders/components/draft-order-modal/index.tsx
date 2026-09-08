@@ -47,7 +47,12 @@ const DraftOrderModal: FC<Props> = ({
 	const isDesktop = useIsDesktop();
 	const {
 		form,
-		context: { items },
+		context: {
+			items,
+			shippingPolicyQuote,
+			isShippingPolicyLoading,
+			shippingPolicyError,
+		},
 	} = useNewDraftOrderForm();
 
 	const steps = [
@@ -59,7 +64,25 @@ const DraftOrderModal: FC<Props> = ({
 
 	const handleFinish = async () => {
 		try {
+			if (isShippingPolicyLoading) {
+				message.info('Đang tính phí vận chuyển, vui lòng thử lại sau ít giây.');
+				return;
+			}
+			if (shippingPolicyError) {
+				message.error(
+					'Cấu hình phí vận chuyển đang bị hở hoặc chồng khoảng giá trị.'
+				);
+				return;
+			}
+
 			const values = form.getFieldsValue(true);
+			const shippingOptionId = shippingPolicyQuote?.configured
+				? shippingPolicyQuote.option.id
+				: values.shipping_option;
+			if (!shippingOptionId) {
+				message.error('Vui lòng chọn hoặc cấu hình phương thức vận chuyển.');
+				return;
+			}
 			const transformedData = {
 				email: values.email,
 				items: items.map((i: any) => ({
@@ -69,7 +92,7 @@ const DraftOrderModal: FC<Props> = ({
 						: { title: i.title, unit_price: i.unit_price }),
 				})),
 				region_id: values.region,
-				shipping_methods: [{ option_id: values.shipping_option }],
+				shipping_methods: [{ option_id: shippingOptionId }],
 				shipping_address: values.shipping_address_id || {
 					...values.shipping_address,
 					country_code: draftOrderCountryCode(

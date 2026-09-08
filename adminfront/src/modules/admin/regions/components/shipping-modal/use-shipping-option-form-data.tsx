@@ -1,4 +1,3 @@
-import { MetadataFormType } from '@/types/common';
 import { Option } from '@/types/shared';
 import fulfillmentProvidersMapper from '@/utils/fulfillment-providers.mapper';
 import {
@@ -24,6 +23,8 @@ type Requirement = {
 
 export type ShippingOptionFormType = {
 	store_option: boolean;
+	automatic_policy: boolean;
+	customer_pays_external: boolean;
 	name: string | null;
 	price_type: ShippingOptionPriceType | null;
 	amount: number | null;
@@ -33,7 +34,7 @@ export type ShippingOptionFormType = {
 		min_subtotal: Requirement | null;
 		max_subtotal: Requirement | null;
 	};
-	metadata: MetadataFormType;
+	metadata?: Record<string, unknown>;
 };
 
 export const useShippingOptionFormData = (
@@ -140,6 +141,11 @@ export const useShippingOptionFormData = (
 			admin_only: !data.store_option,
 			amount: data.amount!,
 			requirements: getRequirementsData(data) as any,
+			metadata: {
+				...(data.metadata ?? {}),
+				automatic_shipping_policy: data.automatic_policy === true,
+				customer_pays_external: data.customer_pays_external === true,
+			},
 		};
 
 		if (isReturn) {

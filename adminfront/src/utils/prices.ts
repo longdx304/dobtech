@@ -72,9 +72,18 @@ export const displayUnitPrice = (item: PricedVariant, region: Region) => {
 };
 
 export const extractOptionPrice = (price: number, region: Region) => {
-	let amount = price;
-	amount = (amount * (1 + region.tax_rate / 100)) / 100;
-	return `${amount} ${region.currency_code.toUpperCase()}`;
+	const currencyCode = region.currency_code.toUpperCase();
+	const amountWithTax = price * (1 + region.tax_rate / 100);
+	const amount = normalizeAmount(currencyCode, amountWithTax);
+	const formatted = new Intl.NumberFormat(
+		currencyCode === 'VND' ? 'vi-VN' : 'en-US',
+		{
+			minimumFractionDigits: currencies[currencyCode]?.decimal_digits ?? 0,
+			maximumFractionDigits: currencies[currencyCode]?.decimal_digits ?? 0,
+		}
+	).format(amount);
+
+	return `${formatted} ${currencyCode}`;
 };
 
 /**

@@ -37,6 +37,17 @@ const shippingColumns = ({ handleEdit, handleDelete }: Props) => [
 		},
 	},
 	{
+		title: 'Chính sách tự động',
+		key: 'automatic_policy',
+		className: 'text-xs',
+		render: (_: unknown, record: ShippingOption) =>
+			record.metadata?.automatic_shipping_policy === true ? (
+				<Tag color="blue">Tự động</Tag>
+			) : (
+				'-'
+			),
+	},
+	{
 		title: '',
 		key: 'action',
 		width: 40,
