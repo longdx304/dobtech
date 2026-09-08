@@ -99,7 +99,7 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 			? cachedRegion.countries.map((country) => ({
 					label: country.display_name,
 					value: country.iso_2,
-			  }))
+				}))
 			: [];
 	}, [cachedRegion]);
 
@@ -141,6 +141,13 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 		if (!shipping_options) {
 			return [];
 		}
+		// Shipping is selected before items in the draft-order flow. At that point
+		// the subtotal is still 0, so filtering by requirements would incorrectly
+		// hide every tier except the lowest one. Show all options until items exist;
+		// the automatic policy will resolve the applicable tier after items change.
+		if (!itemsSelected.length) {
+			return shipping_options;
+		}
 
 		return shipping_options?.reduce((acc, next) => {
 			if (next.requirements) {
@@ -162,7 +169,7 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 			return acc;
 		}, [] as ShippingOption[]);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [shipping_options, itemsSubtotal]);
+	}, [shipping_options, itemsSubtotal, itemsSelected.length]);
 
 	useEffect(() => {
 		const formValues = form.getFieldsValue();
