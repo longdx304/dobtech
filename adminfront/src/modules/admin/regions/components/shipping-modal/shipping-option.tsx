@@ -105,6 +105,34 @@ const ShippingOptionModal: FC<Props> = ({
 		useShippingOptionFormData(regionId);
 
 	useEffect(() => {
+		if (!state || !isCreate) {
+			return;
+		}
+
+		const currentValues = form.getFieldsValue([
+			'shipping_profile',
+			'fulfillment_provider',
+		]);
+		const defaultProfile =
+			shippingProfileOptions.find((option) =>
+				String(option.label).toLowerCase().includes('default')
+			) ?? shippingProfileOptions[0];
+		const manualFulfillment =
+			fulfillmentOptions.find((option) =>
+				String(option.label).toLowerCase().includes('manual')
+			) ?? fulfillmentOptions[0];
+
+		form.setFieldsValue({
+			...(currentValues.shipping_profile || !defaultProfile
+				? {}
+				: { shipping_profile: defaultProfile.value }),
+			...(currentValues.fulfillment_provider || !manualFulfillment
+				? {}
+				: { fulfillment_provider: manualFulfillment }),
+		});
+	}, [form, fulfillmentOptions, isCreate, shippingProfileOptions, state]);
+
+	useEffect(() => {
 		if (!isCreate && shippingOption) {
 			setVisibleInStore(!shippingOption.admin_only);
 			const requirements = getRequirementsData(shippingOption as any);
@@ -139,11 +167,11 @@ const ShippingOptionModal: FC<Props> = ({
 	}, [shippingOption]);
 
 	const parser = (value: any) => {
-		return value.replace(/\$\s?|(,*)/g, '');
+		return String(value ?? '').replace(/[.,\s]/g, '');
 	};
 	const formatter = (value: any) => {
 		if (value) {
-			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+			return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 		}
 		return value;
 	};
