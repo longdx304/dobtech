@@ -14,6 +14,15 @@ const pwaConfig = {
 const nextConfig = {
 	reactStrictMode: true,
 	images: {
+		// Preview/staging should not consume the production Image Optimization
+		// quota. Production keeps Vercel optimization enabled.
+		unoptimized: process.env.VERCEL_ENV === 'preview',
+		// Product image URLs are immutable uploads. Keep optimized variants long
+		// enough to avoid repeated transformations and cache writes.
+		minimumCacheTTL: 2678400,
+		// The admin only renders fixed thumbnails from 28px to 72px. Keep the
+		// useful 1x/2x buckets and avoid producing 16px, 256px, or 384px variants.
+		imageSizes: [32, 48, 64, 96, 128, 144],
 		remotePatterns: [
 			{
 				protocol: "http",

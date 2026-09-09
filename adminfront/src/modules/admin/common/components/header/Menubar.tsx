@@ -1,13 +1,13 @@
 import type { MenuProps } from 'antd';
 import { Menu, message } from 'antd';
 import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { removeCookie } from '@/actions/auth';
+import { removeCookie, setUserData } from '@/actions/auth';
 import {
 	ADMIN_ACCESS_PROFILE_REFRESH_EVENT,
 	AccessPermission,
+	resolvePagePermissions,
 } from '@/lib/access-control';
 import {
 	UserPasswordModal,
@@ -27,13 +27,19 @@ interface Props {
 
 const Menubar = ({ user, remove, className, onClose = () => {} }: Props) => {
 	const router = useRouter();
-	const pathname = usePathname();
 	const { client } = useMedusa();
 	const [, contextHolder] = message.useMessage();
 	const { mutateAsync } = useAdminDeleteSession();
+	const userId = user?.id;
+	const userRole = user?.role;
+	const userPermissions =
+		(user as typeof user & { permissions?: string | null })?.permissions ??
+		null;
 	const [profileOpen, setProfileOpen] = useState(false);
 	const [passwordOpen, setPasswordOpen] = useState(false);
-	const [pagePermissions, setPagePermissions] = useState<AccessPermission[]>();
+	const [pagePermissions, setPagePermissions] = useState<AccessPermission[]>(
+		() => resolvePagePermissions(user as any)
+	);
 	const [accessProfileVersion, setAccessProfileVersion] = useState(0);
 
 	useEffect(() => {
@@ -51,7 +57,7 @@ const Menubar = ({ user, remove, className, onClose = () => {} }: Props) => {
 	}, []);
 
 	useEffect(() => {
-		if (!user || user.role === 'admin') return;
+		if (!userId || !userRole || userRole === 'admin') return;
 		const controller = new AbortController();
 		client.admin.custom
 			.get('/admin/me/access', undefined, undefined, {
@@ -60,11 +66,17 @@ const Menubar = ({ user, remove, className, onClose = () => {} }: Props) => {
 			.then((profile) => {
 				if (profile?.page_permissions) {
 					setPagePermissions(profile.page_permissions);
+					void setUserData(
+						userRole,
+						userPermissions,
+						profile.page_permissions,
+						profile.default_route ?? null
+					);
 				}
 			})
 			.catch(() => {});
 		return () => controller.abort();
-	}, [accessProfileVersion, client, pathname, user?.id, user?.role]);
+	}, [accessProfileVersion, client, userId, userPermissions, userRole]);
 
 	const handleClickMenu: MenuProps['onClick'] = (e) => {
 		const { key } = e;

@@ -7,6 +7,10 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Input, InputPassword } from '@/components/Input';
 import { ERoutes } from '@/types/routes';
+import {
+	getDefaultAdminRoute,
+	resolvePagePermissions,
+} from '@/lib/access-control';
 import { Form, FormProps, message } from 'antd';
 import { useAdminLogin, useMedusa } from 'medusa-react';
 import Image from 'next/image';
@@ -41,7 +45,13 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 							{ headers: { Authorization: `Bearer ${access_token}` } }
 						);
 						const { user } = await res.json();
-						await setUserData(user.role, user.permissions);
+						const pagePermissions = resolvePagePermissions(user);
+						await setUserData(
+							user.role,
+							user.permissions,
+							pagePermissions,
+							getDefaultAdminRoute(pagePermissions)
+						);
 					});
 				message.success('Đăng nhập thành công!');
 				router.push(ERoutes.HOME);
@@ -77,8 +87,8 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 					Vận hành đồng bộ.
 				</h1>
 				<p className="mt-5 max-w-[460px] text-base leading-7 text-blue-50/85">
-					Theo dõi nhập hàng, xuất hàng, kiểm hàng và tồn kho trên cùng một
-					hệ thống DOB Warehouse.
+					Theo dõi nhập hàng, xuất hàng, kiểm hàng và tồn kho trên cùng một hệ
+					thống DOB Warehouse.
 				</p>
 			</section>
 
@@ -91,11 +101,14 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 								alt="DOB"
 								width={30}
 								height={40}
+								unoptimized
 								priority
 							/>
 						</div>
 						<div>
-							<div className="text-2xl font-bold tracking-tight">DOB Warehouse</div>
+							<div className="text-2xl font-bold tracking-tight">
+								DOB Warehouse
+							</div>
 							<div className="text-sm text-blue-100/85">
 								Warehouse Management System
 							</div>
@@ -107,7 +120,9 @@ const LoginTemplate = ({}: LoginTemplateProps) => {
 						className="border border-white/50 bg-white/95 shadow-2xl backdrop-blur-md [&_.ant-card-body]:flex [&_.ant-card-body]:flex-col [&_.ant-card-body]:gap-4 [&_.ant-card-body]:p-6 sm:[&_.ant-card-body]:p-8"
 					>
 						<div>
-							<h2 className="m-0 text-2xl font-bold text-slate-900">Đăng nhập</h2>
+							<h2 className="m-0 text-2xl font-bold text-slate-900">
+								Đăng nhập
+							</h2>
 							<p className="mb-0 mt-2 text-sm text-slate-500">
 								Sử dụng tài khoản nội bộ để tiếp tục.
 							</p>

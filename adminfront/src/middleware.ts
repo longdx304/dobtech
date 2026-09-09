@@ -1,26 +1,26 @@
-import isEmpty from 'lodash/isEmpty';
-import intersection from 'lodash/intersection';
-import { decodeJwt } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { hasAdminRouteAccess } from '@/lib/access-control';
 import {
-	AdminAccessProfileResult,
-	classifyAdminAccessProfileStatus,
-} from '@/lib/admin-access-profile';
-import { ERoutes, routesConfig } from '@/types/routes';
+	AccessPermission,
+	getDefaultAdminRoute,
+	hasAdminRouteAccess,
+	resolvePagePermissions,
+} from '@/lib/access-control';
+import { ERoutes } from '@/types/routes';
 import { ERole } from './types/account';
 
-// Environment variable to control user access paths
-const USER_ACCESS_TYPE = process.env.NEXT_PUBLIC_USER_ACCESS_TYPE || 'admin';
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9000';
 const PUBLIC_ROUTES = ['/login'];
 const ACCESS_DENIED_ROUTE = '/access-denied';
 
 interface CachedUserData {
 	role: ERole;
-	permissions: string;
+	permissions: string | null;
+	page_permissions?: AccessPermission[];
+	default_route?: string | null;
 }
+
+const VALID_ROLES = new Set<string>(Object.values(ERole));
+const VALID_PAGE_PERMISSIONS = new Set<string>(Object.values(AccessPermission));
 
 /**
  * Decodes JWT and checks expiry — no secret needed in Edge Runtime.
@@ -29,8 +29,20 @@ interface CachedUserData {
 function verifyToken(token: string | undefined): boolean {
 	if (!token) return false;
 	try {
-		const payload = decodeJwt(token);
-		if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+		const encodedPayload = token.split('.')[1];
+		if (!encodedPayload) return false;
+		const base64 = encodedPayload.replace(/-/g, '+').replace(/_/g, '/');
+		const paddedBase64 = base64.padEnd(
+			base64.length + ((4 - (base64.length % 4)) % 4),
+			'='
+		);
+		const payload = JSON.parse(atob(paddedBase64)) as { exp?: unknown };
+		if (
+			payload.exp !== undefined &&
+			(typeof payload.exp !== 'number' ||
+				!Number.isFinite(payload.exp) ||
+				payload.exp <= Math.floor(Date.now() / 1000))
+		) {
 			return false; // token expired
 		}
 		return true;
@@ -46,17 +58,43 @@ function getUserData(request: NextRequest): CachedUserData | null {
 	const raw = request.cookies.get('_user_data_')?.value;
 	if (!raw) return null;
 	try {
-		return JSON.parse(raw) as CachedUserData;
+		const parsed = JSON.parse(raw) as Record<string, unknown>;
+		if (
+			!parsed ||
+			typeof parsed !== 'object' ||
+			typeof parsed.role !== 'string' ||
+			!VALID_ROLES.has(parsed.role) ||
+			(parsed.permissions !== undefined &&
+				parsed.permissions !== null &&
+				typeof parsed.permissions !== 'string')
+		) {
+			return null;
+		}
+
+		const pagePermissions = Array.isArray(parsed.page_permissions)
+			? parsed.page_permissions.filter(
+					(permission): permission is AccessPermission =>
+						typeof permission === 'string' &&
+						VALID_PAGE_PERMISSIONS.has(permission)
+				)
+			: undefined;
+		const defaultRoute =
+			typeof parsed.default_route === 'string' &&
+			(parsed.default_route === ERoutes.HOME ||
+				parsed.default_route.startsWith(`${ERoutes.HOME}/`))
+				? parsed.default_route
+				: null;
+
+		return {
+			role: parsed.role as ERole,
+			permissions:
+				typeof parsed.permissions === 'string' ? parsed.permissions : null,
+			page_permissions: pagePermissions,
+			default_route: defaultRoute,
+		};
 	} catch {
 		return null;
 	}
-}
-
-/**
- * Determines the appropriate redirect path based on user access type
- */
-function getRedirectPath(): string {
-	return USER_ACCESS_TYPE === 'kiot' ? ERoutes.KIOT_HOME : ERoutes.HOME;
 }
 
 /**
@@ -64,46 +102,6 @@ function getRedirectPath(): string {
  */
 function isPublicRoute(pathname: string): boolean {
 	return PUBLIC_ROUTES.includes(pathname) || pathname === ERoutes.LOGIN;
-}
-
-/**
- * Validates if user has access to the requested path based on environment configuration
- */
-function validatePathAccess(pathname: string): boolean {
-	if (!USER_ACCESS_TYPE || isPublicRoute(pathname)) {
-		return true;
-	}
-
-	const pathAccessMap = {
-		kiot: pathname.startsWith('/kiot/') || pathname === '/kiot',
-		admin: pathname.startsWith('/admin/') || pathname === '/admin',
-	};
-
-	return pathAccessMap[USER_ACCESS_TYPE as keyof typeof pathAccessMap] ?? true;
-}
-
-/**
- * Checks if user has required permissions for the current route
- */
-function hasRoutePermissions(
-	pathname: string,
-	userPermissions: string
-): boolean {
-	const routeConfig = routesConfig.find((route) =>
-		pathname.startsWith(route.path)
-	);
-
-	if (!routeConfig?.mode || routeConfig.mode.length === 0) {
-		return false;
-	}
-
-	const userPermissionsList = userPermissions.split(',');
-	const requiredPermissions = intersection(
-		routeConfig.mode,
-		userPermissionsList
-	);
-
-	return !isEmpty(requiredPermissions);
 }
 
 /**
@@ -120,31 +118,23 @@ function createLoginRedirect(request: NextRequest): NextResponse {
 	return response;
 }
 
-async function getAdminAccessProfile(
-	accessToken: string
-): Promise<AdminAccessProfileResult> {
-	const response = await fetch(`${BACKEND_URL}/admin/me/access`, {
-		headers: { Authorization: `Bearer ${accessToken}` },
-		cache: 'no-store',
-	});
-	if (!response.ok) {
-		return { type: classifyAdminAccessProfileStatus(response.status) };
-	}
-	return { type: 'ok', profile: await response.json() };
-}
-
 export async function middleware(request: NextRequest) {
 	try {
 		const pathname = request.nextUrl.pathname;
 
-		// Check environment-based path access restrictions
-		if (!validatePathAccess(pathname)) {
-			return createRedirect(request, getRedirectPath());
-		}
-
 		// Allow public routes without authentication
 		if (isPublicRoute(pathname)) {
 			return NextResponse.next();
+		}
+
+		// Kiot is retired. Keep these routes behind middleware so they cannot
+		// become publicly accessible, and send every request to the Admin app.
+		if (
+			pathname === '/' ||
+			pathname === ERoutes.KIOT_HOME ||
+			pathname.startsWith(`${ERoutes.KIOT_HOME}/`)
+		) {
+			return createRedirect(request, ERoutes.HOME);
 		}
 
 		// Decode JWT locally — no backend call, no network dependency
@@ -155,46 +145,25 @@ export async function middleware(request: NextRequest) {
 			return createLoginRedirect(request);
 		}
 
-		if (pathname === ERoutes.HOME || pathname.startsWith(`${ERoutes.HOME}/`)) {
-			const accessProfileResult = await getAdminAccessProfile(accessToken!);
-			if (accessProfileResult.type === 'auth_failed') {
-				return createLoginRedirect(request);
-			}
-			if (accessProfileResult.type === 'unavailable') {
-				return createRedirect(request, ACCESS_DENIED_ROUTE);
-			}
-			const { profile: accessProfile } = accessProfileResult;
-			if (accessProfile.role === ERole.ADMIN) {
-				return NextResponse.next();
-			}
-			if (!hasAdminRouteAccess(pathname, accessProfile.page_permissions)) {
-				return createRedirect(
-					request,
-					accessProfile.default_route ?? ACCESS_DENIED_ROUTE
-				);
-			}
-			return NextResponse.next();
-		}
-
-		// Read user role/permissions from cookie cached at login time
 		const userData = getUserData(request);
-
 		if (!userData) {
 			return createLoginRedirect(request);
 		}
 
-		const { role, permissions } = userData;
-
-		// Admin users have full access
-		if (role === ERole.ADMIN) {
+		if (userData.role === ERole.ADMIN) {
 			return NextResponse.next();
 		}
 
-		// Check route-specific permissions
-		if (!hasRoutePermissions(pathname, permissions)) {
-			return createRedirect(request, getRedirectPath());
+		const pagePermissions =
+			userData.page_permissions ?? resolvePagePermissions(userData);
+		if (!hasAdminRouteAccess(pathname, pagePermissions)) {
+			return createRedirect(
+				request,
+				userData.default_route ??
+					getDefaultAdminRoute(pagePermissions) ??
+					ACCESS_DENIED_ROUTE
+			);
 		}
-
 		return NextResponse.next();
 	} catch (error) {
 		console.error('Middleware error:', error);
@@ -205,5 +174,4 @@ export async function middleware(request: NextRequest) {
 export const config = {
 	matcher: ['/', '/admin/:path*', '/kiot/:path*', '/login'],
 	runtime: 'experimental-edge',
-	unstable_allowDynamic: ['**/node_modules/lodash*/**/*.js'],
 };

@@ -69,6 +69,7 @@ const Header: FC<Props> = ({}) => {
 								src="/images/dob-icon.png"
 								width={28}
 								height={37}
+								unoptimized
 								alt="Dob Icon"
 							/>
 						</Link>
