@@ -50,20 +50,32 @@ const ShippingModal: FC<Props> = ({
 		shipping_options: shippingOptions,
 		isLoading: isLoadingShipping,
 		refetch: refetchShipping,
-	} = useAdminShippingOptions({
-		region_id: regionId,
-		is_return: false,
-	});
+	} = useAdminShippingOptions(
+		{
+			region_id: regionId,
+			is_return: false,
+		},
+		{
+			enabled: state && Boolean(regionId),
+			retry: false,
+		}
+	);
 
 	// Return Shipping
 	const {
 		shipping_options: returnShippingOptions,
 		isLoading: isLoadingReturnShipping,
 		refetch: refetchReturnShipping,
-	} = useAdminShippingOptions({
-		region_id: regionId,
-		is_return: true,
-	});
+	} = useAdminShippingOptions(
+		{
+			region_id: regionId,
+			is_return: true,
+		},
+		{
+			enabled: state && Boolean(regionId),
+			retry: false,
+		}
+	);
 
 	const handleEditShipping = (record: ShippingOption) => {
 		setCurrentShipping(record);

@@ -37,8 +37,12 @@ const ShippingOptionModal: FC<Props> = ({
 		shippingOption?.id || ''
 	);
 
-	const { getShippingOptionData, getRequirementsData } =
-		useShippingOptionFormData(regionId || '');
+	const {
+		shippingProfileOptions,
+		fulfillmentOptions,
+		getShippingOptionData,
+		getRequirementsData,
+	} = useShippingOptionFormData(regionId, false, state);
 
 	const createPayload = (values: AdminPostShippingOptionsReq) => {
 		const { payload } = getShippingOptionData(values as any, regionId);
@@ -100,9 +104,6 @@ const ShippingOptionModal: FC<Props> = ({
 			return;
 		}
 	};
-
-	const { shippingProfileOptions, fulfillmentOptions } =
-		useShippingOptionFormData(regionId);
 
 	useEffect(() => {
 		if (!state || !isCreate) {
