@@ -39,10 +39,17 @@ export type ShippingOptionFormType = {
 
 export const useShippingOptionFormData = (
 	regionId: string,
-	isReturn = false
+	isReturn = false,
+	enabled = true
 ) => {
-	const { shipping_profiles } = useAdminShippingProfiles();
-	const { fulfillment_options } = useAdminRegionFulfillmentOptions(regionId);
+	const { shipping_profiles } = useAdminShippingProfiles({
+		enabled: enabled && Boolean(regionId),
+		retry: false,
+	});
+	const { fulfillment_options } = useAdminRegionFulfillmentOptions(regionId, {
+		enabled: enabled && Boolean(regionId),
+		retry: false,
+	});
 
 	const fulfillmentOptions: Option[] = useMemo(() => {
 		if (!fulfillment_options) {

@@ -148,18 +148,20 @@ const RegionList: FC<Props> = () => {
 				}}
 				region={currentRegion || undefined}
 			/>
-			<ShippingModal
-				state={stateShipping}
-				handleOk={() => {
-					onCloseShipping();
-					setRegionId(null);
-				}}
-				handleCancel={() => {
-					onCloseShipping();
-					setRegionId(null);
-				}}
-				regionId={regionId ?? ''}
-			/>
+			{regionId && (
+				<ShippingModal
+					state={stateShipping}
+					handleOk={() => {
+						onCloseShipping();
+						setRegionId(null);
+					}}
+					handleCancel={() => {
+						onCloseShipping();
+						setRegionId(null);
+					}}
+					regionId={regionId}
+				/>
+			)}
 		</Card>
 	);
 };
