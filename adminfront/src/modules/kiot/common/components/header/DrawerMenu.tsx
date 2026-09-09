@@ -27,6 +27,7 @@ const DrawerMenu = ({ state, onOpen, onClose, user }: Props) => {
 					src="/images/dob-icon.png"
 					width={33}
 					height={48}
+					unoptimized
 					alt="Dob Icon"
 				/>
 			}
