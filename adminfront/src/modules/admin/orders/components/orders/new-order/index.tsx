@@ -229,7 +229,14 @@ const NewOrderModal: FC<Props> = ({
 					: { title: i.title, unit_price: i.unit_price / (1 + taxRate / 100) }),
 			})),
 			region_id: values.region,
-			shipping_methods: [{ option_id: values.shipping_option }],
+			shipping_methods: [
+				{
+					option_id: values.shipping_option,
+					data: values.manual_shipping_override
+						? { manual_shipping_override: true }
+						: undefined,
+				},
+			],
 			shipping_address: values.shipping_address_id || {
 				...values.shipping_address,
 				country_code: orderFormCountryCode(values.shipping_address?.country_code),
