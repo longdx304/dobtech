@@ -1,6 +1,6 @@
 import { useStepModal } from '@/lib/providers/stepped-modal-provider';
 import { extractOptionPrice } from '@/utils/prices';
-import { Alert, Form, Select, Spin } from 'antd';
+import { Alert, Form, Select, Spin, Switch } from 'antd';
 import { useAdminRegions } from 'medusa-react';
 import { useEffect, useMemo } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
@@ -19,6 +19,10 @@ const SelectRegion = ({ requireSalesPerson = false }: Props) => {
 
 	const reg = Form.useWatch('region', form);
 	const selectedShippingOption = Form.useWatch('shipping_option', form);
+	const isManualShippingOverride = Form.useWatch(
+		'manual_shipping_override',
+		form
+	);
 	const selectedSalesPerson = Form.useWatch('sales_person_id', form);
 
 	const regionOptions = useMemo(() => {
@@ -112,7 +116,27 @@ const SelectRegion = ({ requireSalesPerson = false }: Props) => {
 					) : (
 						<Form form={form} layout="vertical">
 							<Form.Item
-								label="Chọn phương thức vận chuyển thích hợp"
+								name="manual_shipping_override"
+								label="Điều chỉnh vận chuyển"
+								valuePropName="checked"
+							>
+								<Switch />
+							</Form.Item>
+							{isManualShippingOverride && (
+								<Alert
+									type="info"
+									showIcon
+									className="mb-4"
+									message="Nhân viên tự quyết định phí vận chuyển"
+									description="Chọn Khách tự trả phí, Phí vận chuyển 30k hoặc Miễn phí vận chuyển. Lựa chọn này được giữ nguyên khi tạo và điều chỉnh đơn."
+								/>
+							)}
+							<Form.Item
+								label={
+									isManualShippingOverride
+										? 'Chọn chính sách vận chuyển áp dụng'
+										: 'Chọn phương thức vận chuyển thích hợp'
+								}
 								name="shipping_option"
 								rules={[
 									{

@@ -34,6 +34,7 @@ export type NewDraftOrderForm = {
 		product_title?: string;
 	}[];
 	shipping_option: string | null;
+	manual_shipping_override?: boolean;
 	customer_id?: any | null;
 	sales_person_id?: string | null;
 	email: string;
@@ -79,6 +80,10 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 	}, [region]);
 
 	const selectedShippingOption = Form.useWatch('shipping_option', form);
+	const isManualShippingOverride = Form.useWatch(
+		'manual_shipping_override',
+		form
+	);
 
 	const [cachedShippingOption, setCachedShippingOption] = useState<
 		ShippingOption | undefined
@@ -132,14 +137,19 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 	);
 
 	useEffect(() => {
-		if (shippingPolicyQuote?.configured) {
+		if (shippingPolicyQuote?.configured && !isManualShippingOverride) {
 			form.setFieldValue('shipping_option', shippingPolicyQuote.option.id);
 		}
-	}, [form, shippingPolicyQuote]);
+	}, [form, isManualShippingOverride, shippingPolicyQuote]);
 
 	const validShippingOptions = useMemo(() => {
 		if (!shipping_options) {
 			return [];
+		}
+		if (isManualShippingOverride) {
+			return shipping_options.filter(
+				(option) => option.metadata?.automatic_shipping_policy === true
+			);
 		}
 		// Shipping is selected before items in the draft-order flow. At that point
 		// the subtotal is still 0, so filtering by requirements would incorrectly
@@ -169,7 +179,12 @@ const NewDraftOrderFormProvider = ({ children }: { children?: ReactNode }) => {
 			return acc;
 		}, [] as ShippingOption[]);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [shipping_options, itemsSubtotal, itemsSelected.length]);
+	}, [
+		shipping_options,
+		itemsSubtotal,
+		itemsSelected.length,
+		isManualShippingOverride,
+	]);
 
 	useEffect(() => {
 		const formValues = form.getFieldsValue();
