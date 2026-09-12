@@ -3,6 +3,7 @@ import { Card } from '@/components/Card';
 import { ActionAbles } from '@/components/Dropdown';
 import { Flex } from '@/components/Flex';
 import { Title } from '@/components/Typography';
+import { Select } from '@/components/Select';
 import { getErrorMessage } from '@/lib/utils';
 import StatusIndicator from '@/modules/admin/common/components/status-indicator';
 import { TrackingLink } from '@/modules/admin/orders/components/common';
@@ -14,16 +15,18 @@ import {
 	Fulfillment as TFulfillment,
 	User,
 } from '@medusajs/medusa';
-import { Modal as AntdModal, Divider, Empty, message } from 'antd';
+import { Button, Modal as AntdModal, Divider, Empty, message } from 'antd';
 import _ from 'lodash';
 import { CircleX, Package, Store } from 'lucide-react';
 import {
 	useAdminCancelClaimFulfillment,
 	useAdminCancelFulfillment,
 	useAdminCancelSwapFulfillment,
+	useAdminShippingOptions,
+	useMedusa,
 } from 'medusa-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import MarkShippedModal from './mark-shipped-modal';
 import { Order } from '@/types/order';
 
@@ -110,6 +113,26 @@ const gatherAllFulfillments = (order: Order) => {
 
 const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 	const [fulfillmentToShip, setFulfillmentToShip] = useState(null);
+	const { client } = useMedusa();
+	const [selectedShippingOptionId, setSelectedShippingOptionId] = useState<
+		string | undefined
+	>();
+	const [savingShippingPolicy, setSavingShippingPolicy] = useState(false);
+	const { shipping_options: shippingOptions } = useAdminShippingOptions(
+		{ region_id: order?.region_id, is_return: false, limit: 100 },
+		{ enabled: Boolean(order?.region_id) }
+	);
+	const policyOptions = useMemo(
+		() =>
+			(shippingOptions ?? []).filter(
+				(option: any) => option.metadata?.automatic_shipping_policy === true
+			),
+		[shippingOptions]
+	);
+
+	useEffect(() => {
+		setSelectedShippingOptionId(order?.shipping_methods?.[0]?.shipping_option_id);
+	}, [order?.id, order?.shipping_methods]);
 
 	if (!order || order.id === undefined) {
 		return (
@@ -120,6 +143,35 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 	}
 
 	const allFulfillments = gatherAllFulfillments(order);
+	const isManualShippingPolicy =
+		(order as any).metadata?.shipping_policy_mode === 'manual';
+	const saveShippingPolicy = async (mode: 'automatic' | 'manual') => {
+		if (mode === 'manual' && !selectedShippingOptionId) {
+			message.error('Vui lòng chọn phương thức vận chuyển');
+			return;
+		}
+		setSavingShippingPolicy(true);
+		try {
+			await client.admin.custom.post(`/admin/orders/${order.id}/shipping-policy`, {
+				mode,
+				...(mode === 'manual'
+					? { shipping_option_id: selectedShippingOptionId }
+					: {}),
+			});
+			message.success(
+				mode === 'manual'
+					? 'Đã lưu phương thức vận chuyển chỉnh tay'
+					: 'Đã bật lại chính sách vận chuyển tự động'
+			);
+			refetch();
+		} catch (error: any) {
+			message.error(
+				error?.response?.data?.message || 'Không thể cập nhật phương thức vận chuyển'
+			);
+		} finally {
+			setSavingShippingPolicy(false);
+		}
+	};
 
 	return (
 		<Card loading={isLoading} className="px-4">
@@ -163,6 +215,41 @@ const Fulfillment = ({ order, isLoading, refetch }: Props) => {
 						</span>
 					</div>
 				))}
+				<div className="mt-5 rounded border border-gray-200 p-3">
+					<div className="mb-1 text-xs font-medium text-gray-900">
+						Điều chỉnh phí vận chuyển
+					</div>
+					<div className="mb-3 text-xs text-gray-500">
+						{isManualShippingPolicy
+							? 'Đơn này đang giữ mức phí do nhân viên chọn.'
+							: 'Đơn này sẽ tự đổi mức phí khi giá trị đơn được điều chỉnh.'}
+					</div>
+					<Select
+						value={selectedShippingOptionId}
+						onChange={setSelectedShippingOptionId}
+						options={policyOptions.map((option: any) => ({
+							value: option.id,
+							label: `${option.name} - ${Number(option.amount ?? 0).toLocaleString('vi-VN')} VND`,
+						}))}
+						placeholder="Chọn mức phí"
+						className="mb-2 w-full"
+					/>
+					<div className="flex flex-wrap gap-2">
+						<Button
+							type="primary"
+							loading={savingShippingPolicy}
+							onClick={() => saveShippingPolicy('manual')}
+						>
+							Lưu chỉnh tay
+						</Button>
+						<Button
+							loading={savingShippingPolicy}
+							onClick={() => saveShippingPolicy('automatic')}
+						>
+							Theo chính sách tự động
+						</Button>
+					</div>
+				</div>
 				<Divider className="mt-4 mb-2" />
 				<div className="">
 					{allFulfillments.map((fulfillmentObj: any, i: number) => (
