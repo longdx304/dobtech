@@ -116,6 +116,12 @@ const itemManagement: Array<[AccessPermission, MenuItem]> = [
 	[AccessPermission.ManagementOperationsReport, getItem('Báo cáo vận hành', 'operations-report', <BarChart3 />)],
 ];
 
+const itemAccounting: Array<[AccessPermission, MenuItem]> = [
+	[AccessPermission.AccountingWorkspace, getItem('Đối soát đơn hàng', 'accounting', <BadgeDollarSign />)],
+	[AccessPermission.AccountingWorkspace, getItem('Số lượng tính chiết khấu', 'accounting-discount', <SquarePercent />)],
+	[AccessPermission.AccountingWorkspace, getItem('Chi phí giao ngoài', 'accounting-delivery-costs', <Truck />)],
+];
+
 // Item menu user
 const itemUser = (
 	user: IAdminResponse,
@@ -159,6 +165,13 @@ export const menuItems = (
 	const warehouse = filterAllowed(itemsWarehouse);
 	const settings = filterAllowed(itemSettings);
 	const management = filterAllowed(itemManagement);
+	const accounting = filterAllowed(itemAccounting);
+	const managementItems = [
+		...management,
+		...(accounting.length > 0
+			? [getItem('Kế toán', 'accounting-group', null, accounting)]
+			: []),
+	];
 	const adminItems = [
 		allowed.has(AccessPermission.AccountsManage) &&
 			getItem('Quản lý nhân viên', 'accounts', <Users />),
@@ -168,7 +181,7 @@ export const menuItems = (
 	return [
 		allowed.has(AccessPermission.DashboardView) &&
 			getItem('Bảng điều khiển', 'dashboard', <LayoutDashboard />),
-		management.length > 0 && getItem('Quản lý', 'management', null, management, 'group'),
+		managementItems.length > 0 && getItem('Quản lý', 'management', null, managementItems, 'group'),
 		sales.length > 0 && getItem('Bán hàng', 'sale', null, sales, 'group'),
 		purchases.length > 0 && getItem('Mua hàng', 'purchase', null, purchases, 'group'),
 		warehouse.length > 0 && getItem('Kho', 'inventory', null, warehouse, 'group'),
@@ -207,4 +220,7 @@ export const menuRoutes: Record<string, string> = {
 	'warehouse-manage': ERoutes.WAREHOUSE_MANAGE,
 	'warehouse-inventory-checker': ERoutes.WAREHOUSE_INVENTORY_CHECKER,
 	'operations-report': ERoutes.OPERATIONS_REPORT,
+	accounting: ERoutes.ACCOUNTING,
+	'accounting-discount': ERoutes.ACCOUNTING_DISCOUNT,
+	'accounting-delivery-costs': ERoutes.ACCOUNTING_DELIVERY_COSTS,
 };
