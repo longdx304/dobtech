@@ -27,6 +27,7 @@ export enum AccessPermission {
 	WarehouseShipment = 'warehouse.shipment',
 	WarehouseTransactions = 'warehouse.transactions',
 	ManagementOperationsReport = 'management.operations_report',
+	AccountingWorkspace = 'accounting.workspace',
 	SettingsRegions = 'settings.regions',
 	SettingsItemUnits = 'settings.item_units',
 	SettingsCurrencies = 'settings.currencies',
@@ -83,6 +84,7 @@ export const pagePermissionDefinitions: PagePermissionDefinition[] = [
 	{ permission: AccessPermission.WarehouseShipment, label: 'Vận chuyển', group: 'Kho', route: '/admin/warehouse/shipment', roles: [EPermissions.Manager, EPermissions.Driver] },
 	{ permission: AccessPermission.WarehouseTransactions, label: 'Sổ kho', group: 'Kho', route: '/admin/warehouse/transactions', roles: [EPermissions.Manager, EPermissions.Warehouse] },
 	{ permission: AccessPermission.ManagementOperationsReport, label: 'Báo cáo vận hành', group: 'Quản lý', route: '/admin/management/operations-report', roles: [EPermissions.Manager] },
+	{ permission: AccessPermission.AccountingWorkspace, label: 'Kế toán · Đối soát đơn hàng', group: 'Quản lý', route: '/admin/accounting', roles: [EPermissions.Manager, EPermissions.Accountant] },
 	{ permission: AccessPermission.SettingsRegions, label: 'Khu vực', group: 'Cài đặt', route: '/admin/regions', roles: [EPermissions.Manager] },
 	{ permission: AccessPermission.SettingsItemUnits, label: 'Đơn vị hàng', group: 'Cài đặt', route: '/admin/item-unit', roles: [EPermissions.Manager] },
 	{ permission: AccessPermission.SettingsCurrencies, label: 'Tiền tệ', group: 'Cài đặt', route: '/admin/currencies', roles: [EPermissions.Manager] },
@@ -116,16 +118,19 @@ export function getPresetPagePermissions(roles: EPermissions[]): AccessPermissio
 }
 
 export function resolvePagePermissions(user: AccessControlledUser): AccessPermission[] {
+	const roles = new Set((user.permissions ?? '').split(',').filter(Boolean));
+	const canUseAccounting = roles.has(EPermissions.Manager) || roles.has(EPermissions.Accountant);
 	const saved = user.metadata?.access_control?.page_permissions;
 	if (Array.isArray(saved)) {
 		return saved.filter(
 			(permission): permission is AccessPermission =>
-				validPermissions.has(permission as AccessPermission)
+				validPermissions.has(permission as AccessPermission) &&
+				(permission !== AccessPermission.AccountingWorkspace || canUseAccounting)
 		);
 	}
 
 	return getPresetPagePermissions(
-		(user.permissions ?? '').split(',').filter(Boolean) as EPermissions[]
+		Array.from(roles) as EPermissions[]
 	);
 }
 

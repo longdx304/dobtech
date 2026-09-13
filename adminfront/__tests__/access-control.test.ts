@@ -52,6 +52,15 @@ describe('access control', () => {
 		).toEqual([AccessPermission.SettingsRegions]);
 	});
 
+	it('keeps accounting under manager/accountant roles even when metadata grants it', () => {
+		expect(resolvePagePermissions({ permissions: EPermissions.Sale, metadata: {
+			access_control: { page_permissions: [AccessPermission.AccountingWorkspace, AccessPermission.SalesOrders] },
+		} })).toEqual([AccessPermission.SalesOrders]);
+		expect(resolvePagePermissions({ permissions: EPermissions.Accountant, metadata: {
+			access_control: { page_permissions: [AccessPermission.AccountingWorkspace] },
+		} })).toEqual([AccessPermission.AccountingWorkspace]);
+	});
+
 	it('matches child routes before the admin dashboard route', () => {
 		expect(
 			hasAdminRouteAccess('/admin/regions', [AccessPermission.DashboardView])
