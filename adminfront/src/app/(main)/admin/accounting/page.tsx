@@ -1,6 +1,7 @@
 'use client';
 
 import { Input } from '@/components/Input';
+import { Card } from '@/components/Card';
 import { Title } from '@/components/Typography';
 import { Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
@@ -22,12 +23,16 @@ export default function AccountingPage() {
 		expand: 'customer',
 		fields: 'id,display_id,created_at,fulfillment_status,total,customer_id',
 	} as any);
-	return <div className="space-y-4">
-		<div>
-			<Title level={3}>Kế toán · Đối soát đơn hàng</Title>
-			<p className="text-sm text-gray-600">Chuẩn bị mã khách thuế, chia đơn thành nhiều phần hóa đơn và theo dõi chi phí giao ngoài. Xuất file MISA hai sổ sẽ được nối sau khi kiểm chứng mẫu import.</p>
+	return <div className="mx-auto max-w-7xl space-y-4 pb-10">
+		<div className="mb-1">
+			<Title level={3} className="!mb-1">Kế toán</Title>
+			<p className="text-sm text-gray-500 mb-0">Đối soát đơn hàng, chia hóa đơn và chuẩn bị hai file MISA QT/TH.</p>
 		</div>
-		<Input value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder="Tìm đơn hàng hoặc khách hàng" className="max-w-sm" />
+		<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered>
+		<div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+			<div><Title level={4} className="!mb-1">Danh sách đối soát</Title><p className="text-sm text-gray-500 mb-0">Mở một đơn để quản lý mã thuế, phân bổ và kiểm tra file xuất.</p></div>
+			<Input value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder="Tìm đơn hàng hoặc khách hàng" className="max-w-sm" />
+		</div>
 		<Table
 			rowKey="id"
 			loading={isLoading}
@@ -43,5 +48,6 @@ export default function AccountingPage() {
 			pagination={{ current: page, pageSize, total: count ?? 0, onChange: setPage }}
 			scroll={{ x: 850 }}
 		/>
+		</Card>
 	</div>;
 }

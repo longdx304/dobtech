@@ -32,7 +32,7 @@ export default function ExternalDeliveryCosts({ orderId }: { orderId: string }) 
 	const [deliveryDate, setDeliveryDate] = useState('');
 	const [reference, setReference] = useState('');
 	const [note, setNote] = useState('');
-	const { data: costs = [], refetch } = useQuery({
+	const { data: costs = [], refetch, isLoading } = useQuery({
 		queryKey: ['external-delivery-costs', orderId],
 		queryFn: async () => {
 			const response = await client.admin.custom.get(`/admin/orders/${orderId}/external-delivery-costs`) as { costs: ExternalCost[] };
@@ -73,14 +73,13 @@ export default function ExternalDeliveryCosts({ orderId }: { orderId: string }) 
 			message.error(getErrorMessage(error));
 		}
 	};
-	return <Card className="w-full" bordered={false}>
-		<div className="flex items-center justify-between gap-2 mb-2">
-			<Title level={4} className="!mb-0">Chi phí giao ngoài</Title>
-			<Button size="small" onClick={() => setOpen(true)}>Thêm chi phí</Button>
+	return <Card className="w-full !rounded-xl !shadow-none !border !border-gray-200" bordered>
+		<div className="flex flex-wrap items-start justify-between gap-2 mb-3">
+			<div><Title level={4} className="!mb-1">Chi phí giao ngoài</Title><p className="text-sm text-gray-500 mb-0">Theo dõi Grab/Ahamove nội bộ, không đưa vào MISA.</p></div>
+			<Button type="default" onClick={() => setOpen(true)}>Thêm chi phí</Button>
 		</div>
-		<div className="text-xs text-gray-500 mb-3">Theo dõi Grab/Ahamove nội bộ; không đưa khoản này vào file nhập MISA.</div>
-		{costs.length === 0 ? <div className="text-sm text-gray-500">Chưa có khoản giao ngoài.</div> : costs.map((cost) =>
-			<div key={cost.id} className="flex flex-wrap items-center justify-between gap-2 border-t py-2 text-sm">
+		{isLoading ? <div className="rounded-lg border border-gray-200 px-4 py-6 text-center text-sm text-gray-500">Đang tải chi phí giao ngoài...</div> : costs.length === 0 ? <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center text-sm text-gray-500">Chưa có khoản giao ngoài.</div> : costs.map((cost) =>
+			<div key={cost.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 py-3 text-sm first:border-t-0">
 				<div>{cost.delivery_date} · {cost.provider} · {money.format(cost.amount)} · {cost.paid_by === 'company' ? 'Công ty trả' : 'Khách trả'}{cost.reference ? ` · ${cost.reference}` : ''}</div>
 				<Button type="link" danger size="small" onClick={() => Modal.confirm({ title: 'Bỏ khoản chi phí này?', onOk: () => remove(cost.id) })}>Bỏ</Button>
 			</div>

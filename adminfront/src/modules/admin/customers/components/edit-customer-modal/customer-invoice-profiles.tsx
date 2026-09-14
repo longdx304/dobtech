@@ -5,7 +5,7 @@ import { Input } from '@/components/Input';
 import { Title } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import { Form, List, Modal, Switch, Tag, message } from 'antd';
+import { Form, Modal, Switch, Tag, message } from 'antd';
 import { useMedusa } from 'medusa-react';
 import { useState } from 'react';
 
@@ -28,7 +28,7 @@ export default function CustomerInvoiceProfiles({ customerId, enabled }: { custo
 	const [editing, setEditing] = useState<InvoiceProfile | null>(null);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [saving, setSaving] = useState(false);
-	const { data: profiles = [], refetch } = useQuery({
+	const { data: profiles = [], refetch, isLoading } = useQuery({
 		queryKey: ['customer-invoice-profiles', customerId],
 		queryFn: async () => {
 			const response = await client.admin.custom.get(`/admin/customers/${customerId}/invoice-profiles`) as { profiles: InvoiceProfile[] };
@@ -68,28 +68,19 @@ export default function CustomerInvoiceProfiles({ customerId, enabled }: { custo
 	};
 
 	return <>
-		<div className="flex items-center justify-between mb-2">
-			<Title level={5} className="!mb-0">Mã khách thuế MISA</Title>
-			<Button type="default" size="small" onClick={() => openDialog(null)}>Thêm mã</Button>
+		<div className="flex flex-wrap items-start justify-between gap-2 mb-3">
+			<div><Title level={4} className="!mb-1">Mã khách thuế MISA</Title><p className="text-sm text-gray-500 mb-0">Dùng đúng mã khách đã có trên MISA khi chia hóa đơn.</p></div>
+			<Button type="default" onClick={() => openDialog(null)}>Thêm mã</Button>
 		</div>
-		<div className="text-xs text-gray-500 mb-3">
-			Kế toán và sales admin tạo mã trên MISA trước, sau đó nhập đúng mã đó tại đây. Mã khách quản trị ở phần thông tin khách hàng vẫn giữ nguyên.
-		</div>
-		<List
-			size="small"
-			bordered
-			dataSource={profiles}
-			locale={{ emptyText: 'Chưa có mã khách thuế' }}
-			renderItem={(profile) => <List.Item actions={[
-				<Button key="edit" type="link" size="small" onClick={() => openDialog(profile)}>Sửa</Button>,
-			]}>
-				<div className="flex flex-wrap items-center gap-2 text-sm">
-					<span className="font-medium">{profile.misa_customer_code}</span>
-					<span>{profile.label}</span>
-					{!profile.is_active && <Tag>Ngừng sử dụng</Tag>}
-				</div>
-			</List.Item>}
-		/>
+		{isLoading ? <div className="rounded-lg border border-gray-200 px-4 py-6 text-center text-sm text-gray-500">Đang tải mã khách thuế...</div> : profiles.length === 0 ? <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center">
+			<div className="text-sm font-medium text-gray-700">Chưa có mã khách thuế</div>
+			<div className="text-xs text-gray-500 mt-1">Tạo mã trên MISA, sau đó thêm mã tương ứng tại đây.</div>
+		</div> : <div className="divide-y divide-gray-100 rounded-lg border border-gray-200 px-3">
+			{profiles.map((profile) => <div key={profile.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+				<div className="flex flex-wrap items-center gap-2 min-w-0"><span className="font-semibold">{profile.misa_customer_code}</span><span className="text-gray-600">{profile.label}</span>{!profile.is_active && <Tag>Ngừng sử dụng</Tag>}</div>
+				<Button type="link" size="small" onClick={() => openDialog(profile)}>Sửa</Button>
+			</div>)}
+		</div>}
 		<Modal
 			open={dialogOpen}
 			title={editing ? 'Sửa mã khách thuế' : 'Thêm mã khách thuế'}
