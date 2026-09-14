@@ -1,5 +1,6 @@
 /** @jest-environment node */
 
+import { expect } from '@jest/globals';
 import { extractOptionPrice } from '@/utils/prices';
 
 describe('extractOptionPrice', () => {

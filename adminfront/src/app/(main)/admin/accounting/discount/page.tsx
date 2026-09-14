@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/Button';
+import { Card } from '@/components/Card';
 import { Title } from '@/components/Typography';
 import { useQuery } from '@tanstack/react-query';
 import { Input, Select, Table, message } from 'antd';
@@ -81,12 +82,12 @@ export default function AccountingDiscountPage() {
 		}))), 'Theo khách quản trị');
 		XLSX.writeFile(workbook, `So_luong_chiet_khau_${basis}_${from}_${to}.xlsx`);
 	};
-	return <div className="space-y-4 pb-10">
+	return <div className="mx-auto max-w-7xl space-y-4 pb-10">
 		<div>
-			<Title level={3}>Số lượng tính chiết khấu</Title>
-			<p className="text-sm text-gray-600">Chỉ tính các phần đã xác nhận xuất hóa đơn, loại mã NTD. Có thể đổi ngày hóa đơn, ngày giao hoặc ngày hoàn thành kho để đối chiếu.</p>
-			<p className="text-sm text-amber-700">Báo cáo thử nghiệm: chưa trừ hàng trả lại/hóa đơn điều chỉnh và chưa khóa kỳ chiết khấu; không dùng làm số chốt thanh toán.</p>
+			<Title level={3} className="!mb-1">Số lượng tính chiết khấu</Title>
+			<p className="text-sm text-gray-500 mb-0">Theo dõi số đã xác nhận xuất hóa đơn, không tính mã NTD. Có thể đổi cách chọn ngày để đối chiếu.</p>
 		</div>
+		<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered>
 		<div className="flex flex-wrap items-end gap-3">
 			<div><label className="block text-sm mb-1">Cách chọn ngày</label><Select value={basis} onChange={setBasis} className="w-48" options={[
 				{ value: 'invoice', label: 'Ngày hóa đơn' },
@@ -98,7 +99,10 @@ export default function AccountingDiscountPage() {
 			<div><label className="block text-sm mb-1">Mã khách quản trị</label><Input placeholder="Tất cả" value={customerCode} onChange={(event) => setCustomerCode(event.target.value)} /></div>
 			<Button onClick={exportExcel} disabled={!rows.length}>Xuất Excel</Button>
 		</div>
-		<Title level={5}>Tổng hợp theo khách quản trị</Title>
+		<div className="mt-3 text-xs text-amber-700">Báo cáo thử nghiệm: chưa trừ hàng trả lại/hóa đơn điều chỉnh và chưa khóa kỳ. Không dùng làm số chốt thanh toán.</div>
+		</Card>
+		<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered>
+		<Title level={4}>Tổng hợp theo khách quản trị</Title>
 		<Table rowKey="customer_id" loading={isLoading} dataSource={byCustomer} columns={[
 			{ title: 'Mã quản trị', dataIndex: 'management_customer_code' },
 			{ title: 'Khách hàng', dataIndex: 'customer_name' },
@@ -106,7 +110,9 @@ export default function AccountingDiscountPage() {
 			{ title: 'Số hóa đơn', dataIndex: 'invoice_count' },
 			{ title: 'Các mã thuế', dataIndex: 'tax_codes', render: (value: string[]) => value.join(', ') },
 		]} pagination={{ pageSize: 50 }} scroll={{ x: 720 }} />
-		<Title level={5}>Chi tiết theo mã khách thuế</Title>
+		</Card>
+		<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered>
+		<Title level={4}>Chi tiết theo mã khách thuế</Title>
 		<Table rowKey={(row) => `${row.customer_id}:${row.tax_customer_code}`} loading={isLoading} dataSource={rows} columns={[
 			{ title: 'Mã quản trị', dataIndex: 'management_customer_code' },
 			{ title: 'Khách hàng', dataIndex: 'customer_name' },
@@ -115,5 +121,6 @@ export default function AccountingDiscountPage() {
 			{ title: 'Số hóa đơn', dataIndex: 'invoice_count' },
 			{ title: 'Số đơn', dataIndex: 'order_count' },
 		]} pagination={{ pageSize: 50 }} scroll={{ x: 720 }} />
+		</Card>
 	</div>;
 }

@@ -75,15 +75,15 @@ export interface SmeExcelRow {
 	'XK vào khu phi thuế quan và các TH được coi như XK': string | number;
 	'Lập kèm hóa đơn': string | number;
 	'Đã lập hóa đơn': string | number;
-	'Ngày hạch toán (*)': string;
-	'Ngày chứng từ (*)': string;
+	'Ngày hạch toán (*)': string | Date;
+	'Ngày chứng từ (*)': string | Date;
 	'Số chứng từ (*)': string;
 	'Số phiếu xuất': string;
 	'Lý do xuất': string;
 	'Mẫu số HĐ': string;
 	'Ký hiệu HĐ': string;
 	'Số hóa đơn': string;
-	'Ngày hóa đơn': string;
+	'Ngày hóa đơn': string | Date;
 	'Mã khách hàng': string;
 	'Tên khách hàng': string;
 	'Địa chỉ': string;

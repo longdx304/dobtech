@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/Button';
+import { Card } from '@/components/Card';
 import { Title } from '@/components/Typography';
 import { useQuery } from '@tanstack/react-query';
 import { Input, Select, Table, message } from 'antd';
@@ -67,11 +68,12 @@ export default function DeliveryCostsReportPage() {
 		XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.by_order), 'Theo đơn');
 		XLSX.writeFile(workbook, `Chi_phi_giao_ngoai_${from}_${to}.xlsx`);
 	};
-	return <div className="space-y-4 pb-10">
+	return <div className="mx-auto max-w-7xl space-y-4 pb-10">
 		<div>
-			<Title level={3}>Chi phí giao ngoài</Title>
-			<p className="text-sm text-gray-600">Tổng hợp theo ngày giao thực tế, khách quản trị và sale phụ trách. Mặc định chỉ tính khoản công ty trả; có thể đổi bộ lọc.</p>
+			<Title level={3} className="!mb-1">Chi phí giao ngoài</Title>
+			<p className="text-sm text-gray-500 mb-0">Theo dõi chi phí theo ngày giao, khách quản trị và sale phụ trách.</p>
 		</div>
+		<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered>
 		<div className="flex flex-wrap items-end gap-3">
 			<div><label className="block text-sm mb-1">Từ ngày</label><Input type="date" value={from} onChange={(event) => setFrom(event.target.value)} /></div>
 			<div><label className="block text-sm mb-1">Đến ngày</label><Input type="date" value={to} onChange={(event) => setTo(event.target.value)} /></div>
@@ -79,21 +81,27 @@ export default function DeliveryCostsReportPage() {
 			<Button onClick={exportExcel} disabled={!rows.length}>Xuất Excel</Button>
 		</div>
 		{Boolean(error) && <div className="text-sm text-red-600">Không tải được báo cáo. Hãy chọn khoảng ngày ngắn hơn hoặc thử lại.</div>}
-		<div className="text-lg font-medium">Tổng chi phí: {money.format(data?.total_amount ?? 0)}</div>
-		<Title level={5}>Theo khách hàng</Title>
+		<div className="mt-4 rounded-lg bg-gray-50 px-4 py-3 text-sm"><span className="text-gray-500">Tổng chi phí theo bộ lọc</span><div className="text-xl font-semibold mt-1">{money.format(data?.total_amount ?? 0)}</div></div>
+		</Card>
+		<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered>
+		<Title level={4}>Theo khách hàng</Title>
 		<Table rowKey={(row) => row.customer_code || row.customer_name || 'unknown'} loading={isLoading} dataSource={data?.by_customer ?? []} pagination={{ pageSize: 20 }} columns={[
 			{ title: 'Mã quản trị', dataIndex: 'customer_code' },
 			{ title: 'Khách hàng', dataIndex: 'customer_name' },
 			{ title: 'Chi phí', dataIndex: 'amount', render: (value: number) => money.format(value) },
 			{ title: '% tổng chi phí', dataIndex: 'share_percent', render: percent },
 		]} />
-		<Title level={5}>Theo sale</Title>
+		</Card>
+		<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered>
+		<Title level={4}>Theo sale</Title>
 		<Table rowKey="sales_person" loading={isLoading} dataSource={data?.by_sales_person ?? []} pagination={{ pageSize: 20 }} columns={[
 			{ title: 'Sale', dataIndex: 'sales_person' },
 			{ title: 'Chi phí', dataIndex: 'amount', render: (value: number) => money.format(value) },
 			{ title: '% tổng chi phí', dataIndex: 'share_percent', render: percent },
 		]} />
-		<Title level={5}>Theo đơn hàng</Title>
+		</Card>
+		<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered>
+		<Title level={4}>Theo đơn hàng</Title>
 		<Table rowKey="order_id" loading={isLoading} dataSource={data?.by_order ?? []} pagination={{ pageSize: 20 }} columns={[
 			{ title: 'Đơn', render: (_: unknown, row: OrderSummaryRow) => <Link href={`/admin/accounting/orders/${row.order_id}`} className="text-blue-600">#{row.display_id}</Link> },
 			{ title: 'Mã quản trị', dataIndex: 'customer_code' },
@@ -102,7 +110,9 @@ export default function DeliveryCostsReportPage() {
 			{ title: 'Tổng đơn', dataIndex: 'order_total', render: (value: number) => money.format(value) },
 			{ title: '% chi phí / đơn', dataIndex: 'percent_of_order', render: percent },
 		]} scroll={{ x: 760 }} />
-		<Title level={5}>Chi tiết chuyến giao</Title>
+		</Card>
+		<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered>
+		<Title level={4}>Chi tiết chuyến giao</Title>
 		<Table rowKey="id" loading={isLoading} dataSource={rows} pagination={{ pageSize: 30 }} scroll={{ x: 900 }} columns={[
 			{ title: 'Ngày giao', dataIndex: 'delivery_date' },
 			{ title: 'Đơn', render: (_: unknown, row: CostRow) => <Link href={`/admin/accounting/orders/${row.order_id}`} className="text-blue-600">#{row.display_id}</Link> },
@@ -112,5 +122,6 @@ export default function DeliveryCostsReportPage() {
 			{ title: 'Chi phí', dataIndex: 'amount', render: (value: number) => money.format(value) },
 			{ title: '% chuyến / đơn', dataIndex: 'percent_of_order', render: percent },
 		]} />
+		</Card>
 	</div>;
 }

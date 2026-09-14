@@ -1,9 +1,10 @@
 /** @jest-environment node */
 
 import { NextRequest } from 'next/server';
+import { expect } from '@jest/globals';
 
 import { AccessPermission } from '@/lib/access-control';
-import { middleware } from '@/middleware';
+import { middleware } from '../src/middleware';
 
 function jwt(exp: number): string {
 	const encode = (value: object) =>

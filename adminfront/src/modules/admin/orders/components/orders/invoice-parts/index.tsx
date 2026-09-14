@@ -6,7 +6,7 @@ import { Title } from '@/components/Typography';
 import { getErrorMessage } from '@/lib/utils';
 import { Order } from '@/types/order';
 import { useQuery } from '@tanstack/react-query';
-import { Input, InputNumber, Select, Tag, message } from 'antd';
+import { Alert, Input, InputNumber, Select, Tag, message } from 'antd';
 import { useMedusa } from 'medusa-react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -48,7 +48,7 @@ export default function InvoiceParts({ order }: { order: Order }) {
 	const [issuingId, setIssuingId] = useState<string | null>(null);
 	const customerId = order.customer_id;
 	const lineItems = useMemo(() => order.items ?? [], [order.items]);
-	const { data: profiles = [] } = useQuery({
+	const { data: profiles = [], isLoading: profilesLoading } = useQuery({
 		queryKey: ['customer-invoice-profiles', customerId],
 		queryFn: async () => {
 			const response = await client.admin.custom.get(`/admin/customers/${customerId}/invoice-profiles`) as { profiles: InvoiceProfile[] };
@@ -56,7 +56,7 @@ export default function InvoiceParts({ order }: { order: Order }) {
 		},
 		enabled: Boolean(customerId),
 	});
-	const { data: parts = [], refetch } = useQuery({
+	const { data: parts = [], refetch, isLoading: partsLoading } = useQuery({
 		queryKey: ['order-invoice-parts', order.id],
 		queryFn: async () => {
 			const response = await client.admin.custom.get(`/admin/orders/${order.id}/invoice-parts`) as { parts: InvoicePart[] };
@@ -167,24 +167,22 @@ export default function InvoiceParts({ order }: { order: Order }) {
 		}
 	};
 
-	return <Card className="w-full" bordered={false}>
-		<div className="flex items-center justify-between gap-2 mb-3">
-			<Title level={4} className="!mb-0">Phân bổ xuất hóa đơn</Title>
-			<Button size="small" onClick={addPart} disabled={hasIssued || profiles.every((profile) => !profile.is_active)}>Thêm phần hóa đơn</Button>
+	return <Card className="w-full !rounded-xl !shadow-none !border !border-gray-200" bordered>
+		<div className="flex flex-wrap items-start justify-between gap-2 mb-4">
+			<div><Title level={4} className="!mb-1">Phân bổ xuất hóa đơn</Title><p className="text-sm text-gray-500 mb-0">Chia từng mặt hàng theo mã thuế. Tổng số lượng phải bằng đơn quản trị.</p></div>
+			<Button type="default" onClick={addPart} disabled={profilesLoading || partsLoading || hasIssued || profiles.every((profile) => !profile.is_active)}>Thêm phần hóa đơn</Button>
 		</div>
-		<div className="text-xs text-gray-500 mb-3">Một đơn có thể chia cho nhiều mã thuế, kể cả nhiều hóa đơn cùng một mã. Tổng số lượng từng mặt hàng phải bằng đơn quản trị. Ngày hóa đơn thực tế được ghi riêng sau khi hóa đơn đã phát hành.</div>
-		<div className="text-xs text-amber-700 mb-3">Đã có đối chiếu tiền dự kiến nhưng phân bổ này chưa được nối vào file MISA hiện tại. Không dùng file xuất hiện tại làm file thuế cho đơn đã tách.</div>
-		{reconciliation && <div className="border rounded p-3 mb-3 text-sm space-y-1">
-			<div className="font-medium">Đối chiếu tiền dự kiến (VND)</div>
-			<div>Quản trị: {vnd(reconciliation.management.total)} · Thuế: {vnd(reconciliation.tax_parts.reduce((sum, part) => sum + part.total, 0))}</div>
-			<div>Chênh lệch: {vnd(reconciliation.difference.total)} · Trước thuế {vnd(reconciliation.difference.subtotal)} · Chiết khấu {vnd(reconciliation.difference.discount_total)} · VAT {vnd(reconciliation.difference.tax_total)} · Phí giao {vnd(reconciliation.difference.shipping_total)}</div>
+		{reconciliation && <div className="rounded-lg border border-green-200 bg-green-50 p-4 mb-4 text-sm space-y-1">
+			<div className="font-medium text-green-800">Đối chiếu phân bổ nội bộ</div>
+			<div>Quản trị {vnd(reconciliation.management.total)} · Các phần thuế {vnd(reconciliation.tax_parts.reduce((sum, part) => sum + part.total, 0))} · Chênh lệch {vnd(reconciliation.difference.total)}</div>
 			{reconciliation.tax_parts.map((part) => <div key={part.part_id} className="text-xs border-t pt-1">
 				{part.misa_customer_code}: trước thuế {vnd(part.subtotal)} − CK {vnd(part.discount_total)} + phí giao {vnd(part.shipping_total)} + VAT {vnd(part.tax_total)} = {vnd(part.total)}
 			</div>)}
-			<div className="text-xs text-amber-700">Chỉ là phép chia và đối chiếu nội bộ; chưa xác nhận cấu trúc import MISA.</div>
 		</div>}
-		{Boolean(reconciliationError) && parts.length > 0 && <div className="text-xs text-red-600 mb-3">Chưa đối chiếu được tiền: {String(getErrorMessage(reconciliationError))}</div>}
-		{profiles.length === 0 && <div className="text-sm text-amber-700 mb-3">Khách chưa có mã thuế. Hãy thêm trong hồ sơ Khách hàng trước.</div>}
+		{Boolean(reconciliationError) && parts.length > 0 && <Alert className="mb-4" type="error" showIcon message={`Chưa đối chiếu được tiền: ${String(getErrorMessage(reconciliationError))}`} />}
+		{(profilesLoading || partsLoading) && <div className="rounded-lg border border-gray-200 px-4 py-5 text-center text-sm text-gray-500 mb-4">Đang tải phân bổ hóa đơn...</div>}
+		{!profilesLoading && !partsLoading && profiles.length === 0 && <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-5 text-center text-sm text-gray-600 mb-4">Thêm mã khách thuế ở phần trên để bắt đầu phân bổ.</div>}
+		{!profilesLoading && !partsLoading && profiles.length > 0 && drafts.length === 0 && <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-5 text-center text-sm text-gray-600 mb-4">Chưa có phần hóa đơn. Chọn “Thêm phần hóa đơn” để chia hàng cho mã thuế.</div>}
 		{drafts.map((draft, index) => {
 			const profile = profiles.find((candidate) => candidate.id === draft.profile_id);
 			return <div key={draft.key} className="border rounded p-3 mb-3 space-y-3">
