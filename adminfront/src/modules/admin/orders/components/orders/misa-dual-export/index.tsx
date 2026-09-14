@@ -110,7 +110,7 @@ export default function MisaDualExport({ order }: { order: Order }) {
 			type="warning"
 			showIcon
 			message="Cần kiểm chứng import trên MISA trước khi dùng thật"
-			description="Dùng số chứng từ BH…/n và BH…-i/n theo ghi chú mẫu mới của anh Bình; tên file phân biệt QT/TH. Giá dòng là số tiền cuối cùng, chiết khấu và phí giao trên đơn được phân bổ vào giá hàng. Kế toán cần kiểm tra VAT, kho và ĐVT theo từng mặt hàng."
+			description="Dùng số chứng từ BH…/n và BH…-i/n theo mẫu kế toán cung cấp; tên file phân biệt QT/TH. Giá dòng là số tiền cuối cùng, chiết khấu và phí giao trên đơn được phân bổ vào giá hàng. Kế toán cần kiểm tra VAT, kho và ĐVT theo từng mặt hàng."
 		/>
 		<div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
 			<div className="md:col-span-1">
