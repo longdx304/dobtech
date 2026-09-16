@@ -21,6 +21,8 @@ import { FC, useState } from 'react';
 import { getCustomerNote } from './customer-note';
 import { generatePdfBlob } from './order-pdf';
 import SalesPersonSelect from './sales-person-select';
+import InvoiceAllocation from './invoice-allocation';
+import type { NewOrderInvoicePart } from './invoice-allocation-utils';
 
 export interface pdfOrderRes {
 	isSendEmail?: boolean;
@@ -106,6 +108,7 @@ const NewOrderModal: FC<Props> = ({
 		context: { items, region },
 	} = useNewDraftOrderForm();
 	const [isSendEmail, setIsSendEmail] = useState(false);
+	const [invoiceParts, setInvoiceParts] = useState<NewOrderInvoicePart[]>([]);
 
 	// Initialize transfer order mutation
 	const transferOrder = useAdminDraftOrderTransferOrder();
@@ -135,7 +138,11 @@ const NewOrderModal: FC<Props> = ({
 		},
 		{ title: '', content: <ShippingDetails /> },
 		{ title: '', content: <Items /> },
-		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} /> },
+		{
+			title: '',
+			content: <InvoiceAllocation customerId={watchedId} items={items} value={invoiceParts} onChange={setInvoiceParts} />,
+		},
+		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} invoiceParts={invoiceParts} customerId={watchedId} /> },
 	];
 
 	const generateFilePdf = async (
@@ -302,12 +309,21 @@ const NewOrderModal: FC<Props> = ({
 							isSendEmail: isSendEmail,
 							urlPdf,
 							sales_person_id: values.sales_person_id,
+							invoice_parts: invoiceParts.map((part) => ({
+								profile_id: part.profile_id,
+								consumer_name: part.consumer_name,
+								consumer_address: part.consumer_address,
+								items: Object.entries(part.quantities)
+									.filter(([, quantity]) => quantity > 0)
+									.map(([variant_id, quantity]) => ({ variant_id, quantity })),
+							})),
 						},
 						{
 							onSuccess: () => {
 								message.success('Admin tạo đơn hàng thành công');
 								refetch();
 								form.resetFields();
+								setInvoiceParts([]);
 								handleOk();
 								// Refresh the page to reload prices
 								window.location.reload();

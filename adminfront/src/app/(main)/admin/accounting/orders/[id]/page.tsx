@@ -4,15 +4,16 @@ import { Card } from '@/components/Card';
 import { Title } from '@/components/Typography';
 import CustomerInvoiceProfiles from '@/modules/admin/customers/components/edit-customer-modal/customer-invoice-profiles';
 import InvoiceParts from '@/modules/admin/orders/components/orders/invoice-parts';
-import ExternalDeliveryCosts from '@/modules/admin/orders/components/orders/external-delivery-costs';
 import MisaDualExport from '@/modules/admin/orders/components/orders/misa-dual-export';
 import { Order } from '@/types/order';
 import { ERoutes } from '@/types/routes';
 import { Tag } from 'antd';
 import { useAdminOrder } from 'medusa-react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function AccountingOrderPage({ params }: { params: { id: string } }) {
+	const [allocationDirty, setAllocationDirty] = useState(false);
 	const { order, isLoading } = useAdminOrder(params.id, {
 		expand: 'customer,items,items.variant',
 	});
@@ -35,12 +36,9 @@ export default function AccountingOrderPage({ params }: { params: { id: string }
 					<div className="rounded-lg bg-gray-50 px-4 py-3"><div className="text-xs text-gray-500 mb-1">Tổng đơn</div><div className="font-medium">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.total ?? 0)}</div></div>
 				</div>
 			</Card>
-			<div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
-				<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered><CustomerInvoiceProfiles customerId={order.customer_id} enabled /></Card>
-				<ExternalDeliveryCosts orderId={order.id} />
-			</div>
-			<InvoiceParts order={order as Order} />
-			<MisaDualExport order={order as Order} />
+			<Card className="!rounded-xl !shadow-none !border !border-gray-200" bordered><CustomerInvoiceProfiles customerId={order.customer_id} enabled /></Card>
+			<InvoiceParts order={order as Order} onDirtyChange={setAllocationDirty} />
+			<MisaDualExport order={order as Order} allocationDirty={allocationDirty} />
 		</>}
 	</div>;
 }

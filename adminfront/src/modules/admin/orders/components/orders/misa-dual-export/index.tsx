@@ -22,7 +22,7 @@ const defaultItemSettings = (): ItemMisaSettings => ({
 	unit: 'Đôi', managementWarehouse: 'KHH-HCM', taxWarehouse: 'KHODEPNKTHAI', taxRate: 8,
 });
 
-export default function MisaDualExport({ order }: { order: Order }) {
+export default function MisaDualExport({ order, allocationDirty = false }: { order: Order; allocationDirty?: boolean }) {
 	const { client } = useMedusa();
 	const [settings, setSettings] = useState<DualBookSettings>({
 		postingDate: dayjs(order.handled_at || new Date()).format('YYYY-MM-DD'), items: {},
@@ -30,6 +30,9 @@ export default function MisaDualExport({ order }: { order: Order }) {
 	const [preview, setPreview] = useState<DualBookResult | null>(null);
 	const [previewSignature, setPreviewSignature] = useState('');
 	const [checking, setChecking] = useState(false);
+	useEffect(() => {
+		if (allocationDirty) setPreview(null);
+	}, [allocationDirty]);
 	useEffect(() => {
 		setSettings((previous) => ({
 			...previous,
@@ -57,6 +60,7 @@ export default function MisaDualExport({ order }: { order: Order }) {
 		setPreview(null);
 	};
 	const check = async () => {
+		if (allocationDirty) return;
 		setChecking(true);
 		try {
 			const latestParts = (await refetchParts()).data ?? [];
@@ -75,7 +79,7 @@ export default function MisaDualExport({ order }: { order: Order }) {
 		}
 	};
 	const download = (book: 'QT' | 'TH') => {
-		if (!preview) return;
+		if (!preview || allocationDirty) return;
 		try {
 			if (previewSignature !== JSON.stringify({ parts, reconciliation, settings })) throw new Error('Phân bổ hoặc cấu hình đã thay đổi; hãy kiểm tra lại 2 sổ');
 			const makeFile = (rows: DualBookResult['managementRows']) => {
@@ -139,12 +143,13 @@ export default function MisaDualExport({ order }: { order: Order }) {
 			})}
 		</div>
 		<div className="flex flex-wrap items-center gap-2">
-			<Button type="primary" loading={checking} onClick={check}>Kiểm tra 2 sổ</Button>
-			<Button type="default" disabled={!preview} onClick={() => download('QT')}>Tải file thử QT</Button>
-			<Button type="default" disabled={!preview} onClick={() => download('TH')}>Tải file thử TH</Button>
+			<Button type="primary" loading={checking} disabled={allocationDirty} onClick={check}>Kiểm tra 2 sổ</Button>
+			<Button type="default" disabled={!preview || allocationDirty} onClick={() => download('QT')}>Tải file thử QT</Button>
+			<Button type="default" disabled={!preview || allocationDirty} onClick={() => download('TH')}>Tải file thử TH</Button>
 			{!parts.length && <span className="text-xs text-amber-700">Cần lưu phân bổ hóa đơn trước.</span>}
+			{allocationDirty && <span className="text-xs text-amber-700">Lưu phân bổ trước khi kiểm tra và tải file mới.</span>}
 		</div>
-		{preview && <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm">
+		{preview && !allocationDirty && <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm">
 			<div className="font-medium text-green-800">Tổng thanh toán khớp: QT {money.format(preview.managementTotal)} = TH {money.format(preview.taxTotal)}</div>
 			<div className="mt-1 text-gray-600">{preview.managementRows.length} dòng QT · {preview.taxRows.length} dòng TH · {preview.documentNumbers.length} chứng từ thuế</div>
 			<div className="mt-1 text-xs text-gray-600">Số chứng từ QT: {String(preview.managementRows[0]['Số chứng từ (*)'])}</div>

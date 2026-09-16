@@ -29,7 +29,6 @@ export enum ERoutes {
 	OPERATIONS_REPORT = '/admin/management/operations-report',
 	ACCOUNTING = '/admin/accounting',
 	ACCOUNTING_DISCOUNT = '/admin/accounting/discount',
-	ACCOUNTING_DELIVERY_COSTS = '/admin/accounting/delivery-costs',
 
 	// KIOT system routes
 	KIOT_HOME = '/kiot',
