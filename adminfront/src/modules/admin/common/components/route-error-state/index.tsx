@@ -15,7 +15,6 @@ type RouteErrorStateProps = {
 
 const RouteErrorState = ({
 	error,
-	reset,
 	title,
 	description,
 	logContext,
@@ -34,7 +33,7 @@ const RouteErrorState = ({
 		>
 			<Title level={4}>{title}</Title>
 			<Text className="max-w-lg text-gray-500">{description}</Text>
-			<Button type="primary" onClick={reset}>
+			<Button type="primary" onClick={() => window.location.reload()}>
 				Thử lại
 			</Button>
 		</Flex>
