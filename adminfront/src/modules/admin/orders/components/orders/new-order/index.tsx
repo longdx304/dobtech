@@ -59,50 +59,79 @@ type Props = {
 	refetch: () => void;
 };
 
-type OrderDetailsStepProps = {
+type InvoiceStepProps = {
 	customerId?: string;
 	items: LineItemForm[];
 	invoiceParts: NewOrderInvoicePart[];
 	onInvoicePartsChange: (parts: NewOrderInvoicePart[]) => void;
 };
 
-const OrderDetailsStep = ({
+const CustomerInvoiceStep = ({
 	customerId,
 	items,
 	invoiceParts,
 	onInvoicePartsChange,
-}: OrderDetailsStepProps) => {
+}: InvoiceStepProps) => {
 	const { enableNext, disableNext } = useStepModal();
 	const [shippingValid, setShippingValid] = useState(false);
-	const [itemsValid, setItemsValid] = useState(false);
 	const [invoiceValid, setInvoiceValid] = useState(false);
 
 	useEffect(() => {
-		if (shippingValid && itemsValid && invoiceValid) enableNext();
+		if (shippingValid && invoiceValid) enableNext();
 		else disableNext();
-	}, [disableNext, enableNext, invoiceValid, itemsValid, shippingValid]);
+	}, [disableNext, enableNext, invoiceValid, shippingValid]);
 
 	return (
-		<div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(360px,0.8fr)_minmax(700px,1.6fr)]">
+		<div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
 			<section className="rounded-xl border border-gray-200 bg-white p-4">
 				<h3 className="mb-4 text-base font-semibold">Khách hàng và giao hàng</h3>
 				<ShippingDetails onValidityChange={setShippingValid} />
 			</section>
-			<div className="space-y-5">
-				<section className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-					<h3 className="px-4 pt-4 text-base font-semibold">Sản phẩm</h3>
-					<Items onValidityChange={setItemsValid} />
-				</section>
-				<section className="rounded-xl border border-gray-200 bg-white p-4">
-					<InvoiceAllocation
-						customerId={customerId}
-						items={items}
-						value={invoiceParts}
-						onChange={onInvoicePartsChange}
-						onValidityChange={setInvoiceValid}
-					/>
-				</section>
-			</div>
+			<section className="rounded-xl border border-gray-200 bg-white p-4">
+				<InvoiceAllocation
+					mode="profiles"
+					customerId={customerId}
+					items={items}
+					value={invoiceParts}
+					onChange={onInvoicePartsChange}
+					onValidityChange={setInvoiceValid}
+				/>
+			</section>
+		</div>
+	);
+};
+
+const ItemsInvoiceStep = ({
+	customerId,
+	items,
+	invoiceParts,
+	onInvoicePartsChange,
+}: InvoiceStepProps) => {
+	const { enableNext, disableNext } = useStepModal();
+	const [itemsValid, setItemsValid] = useState(false);
+	const [invoiceValid, setInvoiceValid] = useState(false);
+
+	useEffect(() => {
+		if (itemsValid && invoiceValid) enableNext();
+		else disableNext();
+	}, [disableNext, enableNext, invoiceValid, itemsValid]);
+
+	return (
+		<div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(700px,1.55fr)_minmax(380px,0.85fr)]">
+			<section className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+				<h3 className="px-4 pt-4 text-base font-semibold">Sản phẩm</h3>
+				<Items onValidityChange={setItemsValid} />
+			</section>
+			<section className="rounded-xl border border-gray-200 bg-white p-4">
+				<InvoiceAllocation
+					mode="quantities"
+					customerId={customerId}
+					items={items}
+					value={invoiceParts}
+					onChange={onInvoicePartsChange}
+					onValidityChange={setInvoiceValid}
+				/>
+			</section>
 		</div>
 	);
 };
@@ -188,7 +217,18 @@ const NewOrderModal: FC<Props> = ({
 		{
 			title: '',
 			content: (
-				<OrderDetailsStep
+				<CustomerInvoiceStep
+					customerId={watchedId}
+					items={items}
+					invoiceParts={invoiceParts}
+					onInvoicePartsChange={setInvoiceParts}
+				/>
+			),
+		},
+		{
+			title: '',
+			content: (
+				<ItemsInvoiceStep
 					customerId={watchedId}
 					items={items}
 					invoiceParts={invoiceParts}
