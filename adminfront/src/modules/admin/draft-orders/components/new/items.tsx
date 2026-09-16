@@ -13,7 +13,7 @@ import { Table, TabsProps } from 'antd';
 import _, { differenceBy } from 'lodash';
 import { CircleCheck, CircleX, Search, Upload } from 'lucide-react';
 import { useAdminVariants } from 'medusa-react';
-import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 import UploadModal from './modal-upload';
 import productsColumns from './product-columns';
@@ -31,7 +31,11 @@ export interface VariantPrice {
 	amount?: number;
 }
 
-const Items = () => {
+type Props = {
+	onValidityChange?: (valid: boolean) => void;
+};
+
+const Items = ({ onValidityChange }: Props = {}) => {
 	const { state, onOpen, onClose } = useToggleState();
 
 	const [selectedVariantIds, setSelectedVariantIds] = useState<string[]>([]);
@@ -53,6 +57,15 @@ const Items = () => {
 		form,
 	} = useNewDraftOrderForm();
 	const { enableNext, disableNext } = useStepModal();
+	const reportValidity = useCallback((valid: boolean) => {
+		if (onValidityChange) {
+			onValidityChange(valid);
+		} else if (valid) {
+			enableNext();
+		} else {
+			disableNext();
+		}
+	}, [disableNext, enableNext, onValidityChange]);
 
 	// Fetch variants
 	const { isLoading, count, variants } = useAdminVariants({
@@ -233,16 +246,15 @@ const Items = () => {
 
 	useEffect(() => {
 		if (variantPrices.some((p) => p.unit_price === 0)) {
-			disableNext();
+			reportValidity(false);
 			return;
 		}
 		if (selectedVariants.length > 0) {
-			enableNext();
+			reportValidity(true);
 		} else {
-			disableNext();
+			reportValidity(false);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectedVariants, variantPrices]);
+	}, [selectedVariants, variantPrices, reportValidity]);
 
 	// Handle quantity changes
 	const handleQuantityChange = (value: number, variantId: string) => {

@@ -25,6 +25,8 @@ interface StepModalProps {
 	onFinish: () => void;
 	isMobile?: boolean;
 	loading?: boolean;
+	desktopWidth?: number | string;
+	desktopBodyMaxHeight?: number | string;
 }
 
 // Step Context
@@ -121,6 +123,8 @@ export const StepModal: React.FC<StepModalProps> = ({
 	onFinish,
 	isMobile = false,
 	loading = false,
+	desktopWidth = 800,
+	desktopBodyMaxHeight = 600,
 }) => {
 	const SteppedContext = useStepModal();
 
@@ -174,11 +178,11 @@ export const StepModal: React.FC<StepModalProps> = ({
 					{SteppedContext.currentStep === steps.length - 1 ? 'Tạo' : 'Tiếp tục'}
 				</Button>,
 			]}
-			width={isMobile ? '95%' : 800}
+			width={isMobile ? '95%' : desktopWidth}
 			centered
 			styles={{
 				body: {
-					maxHeight: isMobile ? '65vh' : '600px',
+					maxHeight: isMobile ? '65vh' : desktopBodyMaxHeight,
 					overflowY: 'auto',
 				},
 			}}

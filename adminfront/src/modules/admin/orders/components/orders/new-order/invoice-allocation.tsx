@@ -8,7 +8,7 @@ import { getErrorMessage } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Form, InputNumber, Modal, Select, Tag, message } from 'antd';
 import { useMedusa } from 'medusa-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { NewOrderInvoicePart, normalizeInvoiceParts } from './invoice-allocation-utils';
 
 export type { NewOrderInvoicePart } from './invoice-allocation-utils';
@@ -33,17 +33,28 @@ type Props = {
 	items: OrderItem[];
 	value: NewOrderInvoicePart[];
 	onChange: (parts: NewOrderInvoicePart[]) => void;
+	onValidityChange?: (valid: boolean) => void;
 };
 
 const makeKey = () => `invoice-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-export default function InvoiceAllocation({ customerId, items, value, onChange }: Props) {
+export default function InvoiceAllocation({ customerId, items, value, onChange, onValidityChange }: Props) {
 	const { client } = useMedusa();
 	const { enableNext, disableNext } = useStepModal();
 	const [profileModalOpen, setProfileModalOpen] = useState(false);
 	const lastValidity = useRef<boolean | null>(null);
+	const lastCustomerId = useRef(customerId);
 	const [profileForm] = Form.useForm<{ misa_customer_code: string; label: string }>();
 	const [savingProfile, setSavingProfile] = useState(false);
+	const reportValidity = useCallback((valid: boolean) => {
+		if (onValidityChange) {
+			onValidityChange(valid);
+		} else if (valid) {
+			enableNext();
+		} else {
+			disableNext();
+		}
+	}, [disableNext, enableNext, onValidityChange]);
 	const { data: profiles = [], isLoading, refetch } = useQuery({
 		queryKey: ['customer-invoice-profiles', customerId],
 		queryFn: async () => {
@@ -61,11 +72,17 @@ export default function InvoiceAllocation({ customerId, items, value, onChange }
 	}) && items.every((item) => normalized.reduce((sum, part) => sum + (part.quantities[item.variant_id] ?? 0), 0) === item.quantity);
 
 	useEffect(() => {
+		if (lastCustomerId.current === customerId) return;
+		lastCustomerId.current = customerId;
+		lastValidity.current = null;
+		onChange([]);
+	}, [customerId, onChange]);
+
+	useEffect(() => {
 		if (lastValidity.current === valid) return;
 		lastValidity.current = valid;
-		if (valid) enableNext();
-		else disableNext();
-	}, [disableNext, enableNext, valid]);
+		reportValidity(valid);
+	}, [reportValidity, valid]);
 
 	useEffect(() => {
 		if (!profiles.length || (value.length && value.every((part) => profiles.some((profile) => profile.id === part.profile_id)))) return;

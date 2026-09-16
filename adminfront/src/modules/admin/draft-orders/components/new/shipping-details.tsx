@@ -6,11 +6,11 @@ import { isValidEmail } from '@/utils/is-valid-email';
 import mapAddressToForm from '@/utils/map-address-to-form';
 import { Customer } from '@medusajs/medusa';
 import { Form, Radio } from 'antd';
-import { debounce, isEmpty } from 'lodash';
+import { debounce } from 'lodash';
 import { LoaderCircle, LockIcon, PlusIcon } from 'lucide-react';
 import { useAdminNextCustomerCode } from '@/lib/hooks/api/customer';
 import { useAdminCustomer, useAdminCustomers } from 'medusa-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 import CreateCustomerModal from '../create-customer-modal';
 import AddressForm, { AddressType } from './address-form';
@@ -19,19 +19,32 @@ type ValueType = {
 	label: string;
 	value: string;
 };
-const ShippingDetails = () => {
+
+type Props = {
+	onValidityChange?: (valid: boolean) => void;
+};
+
+const ShippingDetails = ({ onValidityChange }: Props = {}) => {
 	const [addNew, setAddNew] = useState(false);
 	const { disableNext, enableNext } = useStepModal();
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const { nextCode } = useAdminNextCustomerCode({ enabled: isCreateModalOpen });
 	const [sameAsShipping, setSameAsShipping] = useState(true);
 	const [searchValue, setSearchValue] = useState<ValueType | undefined>();
-	const [customerValue, setCustomerValue] = useState<string>('');
 
 	const {
 		context: { validCountries },
 		form,
 	} = useNewDraftOrderForm();
+	const reportValidity = useCallback((valid: boolean) => {
+		if (onValidityChange) {
+			onValidityChange(valid);
+		} else if (valid) {
+			enableNext();
+		} else {
+			disableNext();
+		}
+	}, [disableNext, enableNext, onValidityChange]);
 
 	const customerId = Form.useWatch('customer_id', form);
 	const shippingAddressId = Form.useWatch('shipping_address_id', form);
@@ -68,15 +81,11 @@ const ShippingDetails = () => {
 		}));
 	}, [customers]);
 
-	const handleSelect = async (data: ValueType) => {
-		const { label, value } = data as ValueType;
-		if (!value || !label) return;
-
+	const handleSelect = (value: string) => {
+		if (!value) return;
 		const customerSelect = customers?.find((item) => item.id === value);
 		form.setFieldValue('customer_id', value);
 		form.setFieldValue('email', customerSelect?.email);
-
-		setCustomerValue(value);
 	};
 
 	// get valid addresses
@@ -96,23 +105,6 @@ const ShippingDetails = () => {
 			return validCountryCodes.includes(country_code.toLowerCase());
 		});
 	}, [customer, validCountries]);
-
-	const onCustomerSelect = (customerId: string) => {
-		// Find the selected customer in customerOptions
-		const selectedCustomer = customerOptions?.find(
-			(option) => option.value === customerId
-		);
-
-		if (selectedCustomer) {
-			// Extract email from the label (assuming label format is "First Last (email)")
-			const emailMatch = /\(([^()]+)\)$/.exec(selectedCustomer.label);
-			const email = emailMatch ? emailMatch[1] : '';
-
-			// Set the customer_id and email fields in the form
-			form.setFieldValue('customer_id', selectedCustomer.value);
-			form.setFieldValue('email', email);
-		}
-	};
 
 	const onCreateNew = () => {
 		form.setFieldValue('shipping_address_id', null);
@@ -144,13 +136,13 @@ const ShippingDetails = () => {
 	 */
 	useEffect(() => {
 		if (!email || !isValidEmail(email)) {
-			disableNext();
+			reportValidity(false);
 			return;
 		}
 
 		// If an existing address is selected via radio button
 		if (shippingAddressId && validAddresses.length && !addNew) {
-			enableNext();
+			reportValidity(true);
 			return;
 		}
 
@@ -160,13 +152,15 @@ const ShippingDetails = () => {
 				!shippingAddress.address_1 ||
 				!shippingAddress.country_code
 			) {
-				disableNext();
+				reportValidity(false);
 			} else {
-				enableNext();
+				reportValidity(true);
 			}
+		} else {
+			reportValidity(false);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [shippingAddress, email, shippingAddressId, validAddresses, addNew]);
+	}, [shippingAddress, email, shippingAddressId, validAddresses, addNew, reportValidity]);
 
 	useEffect(() => {
 		// Reset shipping address info when a different customer is selected
@@ -207,8 +201,8 @@ const ShippingDetails = () => {
 
 	// Add this handler function
 	const handleCustomerCreated = (newCustomer: Customer) => {
-		// Select the newly created customer
-		onCustomerSelect(newCustomer.id);
+		form.setFieldValue('customer_id', newCustomer.id);
+		form.setFieldValue('email', newCustomer.email);
 	};
 
 	return (
@@ -225,10 +219,8 @@ const ShippingDetails = () => {
 							placeholder="Chọn khách hàng"
 							allowClear
 							options={customerOptions}
-							labelInValue
 							autoClearSearchValue={false}
 							filterOption={false}
-							value={!isEmpty(customerValue) ? customerValue : undefined}
 							onSearch={debounceFetcher}
 							onSelect={handleSelect}
 							showSearch
