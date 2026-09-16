@@ -17,6 +17,12 @@ export type AdminDraftOrderTransferReq = {
 	isSendEmail?: boolean;
 	urlPdf: string;
 	sales_person_id?: string | null;
+	invoice_parts?: Array<{
+		profile_id: string;
+		consumer_name?: string | null;
+		consumer_address?: string | null;
+		items: Array<{ variant_id: string; quantity: number }>;
+	}>;
 };
 
 export const useAdminDraftOrderTransferOrder = (
@@ -36,6 +42,7 @@ export const useAdminDraftOrderTransferOrder = (
 				isSendEmail: payload.isSendEmail,
 				urlPdf: payload.urlPdf,
 				sales_person_id: payload.sales_person_id,
+				invoice_parts: payload.invoice_parts,
 			}),
 		buildOptions(
 			queryClient,

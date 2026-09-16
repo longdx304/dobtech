@@ -40,9 +40,10 @@ type Reconciliation = {
 };
 const vnd = (value: number) => `${new Intl.NumberFormat('vi-VN').format(value)} đ`;
 
-export default function InvoiceParts({ order }: { order: Order }) {
+export default function InvoiceParts({ order, onDirtyChange }: { order: Order; onDirtyChange?: (dirty: boolean) => void }) {
 	const { client } = useMedusa();
 	const [drafts, setDrafts] = useState<DraftPart[]>([]);
+	const [allocationDirty, setAllocationDirty] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [issueDates, setIssueDates] = useState<Record<string, string>>({});
 	const [issuingId, setIssuingId] = useState<string | null>(null);
@@ -83,7 +84,9 @@ export default function InvoiceParts({ order }: { order: Order }) {
 			is_issued: part.is_issued,
 			invoice_date: part.invoice_date,
 		})));
-	}, [parts]);
+		setAllocationDirty(false);
+		onDirtyChange?.(false);
+	}, [parts, onDirtyChange]);
 
 	const hasIssued = drafts.some((draft) => draft.is_issued);
 	const totals = useMemo(() => {
@@ -98,8 +101,12 @@ export default function InvoiceParts({ order }: { order: Order }) {
 	}, [drafts, lineItems]);
 	const updateDraft = (key: string, patch: Partial<DraftPart>) => {
 		setDrafts((previous) => previous.map((draft) => draft.key === key ? { ...draft, ...patch } : draft));
+		setAllocationDirty(true);
+		onDirtyChange?.(true);
 	};
 	const addPart = () => {
+		setAllocationDirty(true);
+		onDirtyChange?.(true);
 		setDrafts((previous) => [...previous, {
 			key: `new-${Date.now()}-${Math.random()}`,
 			profile_id: profiles.find((profile) => profile.is_active)?.id ?? '',
@@ -143,6 +150,8 @@ export default function InvoiceParts({ order }: { order: Order }) {
 			message.success('Đã lưu phân bổ hóa đơn');
 			await refetch();
 			await refetchReconciliation();
+			setAllocationDirty(false);
+			onDirtyChange?.(false);
 		} catch (error) {
 			message.error(getErrorMessage(error));
 		} finally {
@@ -172,7 +181,8 @@ export default function InvoiceParts({ order }: { order: Order }) {
 			<div><Title level={4} className="!mb-1">Phân bổ xuất hóa đơn</Title><p className="text-sm text-gray-500 mb-0">Chia từng mặt hàng theo mã thuế. Tổng số lượng phải bằng đơn quản trị.</p></div>
 			<Button type="default" onClick={addPart} disabled={profilesLoading || partsLoading || hasIssued || profiles.every((profile) => !profile.is_active)}>Thêm phần hóa đơn</Button>
 		</div>
-		{reconciliation && <div className="rounded-lg border border-green-200 bg-green-50 p-4 mb-4 text-sm space-y-1">
+		{allocationDirty && <Alert className="mb-4" type="warning" showIcon message="Phân bổ đã thay đổi nhưng chưa lưu. Kết quả đối chiếu và file QT/TH chỉ cập nhật sau khi lưu." />}
+		{!allocationDirty && reconciliation && <div className="rounded-lg border border-green-200 bg-green-50 p-4 mb-4 text-sm space-y-1">
 			<div className="font-medium text-green-800">Đối chiếu phân bổ nội bộ</div>
 			<div>Quản trị {vnd(reconciliation.management.total)} · Các phần thuế {vnd(reconciliation.tax_parts.reduce((sum, part) => sum + part.total, 0))} · Chênh lệch {vnd(reconciliation.difference.total)}</div>
 			{reconciliation.tax_parts.map((part) => <div key={part.part_id} className="text-xs border-t pt-1">
@@ -189,7 +199,7 @@ export default function InvoiceParts({ order }: { order: Order }) {
 				<div className="flex flex-wrap items-center gap-2">
 					<span className="font-medium">Hóa đơn {index + 1}</span>
 					{draft.is_issued ? <Tag color="green">Đã xuất {draft.invoice_date}</Tag> : <Tag>Chưa xác nhận xuất</Tag>}
-					{!hasIssued && <Button type="link" danger size="small" onClick={() => setDrafts((previous) => previous.filter((part) => part.key !== draft.key))}>Bỏ phần</Button>}
+					{!hasIssued && <Button type="link" danger size="small" onClick={() => { setDrafts((previous) => previous.filter((part) => part.key !== draft.key)); setAllocationDirty(true); onDirtyChange?.(true); }}>Bỏ phần</Button>}
 				</div>
 				<Select className="w-full" value={draft.profile_id || undefined} placeholder="Chọn mã khách thuế" disabled={hasIssued} onChange={(profile_id) => updateDraft(draft.key, { profile_id })}
 					options={profiles.filter((item) => item.is_active || item.id === draft.profile_id).map((item) => ({ value: item.id, label: `${item.misa_customer_code} — ${item.label}` }))} />

@@ -32,6 +32,7 @@ export type NewDraftOrderForm = {
 		unit_price: number;
 		thumbnail?: string | null;
 		product_title?: string;
+		sku?: string | null;
 	}[];
 	shipping_option: string | null;
 	manual_shipping_override?: boolean;

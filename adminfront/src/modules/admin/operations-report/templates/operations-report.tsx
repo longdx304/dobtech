@@ -19,8 +19,9 @@ type OperationsRow = {
 	display_id: number;
 	misa_document_number: string;
 	misa_stock_out_number: string;
-	misa_first_exported_at: string;
+	misa_first_exported_at: string | null;
 	misa_pair_quantity: number | null;
+	pair_details: string;
 	sales_person: string;
 	preparers: string;
 	checkers: string;
@@ -52,6 +53,7 @@ const exportRows = (operations: OperationsRow[]) =>
 		Bao: '',
 		Bịch: '',
 		Đôi: item.misa_pair_quantity ?? '',
+		'Chi tiết số đôi': item.pair_details,
 		'Người soạn': item.preparers,
 		'Người Kiểm': item.checkers,
 		'Người giao': item.shippers,
@@ -124,10 +126,11 @@ export default function OperationsReport() {
 			),
 		},
 		{ title: 'NV bán hàng', dataIndex: 'sales_person', key: 'sales_person', width: 180 },
-		{ title: 'Đơn hàng', dataIndex: 'misa_document_number', key: 'misa_document_number', width: 150 },
+		{ title: 'Mã MISA', dataIndex: 'misa_document_number', key: 'misa_document_number', width: 150, render: (value: string | null) => value || 'Chưa xuất MISA' },
 		{ title: 'Bao', key: 'bags', width: 90, render: () => '' },
 		{ title: 'Bịch', key: 'packs', width: 90, render: () => '' },
-		{ title: 'Đôi', dataIndex: 'misa_pair_quantity', key: 'misa_pair_quantity', width: 90, render: (value: number | null) => value ?? '' },
+		{ title: 'Tổng số đôi', dataIndex: 'misa_pair_quantity', key: 'misa_pair_quantity', width: 110, render: (value: number | null) => value ?? 0 },
+		{ title: 'Chi tiết số đôi', dataIndex: 'pair_details', key: 'pair_details', width: 260 },
 		{ title: 'Người soạn', dataIndex: 'preparers', key: 'preparers' },
 		{ title: 'Người kiểm', dataIndex: 'checkers', key: 'checkers' },
 		{ title: 'Người giao', dataIndex: 'shippers', key: 'shippers' },
@@ -252,7 +255,7 @@ export default function OperationsReport() {
 				</Space>
 			</div>
 			<Space wrap className="mb-4">
-				<Input value={q} onChange={(event) => { setQ(event.target.value); setPage(1); }} placeholder="Tìm mã BH..." prefix={<Search size={16} />} className="w-[260px]" />
+				<Input value={q} onChange={(event) => { setQ(event.target.value); setPage(1); }} placeholder="Tìm số đơn hoặc mã BH..." prefix={<Search size={16} />} className="w-[260px]" />
 				<DatePicker.RangePicker onChange={(values) => { setRange([values?.[0]?.format('YYYY-MM-DD'), values?.[1]?.format('YYYY-MM-DD')]); setPage(1); }} />
 			</Space>
 			{legacyRows.length > 0 && (

@@ -119,7 +119,6 @@ const itemManagement: Array<[AccessPermission, MenuItem]> = [
 const itemAccounting: Array<[AccessPermission, MenuItem]> = [
 	[AccessPermission.AccountingWorkspace, getItem('Đối soát đơn hàng', 'accounting', <BadgeDollarSign />)],
 	[AccessPermission.AccountingWorkspace, getItem('Số lượng tính chiết khấu', 'accounting-discount', <SquarePercent />)],
-	[AccessPermission.AccountingWorkspace, getItem('Chi phí giao ngoài', 'accounting-delivery-costs', <Truck />)],
 ];
 
 // Item menu user
@@ -222,5 +221,4 @@ export const menuRoutes: Record<string, string> = {
 	'operations-report': ERoutes.OPERATIONS_REPORT,
 	accounting: ERoutes.ACCOUNTING,
 	'accounting-discount': ERoutes.ACCOUNTING_DISCOUNT,
-	'accounting-delivery-costs': ERoutes.ACCOUNTING_DELIVERY_COSTS,
 };

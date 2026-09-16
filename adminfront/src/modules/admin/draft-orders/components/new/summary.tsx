@@ -13,11 +13,17 @@ import { useAdminShippingOptions } from 'medusa-react';
 import { MedusaImage } from '@/components/MedusaImage';
 import { useContext, useMemo } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
+import type { NewOrderInvoicePart } from '@/modules/admin/orders/components/orders/new-order/invoice-allocation-utils';
+import { useQuery } from '@tanstack/react-query';
+import { useMedusa } from 'medusa-react';
 
 type Props = {
 	setIsSendEmail: React.Dispatch<React.SetStateAction<boolean>>;
+	invoiceParts?: NewOrderInvoicePart[];
+	customerId?: string;
 };
-const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
+const Summary: React.FC<Props> = ({ setIsSendEmail, invoiceParts = [], customerId }) => {
+	const { client } = useMedusa();
 	const {
 		form,
 		context: {
@@ -133,6 +139,14 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 			0
 		);
 	}, [sortedItems]);
+	const { data: invoiceProfiles = [] } = useQuery({
+		queryKey: ['customer-invoice-profiles', customerId],
+		queryFn: async () => {
+			const response = await client.admin.custom.get(`/admin/customers/${customerId}/invoice-profiles`) as { profiles: Array<{ id: string; misa_customer_code: string; label: string }> };
+			return response.profiles;
+		},
+		enabled: Boolean(customerId),
+	});
 
 	return (
 		<div className="min-h-[705px]">
@@ -214,8 +228,21 @@ const Summary: React.FC<Props> = ({ setIsSendEmail }) => {
 				</div>
 			</SummarySection>
 
+			<SummarySection title="Xuất hóa đơn" editIndex={3}>
+				<div className="space-y-3">
+					{invoiceParts.map((part, index) => {
+						const profile = invoiceProfiles.find((candidate) => candidate.id === part.profile_id);
+						const total = Object.values(part.quantities).reduce((sum, quantity) => sum + quantity, 0);
+						return <div key={part.key} className="rounded-lg border border-gray-200 p-3">
+							<div className="flex flex-wrap justify-between gap-2"><span className="font-medium">{profile ? `${profile.misa_customer_code} — ${profile.label}` : `Khách xuất hóa đơn ${index + 1}`}</span><span className="font-semibold">{total} đôi</span></div>
+							<div className="mt-2 text-xs text-gray-500">{sortedItems.filter((item) => (part.quantities[item.variant_id] ?? 0) > 0).map((item) => `${item.sku || item.title}: ${part.quantities[item.variant_id]}`).join(' · ')}</div>
+						</div>;
+					})}
+				</div>
+			</SummarySection>
+
 			{selectedShippingOption && (
-				<SummarySection title="Chi tiết vận chuyển" editIndex={3}>
+				<SummarySection title="Chi tiết vận chuyển" editIndex={1}>
 					<div className="grid grid-cols-2 gap-6">
 						{shipping && (
 							<div className="border-r pr-6">
