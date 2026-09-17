@@ -61,6 +61,7 @@ type Props = {
 
 type InvoiceStepProps = {
 	customerId?: string;
+	onCustomerIdChange?: (customerId?: string) => void;
 	items: LineItemForm[];
 	invoiceParts: NewOrderInvoicePart[];
 	onInvoicePartsChange: (parts: NewOrderInvoicePart[]) => void;
@@ -68,6 +69,7 @@ type InvoiceStepProps = {
 
 const CustomerInvoiceStep = ({
 	customerId,
+	onCustomerIdChange,
 	items,
 	invoiceParts,
 	onInvoicePartsChange,
@@ -85,7 +87,10 @@ const CustomerInvoiceStep = ({
 		<div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
 			<section className="rounded-xl border border-gray-200 bg-white p-4">
 				<h3 className="mb-4 text-base font-semibold">Khách hàng và giao hàng</h3>
-				<ShippingDetails onValidityChange={setShippingValid} />
+				<ShippingDetails
+					onValidityChange={setShippingValid}
+					onCustomerIdChange={onCustomerIdChange}
+				/>
 			</section>
 			<section className="rounded-xl border border-gray-200 bg-white p-4">
 				<InvoiceAllocation
@@ -187,6 +192,7 @@ const NewOrderModal: FC<Props> = ({
 	} = useNewDraftOrderForm();
 	const [isSendEmail, setIsSendEmail] = useState(false);
 	const [invoiceParts, setInvoiceParts] = useState<NewOrderInvoicePart[]>([]);
+	const [persistedCustomerId, setPersistedCustomerId] = useState<string>();
 
 	// Initialize transfer order mutation
 	const transferOrder = useAdminDraftOrderTransferOrder();
@@ -196,8 +202,12 @@ const NewOrderModal: FC<Props> = ({
 		| string
 		| undefined;
 	const watchedId = resolveFormCustomerId(watchedCustomerId);
-	const { customer: selectedCustomer } = useAdminCustomer(watchedId || '', {
-		enabled: !!watchedId,
+	useEffect(() => {
+		if (watchedId) setPersistedCustomerId(watchedId);
+	}, [watchedId]);
+	const customerId = watchedId ?? persistedCustomerId;
+	const { customer: selectedCustomer } = useAdminCustomer(customerId || '', {
+		enabled: !!customerId,
 	});
 
 	const adminAddCustomerAddress = useAdminAddCustomerAddress();
@@ -218,7 +228,8 @@ const NewOrderModal: FC<Props> = ({
 			title: '',
 			content: (
 				<CustomerInvoiceStep
-					customerId={watchedId}
+					customerId={customerId}
+					onCustomerIdChange={setPersistedCustomerId}
 					items={items}
 					invoiceParts={invoiceParts}
 					onInvoicePartsChange={setInvoiceParts}
@@ -229,14 +240,14 @@ const NewOrderModal: FC<Props> = ({
 			title: '',
 			content: (
 				<ItemsInvoiceStep
-					customerId={watchedId}
+					customerId={customerId}
 					items={items}
 					invoiceParts={invoiceParts}
 					onInvoicePartsChange={setInvoiceParts}
 				/>
 			),
 		},
-		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} invoiceParts={invoiceParts} customerId={watchedId} /> },
+		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} invoiceParts={invoiceParts} customerId={customerId} /> },
 	];
 
 	const generateFilePdf = async (
@@ -288,8 +299,8 @@ const NewOrderModal: FC<Props> = ({
 
 	const addCustomerAddress = async () => {
 		const values = form.getFieldsValue(true);
-		const customerId = resolveFormCustomerId(values.customer_id);
-		if (!customerId) {
+		const resolvedCustomerId = resolveFormCustomerId(values.customer_id) ?? customerId;
+		if (!resolvedCustomerId) {
 			throw new Error('Chưa chọn khách hàng để lưu địa chỉ');
 		}
 		const sa = values.shipping_address;
@@ -311,7 +322,7 @@ const NewOrderModal: FC<Props> = ({
 			metadata: { is_default: true },
 		};
 
-		await adminAddCustomerAddress.mutateAsync({ customerId, payload });
+		await adminAddCustomerAddress.mutateAsync({ customerId: resolvedCustomerId, payload });
 	};
 
 	const generateTransferOrderData = (tax: number) => {
@@ -346,7 +357,7 @@ const NewOrderModal: FC<Props> = ({
 				...values.billing_address,
 				country_code: orderFormCountryCode(values.billing_address?.country_code),
 			},
-			customer_id: values.customer_id,
+			customer_id: resolveFormCustomerId(values.customer_id) ?? customerId,
 			discounts: values.discount_code
 				? [{ code: values.discount_code }]
 				: undefined,
@@ -360,7 +371,7 @@ const NewOrderModal: FC<Props> = ({
 			const values = form.getFieldsValue(true);
 			// Lưu địa chỉ mới vào hồ sơ khách khi không chọn địa chỉ có sẵn (kể cả đã có địa chỉ cũ).
 			const shouldSaveAddressToCustomer =
-				!!resolveFormCustomerId(values.customer_id) &&
+				!!(resolveFormCustomerId(values.customer_id) ?? customerId) &&
 				!values.shipping_address_id &&
 				!!values.shipping_address?.address_1 &&
 				!!values.shipping_address?.first_name;
@@ -418,6 +429,7 @@ const NewOrderModal: FC<Props> = ({
 								refetch();
 								form.resetFields();
 								setInvoiceParts([]);
+								setPersistedCustomerId(undefined);
 								handleOk();
 								// Refresh the page to reload prices
 								window.location.reload();
