@@ -228,7 +228,7 @@ const Summary: React.FC<Props> = ({ setIsSendEmail, invoiceParts = [], customerI
 				</div>
 			</SummarySection>
 
-			<SummarySection title="Xuất hóa đơn" editIndex={3}>
+			<SummarySection title="Xuất hóa đơn" editIndex={2}>
 				<div className="space-y-3">
 					{invoiceParts.map((part, index) => {
 						const profile = invoiceProfiles.find((candidate) => candidate.id === part.profile_id);
