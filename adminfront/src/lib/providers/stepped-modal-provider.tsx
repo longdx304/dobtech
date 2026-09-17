@@ -6,10 +6,12 @@ import { clsx } from 'clsx';
 import React, {
 	createContext,
 	ReactNode,
+	useCallback,
 	useContext,
 	useMemo,
 	useReducer,
 } from 'react';
+import { StepActions, stepReducer } from './stepped-modal-state';
 
 // Types
 type StepModalScreen = {
@@ -29,16 +31,6 @@ interface StepModalProps {
 	desktopBodyMaxHeight?: number | string;
 }
 
-// Step Context
-enum StepActions {
-	NEXT,
-	PREV,
-	RESET,
-	SET_PAGE,
-	ENABLE_NEXT,
-	DISABLE_NEXT,
-}
-
 interface SteppedContextType {
 	currentStep: number;
 	nextEnabled: boolean;
@@ -52,28 +44,6 @@ interface SteppedContextType {
 
 export const SteppedContext = createContext<SteppedContextType | null>(null);
 
-const stepReducer = (
-	state: { currentStep: number; nextEnabled: boolean },
-	action: { type: StepActions; payload?: any }
-) => {
-	switch (action.type) {
-		case StepActions.NEXT:
-			return { ...state, currentStep: state.currentStep + 1 };
-		case StepActions.PREV:
-			return { ...state, currentStep: Math.max(0, state.currentStep - 1) };
-		case StepActions.RESET:
-			return { ...state, currentStep: 0, nextEnabled: true };
-		case StepActions.SET_PAGE:
-			return { ...state, currentStep: action.payload };
-		case StepActions.ENABLE_NEXT:
-			return { ...state, nextEnabled: true };
-		case StepActions.DISABLE_NEXT:
-			return { ...state, nextEnabled: false };
-		default:
-			return state;
-	}
-};
-
 // Step Provider Component
 export const StepModalProvider: React.FC<{ children: ReactNode }> = ({
 	children,
@@ -82,20 +52,35 @@ export const StepModalProvider: React.FC<{ children: ReactNode }> = ({
 		currentStep: 0,
 		nextEnabled: true,
 	});
+	const goToNext = useCallback(() => dispatch({ type: StepActions.NEXT }), []);
+	const goToPrev = useCallback(() => dispatch({ type: StepActions.PREV }), []);
+	const reset = useCallback(() => dispatch({ type: StepActions.RESET }), []);
+	const setStep = useCallback((step: number) =>
+		dispatch({ type: StepActions.SET_PAGE, payload: step }), []);
+	const enableNext = useCallback(() => dispatch({ type: StepActions.ENABLE_NEXT }), []);
+	const disableNext = useCallback(() => dispatch({ type: StepActions.DISABLE_NEXT }), []);
 
 	const contextValue = useMemo(
 		() => ({
 			currentStep: state.currentStep,
 			nextEnabled: state.nextEnabled,
-			goToNext: () => dispatch({ type: StepActions.NEXT }),
-			goToPrev: () => dispatch({ type: StepActions.PREV }),
-			reset: () => dispatch({ type: StepActions.RESET }),
-			setStep: (step: number) =>
-				dispatch({ type: StepActions.SET_PAGE, payload: step }),
-			enableNext: () => dispatch({ type: StepActions.ENABLE_NEXT }),
-			disableNext: () => dispatch({ type: StepActions.DISABLE_NEXT }),
+			goToNext,
+			goToPrev,
+			reset,
+			setStep,
+			enableNext,
+			disableNext,
 		}),
-		[state]
+		[
+			disableNext,
+			enableNext,
+			goToNext,
+			goToPrev,
+			reset,
+			setStep,
+			state.currentStep,
+			state.nextEnabled,
+		]
 	);
 
 	return (
