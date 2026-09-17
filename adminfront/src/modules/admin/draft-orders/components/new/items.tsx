@@ -3,13 +3,16 @@ import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Tabs } from '@/components/Tabs';
 import { Tooltip } from '@/components/Tooltip';
-import { useAdminVariantsSku } from '@/lib/hooks/api/variants';
+import {
+	useAdminVariantAvailability,
+	useAdminVariantsSku,
+} from '@/lib/hooks/api/variants';
 import useToggleState from '@/lib/hooks/use-toggle-state';
 import { useStepModal } from '@/lib/providers/stepped-modal-provider';
 import { formatNumber } from '@/lib/utils';
 import { ProductVariant, Region } from '@medusajs/medusa';
 import { PricedVariant } from '@medusajs/medusa/dist/types/pricing';
-import { Table, TabsProps } from 'antd';
+import { Alert, Table, TabsProps } from 'antd';
 import _, { differenceBy } from 'lodash';
 import { CircleCheck, CircleX, Search, Upload } from 'lucide-react';
 import { useAdminVariants } from 'medusa-react';
@@ -102,6 +105,43 @@ const Items = ({ onValidityChange }: Props = {}) => {
 				enabled: !!items?.length,
 			}
 		);
+
+	const availabilityVariantIds = useMemo(
+		() =>
+			Array.from(
+				new Set(
+					[
+						...(variants ?? []),
+						...(selectedVariantsData ?? []),
+						...(variantsBySku ?? []),
+					]
+						.map((variant) => variant.id)
+						.filter((id): id is string => Boolean(id))
+				)
+			),
+		[variants, selectedVariantsData, variantsBySku]
+	);
+	const {
+		availability,
+		isFetching: isAvailabilityFetching,
+	} = useAdminVariantAvailability(availabilityVariantIds);
+	const availabilityByVariantId = useMemo(
+		() =>
+			new Map(
+				availability.map((item) => [item.id, item.available_quantity] as const)
+			),
+		[availability]
+	);
+	const withLiveAvailability = useCallback(
+		(variant: ProductVariant) => ({
+			...variant,
+			inventory_quantity: Math.max(
+				0,
+				availabilityByVariantId.get(variant.id) ?? 0
+			),
+		}),
+		[availabilityByVariantId]
+	);
 
 	// Get default price for a variant
 	const getDefaultPrice = (variant: any) => {
@@ -249,12 +289,35 @@ const Items = ({ onValidityChange }: Props = {}) => {
 			reportValidity(false);
 			return;
 		}
-		if (selectedVariants.length > 0) {
+		const quantitiesWithinAvailableStock = selectedVariants.every((variant) => {
+			if (variant.allow_backorder) return true;
+			const availableQuantity = availabilityByVariantId.get(variant.id);
+			const requestedQuantity =
+				variantQuantities.find((item) => item.variantId === variant.id)
+					?.quantity ?? 0;
+			return (
+				availableQuantity !== undefined &&
+				requestedQuantity <= Math.max(0, availableQuantity)
+			);
+		});
+
+		if (
+			selectedVariants.length > 0 &&
+			!isAvailabilityFetching &&
+			quantitiesWithinAvailableStock
+		) {
 			reportValidity(true);
 		} else {
 			reportValidity(false);
 		}
-	}, [selectedVariants, variantPrices, reportValidity]);
+	}, [
+		availabilityByVariantId,
+		isAvailabilityFetching,
+		reportValidity,
+		selectedVariants,
+		variantPrices,
+		variantQuantities,
+	]);
 
 	// Handle quantity changes
 	const handleQuantityChange = (value: number, variantId: string) => {
@@ -407,6 +470,25 @@ const Items = ({ onValidityChange }: Props = {}) => {
 	const totalQuantity = useMemo(() => {
 		return variantQuantities.reduce((total, item) => total + item.quantity, 0);
 	}, [variantQuantities]);
+
+	const inventoryIssues = useMemo(
+		() =>
+			selectedVariants.flatMap((variant) => {
+				if (variant.allow_backorder) return [];
+				const requestedQuantity =
+					variantQuantities.find((item) => item.variantId === variant.id)
+						?.quantity ?? 0;
+				const availableQuantity = Math.max(
+					0,
+					availabilityByVariantId.get(variant.id) ?? 0
+				);
+				if (requestedQuantity <= availableQuantity) return [];
+				return [
+					`${variant.sku || variant.title}: cần ${requestedQuantity}, còn khả dụng ${availableQuantity}`,
+				];
+			}),
+		[availabilityByVariantId, selectedVariants, variantQuantities]
+	);
 
 	// Paginated selected variants for display
 	const paginatedSelectedVariants = useMemo(() => {
@@ -583,18 +665,30 @@ const Items = ({ onValidityChange }: Props = {}) => {
 			</div>
 			<div className="flex justify-end">{`Đã chọn : ${selectedVariantsCount ?? 0
 				} biến thể`}</div>
+			{inventoryIssues.length > 0 && !isAvailabilityFetching && (
+				<Alert
+					type="error"
+					showIcon
+					message="Số lượng vượt quá tồn khả dụng"
+					description={inventoryIssues.join('; ')}
+					className="mb-3"
+				/>
+			)}
 			<Table
 				rowSelection={{
 					selectedRowKeys: selectedVariantIds,
 					onChange: handleRowSelectionChange as any,
 					preserveSelectedRowKeys: true,
 					getCheckboxProps: (record: any) => ({
-						disabled: handleDisable(record),
+						disabled:
+							!selectedVariantIds.includes(record.id) && handleDisable(record),
 					}),
 				}}
-				loading={isLoading}
+				loading={isLoading || isAvailabilityFetching}
 				columns={columns as any}
-				dataSource={(activeTab === 'list' ? variants : paginatedSelectedVariants) ?? []}
+				dataSource={(
+					(activeTab === 'list' ? variants : paginatedSelectedVariants) ?? []
+				).map((variant) => withLiveAvailability(variant as ProductVariant))}
 				rowKey="id"
 				scroll={{ x: 700 }}
 				pagination={

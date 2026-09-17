@@ -1,5 +1,5 @@
 'use client';
-import { FloatButton } from '@/components/Button';
+import { Button, FloatButton } from '@/components/Button';
 import { Flex } from '@/components/Flex';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table';
@@ -118,18 +118,28 @@ const OrderList: FC<Props> = () => {
 	return (
 		// <div className="w-full">
 		<>
-			<Flex align="center" justify="flex-start" className="">
+			<Flex
+				align="center"
+				justify="space-between"
+				className="flex-wrap gap-3 pb-4"
+			>
 				<Title level={3}>Đơn hàng</Title>
-			</Flex>
-			<Flex align="center" justify="flex-end" className="pb-4">
-				<Input
-					// size="small"
-					placeholder="Tìm kiếm đơn hàng..."
-					name="search"
-					prefix={<Search size={16} />}
-					onChange={handleChangeDebounce}
-					className="w-[300px]"
-				/>
+				<Flex align="center" className="flex-wrap gap-2">
+					<Input
+						placeholder="Tìm kiếm đơn hàng..."
+						name="search"
+						prefix={<Search size={16} />}
+						onChange={handleChangeDebounce}
+						className="w-[300px] max-w-full"
+					/>
+					<Button
+						icons={<Plus size={18} />}
+						onClick={handleCreateOrderByAdmin}
+						data-testid="btnCreateSupplier"
+					>
+						Tạo đơn hàng
+					</Button>
+				</Flex>
 			</Flex>
 		<Table
 			loading={isLoading}
@@ -166,13 +176,6 @@ const OrderList: FC<Props> = () => {
 				showTotal: (total, range) =>
 					`${range[0]}-${range[1]} trong ${total} đơn hàng`,
 			}}
-		/>
-		<FloatButton
-			className="absolute"
-			icon={<Plus color="white" size={20} strokeWidth={2} />}
-			type="primary"
-			onClick={handleCreateOrderByAdmin}
-			data-testid="btnCreateSupplier"
 		/>
 		{selectedRowKeys.length > 0 && (
 			<FloatButton

@@ -7,6 +7,7 @@ import {
 import { getErrorMessage } from '@/lib/utils';
 import InvoiceAllocation from '@/modules/admin/orders/components/orders/new-order/invoice-allocation';
 import type { NewOrderInvoicePart } from '@/modules/admin/orders/components/orders/new-order/invoice-allocation-utils';
+import SalesPersonSelect from '@/modules/admin/orders/components/orders/new-order/sales-person-select';
 import { Form, message } from 'antd';
 import { useAdminCreateDraftOrder } from 'medusa-react';
 import { FC, useEffect, useState } from 'react';
@@ -190,7 +191,15 @@ const DraftOrderModal: FC<Props> = ({
 	};
 
 	const steps = [
-		{ title: '', content: <SelectRegion /> },
+		{
+			title: '',
+			content: (
+				<div className="flex flex-col">
+					<SelectRegion requireSalesPerson />
+					<SalesPersonSelect required />
+				</div>
+			),
+		},
 		{
 			title: '',
 			content: (
@@ -256,7 +265,14 @@ const DraftOrderModal: FC<Props> = ({
 						: { title: i.title, unit_price: i.unit_price }),
 				})),
 				region_id: values.region,
-				shipping_methods: [{ option_id: shippingOptionId }],
+				shipping_methods: [
+					{
+						option_id: shippingOptionId,
+						data: values.manual_shipping_override
+							? { manual_shipping_override: true }
+							: undefined,
+					},
+				],
 				shipping_address: values.shipping_address_id || {
 					...values.shipping_address,
 					country_code: draftOrderCountryCode(
@@ -274,6 +290,7 @@ const DraftOrderModal: FC<Props> = ({
 					? [{ code: values.discount_code }]
 					: undefined,
 				metadata: {
+					sales_person_id: values.sales_person_id,
 					invoice_parts: invoiceParts.map((part) => ({
 						profile_id: part.profile_id,
 						consumer_name: part.consumer_name,

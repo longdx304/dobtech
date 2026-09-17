@@ -335,7 +335,7 @@ const productsColumns = ({
 			},
 		},
 		{
-			title: 'Còn hàng',
+			title: 'Còn khả dụng',
 			key: 'inventory_quantity',
 			dataIndex: 'inventory_quantity',
 			className: 'text-xs',
