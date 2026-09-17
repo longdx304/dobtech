@@ -22,9 +22,10 @@ type ValueType = {
 
 type Props = {
 	onValidityChange?: (valid: boolean) => void;
+	onCustomerIdChange?: (customerId?: string) => void;
 };
 
-const ShippingDetails = ({ onValidityChange }: Props = {}) => {
+const ShippingDetails = ({ onValidityChange, onCustomerIdChange }: Props = {}) => {
 	const [addNew, setAddNew] = useState(false);
 	const { disableNext, enableNext } = useStepModal();
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -86,6 +87,7 @@ const ShippingDetails = ({ onValidityChange }: Props = {}) => {
 		const customerSelect = customers?.find((item) => item.id === value);
 		form.setFieldValue('customer_id', value);
 		form.setFieldValue('email', customerSelect?.email);
+		onCustomerIdChange?.(value);
 	};
 
 	// get valid addresses
@@ -203,11 +205,12 @@ const ShippingDetails = ({ onValidityChange }: Props = {}) => {
 	const handleCustomerCreated = (newCustomer: Customer) => {
 		form.setFieldValue('customer_id', newCustomer.id);
 		form.setFieldValue('email', newCustomer.email);
+		onCustomerIdChange?.(newCustomer.id);
 	};
 
 	return (
 		<div className="flex h-max flex-col gap-y-8">
-			<Form form={form} layout="vertical">
+			<div>
 				<div className="flex gap-x-2 items-center">
 					<Form.Item
 						name={'customer_id'}
@@ -218,6 +221,11 @@ const ShippingDetails = ({ onValidityChange }: Props = {}) => {
 							className="w-full"
 							placeholder="Chọn khách hàng"
 							allowClear
+							onClear={() => {
+								form.setFieldValue('customer_id', undefined);
+								form.setFieldValue('email', undefined);
+								onCustomerIdChange?.(undefined);
+							}}
 							options={customerOptions}
 							autoClearSearchValue={false}
 							filterOption={false}
@@ -297,7 +305,7 @@ const ShippingDetails = ({ onValidityChange }: Props = {}) => {
 						)}
 					</div>
 				)}
-			</Form>
+			</div>
 
 			{/* Hidden input for shipping address */}
 			<Form.Item name="shipping_address" hidden>
