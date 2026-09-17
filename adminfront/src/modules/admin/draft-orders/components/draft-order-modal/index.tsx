@@ -2,11 +2,14 @@ import useIsDesktop from '@/lib/hooks/useIsDesktop';
 import {
 	StepModal,
 	StepModalProvider,
+	useStepModal,
 } from '@/lib/providers/stepped-modal-provider';
 import { getErrorMessage } from '@/lib/utils';
-import { message } from 'antd';
+import InvoiceAllocation from '@/modules/admin/orders/components/orders/new-order/invoice-allocation';
+import type { NewOrderInvoicePart } from '@/modules/admin/orders/components/orders/new-order/invoice-allocation-utils';
+import { Form, message } from 'antd';
 import { useAdminCreateDraftOrder } from 'medusa-react';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useNewDraftOrderForm } from '../../hooks/use-new-draft-form';
 import ItemsDraft from '../new/items-draft';
 import SelectRegion from '../new/select-region';
@@ -19,6 +22,113 @@ type Props = {
 	handleCancel: () => void;
 	setIsSendEmail: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
+type DraftLineItem = {
+	quantity: number;
+	variant_id: string;
+	title: string;
+	unit_price: number;
+	thumbnail?: string | null;
+	product_title?: string;
+	sku?: string | null;
+};
+
+type InvoiceStepProps = {
+	customerId?: string;
+	onCustomerIdChange?: (customerId?: string) => void;
+	items: DraftLineItem[];
+	invoiceParts: NewOrderInvoicePart[];
+	onInvoicePartsChange: (parts: NewOrderInvoicePart[]) => void;
+};
+
+const CustomerInvoiceStep = ({
+	customerId,
+	onCustomerIdChange,
+	items,
+	invoiceParts,
+	onInvoicePartsChange,
+}: InvoiceStepProps) => {
+	const { enableNext, disableNext } = useStepModal();
+	const [shippingValid, setShippingValid] = useState(false);
+	const [invoiceValid, setInvoiceValid] = useState(false);
+
+	useEffect(() => {
+		if (shippingValid && invoiceValid) enableNext();
+		else disableNext();
+	}, [disableNext, enableNext, invoiceValid, shippingValid]);
+
+	return (
+		<div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+			<section className="rounded-xl border border-gray-200 bg-white p-4">
+				<h3 className="mb-4 text-base font-semibold">Khách hàng và giao hàng</h3>
+				<ShippingDetails
+					onValidityChange={setShippingValid}
+					onCustomerIdChange={onCustomerIdChange}
+				/>
+			</section>
+			<section className="rounded-xl border border-gray-200 bg-white p-4">
+				<InvoiceAllocation
+					mode="profiles"
+					customerId={customerId}
+					items={items}
+					value={invoiceParts}
+					onChange={onInvoicePartsChange}
+					onValidityChange={setInvoiceValid}
+				/>
+			</section>
+		</div>
+	);
+};
+
+const ItemsInvoiceStep = ({
+	customerId,
+	items,
+	invoiceParts,
+	onInvoicePartsChange,
+}: InvoiceStepProps) => {
+	const { enableNext, disableNext } = useStepModal();
+	const [itemsValid, setItemsValid] = useState(false);
+	const [invoiceValid, setInvoiceValid] = useState(false);
+
+	useEffect(() => {
+		if (itemsValid && invoiceValid) enableNext();
+		else disableNext();
+	}, [disableNext, enableNext, invoiceValid, itemsValid]);
+
+	return (
+		<div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(700px,1.55fr)_minmax(380px,0.85fr)]">
+			<section className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+				<h3 className="px-4 pt-4 text-base font-semibold">Sản phẩm</h3>
+				<ItemsDraft onValidityChange={setItemsValid} />
+			</section>
+			<section className="rounded-xl border border-gray-200 bg-white p-4">
+				<InvoiceAllocation
+					mode="quantities"
+					customerId={customerId}
+					items={items}
+					value={invoiceParts}
+					onChange={onInvoicePartsChange}
+					onValidityChange={setInvoiceValid}
+				/>
+			</section>
+		</div>
+	);
+};
+
+function resolveDraftCustomerId(raw: unknown): string | undefined {
+	if (typeof raw === 'string') {
+		const value = raw.trim();
+		return value || undefined;
+	}
+	if (typeof raw === 'object' && raw !== null && 'value' in raw) {
+		const value = (raw as { value?: unknown }).value;
+		if (typeof value === 'string') {
+			const trimmed = value.trim();
+			return trimmed || undefined;
+		}
+	}
+	return undefined;
+}
 
 /** Form may store country as string (e.g. "vn") or Select option { label, value }. */
 function draftOrderCountryCode(raw: unknown, fallback = 'vn'): string {
@@ -49,17 +159,71 @@ const DraftOrderModal: FC<Props> = ({
 		form,
 		context: {
 			items,
+			setItems,
+			setDataFromExcel,
 			shippingPolicyQuote,
 			isShippingPolicyLoading,
 			shippingPolicyError,
 		},
 	} = useNewDraftOrderForm();
+	const [invoiceParts, setInvoiceParts] = useState<NewOrderInvoicePart[]>([]);
+	const [persistedCustomerId, setPersistedCustomerId] = useState<string>();
+	const watchedCustomerId = Form.useWatch('customer_id', form);
+	const watchedId = resolveDraftCustomerId(watchedCustomerId);
+
+	useEffect(() => {
+		if (watchedId) setPersistedCustomerId(watchedId);
+	}, [watchedId]);
+
+	const customerId = watchedId ?? persistedCustomerId;
+	const resetDraftState = () => {
+		form.resetFields();
+		setItems([]);
+		setDataFromExcel([]);
+		setInvoiceParts([]);
+		setPersistedCustomerId(undefined);
+		setIsSendEmail(false);
+	};
+	const handleModalCancel = () => {
+		resetDraftState();
+		handleCancel();
+	};
 
 	const steps = [
 		{ title: '', content: <SelectRegion /> },
-		{ title: '', content: <ShippingDetails /> },
-		{ title: '', content: <ItemsDraft /> },
-		{ title: '', content: <Summary setIsSendEmail={setIsSendEmail} /> },
+		{
+			title: '',
+			content: (
+				<CustomerInvoiceStep
+					customerId={customerId}
+					onCustomerIdChange={setPersistedCustomerId}
+					items={items}
+					invoiceParts={invoiceParts}
+					onInvoicePartsChange={setInvoiceParts}
+				/>
+			),
+		},
+		{
+			title: '',
+			content: (
+				<ItemsInvoiceStep
+					customerId={customerId}
+					items={items}
+					invoiceParts={invoiceParts}
+					onInvoicePartsChange={setInvoiceParts}
+				/>
+			),
+		},
+		{
+			title: '',
+			content: (
+				<Summary
+					setIsSendEmail={setIsSendEmail}
+					invoiceParts={invoiceParts}
+					customerId={customerId}
+				/>
+			),
+		},
 	];
 
 	const handleFinish = async () => {
@@ -105,16 +269,26 @@ const DraftOrderModal: FC<Props> = ({
 						values.billing_address?.country_code
 					),
 				},
-				customer_id: values.customer_id,
+				customer_id: resolveDraftCustomerId(values.customer_id) ?? customerId,
 				discounts: values.discount_code
 					? [{ code: values.discount_code }]
 					: undefined,
+				metadata: {
+					invoice_parts: invoiceParts.map((part) => ({
+						profile_id: part.profile_id,
+						consumer_name: part.consumer_name,
+						consumer_address: part.consumer_address,
+						items: Object.entries(part.quantities)
+							.filter(([, quantity]) => quantity > 0)
+							.map(([variant_id, quantity]) => ({ variant_id, quantity })),
+					})),
+				},
 			};
 
 			mutate(transformedData as any, {
 				onSuccess: () => {
 					message.success('Tạo bản nháp đơn hàng thành công');
-					form.resetFields();
+					resetDraftState();
 					handleOk();
 				},
 				onError: (error) => {
@@ -133,11 +307,13 @@ const DraftOrderModal: FC<Props> = ({
 		<StepModalProvider>
 			<StepModal
 				open={state}
-				onCancel={handleCancel}
+				onCancel={handleModalCancel}
 				title="Tạo bản nháp đơn hàng"
 				steps={steps}
 				onFinish={handleFinish}
 				isMobile={!isDesktop}
+				desktopWidth={1400}
+				desktopBodyMaxHeight="75vh"
 			/>
 		</StepModalProvider>
 	);
