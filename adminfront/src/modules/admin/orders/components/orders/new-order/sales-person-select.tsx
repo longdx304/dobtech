@@ -2,7 +2,7 @@ import { Select } from '@/components/Select';
 import { EPermissions, hasEmployeePermission } from '@/types/account';
 import { Form } from 'antd';
 import debounce from 'lodash/debounce';
-import { useAdminUsers } from 'medusa-react';
+import { useAdminUser, useAdminUsers } from 'medusa-react';
 import { useEffect, useMemo, useState } from 'react';
 
 type Props = {
@@ -11,6 +11,8 @@ type Props = {
 
 const SalesPersonSelect = ({ required = false }: Props) => {
 	const [searchValue, setSearchValue] = useState('');
+	const form = Form.useFormInstance();
+	const selectedSalesPersonId = Form.useWatch('sales_person_id', form);
 	const { users, isLoading } = useAdminUsers(
 		{
 			offset: 0,
@@ -21,6 +23,10 @@ const SalesPersonSelect = ({ required = false }: Props) => {
 			keepPreviousData: true,
 		}
 	);
+	const { user: selectedSalesPerson, isLoading: isSelectedSalesPersonLoading } =
+		useAdminUser(selectedSalesPersonId || '', {
+			enabled: Boolean(selectedSalesPersonId),
+		});
 
 	const handleSearch = useMemo(
 		() => debounce((value: string) => setSearchValue(value.trim()), 500),
@@ -31,9 +37,8 @@ const SalesPersonSelect = ({ required = false }: Props) => {
 		return () => handleSearch.cancel();
 	}, [handleSearch]);
 
-	const options = useMemo(
-		() =>
-			(users ?? [])
+	const options = useMemo(() => {
+		const result = (users ?? [])
 				.filter((user) =>
 					hasEmployeePermission(
 						(user as typeof user & { permissions?: string }).permissions,
@@ -50,9 +55,29 @@ const SalesPersonSelect = ({ required = false }: Props) => {
 						value: user.id,
 						label: fullName ? `${fullName} (${user.email})` : user.email,
 					};
-				}),
-		[users]
-	);
+				});
+
+		if (
+			selectedSalesPerson &&
+			!result.some((option) => option.value === selectedSalesPerson.id)
+		) {
+			const fullName = [
+				selectedSalesPerson.first_name,
+				selectedSalesPerson.last_name,
+			]
+				.filter(Boolean)
+				.join(' ')
+				.trim();
+			result.unshift({
+				value: selectedSalesPerson.id,
+				label: fullName
+					? `${fullName} (${selectedSalesPerson.email})`
+					: selectedSalesPerson.email,
+			});
+		}
+
+		return result;
+	}, [selectedSalesPerson, users]);
 
 	return (
 		<Form.Item
@@ -74,7 +99,7 @@ const SalesPersonSelect = ({ required = false }: Props) => {
 				allowClear
 				showSearch
 				filterOption={false}
-				loading={isLoading}
+				loading={isLoading || isSelectedSalesPersonLoading}
 				onSearch={handleSearch}
 				options={options}
 				placeholder="Chọn nhân viên bán hàng"
